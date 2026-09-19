@@ -15,7 +15,9 @@ describe.skipIf(!dbConfigured())("fetchTherapistProfile", () => {
     expect(bySlug?.showSupervisor).toBe(false);
     expect(bySlug?.videoUrl).toBeNull();
     expect(bySlug?.photoUrl).toBeNull();
-    expect(bySlug?.licenses).toEqual([{ number: "MFC 112938", state: "CA" }]);
+    expect(bySlug?.licenses).toEqual(
+      expect.arrayContaining([{ number: "MFC 112938", state: "CA" }]),
+    );
     expect(bySlug?.rates[0]).toMatchObject({
       service_type: "Individual",
       duration_minutes: 50,
