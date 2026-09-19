@@ -4,13 +4,13 @@ Hackathon. Hours, not weeks. If it is not in **Must ship**, do not build it.
 
 ## Product
 
-Patients find a therapist by must-have filters. Therapists publish a profile clients can actually read (photo, tags, rates, conversation cards, contact). Kitchen Sink does **not** book sessions or broker intros.
+Patients find a therapist by must-have filters. Therapists publish a profile clients can actually read (photo, intro video, tags, rates, conversation cards, contact). Kitchen Sink does **not** book sessions or broker intros.
 
 ## Must ship
 
-1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties, insurance, license state. AND semantics: therapist must match every selected tag. Empty filters = all therapists open to new clients.
-2. **Therapist profile** — photo, **intro video**, name, credential, licenses, years practicing, format, modalities, insurance, cash-pay rate, about, conversation cards, reviews (read-only seed data), contact (email / phone / text as listed).
-3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info → **photo + intro video** → practice tags → cards + contact + optional product feedback.
+1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties, insurance, license state. OR semantics: therapist must match **some** selected tag. Empty filters = all therapists open to new clients.
+2. **Therapist profile** — photo, **intro video**, name, credential, **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile), about, conversation cards, reviews (read-only seed data), contact (email / phone / text as listed). If credential is associate or trainee, collect and show **supervising clinician name** (required) and **supervisor license #**; show a pre-license note on profile. Profile hero plays the intro video.
+3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (incl. repeatable state-license rows) → **photo + intro video** → practice tags → cards + contact + optional product feedback.
 4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
@@ -23,7 +23,7 @@ Patients find a therapist by must-have filters. Therapists publish a profile cli
 - Video transcoding, multiple videos, or a video CMS. One intro clip per therapist, stored as uploaded, played with a native `<video>` player.
 - Maps, geocoding, distance search. If in-person is selected, **store** location. Search uses license state, not lat/lon.
 - Messaging, likes/hearts, admin moderation, realtime.
-- Supervisor license as a hard legal workflow. Store name + license # when credential is associate/pre-license; show a note. Do not block the rest of the form.
+- Supervisor license **verification** workflow (no legal review, no blocking publish beyond required fields above).
 
 Patient tables stay in the schema so we do not paint into a corner. No patient UI this weekend.
 
@@ -34,16 +34,16 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | Flow | What it is |
 | --- | --- |
 | Nav | Home, Find a Therapist, Join as a Therapist |
-| Therapist onboarding 1 | Name, credential, years practicing, optional supervisor, 1..n state licenses |
+| Therapist onboarding 1 | Name, credential dropdown, years practicing, **State license(s)** repeater (license # + state per row, remove row, “+ Add another state license”); if associate/trainee credential, supervising clinician name + supervisor license # |
 | Therapist onboarding 2 | Photo + intro video upload (prototype shows photo; profile hero has a 1 min intro play button — collect both here) |
-| Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties, modalities, identity (tags) |
-| Therapist onboarding 4 | Conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
-| Search | Must-have chips. Result card: photo/initials, name, credential, years, tags, rate |
-| Profile | Hero (photo + playable intro video) + rates + cards + about + reviews |
+| Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
+| Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
+| Search | Must-have chips. Result card: photo/initials, name, credential, years, tags, starting rate (lowest price) |
+| Profile | Hero (photo + playable intro video) + credential + all state licenses (# + state per row) + supervisor (if associate/trainee) + all rates (service + duration + price) + cards + about + reviews |
 
 Match visual tone: cream page, navy type, terracotta buttons, rounded cards. Do not invent a second design system.
 
-Rates appear on search cards and profile. They are **not** in the original data notes. Store them on the therapist row.
+Rates appear on search cards and profile. They are **not** in the original data notes. Store in `rates` (1:n per therapist). Search card shows lowest price as “starting rate”.
 
 ## Data
 
@@ -54,7 +54,7 @@ profiles
   id uuid PK = auth.uid()
   role text check (therapist | patient)
   name, email, phone, about_me
-  photo_key, video_key          -- Supabase Storage keys
+  photo_key, video_key          -- Supabase Storage keys; intro video required for ship
   created_at
 
 therapists                      -- 1:1 with therapist profiles
@@ -64,14 +64,20 @@ therapists                      -- 1:1 with therapist profiles
   open_to_new_clients bool
   virtual_practice bool
   in_person_practice bool
-  supervisor_name, supervisor_license  -- null unless associate
-  cash_pay_cents int            -- e.g. 16500
-  session_minutes int           -- e.g. 50
+  supervisor_name, supervisor_license  -- required when credential is associate/trainee; null otherwise
   sliding_scale_min_cents, sliding_scale_max_cents  -- nullable
   superbill bool default false
 
-licenses
+rates                         -- 1:n; min 1 row per therapist; add/remove in onboarding + profile edit
+  id, therapist_id
+  service_type text             -- Individual, Couples, Family, Group
+  duration_minutes int          -- e.g. 50
+  price_cents int               -- e.g. 16500
+  unique (therapist_id, service_type)
+
+licenses                      -- 1:n; min 1 row per therapist; add/remove in onboarding + profile edit
   id, therapist_id, number, state
+  unique (therapist_id, state)  -- one row per state; number + state both required
 
 locations                       -- 1:1, required if in_person_practice
   profile_id PK
@@ -79,7 +85,7 @@ locations                       -- 1:1, required if in_person_practice
   address, address2, state, zip
 
 tags
-  id, profile_id, kind, label
+  id, profile_id, kind, label   -- label = preset chip or therapist-typed custom (specialty/modality/insurance)
   kind: specialty | modality | identity | insurance | outreach
   unique (profile_id, kind, label)
 
@@ -99,12 +105,17 @@ reviews
   created_at
 ```
 
-Lookup labels (fixed for the demo, do not make them user-typed except custom cards):
+Suggested labels (preset chips; therapist may also add custom labels for specialty, modality, insurance):
 
-- Specialties: Anxiety, Depression, Trauma & PTSD, Couples & Relationships, ADHD, Grief & Loss, Life Transitions, Teens, Immigration
-- Modalities: CBT, DBT, EMDR, Psychodynamic, ACT, Somatic, Narrative, Attachment-Based
-- Insurance: Aetna, BCBS, Cigna, Optum, Cash Pay Only, Out-of-Network Superbill
-- Outreach: email, phone, text
+- Credentials (fixed dropdown only): Associate MFT (AMFT), Associate CSW (ACSW), Associate PC (APCC), Registered Associate / Trainee, LMFT, LCSW, LPC, PsyD, PhD, MD. Associate/trainee values require supervisor fields.
+- Rate service types (fixed): Individual, Couples, Family, Group
+- Rate durations (minutes, fixed): 30, 45, 50, 60, 90
+- Specialties (preset + custom): Anxiety, Depression, Trauma & PTSD, Couples & Relationships, ADHD, Grief & Loss, Life Transitions, Teens, Immigration
+- Modalities (preset + custom): CBT, DBT, EMDR, Psychodynamic, ACT, Somatic, Narrative, Attachment-Based
+- Insurance (preset + custom): Aetna, BCBS, Cigna, Optum, Cash Pay Only, Out-of-Network Superbill
+- Outreach (fixed): email, phone, text
+
+**Custom tags:** onboarding shows preset chips plus free-text “Add your own” for specialties, modalities, and insurance. Trim whitespace; store in `tags` like presets; show on profile and result cards. Patient search chips use the **preset lists only** (no free-text patient filters this weekend).
 
 Identity tags: include a small fixed set if shown in onboarding; not a search must-have this weekend.
 
@@ -114,15 +125,14 @@ RLS: public can `select` therapists who are `open_to_new_clients`. Owner can ins
 
 ## Matching
 
-Access pattern: therapists whose specialty set **contains** the patient’s selected specialties, plus other ANDed filters.
+Access pattern: therapists whose tags **overlap** the patient’s selected tags (match at least one), plus session format and license state when selected.
 
 One RPC or one query. Do not load all therapists and filter in JS.
 
 ```sql
--- specialty AND: therapist tags @> selected specialties
+-- tag OR: therapist tags && selected tags (overlap — match at least one)
 -- also: open_to_new_clients
 -- session format: virtual_practice and/or in_person_practice
--- insurance: therapist insurance labels overlap selected
 -- license state: exists licenses.state = selected
 ```
 
@@ -131,10 +141,11 @@ Indexes (required, this is the performance story):
 - `tags (profile_id, kind, label)` unique
 - `tags (kind, label, profile_id)` for reverse lookup
 - `licenses (therapist_id)`, `licenses (state)`
+- `rates (therapist_id)`
 - partial index on `therapists (profile_id) where open_to_new_clients`
 - optional denormalized `therapists.specialty_labels text[]` with GIN if the join is slower in explain. Prefer the array if we touch matching twice.
 
-Return search cards in **one round trip** (join photo URL, credential, years, a few tags, rate). Cap page size (24). No unbounded select.
+Return search cards in **one round trip** (join photo URL, credential, years, a few tags, min rate). Cap page size (24). No unbounded select.
 
 ## Stack
 
@@ -150,7 +161,7 @@ App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboa
 - Match query < 50ms on seeded data; write an `explain analyze` fixture test or SQL comment with the plan.
 - Indexes on every FK and every WHERE/JOIN column used by search.
 - RLS policies wrap `auth.uid()` in `(select auth.uid())`.
-- Images via Supabase public URL; next/image if it is free, skip if it fights Storage. Intro video loads only on the profile page, not on `/find`.
+- Images via Supabase public URL; next/image if it is free, skip if it fights Storage. Intro video loads only on the profile page, not on `/find`. Video via public Storage URL + native `<video>`; no transcoding this weekend.
 - No ORM waterfall. Server components fetch; no client waterfall of sequential supabase calls.
 
 ## CI / CD

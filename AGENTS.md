@@ -12,7 +12,7 @@ Subagent-driven. Independent tasks in parallel; schema/search query sequential. 
 
 ## Data
 
-One `tags` table. Match is AND on selected specialties, one SQL round trip. Skill: `kitchen-sink-matching`.
+One `tags` table. Match is OR on selected tags (some match), one SQL round trip. Skill: `kitchen-sink-matching`.
 
 ## Docs
 

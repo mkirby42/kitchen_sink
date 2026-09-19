@@ -1,6 +1,6 @@
 # Kitchen Sink
 
-Match therapists to patients. Patients tap must-have tags. We only show therapists who match **every** selected tag.
+Match therapists to patients. Patients tap must-have tags. We show therapists who match **some** selected tag.
 
 Hackathon build. Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). Prototype shots: [prototype_screenshots/](prototype_screenshots/).
 

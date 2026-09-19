@@ -1,6 +1,6 @@
 ---
 name: kitchen-sink-matching
-description: Use when writing or changing Kitchen Sink schema, migrations, RLS, search, therapist filters, tags, or the match query. Covers AND specialty matching, indexes, and in-person location rules.
+description: Use when writing or changing Kitchen Sink schema, migrations, RLS, search, therapist filters, tags, or the match query. Covers OR tag matching, indexes, and in-person location rules.
 ---
 
 # Matching and data
@@ -9,13 +9,13 @@ Spec: `docs/REQUIREMENTS.md` (Data + Matching). Do not invent tables.
 
 ## Shape
 
-- `profiles` + `therapists` (1:1) + `licenses` + `locations` + `tags` + `profile_items` + `reviews` + `feedback`
+- `profiles` + `therapists` (1:1) + `licenses` (1:n, multi-state) + `rates` (1:n, multi-service) + `locations` + `tags` + `profile_items` + `reviews` + `feedback`
 - Tags: one table, `kind` in `specialty | modality | identity | insurance | outreach`
 - Years practicing = `now - start_date_of_practice`, not a stored int
 
 ## Match query
 
-AND across selected filters. Therapist must have **every** selected specialty.
+OR on selected tags. Therapist must match **at least one** selected tag (specialty or insurance). Session format and license state still apply when selected.
 
 One round trip. Filter in SQL, not JS. Page size 24.
 
@@ -23,8 +23,7 @@ Typical predicates:
 
 - `open_to_new_clients = true`
 - virtual / in-person flags
-- specialty labels contained in therapist specialty tags
-- insurance overlap if selected
+- selected tag labels overlap therapist tags (specialty or insurance)
 - `licenses.state` if a state is selected
 
 ## Indexes (required)
