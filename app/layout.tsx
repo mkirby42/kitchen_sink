@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
+import { loadNavUser } from "@/lib/interest/nav";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -23,15 +24,17 @@ export const metadata: Metadata = {
   description: "Match therapists to patients by must-have tags.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const navUser = await loadNavUser();
+
   return (
     <html lang="en" className={`${fraunces.variable} ${sourceSans.variable}`}>
       <body className="min-h-screen antialiased">
-        <SiteHeader />
+        <SiteHeader initialNavUser={navUser} />
         {children}
       </body>
     </html>

@@ -9,7 +9,7 @@ Spec: `docs/REQUIREMENTS.md` (Data + Matching). Do not invent tables.
 
 ## Shape
 
-- `profiles` + `therapists` (1:1) + `licenses` (1:n, multi-state) + `rates` (1:n, multi-service) + `locations` + `tags` + `profile_items` + `reviews` + `feedback`
+- `profiles` + `therapists` (1:1) + `licenses` (1:n, multi-state) + `rates` (1:n, multi-service) + `locations` + `tags` + `profile_items` + `reviews` + `feedback` + `interest` (patient → therapist, unique pair)
 - Tags: one table, `kind` in `specialty | modality | identity | insurance | outreach`
 - Years practicing = `now - start_date_of_practice`, not a stored int
 

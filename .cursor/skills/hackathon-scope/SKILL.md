@@ -14,11 +14,11 @@ Read `docs/REQUIREMENTS.md` **Must ship** and **Cut**. Build only Must ship.
 ## Do not
 
 - Booking, calendars, payments, in-app messaging
-- Patient signup, patient profiles, patient location UI
+- Patient onboarding wizard, patient public profiles, patient location UI (bare patient row for interest is allowed)
 - Review create/edit (seed + display only)
-- Maps, distance search, likes
+- Maps, distance search, likes/hearts chrome (interest table is allowed)
 - Video transcoding or more than one intro clip per therapist
-- New tag kinds, new pages, new design system
+- New tag kinds, new design system. `/matches` is the only new page.
 - Extra libraries when the stack already covers it
 
 ## If tempted

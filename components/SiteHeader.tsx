@@ -1,8 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import type { NavUser } from "@/lib/interest/nav";
 import { routes } from "@/lib/routes";
+import { createClient } from "@/lib/supabase/client";
+import { supabasePublicConfig } from "@/lib/supabase/env";
 
 function navClass(active: boolean) {
   return active
@@ -10,13 +14,68 @@ function navClass(active: boolean) {
     : "text-ink/80 hover:text-ink";
 }
 
-export function SiteHeader() {
+export function SiteHeader({
+  initialNavUser = null,
+}: {
+  initialNavUser?: NavUser | null;
+}) {
   const path = usePathname();
+  const router = useRouter();
+  const [navUser, setNavUser] = useState<NavUser | null>(initialNavUser);
+
+  useEffect(() => {
+    if (!supabasePublicConfig()) return;
+
+    const supabase = createClient();
+
+    async function loadNavUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setNavUser(null);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      const role =
+        profile?.role === "therapist" || profile?.role === "patient"
+          ? profile.role
+          : null;
+
+      setNavUser({ id: user.id, role });
+    }
+
+    void loadNavUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      void loadNavUser();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push(routes.home);
+    router.refresh();
+  }
 
   // Profile and join use their own phone-width chrome (back + wordmark / stepper).
   if (path.startsWith("/t/") || path === routes.join) {
     return null;
   }
+
+  const therapist = navUser?.role === "therapist" ? navUser : null;
 
   return (
     <header className="border-b border-line bg-paper">
@@ -30,7 +89,7 @@ export function SiteHeader() {
             ✦
           </span>
         </Link>
-        <nav className="flex items-center gap-6 text-sm">
+        <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm">
           <Link
             href={routes.home}
             className={navClass(path === routes.home)}
@@ -45,12 +104,40 @@ export function SiteHeader() {
           >
             Find a Therapist
           </Link>
-          <Link
-            href={routes.join}
-            className="rounded-full bg-clay px-4 py-2 font-medium text-paper hover:bg-clay-dark"
-          >
-            Join as a Therapist
-          </Link>
+          {therapist ? (
+            <Link
+              href={routes.matches}
+              className={navClass(path === routes.matches)}
+              aria-current={path === routes.matches ? "page" : undefined}
+            >
+              Interest
+            </Link>
+          ) : null}
+          {!navUser ? (
+            <Link
+              href={routes.join}
+              className="rounded-full bg-clay px-4 py-2 font-medium text-paper hover:bg-clay-dark"
+            >
+              Join as a Therapist
+            </Link>
+          ) : null}
+          {therapist ? (
+            <Link
+              href={routes.therapist(therapist.id)}
+              className="rounded-full bg-clay px-4 py-2 font-medium text-paper hover:bg-clay-dark"
+            >
+              My profile
+            </Link>
+          ) : null}
+          {navUser ? (
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className={navClass(false)}
+            >
+              Sign out
+            </button>
+          ) : null}
         </nav>
       </div>
     </header>

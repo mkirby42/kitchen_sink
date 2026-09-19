@@ -10,11 +10,19 @@ import {
   slidingScaleLabel,
   type TherapistProfileData,
 } from "@/lib/therapists/load";
+import type { InterestViewer } from "@/lib/interest/viewer";
 import { routes } from "@/lib/routes";
 import { HeroMedia } from "./HeroMedia";
+import { InterestControl } from "./InterestControl";
 import { ProfileTabs } from "./ProfileTabs";
 
-export function TherapistProfile({ data }: { data: TherapistProfileData }) {
+export function TherapistProfile({
+  data,
+  viewer,
+}: {
+  data: TherapistProfileData;
+  viewer: InterestViewer;
+}) {
   const format = formatLabel(data.virtual, data.inPerson);
   const licenses = licenseLine(data.licenses);
   const cashRate = data.rates[0];
@@ -141,6 +149,12 @@ export function TherapistProfile({ data }: { data: TherapistProfileData }) {
           </p>
         </article>
       </div>
+
+      <InterestControl
+        therapistId={data.id}
+        givenName={data.givenName}
+        viewer={viewer}
+      />
 
       {ctas.length > 0 ? (
         <div

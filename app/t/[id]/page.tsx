@@ -3,7 +3,27 @@ import {
   ProfileNotFound,
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
+import { loadInterestViewer, type InterestViewer } from "@/lib/interest/viewer";
+import { supabasePublicConfig } from "@/lib/supabase/env";
 import { loadTherapistProfile } from "@/lib/therapists/load";
+
+const emptyViewer: InterestViewer = {
+  userId: null,
+  role: null,
+  interested: false,
+  isOwner: false,
+};
+
+async function loadViewer(therapistId: string): Promise<InterestViewer> {
+  if (!supabasePublicConfig()) return emptyViewer;
+  try {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    return await loadInterestViewer(supabase, therapistId);
+  } catch {
+    return emptyViewer;
+  }
+}
 
 type ProfilePageProps = {
   params: Promise<{ id: string }>;
@@ -26,5 +46,7 @@ export default async function TherapistProfilePage({
 
   if (!data) return <ProfileNotFound />;
 
-  return <TherapistProfile data={data} />;
+  const viewer = await loadViewer(data.id);
+
+  return <TherapistProfile data={data} viewer={viewer} />;
 }
