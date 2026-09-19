@@ -107,10 +107,6 @@ export function step2Errors(draft: JoinDraft): string[] {
     errors.push("Photo is required");
   }
 
-  if (!draft.videoKey?.trim()) {
-    errors.push("Intro video is required");
-  }
-
   return errors;
 }
 
@@ -245,9 +241,6 @@ export function continueHint(step: 1 | 2 | 3 | 4, draft: JoinDraft): string {
       if (!draft.photoKey?.trim()) {
         return "Add a photo to continue";
       }
-      if (!draft.videoKey?.trim()) {
-        return "Add an intro video to continue";
-      }
       return "";
     }
     case 3: {
@@ -284,7 +277,7 @@ export function buildJoinPayload(draft: JoinDraft) {
     phone: draft.phone.trim(),
     about: draft.about.trim(),
     photo_key: draft.photoKey!.trim(),
-    video_key: draft.videoKey!.trim(),
+    video_key: draft.videoKey?.trim() || null,
     credential: draft.credential,
     start_date: startDateFromYears(Number(draft.yearsPracticing)),
     open_to_new_clients: draft.openToNewClients,

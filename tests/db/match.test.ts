@@ -36,7 +36,7 @@ describe.skipIf(!dbConfigured())("search_therapists match model", () => {
     const maya = rows.find((row) => row.profile_id === MAYA_ID);
     expect(maya?.min_price_cents).toBe(16500);
     expect(maya?.photo_key).toBe(`${MAYA_ID}/photo.jpg`);
-    expect(rows[0]).not.toHaveProperty("video_key");
+    expect(maya).not.toHaveProperty("video_key");
   });
 
   it("caps page size at 24", async () => {

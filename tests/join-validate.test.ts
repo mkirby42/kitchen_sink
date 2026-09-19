@@ -122,16 +122,20 @@ describe("join validation", () => {
     );
   });
 
-  it("fails step 2 without photo or video", () => {
+  it("fails step 2 without photo", () => {
     const withoutPhoto = validStep1({ videoKey: "uid/intro.mp4" });
-    const withoutVideo = validStep1({ photoKey: "uid/photo.jpg" });
 
     expect(canContinue(2, withoutPhoto)).toBe(false);
     expect(continueHint(2, withoutPhoto)).toBe("Add a photo to continue");
-    expect(canContinue(2, withoutVideo)).toBe(false);
-    expect(continueHint(2, withoutVideo)).toBe("Add an intro video to continue");
     expect(step2Errors(withoutPhoto).length).toBeGreaterThan(0);
-    expect(step2Errors(withoutVideo).length).toBeGreaterThan(0);
+  });
+
+  it("allows step 2 with photo and no intro video", () => {
+    const withoutVideo = validStep1({ photoKey: "uid/photo.jpg" });
+
+    expect(canContinue(2, withoutVideo)).toBe(true);
+    expect(continueHint(2, withoutVideo)).toBe("");
+    expect(step2Errors(withoutVideo)).toEqual([]);
   });
 
   it("fails in-person without location on step 3", () => {
@@ -268,5 +272,10 @@ describe("buildJoinPayload", () => {
 
   it("throws when draft is incomplete", () => {
     expect(() => buildJoinPayload(emptyDraft())).toThrow();
+  });
+
+  it("allows a null intro video key", () => {
+    const payload = buildJoinPayload(validStep4({ videoKey: null }));
+    expect(payload.video_key).toBeNull();
   });
 });
