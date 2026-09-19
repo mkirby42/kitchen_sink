@@ -8,7 +8,7 @@ Patients find a therapist by must-have filters. Therapists publish a profile cli
 
 ## Must ship
 
-1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties, insurance, license state. OR semantics: therapist must match **some** selected tag. Empty filters = all therapists open to new clients.
+1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties (preset chips **plus** free-text “Add your own”), insurance, license state. OR semantics: therapist must match **some** selected tag. Empty filters = all therapists open to new clients.
 2. **Therapist profile** — photo, **intro video**, name, credential, **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile), about, conversation cards, reviews (read-only seed data), contact (email / phone / text as listed). If credential is associate or trainee, collect and show **supervising clinician name** (required) and **supervisor license #**; show a pre-license note on profile. Profile hero plays the intro video.
 3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (incl. repeatable state-license rows) → **photo + intro video** → practice tags → cards + contact + optional product feedback.
 4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
@@ -38,7 +38,7 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | Therapist onboarding 2 | Photo + intro video upload (prototype shows photo; profile hero has a 1 min intro play button — collect both here) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
 | Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
-| Search | Must-have chips. Result card: photo/initials, name, credential, years, tags, starting rate (lowest price) |
+| Search | Must-have chips (specialties: presets + free-text custom). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price) |
 | Profile | Hero (photo + playable intro video) + credential + all state licenses (# + state per row) + supervisor (if associate/trainee) + all rates (service + duration + price) + cards + about + reviews |
 
 Match visual tone: cream page, navy type, terracotta buttons, rounded cards. Do not invent a second design system.
@@ -115,7 +115,7 @@ Suggested labels (preset chips; therapist may also add custom labels for special
 - Insurance (preset + custom): Aetna, BCBS, Cigna, Optum, Cash Pay Only, Out-of-Network Superbill
 - Outreach (fixed): email, phone, text
 
-**Custom tags:** onboarding shows preset chips plus free-text “Add your own” for specialties, modalities, and insurance. Trim whitespace; store in `tags` like presets; show on profile and result cards. Patient search chips use the **preset lists only** (no free-text patient filters this weekend).
+**Custom tags:** onboarding shows preset chips plus free-text “Add your own” for specialties, modalities, and insurance. Trim whitespace; store in `tags` like presets; show on profile and result cards. Patient search specialties also allow free-text “Add your own”; the typed label becomes a selected filter chip and matches therapists with that specialty tag (same OR overlap). Insurance search stays preset-only.
 
 Identity tags: include a small fixed set if shown in onboarding; not a search must-have this weekend.
 

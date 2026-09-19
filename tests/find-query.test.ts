@@ -3,6 +3,10 @@ import {
   buildFindHref,
   filtersFromSearchParams,
 } from "@/components/search/query";
+import {
+  normalizeSpecialtyFilterLabel,
+  specialtyFilterChips,
+} from "@/lib/tags/presets";
 
 describe("find search URL", () => {
   it("encodes tags as a comma-separated query param", () => {
@@ -46,5 +50,47 @@ describe("find search URL", () => {
       inPerson: false,
       state: "CA",
     });
+  });
+
+  it("round-trips a custom specialty tag", () => {
+    const href = buildFindHref({
+      tags: ["Eating Disorders"],
+      virtual: false,
+      inPerson: false,
+      state: null,
+    });
+    const params = new URLSearchParams(href.split("?")[1]);
+    expect(filtersFromSearchParams(params).tags).toEqual(["Eating Disorders"]);
+  });
+});
+
+describe("custom specialty search chips", () => {
+  it("trims and maps a typed preset to the canonical chip", () => {
+    expect(normalizeSpecialtyFilterLabel("  adhd  ")).toBe("ADHD");
+  });
+
+  it("keeps a new specialty label after trim", () => {
+    expect(normalizeSpecialtyFilterLabel("  Eating  Disorders  ")).toBe(
+      "Eating Disorders",
+    );
+  });
+
+  it("rejects blank input", () => {
+    expect(normalizeSpecialtyFilterLabel("   ")).toBeNull();
+  });
+
+  it("lists custom selected specialties after presets", () => {
+    expect(specialtyFilterChips(["Aetna", "Eating Disorders", "ADHD"])).toEqual([
+      "Anxiety",
+      "Depression",
+      "Trauma & PTSD",
+      "Couples & Relationships",
+      "ADHD",
+      "Grief & Loss",
+      "Life Transitions",
+      "Teens",
+      "Immigration",
+      "Eating Disorders",
+    ]);
   });
 });

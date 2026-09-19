@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   INSURANCE_PRESETS,
   LICENSE_STATES,
-  SPECIALTY_PRESETS,
+  SEARCH_SPECIALTY_MAX_LENGTH,
+  normalizeSpecialtyFilterLabel,
+  specialtyFilterChips,
 } from "@/lib/tags/presets";
 import type { SearchFilters } from "@/lib/search/rpc";
 import { buildFindHref, filtersFromSearchParams } from "./query";
@@ -78,9 +80,20 @@ export function FindFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filters = filtersFromSearchParams(searchParams);
+  const [customSpecialty, setCustomSpecialty] = useState("");
 
   function apply(next: SearchFilters) {
     router.push(buildFindHref(next), { scroll: false });
+  }
+
+  function addCustomSpecialty() {
+    const label = normalizeSpecialtyFilterLabel(customSpecialty, [
+      ...specialtyFilterChips(filters.tags),
+      ...INSURANCE_PRESETS,
+    ]);
+    setCustomSpecialty("");
+    if (!label || filters.tags.includes(label)) return;
+    apply({ ...filters, tags: [...filters.tags, label] });
   }
 
   const mustHaveCount = filters.tags.length + (filters.state ? 1 : 0);
@@ -108,7 +121,7 @@ export function FindFilters() {
       </fieldset>
 
       <FilterGroup title="Specialties">
-        {SPECIALTY_PRESETS.map((label) => (
+        {specialtyFilterChips(filters.tags).map((label) => (
           <Chip
             key={label}
             selected={filters.tags.includes(label)}
@@ -119,6 +132,32 @@ export function FindFilters() {
             {label}
           </Chip>
         ))}
+        <form
+          className="flex w-full basis-full items-center gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            addCustomSpecialty();
+          }}
+        >
+          <label className="sr-only" htmlFor="custom-specialty">
+            Add a specialty
+          </label>
+          <input
+            id="custom-specialty"
+            value={customSpecialty}
+            onChange={(event) => setCustomSpecialty(event.target.value)}
+            placeholder="Add your own"
+            maxLength={SEARCH_SPECIALTY_MAX_LENGTH}
+            autoComplete="off"
+            className="min-w-0 flex-1 rounded-full border border-line bg-paper px-4 py-2 text-sm text-ink placeholder:text-mute"
+          />
+          <button
+            type="submit"
+            className="rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium text-ink hover:border-ink/20"
+          >
+            Add
+          </button>
+        </form>
       </FilterGroup>
 
       <FilterGroup title="Insurance">
