@@ -1,0 +1,36 @@
+# OS
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+dist/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and coverage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+playwright-report/
+test-results/
+
+# Supabase local
+supabase/.temp/
+supabase/.branches/
+
+# Vercel
+.vercel
+
+# Editors
+.idea/
+*.swp
+*.swo
