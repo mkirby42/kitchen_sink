@@ -4,6 +4,10 @@ import { supabasePublicConfig } from "@/lib/supabase/env";
 export const MAYA_ID = "11111111-1111-4111-8111-111111111111";
 export const MAYA_EMAIL = "maya@kitchensink.demo";
 export const MAYA_PASSWORD = "seed-only";
+export const JR_ID = "22222222-2222-4222-8222-222222222222";
+export const JR_EMAIL = "jr@kitchensink.demo";
+export const JR_PASSWORD = "seed-only";
+export const JORDAN_ID = "55555555-5555-4555-8555-555555555001";
 
 export function dbConfigured() {
   return supabasePublicConfig() !== null;
@@ -21,14 +25,22 @@ export function createAnonClient() {
   return anonClient();
 }
 
-export async function createMayaClient() {
+async function signIn(email: string, password: string) {
   const supabase = anonClient();
   const { error } = await supabase.auth.signInWithPassword({
-    email: MAYA_EMAIL,
-    password: MAYA_PASSWORD,
+    email,
+    password,
   });
   if (error) throw error;
   return supabase;
+}
+
+export async function createMayaClient() {
+  return signIn(MAYA_EMAIL, MAYA_PASSWORD);
+}
+
+export async function createJrClient() {
+  return signIn(JR_EMAIL, JR_PASSWORD);
 }
 
 export type SearchRow = {

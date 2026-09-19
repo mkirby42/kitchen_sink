@@ -4,7 +4,7 @@ Hackathon. Hours, not weeks. If it is not in **Must ship**, do not build it.
 
 ## Product
 
-Patients find a therapist by must-have filters. Therapists publish a profile clients can actually read (photo, intro video, tags, rates, conversation cards, contact). Kitchen Sink does **not** book sessions or broker intros.
+Patients find a therapist by must-have filters. Therapists publish a profile clients can actually read (photo, intro video, tags, rates, conversation cards, contact). A patient can tap **I'm interested**; the therapist sees an anonymous list. Kitchen Sink does **not** book sessions or broker intros.
 
 ## Must ship
 
@@ -14,18 +14,19 @@ Patients find a therapist by must-have filters. Therapists publish a profile cli
 4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
+7. **Interest** — patient (email/password, no wizard) taps **I'm interested** on `/t/[id]`. Therapist opens `/matches` and sees aliases only (`Patient ·` + last 4 hex of patient UUID). No messaging. Toggle off deletes the row. See `docs/interest.md`.
 
 ## Cut (do not build)
 
 - Booking, calendars, “Free Consult” / “Book a Session” as real scheduling. Buttons may `mailto:` / `tel:` the listed contact.
-- Patient accounts, patient profiles, patient onboarding.
+- Patient onboarding wizard, patient public profiles, or patient location UI. Interest uses a bare `profiles` row (`role = patient`).
 - Review **write** UI. Seed reviews and display them.
 - Video transcoding, multiple videos, or a video CMS. One intro clip per therapist, stored as uploaded, played with a native `<video>` player.
 - Maps, geocoding, distance search. If in-person is selected, **store** location. Search uses license state, not lat/lon.
-- Messaging, likes/hearts, admin moderation, realtime.
+- Messaging, likes/hearts chrome, admin moderation, realtime. Interest is a persisted row + list, not a heart.
 - Supervisor license **verification** workflow (no legal review, no blocking publish beyond required fields above).
 
-Patient tables stay in the schema so we do not paint into a corner. No patient UI this weekend.
+Patient tables stay in the schema. Patient UI this weekend is **only** sign-in on the profile interest control. No other patient pages.
 
 ## Screens (source of truth)
 
@@ -39,7 +40,8 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
 | Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
 | Search | Must-have chips (specialties: presets + free-text custom). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price / duration) |
-| Profile | Hero (photo + playable intro video) + credential + all state licenses (# + state per row) + supervisor (if associate/trainee) + all rates (service + duration + price) + cards + about + reviews |
+| Profile | Hero (photo + playable intro video) + credential + all state licenses (# + state per row) + supervisor (if associate/trainee) + all rates (service + duration + price) + **I'm interested** + cards + about + reviews |
+| Interest inbox | Therapist-only `/matches`: anonymous aliases + timestamp. Empty state if none. |
 
 Match visual tone: cream page, navy type, terracotta buttons, rounded cards. Do not invent a second design system.
 
@@ -72,7 +74,7 @@ rates                         -- 1:n; min 1 row per therapist; add/remove in onb
   id, therapist_id
   service_type text             -- Individual, Couples, Family, Group
   duration_minutes int          -- e.g. 50
-  price_cents int               -- e.g. 16500
+  price_cents int               -- e.g. 16500; publish requires >= 100 ($1)
   unique (therapist_id, service_type)
 
 licenses                      -- 1:n; min 1 row per therapist; add/remove in onboarding + profile edit
@@ -103,7 +105,13 @@ reviews
   stars_cat_1, stars_cat_2, stars_cat_3  -- store, no UI
   body, session_format, duration_label
   created_at
+
+interest                      -- patient selected this therapist
+  id, patient_id, therapist_id, created_at
+  unique (patient_id, therapist_id)
 ```
+
+Therapist inbox reads `list_my_interest()` (alias + created_at only). Do not join `profiles` for that list. Alias = `Patient ·` + last 4 hex of `patient_id` (dashes stripped, uppercased).
 
 Suggested labels (preset chips; therapist may also add custom labels for specialty, modality, insurance):
 
@@ -155,7 +163,7 @@ Return search cards in **one round trip** (join photo URL, credential, years, a 
 - Supabase hosted Postgres + Auth + Storage
 - Vercel
 
-App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated).
+App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated), `/matches` therapist interest inbox (auth + therapist role).
 
 ## Performance (grading)
 

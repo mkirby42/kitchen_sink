@@ -4,7 +4,7 @@ Read [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) before writing code. It wins o
 
 ## Scope
 
-If it is not in **Must ship**, do not add it. No booking, no patient UI, no extra tag kinds, no new pages. Photo **and** intro video upload are in scope. Skills: `hackathon-scope`.
+If it is not in **Must ship**, do not add it. No booking, no extra tag kinds. Patient UI is **only** profile interest (sign-in + I'm interested). `/matches` is the therapist inbox. Photo **and** intro video upload are in scope. Skills: `hackathon-scope`.
 
 ## Build
 
