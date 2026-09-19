@@ -12,6 +12,12 @@ import {
 import type { SearchFilters } from "@/lib/search/rpc";
 import { buildFindHref, filtersFromSearchParams } from "./query";
 
+function chipClass(selected: boolean) {
+  return selected
+    ? "rounded-full border border-clay bg-clay px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-paper hover:bg-clay-dark"
+    : "rounded-full border border-line bg-paper px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-ink hover:border-ink/25";
+}
+
 function Chip({
   selected,
   onClick,
@@ -26,11 +32,7 @@ function Chip({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={
-        selected
-          ? "rounded-full bg-clay px-4 py-2 text-sm font-medium text-paper hover:bg-clay-dark"
-          : "rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium text-ink hover:border-ink/20"
-      }
+      className={chipClass(selected)}
     >
       {children}
     </button>
@@ -54,7 +56,7 @@ function FilterGroup({
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen((value) => !value)}
-        className="flex w-full items-center justify-between rounded-full border border-line bg-paper px-5 py-3 text-left text-sm font-medium text-ink"
+        className="flex w-full items-center justify-between rounded-full border border-line bg-paper px-5 py-2.5 text-left text-sm font-medium text-ink"
       >
         {title}
         <span aria-hidden className="text-lg leading-none text-mute">
@@ -62,7 +64,7 @@ function FilterGroup({
         </span>
       </button>
       {open ? (
-        <div id={id} className="mt-3 flex flex-wrap gap-2">
+        <div id={id} className="mt-3 flex flex-wrap items-center gap-2">
           {children}
         </div>
       ) : null}
@@ -133,7 +135,7 @@ export function FindFilters() {
           </Chip>
         ))}
         <form
-          className="flex w-full basis-full items-center gap-2"
+          className="inline-flex max-w-full items-center gap-2"
           onSubmit={(event) => {
             event.preventDefault();
             addCustomSpecialty();
@@ -144,17 +146,15 @@ export function FindFilters() {
           </label>
           <input
             id="custom-specialty"
+            key={filters.tags.join("|")}
             value={customSpecialty}
             onChange={(event) => setCustomSpecialty(event.target.value)}
             placeholder="Add your own"
             maxLength={SEARCH_SPECIALTY_MAX_LENGTH}
             autoComplete="off"
-            className="min-w-0 flex-1 rounded-full border border-line bg-paper px-4 py-2 text-sm text-ink placeholder:text-mute"
+            className="w-[9.5rem] min-w-0 rounded-full border border-line bg-paper px-3.5 py-1.5 text-sm text-ink placeholder:text-mute"
           />
-          <button
-            type="submit"
-            className="rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium text-ink hover:border-ink/20"
-          >
+          <button type="submit" className={chipClass(false)}>
             Add
           </button>
         </form>
@@ -175,28 +175,24 @@ export function FindFilters() {
       </FilterGroup>
 
       <FilterGroup title="State licensed in">
-        <label className="sr-only" htmlFor="license-state">
-          License state
-        </label>
-        <select
-          id="license-state"
-          value={filters.state ?? ""}
-          onChange={(event) =>
-            apply({ ...filters, state: event.target.value || null })
-          }
-          className={
-            filters.state
-              ? "rounded-full bg-clay px-4 py-2 text-sm font-medium text-paper"
-              : "rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium text-ink"
-          }
-        >
-          <option value="">Any state</option>
-          {LICENSE_STATES.map((state) => (
-            <option key={state} value={state}>
+        {filters.state ? (
+          <Chip
+            selected
+            onClick={() => apply({ ...filters, state: null })}
+          >
+            {filters.state}
+          </Chip>
+        ) : (
+          LICENSE_STATES.map((state) => (
+            <Chip
+              key={state}
+              selected={false}
+              onClick={() => apply({ ...filters, state })}
+            >
               {state}
-            </option>
-          ))}
-        </select>
+            </Chip>
+          ))
+        )}
       </FilterGroup>
 
       <div className="flex items-center justify-between gap-4 text-sm">

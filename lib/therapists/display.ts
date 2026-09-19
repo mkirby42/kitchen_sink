@@ -22,6 +22,18 @@ export function formatUsdFromCents(cents: number | null | undefined) {
   }).format(cents / 100);
 }
 
+export function formatStartingRate(
+  cents: number | null | undefined,
+  durationMinutes: number | null | undefined,
+) {
+  const price = formatUsdFromCents(cents);
+  if (!price) return null;
+  return {
+    price,
+    duration: durationMinutes != null ? `${durationMinutes} min` : null,
+  };
+}
+
 export function storagePublicUrl(
   bucket: "photos" | "videos",
   key: string | null | undefined,
