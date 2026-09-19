@@ -1,12 +1,22 @@
 import { describe, expect, it } from "vitest";
 import {
   buildFindHref,
+  buildTherapistHref,
   filtersFromSearchParams,
+  resultCountLabel,
 } from "@/components/search/query";
 import {
   normalizeSpecialtyFilterLabel,
   specialtyFilterChips,
 } from "@/lib/tags/presets";
+
+describe("find result copy", () => {
+  it("keeps the plural s in one string so it cannot wrap", () => {
+    expect(resultCountLabel(0)).toBe("0 therapists");
+    expect(resultCountLabel(1)).toBe("1 therapist");
+    expect(resultCountLabel(13)).toBe("13 therapists");
+  });
+});
 
 describe("find search URL", () => {
   it("encodes tags as a comma-separated query param", () => {
@@ -61,6 +71,33 @@ describe("find search URL", () => {
     });
     const params = new URLSearchParams(href.split("?")[1]);
     expect(filtersFromSearchParams(params).tags).toEqual(["Eating Disorders"]);
+  });
+
+  it("carries find filters onto a therapist profile so back can restore them", () => {
+    const filters = {
+      tags: ["Anxiety", "Aetna"],
+      virtual: true,
+      inPerson: false,
+      state: "CA",
+    };
+    const href = buildTherapistHref("maya", filters);
+    expect(href).toBe("/t/maya?tags=Anxiety%2CAetna&virtual=1&state=CA");
+
+    const params = new URLSearchParams(href.split("?")[1]);
+    expect(buildFindHref(filtersFromSearchParams(params))).toBe(
+      "/find?tags=Anxiety%2CAetna&virtual=1&state=CA",
+    );
+  });
+
+  it("keeps a bare therapist path when no filters are selected", () => {
+    expect(
+      buildTherapistHref("maya", {
+        tags: [],
+        virtual: false,
+        inPerson: false,
+        state: null,
+      }),
+    ).toBe("/t/maya");
   });
 });
 

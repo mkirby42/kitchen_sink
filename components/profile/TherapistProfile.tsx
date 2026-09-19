@@ -15,7 +15,13 @@ import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
 import { ProfileTabs } from "./ProfileTabs";
 
-export function TherapistProfile({ data }: { data: TherapistProfileData }) {
+export function TherapistProfile({
+  data,
+  backHref,
+}: {
+  data: TherapistProfileData;
+  backHref: string;
+}) {
   const format = formatLabel(data.virtual, data.inPerson);
   const licenses = licenseLine(data.licenses);
   const cashRate = data.rates[0];
@@ -45,7 +51,7 @@ export function TherapistProfile({ data }: { data: TherapistProfileData }) {
 
       <header className="relative z-10 grid grid-cols-[2.75rem_1fr_2.75rem] items-center py-4">
         <Link
-          href={routes.find}
+          href={backHref}
           className="flex h-11 w-11 items-center justify-center rounded-full bg-paper text-ink shadow-sm"
           aria-label="Back to search"
         >
@@ -345,7 +351,7 @@ function cardCorner(tag: string): { icon: ReactNode; tone: string } {
   return { icon: "✦", tone: "bg-ink/10 text-ink" };
 }
 
-export function ProfileNotFound() {
+export function ProfileNotFound({ backHref }: { backHref: string }) {
   return (
     <main className="mx-auto max-w-lg px-6 py-16">
       <p className="text-sm text-mute">Therapist profile</p>
@@ -357,7 +363,7 @@ export function ProfileNotFound() {
         out of date.
       </p>
       <Link
-        href={routes.find}
+        href={backHref}
         className="mt-8 inline-flex rounded-full bg-clay px-5 py-3 font-medium text-paper hover:bg-clay-dark"
       >
         Back to search

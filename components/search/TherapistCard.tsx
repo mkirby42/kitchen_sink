@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { routes } from "@/lib/routes";
+import { buildTherapistHref } from "@/components/search/query";
 import {
   isMatchedLabel,
   overlapCopy,
   searchCardLabels,
 } from "@/lib/search/overlap";
-import type { SearchRow } from "@/lib/search/rpc";
+import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import {
   formatStartingRate,
   initials,
@@ -52,10 +52,10 @@ function Avatar({ name, photo }: { name: string; photo: string | null }) {
 
 export function TherapistCard({
   row,
-  selectedCount,
+  filters,
 }: {
   row: SearchRow;
-  selectedCount: number;
+  filters: SearchFilters;
 }) {
   const photo = storagePublicUrl("photos", row.photo_key);
   const years = yearsPracticing(row.start_date_of_practice);
@@ -71,12 +71,12 @@ export function TherapistCard({
     .join(" · ");
   const sample = row.profile_id === MAYA_ID;
   const tags = searchCardLabels(row);
-  const hits = overlapCopy(row.match_count, selectedCount);
+  const hits = overlapCopy(row.match_count, filters.tags.length);
   const matched = row.matched_labels ?? [];
 
   return (
     <Link
-      href={routes.therapist(row.profile_id)}
+      href={buildTherapistHref(row.profile_id, filters)}
       className="block rounded-3xl border border-line bg-paper p-6 shadow-sm transition hover:border-ink/15"
     >
       <div className="flex items-start gap-4">
