@@ -1,42 +1,145 @@
 # Kitchen Sink
 
-Match therapists to patients. Patients tap must-have tags. We show therapists who match **some** selected tag.
+Patients tap must-have tags. We show therapists who match **some** selected tag. Therapists publish a readable profile (photo, intro video, licenses, rates, cards). Patients can tap **I'm interested**; the therapist sees an anonymous alias list. No booking.
 
-Hackathon build. Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). Prototype shots: [prototype_screenshots/](prototype_screenshots/).
+Repo: [github.com/mkirby42/kitchen_sink](https://github.com/mkirby42/kitchen_sink)
+Live: [kitchen-sink-tau.vercel.app](https://kitchen-sink-tau.vercel.app)
 
-Production: [kitchen-sink-tau.vercel.app](https://kitchen-sink-tau.vercel.app)
+Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). Prototype shots: [prototype_screenshots/](prototype_screenshots/).
 
-## Stack
+## Quick start
 
-Next.js (App Router) · TypeScript · Tailwind · Supabase (Auth, Postgres, Storage) · Vercel
-
-## Run
+Node 22. Uses the hosted Supabase project already seeded for the demo.
 
 ```bash
+git clone https://github.com/mkirby42/kitchen_sink.git
+cd kitchen_sink
 cp .env.example .env.local
-# fill NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY
+# paste NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY (see Reproduce the demo)
 npm install
 npm run dev
 ```
 
-`/` home · `/find` search · `/t/maya` (or `/t/[id]`) profile · `/join` therapist onboarding.
+Open [http://localhost:3000](http://localhost:3000).
+
+| Route | What |
+| --- | --- |
+| `/` | Home |
+| `/find` | Public search |
+| `/t/maya` | Seeded Maya Chen profile |
+| `/join` | Therapist onboarding (auth) |
+| `/matches` | Therapist interest inbox (auth) |
 
 ```bash
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
-Migrations live in `supabase/migrations/`. The hosted project already has them. Apply the same files if you stand up a new database. After a reset, upload demo photos/videos with `npm run seed:media` (seed users sign in as themselves; password is `seed-only`).
+## Tech stack
+
+Next.js 16 App Router · TypeScript · Tailwind · `@supabase/ssr` + `@supabase/supabase-js` · hosted Supabase (Auth, Postgres, Storage) · Vercel · GitHub Actions
+
+```mermaid
+flowchart LR
+  Browser --> Next["Next.js on Vercel"]
+  Next --> Auth[Supabase Auth]
+  Next --> RPC["Postgres RPCs + RLS"]
+  Next --> Store[Storage photos / videos]
+  RPC --> DB[("profiles · therapists · tags · rates · licenses · interest · reviews")]
+```
+
+- `/find` calls one RPC, `search_therapists` — OR overlap on selected tags, ranked by match count, page size 24.
+- `/t/[id]` loads one therapist (photo + native `<video>` intro). **I'm interested** writes an `interest` row.
+- `/join` is a 4-step therapist wizard; photo required, intro video optional (50MB).
+- `/matches` calls `list_my_interest()` and shows aliases only (`Patient ·` + last 4 hex of the patient UUID).
+- `proxy.ts` refreshes the Supabase session. Schema lives in `supabase/migrations/`.
+
+## Reproduce the demo
+
+### Option A — live app (fastest)
+
+1. Open [kitchen-sink-tau.vercel.app/find](https://kitchen-sink-tau.vercel.app/find).
+2. Tap **Anxiety**. Maya Chen is in the results (ranked by overlap).
+3. Open her profile (`/t/maya`). Play the intro video. Read cards and seed reviews.
+4. Sign in as a seed patient and tap **I'm interested**. Sign in as Maya and open `/matches`.
+
+### Option B — local app, same hosted data
+
+Create a `.env.local` from the sample below. Keys come from the Supabase project **API** page (anon / publishable key only). No other API keys.
+
+```bash
+# .env.local — copy from .env.example
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...   # anon / publishable, not service_role
+```
+
+Then `npm install && npm run dev` and follow Option A on localhost.
+
+Seed accounts (password is always `seed-only`):
+
+| Email | Role | Use |
+| --- | --- | --- |
+| `maya@kitchensink.demo` | therapist | Profile owner; `/matches` already has 3 interests |
+| `jr@kitchensink.demo` | patient | Tap **I'm interested** on a profile |
+| `priya@kitchensink.demo` | patient | Seed reviews + Maya interest |
+| `dm@kitchensink.demo` | patient | Seed reviews + Maya interest |
+
+Ten more therapists (`jordan@` … `chris@kitchensink.demo`) fill search. Same password.
+
+### Option C — empty Supabase project
+
+1. Create a project. Enable email Auth. Create public Storage buckets `photos` and `videos`.
+2. Apply `supabase/migrations/` in filename order (`supabase db push` against the linked project, or the SQL editor).
+3. Put the two public env vars in `.env.local`.
+4. Upload seed portraits/videos: `npm run seed:media` (signs in as each seed user; password `seed-only`).
+5. `npm run dev`.
+
+`SUPABASE_SERVICE_ROLE_KEY` is **not** required for the app, tests, or `seed:media`. Never put the service role in the browser, Vercel public env, or git.
+
+## Data and provenance
+
+Nothing here is a real clinician, patient, license, review, or clinical dataset. No third-party health registry was imported.
+
+| What | Where | Provenance |
+| --- | --- | --- |
+| Maya Chen (LMFT, CA, rates, cards, 3 reviews) | `supabase/migrations/20260919163316_seed_maya_chen.sql` | Written for this hackathon to match [prototype_screenshots/](prototype_screenshots/) |
+| 10 more open therapists + reviews | `supabase/migrations/20260919184500_seed_demo_therapists.sql` | Authored synthetic profiles so `/find` has multiple OR matches |
+| Seed patients J.R., Priya S., D.M. | same Maya seed | Prototype reviewer names; emails are `*@kitchensink.demo` |
+| Interest rows on Maya | later seed / interest migration | J.R., Priya, D.M. already interested so `/matches` is not empty |
+| Tag / credential / insurance chips | `lib/tags/presets.ts` + requirements | Prototype + spec labels, not a published taxonomy |
+| Headshots + intro clips | `supabase/seed/media/<uuid>/` | Synthetic portraits generated for the demo (not real people). `scripts/prepare-demo-media.sh` crops to 720² JPEG and builds a 4s silent Ken Burns MP4 with ffmpeg. Uploaded by `scripts/seed-demo-media.mjs` |
+
+License numbers, phones, and addresses are fake. Reviews are fiction.
+
+## Known limitations
+
+- No booking, calendars, or in-app messaging. Contact buttons are `mailto:` / `tel:` from listed outreach.
+- Interest is a persisted anonymous signal. Therapists never see name, email, or photo. Toggle off deletes the row. No realtime.
+- Reviews are read-only seed data.
+- Search is OR overlap (some tags), not AND. Results cap at 24; no pagination UI.
+- In-person location is stored; search uses license state, not maps or distance.
+- One intro clip per therapist, played as uploaded. No transcoding.
+- Associate/trainee supervisor fields are collected, not verified.
+- Patient UI is only sign-in + **I'm interested** on a profile. No patient onboarding or public patient pages.
+
+## Next steps
+
+- Consult / session booking (explicitly cut this weekend).
+- Opt-in contact reveal or messaging after interest.
+- License verification and real identity checks.
+- AND filters, pagination, maps.
+- Review write path and video transcoding.
 
 ## Docs
 
 | File | What |
 | --- | --- |
-| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | What we ship, what we cut, data, matching, CI |
+| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Must ship, cut list, schema, matching, CI |
+| [docs/interest.md](docs/interest.md) | Anonymous interest rules |
 | [AGENTS.md](AGENTS.md) | How agents work in this repo |
 | [prototype_screenshots/README.md](prototype_screenshots/README.md) | Screen → screenshot map |
 
 ## CI
 
-GitHub Actions on PR and `main`: lint, typecheck, tests, build. Push to `main` deploys production to Vercel only after those checks pass. Pull requests still get Vercel preview deploys.
+GitHub Actions on PR and `main`: lint, typecheck, tests, build. Push to `main` deploys production to Vercel after those checks pass. PRs still get Vercel previews.
 
 Repo secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_DEPLOY_HOOK`. Never put the service role key in CI.
