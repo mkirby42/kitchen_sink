@@ -14,45 +14,43 @@ export function JoinShell({
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
+  const chromeBtn =
+    "grid size-10 shrink-0 place-items-center rounded-full bg-cream text-xl text-ink hover:bg-line";
+
   return (
-    <main className="mx-auto w-full max-w-lg px-4 py-8 sm:px-6 sm:py-12">
+    <main className="mx-auto w-full max-w-lg px-4 py-10 sm:px-6 sm:py-16">
       <section className="overflow-hidden rounded-[2rem] bg-paper shadow-[0_24px_70px_rgba(27,39,68,0.12)]">
-        <div className="flex items-center gap-5 px-6 pt-6 sm:px-10 sm:pt-8">
+        <div className="flex items-center gap-4 px-5 pt-5 sm:px-8 sm:pt-7">
           {onBack ? (
             <button
               type="button"
               aria-label="Go back"
               onClick={onBack}
-              className="grid size-10 shrink-0 place-items-center rounded-full border border-line text-xl text-ink hover:border-clay hover:text-clay"
+              className={chromeBtn}
             >
               ←
             </button>
           ) : (
-            <Link
-              href={routes.home}
-              aria-label="Go home"
-              className="grid size-10 shrink-0 place-items-center rounded-full border border-line text-xl text-ink hover:border-clay hover:text-clay"
-            >
+            <Link href={routes.home} aria-label="Go home" className={chromeBtn}>
               ←
             </Link>
           )}
 
-          <div className="flex flex-1 gap-2" aria-label={step ? `Step ${step} of 4` : "Join"}>
+          <div
+            className="flex flex-1 justify-center gap-1.5"
+            aria-label={step ? `Step ${step} of 4` : "Join"}
+          >
             {[1, 2, 3, 4].map((segment) => (
               <span
                 key={segment}
-                className={`h-1.5 flex-1 rounded-full ${
+                className={`h-1 w-8 rounded-full ${
                   step && segment <= step ? "bg-clay" : "bg-line"
                 }`}
               />
             ))}
           </div>
 
-          <Link
-            href={routes.home}
-            aria-label="Close"
-            className="grid size-10 shrink-0 place-items-center rounded-full border border-line text-xl text-ink hover:border-clay hover:text-clay"
-          >
+          <Link href={routes.home} aria-label="Close" className={chromeBtn}>
             ×
           </Link>
         </div>

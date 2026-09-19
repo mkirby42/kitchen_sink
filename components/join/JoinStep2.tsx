@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { JoinDraft } from "@/lib/join/types";
 import { uploadJoinMedia } from "@/lib/join/submit";
@@ -10,6 +10,107 @@ const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
 const VIDEO_MAX_BYTES = 50 * 1024 * 1024;
+
+function MediaSlot({
+  kind,
+  preview,
+  uploaded,
+  uploading,
+  accept,
+  helpers,
+  onFile,
+}: {
+  kind: "photo" | "video";
+  preview: string | null;
+  uploaded: boolean;
+  uploading: boolean;
+  accept: string;
+  helpers: string[];
+  onFile: (file?: File) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const noun = kind === "photo" ? "photo" : "video";
+
+  return (
+    <section className="space-y-3">
+      {kind === "video" ? (
+        <p className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
+          Intro video
+        </p>
+      ) : null}
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          aria-label={`Choose a ${noun}`}
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+          className="grid size-[4.5rem] shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-clay/45 bg-cream disabled:opacity-60"
+        >
+          {preview ? (
+            kind === "photo" ? (
+              // Blob previews cannot use next/image.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={preview}
+                alt="Selected profile preview"
+                className="size-full object-cover"
+              />
+            ) : (
+              <video
+                src={preview}
+                muted
+                playsInline
+                className="size-full object-cover"
+              />
+            )
+          ) : (
+            <span className="text-2xl text-clay/70" aria-hidden>
+              {kind === "photo" ? "+" : "▶"}
+            </span>
+          )}
+        </button>
+        <div>
+          <button
+            type="button"
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+            className="rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium hover:border-ink/20 disabled:opacity-60"
+          >
+            {uploading
+              ? `Uploading ${noun}…`
+              : preview
+                ? `Change ${noun}…`
+                : `Choose a ${noun}…`}
+          </button>
+          <p className="mt-2 text-sm text-mute">
+            {uploaded
+              ? `${kind === "photo" ? "Photo" : "Video"} uploaded.`
+              : `No ${noun} chosen yet.`}
+          </p>
+        </div>
+      </div>
+      {helpers.map((text) => (
+        <p
+          key={text}
+          className="rounded-2xl bg-cream px-5 py-4 text-center text-sm leading-6 text-mute"
+        >
+          {text}
+        </p>
+      ))}
+      <input
+        ref={inputRef}
+        type="file"
+        accept={accept}
+        disabled={uploading}
+        onChange={(event) => {
+          onFile(event.target.files?.[0]);
+          event.target.value = "";
+        }}
+        className="sr-only"
+      />
+    </section>
+  );
+}
 
 export function JoinStep2({
   userId,
@@ -98,97 +199,31 @@ export function JoinStep2({
 
   return (
     <div className="space-y-10">
-      <section className="grid items-center gap-6 sm:grid-cols-[12rem_1fr]">
-        <label className="group grid size-48 cursor-pointer place-items-center overflow-hidden rounded-full border-2 border-dashed border-clay/50 bg-cream text-center text-sm font-semibold text-clay hover:border-clay">
-          {photoPreview ? (
-            // Blob previews cannot use next/image.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={photoPreview}
-              alt="Selected profile preview"
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="px-6">
-              {uploading.photo ? "Uploading photo…" : "Choose a photo…"}
-            </span>
-          )}
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            disabled={uploading.photo}
-            onChange={(event) => {
-              void chooseFile("photo", event.target.files?.[0]);
-              event.target.value = "";
-            }}
-            className="sr-only"
-          />
-        </label>
-        <div>
-          <h2 className="font-display text-2xl">Your profile photo</h2>
-          <p className="mt-2 leading-7 text-mute">
-            A clear, well-lit headshot — just you, looking at the camera — works
-            best.
-          </p>
-          {draft.photoKey ? (
-            <p className="mt-3 text-sm font-semibold text-clay">Photo uploaded.</p>
-          ) : null}
-        </div>
-      </section>
+      <MediaSlot
+        kind="photo"
+        preview={photoPreview}
+        uploaded={Boolean(draft.photoKey)}
+        uploading={uploading.photo}
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        helpers={[
+          "A clear, well-lit headshot — just you, looking at the camera — works best.",
+          "JPEG, PNG, WebP, or GIF · up to 5MB. This is the photo clients see first on your profile.",
+        ]}
+        onFile={(file) => void chooseFile("photo", file)}
+      />
 
-      <section className="grid items-center gap-6 border-t border-line pt-10 sm:grid-cols-[18rem_1fr]">
-        {videoPreview ? (
-          <div>
-            <video
-              src={videoPreview}
-              controls
-              className="aspect-video w-full rounded-2xl bg-ink object-contain"
-            />
-            <label className="mt-2 block cursor-pointer text-center text-sm font-semibold text-clay hover:text-clay-dark">
-              {uploading.video ? "Uploading video…" : "Choose another video"}
-              <input
-                type="file"
-                accept="video/mp4,video/webm,video/quicktime"
-                disabled={uploading.video}
-                onChange={(event) => {
-                  void chooseFile("video", event.target.files?.[0]);
-                  event.target.value = "";
-                }}
-                className="sr-only"
-              />
-            </label>
-          </div>
-        ) : (
-          <label className="group flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-clay/50 bg-cream text-center text-sm font-semibold text-clay hover:border-clay">
-            <span className="px-6">
-              {uploading.video ? "Uploading video…" : "Choose an intro video…"}
-            </span>
-            <input
-              type="file"
-              accept="video/mp4,video/webm,video/quicktime"
-              disabled={uploading.video}
-              onChange={(event) => {
-                void chooseFile("video", event.target.files?.[0]);
-                event.target.value = "";
-              }}
-              className="sr-only"
-            />
-          </label>
-        )}
-        <div>
-          <h2 className="font-display text-2xl">Your intro video</h2>
-          <p className="mt-2 leading-7 text-mute">
-            Optional. One short intro clip. We&apos;ll play it as uploaded on
-            your public profile — no editing.
-          </p>
-          <p className="mt-2 text-sm text-mute">
-            MP4, WebM, or MOV · up to 50MB
-          </p>
-          {draft.videoKey ? (
-            <p className="mt-3 text-sm font-semibold text-clay">Video uploaded.</p>
-          ) : null}
-        </div>
-      </section>
+      <MediaSlot
+        kind="video"
+        preview={videoPreview}
+        uploaded={Boolean(draft.videoKey)}
+        uploading={uploading.video}
+        accept="video/mp4,video/webm,video/quicktime"
+        helpers={[
+          "Optional. One short intro clip. We'll play it as uploaded on your public profile — no editing.",
+          "MP4, WebM, or MOV · up to 50MB.",
+        ]}
+        onFile={(file) => void chooseFile("video", file)}
+      />
 
       {error ? (
         <p role="alert" className="rounded-2xl bg-cream px-5 py-4 text-sm text-clay-dark">
