@@ -4,6 +4,8 @@ Match therapists to patients. Patients tap must-have tags. We show therapists wh
 
 Hackathon build. Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). Prototype shots: [prototype_screenshots/](prototype_screenshots/).
 
+Production: [kitchen-sink-tau.vercel.app](https://kitchen-sink-tau.vercel.app)
+
 ## Stack
 
 Next.js (App Router) · TypeScript · Tailwind · Supabase (Auth, Postgres, Storage) · Vercel
@@ -12,18 +14,18 @@ Next.js (App Router) · TypeScript · Tailwind · Supabase (Auth, Postgres, Stor
 
 ```bash
 cp .env.example .env.local
-# fill Supabase URL + anon key (pages render without them)
+# fill NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY
 npm install
 npm run dev
 ```
 
-`/` home · `/find` search · `/t/[id]` profile · `/join` therapist signup. Shell only until schema lands.
+`/` home · `/find` search · `/t/maya` (or `/t/[id]`) profile · `/join` therapist onboarding.
 
 ```bash
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
-Needs a local or hosted Supabase project. Apply migrations from `supabase/migrations/` once they exist.
+Migrations live in `supabase/migrations/`. The hosted project already has them. Apply the same files if you stand up a new database. After a reset, upload demo photos/videos with `npm run seed:media` (seed users sign in as themselves; password is `seed-only`).
 
 ## Docs
 

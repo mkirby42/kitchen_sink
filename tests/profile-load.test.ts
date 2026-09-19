@@ -13,16 +13,12 @@ describe.skipIf(!dbConfigured())("fetchTherapistProfile", () => {
     expect(bySlug?.name).toBe("Dr. Maya Chen");
     expect(bySlug?.credential).toBe("LMFT");
     expect(bySlug?.showSupervisor).toBe(false);
-    if (bySlug?.videoUrl) {
-      expect(bySlug.videoUrl).toContain(
-        `/storage/v1/object/public/videos/${MAYA_ID}/`,
-      );
-    }
-    if (bySlug?.photoUrl) {
-      expect(bySlug.photoUrl).toContain(
-        `/storage/v1/object/public/photos/${MAYA_ID}/`,
-      );
-    }
+    expect(bySlug?.photoUrl).toContain(
+      `/storage/v1/object/public/photos/${MAYA_ID}/photo.jpg`,
+    );
+    expect(bySlug?.videoUrl).toContain(
+      `/storage/v1/object/public/videos/${MAYA_ID}/intro.mp4`,
+    );
     expect(bySlug?.licenses).toEqual(
       expect.arrayContaining([{ number: "MFC 112938", state: "CA" }]),
     );
