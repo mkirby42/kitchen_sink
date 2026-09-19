@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed:media": "node scripts/seed-demo-media.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
