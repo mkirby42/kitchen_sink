@@ -48,6 +48,11 @@ describe("profile view helpers", () => {
       "tel:+14155550199",
       "sms:+14155550199",
     ]);
+    expect(actions.map((a) => a.value)).toEqual([
+      "maya@kitchensink.demo",
+      "(415) 555-0199",
+      "(415) 555-0199",
+    ]);
     expect(actions.some((a) => /book a session|calendar/i.test(a.label))).toBe(
       false,
     );

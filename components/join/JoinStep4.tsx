@@ -20,8 +20,6 @@ const FILTERS = [
   ["outcome", "Outcome"],
 ] as const;
 
-const pillClass =
-  "rounded-full border border-line bg-paper px-4 py-2.5 outline-none focus:border-clay";
 const labelClass =
   "text-xs font-semibold tracking-[0.16em] text-mute uppercase";
 const underlineClass =
@@ -213,92 +211,95 @@ export function JoinStep4({
         <div className="mt-4 space-y-3">
           {draft.rates.map((rate, index) => (
             <div key={index} className="flex items-center gap-2">
-              <label className="min-w-0 flex-1">
-                <span className="sr-only">Service type</span>
-                <select
-                  aria-label={`Rate ${index + 1} service type`}
-                  value={rate.service_type}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      rates: current.rates.map((item, itemIndex) =>
-                        itemIndex === index
-                          ? { ...item, service_type: event.target.value }
-                          : item,
-                      ),
-                    }))
-                  }
-                  className={`w-full ${pillClass}`}
-                >
-                  {RATE_SERVICE_TYPES.map((service) => (
-                    <option
-                      key={service}
-                      value={service}
-                      disabled={
-                        service !== rate.service_type && usedServices.has(service)
-                      }
-                    >
-                      {service}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="w-[6.5rem] shrink-0">
-                <span className="sr-only">Duration</span>
-                <select
-                  aria-label={`Rate ${index + 1} duration`}
-                  value={rate.duration_minutes}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      rates: current.rates.map((item, itemIndex) =>
-                        itemIndex === index
-                          ? {
-                              ...item,
-                              duration_minutes: Number(event.target.value),
-                            }
-                          : item,
-                      ),
-                    }))
-                  }
-                  className={`w-full ${pillClass}`}
-                >
-                  {RATE_DURATIONS.map((duration) => (
-                    <option key={duration} value={duration}>
-                      {duration} min
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="relative w-[6.5rem] shrink-0">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-mute">
-                  $
-                </span>
-                <span className="sr-only">Price in dollars</span>
-                <input
-                  aria-label={`Rate ${index + 1} price in dollars`}
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  value={rate.price_cents / 100}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      rates: current.rates.map((item, itemIndex) =>
-                        itemIndex === index
-                          ? {
-                              ...item,
-                              price_cents: Math.round(
-                                Number(event.target.value || 0) * 100,
-                              ),
-                            }
-                          : item,
-                      ),
-                    }))
-                  }
-                  className={`w-full ${pillClass} pl-7`}
-                />
-              </label>
+              <div className="grid flex-1 grid-cols-[minmax(10.5rem,1.4fr)_6.75rem_5.75rem] items-center gap-3 rounded-full border border-line bg-paper px-4 py-1.5">
+                <label className="min-w-[10.5rem]">
+                  <span className="sr-only">Service type</span>
+                  <select
+                    aria-label={`Rate ${index + 1} service type`}
+                    value={rate.service_type}
+                    onChange={(event) =>
+                      setDraft((current) => ({
+                        ...current,
+                        rates: current.rates.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? { ...item, service_type: event.target.value }
+                            : item,
+                        ),
+                      }))
+                    }
+                    className="w-full min-w-[10.5rem] bg-transparent py-1.5 outline-none"
+                  >
+                    {RATE_SERVICE_TYPES.map((service) => (
+                      <option
+                        key={service}
+                        value={service}
+                        disabled={
+                          service !== rate.service_type &&
+                          usedServices.has(service)
+                        }
+                      >
+                        {service}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="min-w-0">
+                  <span className="sr-only">Duration</span>
+                  <select
+                    aria-label={`Rate ${index + 1} duration`}
+                    value={rate.duration_minutes}
+                    onChange={(event) =>
+                      setDraft((current) => ({
+                        ...current,
+                        rates: current.rates.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? {
+                                ...item,
+                                duration_minutes: Number(event.target.value),
+                              }
+                            : item,
+                        ),
+                      }))
+                    }
+                    className="w-full bg-transparent py-1.5 outline-none"
+                  >
+                    {RATE_DURATIONS.map((duration) => (
+                      <option key={duration} value={duration}>
+                        {duration} min
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="relative min-w-0">
+                  <span className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-mute">
+                    $
+                  </span>
+                  <span className="sr-only">Price in dollars</span>
+                  <input
+                    aria-label={`Rate ${index + 1} price in dollars`}
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={rate.price_cents / 100}
+                    onChange={(event) =>
+                      setDraft((current) => ({
+                        ...current,
+                        rates: current.rates.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? {
+                                ...item,
+                                price_cents: Math.round(
+                                  Number(event.target.value || 0) * 100,
+                                ),
+                              }
+                            : item,
+                        ),
+                      }))
+                    }
+                    className="w-full bg-transparent py-1.5 pl-4 outline-none"
+                  />
+                </label>
+              </div>
               <button
                 type="button"
                 aria-label={`Remove rate ${index + 1}`}
@@ -355,23 +356,6 @@ export function JoinStep4({
       </label>
 
       <section className="space-y-6">
-        <label className="block">
-          <span className={labelClass}>Your email</span>
-          <p className="mt-1 text-sm text-mute">
-            For our records; this is also the public email when email outreach is
-            selected.
-          </p>
-          <input
-            type="email"
-            autoComplete="email"
-            value={draft.email}
-            onChange={(event) =>
-              setDraft((current) => ({ ...current, email: event.target.value }))
-            }
-            className={underlineClass}
-          />
-        </label>
-
         <fieldset>
           <legend className={labelClass}>How should clients reach you?</legend>
           <p className="mt-1 text-sm text-mute">
@@ -398,13 +382,57 @@ export function JoinStep4({
           </div>
         </fieldset>
 
-        {draft.outreach.some(
-          (option) => option === "phone" || option === "text",
-        ) ? (
+        {draft.outreach.includes("email") ? (
           <label className="block">
-            <span className={labelClass}>Phone</span>
+            <span className={labelClass}>Email</span>
             <input
-              type="tel"
+              type="text"
+              autoComplete="email"
+              value={draft.email}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, email: event.target.value }))
+              }
+              className={underlineClass}
+            />
+          </label>
+        ) : (
+          <label className="block">
+            <span className={labelClass}>Your email</span>
+            <p className="mt-1 text-sm text-mute">
+              For our records. Select Email above to list it on your profile.
+            </p>
+            <input
+              type="text"
+              autoComplete="email"
+              value={draft.email}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, email: event.target.value }))
+              }
+              className={underlineClass}
+            />
+          </label>
+        )}
+
+        {draft.outreach.includes("phone") ? (
+          <label className="block">
+            <span className={labelClass}>Phone number</span>
+            <input
+              type="text"
+              autoComplete="tel"
+              value={draft.phone}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, phone: event.target.value }))
+              }
+              className={underlineClass}
+            />
+          </label>
+        ) : null}
+
+        {draft.outreach.includes("text") ? (
+          <label className="block">
+            <span className={labelClass}>Number for texts</span>
+            <input
+              type="text"
               autoComplete="tel"
               value={draft.phone}
               onChange={(event) =>

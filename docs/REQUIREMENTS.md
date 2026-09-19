@@ -8,7 +8,7 @@ Patients find a therapist by must-have filters. Therapists publish a profile cli
 
 ## Must ship
 
-1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties (preset chips **plus** free-text “Add your own”), insurance, license state. OR semantics: therapist must match **some** selected tag. Empty filters = all therapists open to new clients.
+1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties (preset chips **plus** free-text “Add your own”), insurance, license state. OR semantics: therapist must match **some** selected tag. Rank by overlap count, then name; cards highlight hits (“3 of 4 tags”). Empty filters = all therapists open to new clients.
 2. **Therapist profile** — photo, **optional intro video**, name, credential, **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile), about, conversation cards, reviews (read-only seed data), contact (email / phone / text as listed). If credential is associate or trainee, collect and show **supervising clinician name** (required) and **supervisor license #**; show a pre-license note on profile. Profile hero plays the intro video when one is uploaded.
 3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (incl. repeatable state-license rows) → **photo (required) + intro video (optional, up to 50MB)** → practice tags → cards + contact + optional product feedback.
 4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
@@ -133,12 +133,13 @@ RLS: public can `select` therapists who are `open_to_new_clients`. Owner can ins
 
 ## Matching
 
-Access pattern: therapists whose tags **overlap** the patient’s selected tags (match at least one), plus session format and license state when selected.
+Access pattern: therapists whose tags **overlap** the patient’s selected tags (match at least one), plus session format and license state when selected. Rank by overlap count, then name. Return `match_count` + `matched_labels` from the same RPC so cards can highlight hits (“3 of 4 tags”).
 
 One RPC or one query. Do not load all therapists and filter in JS.
 
 ```sql
 -- tag OR: therapist tags && selected tags (overlap — match at least one)
+-- rank: match_count desc, name asc
 -- also: open_to_new_clients
 -- session format: virtual_practice and/or in_person_practice
 -- license state: exists licenses.state = selected

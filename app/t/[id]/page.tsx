@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { buildFindHref } from "@/components/search/query";
 import {
   ProfileNotFound,
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
 import { loadInterestViewer, type InterestViewer } from "@/lib/interest/viewer";
+import { parseFindSearchParams } from "@/lib/search/rpc";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { loadTherapistProfile } from "@/lib/therapists/load";
 
@@ -27,6 +29,7 @@ async function loadViewer(therapistId: string): Promise<InterestViewer> {
 
 type ProfilePageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({
@@ -40,13 +43,15 @@ export async function generateMetadata({
 
 export default async function TherapistProfilePage({
   params,
+  searchParams,
 }: ProfilePageProps) {
   const { id } = await params;
+  const backHref = buildFindHref(parseFindSearchParams(await searchParams));
   const data = await loadTherapistProfile(id);
 
-  if (!data) return <ProfileNotFound />;
+  if (!data) return <ProfileNotFound backHref={backHref} />;
 
   const viewer = await loadViewer(data.id);
 
-  return <TherapistProfile data={data} viewer={viewer} />;
+  return <TherapistProfile data={data} backHref={backHref} viewer={viewer} />;
 }

@@ -45,6 +45,7 @@ export type ContactAction = {
   kind: "email" | "phone" | "text";
   label: string;
   href: string;
+  value: string;
 };
 
 export type TherapistProfileData = {
@@ -122,6 +123,7 @@ export function contactActions(input: {
       kind: "email",
       label: "Email",
       href: `mailto:${input.email}`,
+      value: input.email,
     });
   }
   if (wanted.has("phone") && input.phone) {
@@ -129,6 +131,7 @@ export function contactActions(input: {
       kind: "phone",
       label: "Call",
       href: telHref(input.phone),
+      value: input.phone,
     });
   }
   if (wanted.has("text") && input.phone) {
@@ -136,6 +139,7 @@ export function contactActions(input: {
       kind: "text",
       label: "Text",
       href: smsHref(input.phone),
+      value: input.phone,
     });
   }
   return actions;

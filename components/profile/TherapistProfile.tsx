@@ -12,15 +12,18 @@ import {
 } from "@/lib/therapists/load";
 import type { InterestViewer } from "@/lib/interest/viewer";
 import { routes } from "@/lib/routes";
+import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
 import { InterestControl } from "./InterestControl";
 import { ProfileTabs } from "./ProfileTabs";
 
 export function TherapistProfile({
   data,
+  backHref,
   viewer,
 }: {
   data: TherapistProfileData;
+  backHref: string;
   viewer: InterestViewer;
 }) {
   const format = formatLabel(data.virtual, data.inPerson);
@@ -52,7 +55,7 @@ export function TherapistProfile({
 
       <header className="relative z-10 grid grid-cols-[2.75rem_1fr_2.75rem] items-center py-4">
         <Link
-          href={routes.find}
+          href={backHref}
           className="flex h-11 w-11 items-center justify-center rounded-full bg-paper text-ink shadow-sm"
           aria-label="Back to search"
         >
@@ -156,30 +159,7 @@ export function TherapistProfile({
         viewer={viewer}
       />
 
-      {ctas.length > 0 ? (
-        <div
-          className={
-            ctas.length > 1
-              ? "mt-4 grid grid-cols-2 gap-3"
-              : "mt-4 grid grid-cols-1"
-          }
-        >
-          {ctas.map((action) => (
-            <a
-              key={action.kind}
-              href={action.href}
-              className={
-                action.kind === "book"
-                  ? "flex items-center justify-center gap-2 rounded-full bg-clay px-3 py-[0.95rem] text-[15px] font-semibold text-paper hover:bg-clay-dark"
-                  : "flex items-center justify-center gap-2 rounded-full border-2 border-pine bg-paper px-3 py-[0.95rem] text-[15px] font-semibold text-pine hover:bg-pine/5"
-              }
-            >
-              {action.kind === "consult" ? <ConsultIcon /> : <BookIcon />}
-              {action.label}
-            </a>
-          ))}
-        </div>
-      ) : null}
+      <ContactCtas name={data.givenName} actions={ctas} contact={data.contact} />
 
       {data.cards.length > 0 ? (
         <section className="mt-10">
@@ -381,41 +361,7 @@ function cardCorner(tag: string): { icon: ReactNode; tone: string } {
   return { icon: "✦", tone: "bg-ink/10 text-ink" };
 }
 
-function ConsultIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-[18px] w-[18px]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      aria-hidden
-    >
-      <path
-        d="M6 7.25A3.25 3.25 0 0 1 9.25 4h5.5A3.25 3.25 0 0 1 18 7.25v4.5A3.25 3.25 0 0 1 14.75 15H11l-3.5 3v-3H9.25A3.25 3.25 0 0 1 6 11.75v-4.5Z"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function BookIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-[18px] w-[18px]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      aria-hidden
-    >
-      <rect x="4.5" y="5.5" width="15" height="14" rx="2" />
-      <path d="M4.5 10h15M8 3.5v4M16 3.5v4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-export function ProfileNotFound() {
+export function ProfileNotFound({ backHref }: { backHref: string }) {
   return (
     <main className="mx-auto max-w-lg px-6 py-16">
       <p className="text-sm text-mute">Therapist profile</p>
@@ -427,7 +373,7 @@ export function ProfileNotFound() {
         out of date.
       </p>
       <Link
-        href={routes.find}
+        href={backHref}
         className="mt-8 inline-flex rounded-full bg-clay px-5 py-3 font-medium text-paper hover:bg-clay-dark"
       >
         Back to search
