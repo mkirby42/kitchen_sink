@@ -1,6 +1,8 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { formatUsdFromCents, initials } from "@/lib/therapists/display";
 import {
+  consultBookActions,
   formatLabel,
   hasSuperbill,
   licenseLine,
@@ -27,9 +29,10 @@ export function TherapistProfile({ data }: { data: TherapistProfileData }) {
       .map((review) => review.stars)
       .filter((n): n is number => n != null),
   );
+  const ctas = consultBookActions(data.contact);
 
   return (
-    <main className="relative mx-auto max-w-lg overflow-hidden px-4 pb-20">
+    <main className="relative mx-auto max-w-[26.5rem] overflow-hidden px-5 pb-20">
       <div
         className="pointer-events-none absolute -top-8 -left-10 h-32 w-40 rounded-[2.5rem] bg-clay/25"
         aria-hidden
@@ -39,16 +42,33 @@ export function TherapistProfile({ data }: { data: TherapistProfileData }) {
         aria-hidden
       />
 
-      <header className="relative z-10 flex items-center py-4">
+      <header className="relative z-10 grid grid-cols-[2.75rem_1fr_2.75rem] items-center py-4">
         <Link
           href={routes.find}
           className="flex h-11 w-11 items-center justify-center rounded-full bg-paper text-ink shadow-sm"
           aria-label="Back to search"
         >
-          <span aria-hidden className="text-lg">
-            ←
+          <svg
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            aria-hidden
+          >
+            <path d="M15 5 8 12l7 7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Link>
+        <Link
+          href={routes.home}
+          className="justify-self-center font-display text-[1.65rem] leading-none tracking-tight text-ink italic"
+        >
+          Kitchen Sink
+          <span className="ml-1 inline-block text-base not-italic text-clay" aria-hidden>
+            ♡
           </span>
         </Link>
+        <span />
       </header>
 
       <HeroMedia
@@ -122,63 +142,65 @@ export function TherapistProfile({ data }: { data: TherapistProfileData }) {
         </article>
       </div>
 
-      {data.contact.length > 0 ? (
-        <div className="mt-4 flex flex-wrap gap-3">
-          {data.contact.map((action) => {
-            const filled = action.kind === "phone";
-            return (
+      {ctas.length > 0 ? (
+        <div
+          className={
+            ctas.length > 1
+              ? "mt-4 grid grid-cols-2 gap-3"
+              : "mt-4 grid grid-cols-1"
+          }
+        >
+          {ctas.map((action) => (
             <a
               key={action.kind}
               href={action.href}
               className={
-                filled
-                  ? "flex flex-1 items-center justify-center gap-2 rounded-full bg-clay px-5 py-3.5 font-medium text-paper hover:bg-clay-dark"
-                  : "flex flex-1 items-center justify-center gap-2 rounded-full border border-ink/20 bg-paper px-5 py-3.5 font-medium text-ink hover:border-ink/40"
+                action.kind === "book"
+                  ? "flex items-center justify-center gap-2 rounded-full bg-clay px-3 py-[0.95rem] text-[15px] font-semibold text-paper hover:bg-clay-dark"
+                  : "flex items-center justify-center gap-2 rounded-full border-2 border-pine bg-paper px-3 py-[0.95rem] text-[15px] font-semibold text-pine hover:bg-pine/5"
               }
             >
-              {action.kind === "email"
-                ? "✉"
-                : action.kind === "phone"
-                  ? "☎"
-                  : "💬"}{" "}
+              {action.kind === "consult" ? <ConsultIcon /> : <BookIcon />}
               {action.label}
             </a>
-            );
-          })}
+          ))}
         </div>
       ) : null}
 
       {data.cards.length > 0 ? (
         <section className="mt-10">
-          <h2 className="font-display text-2xl tracking-tight text-ink">
+          <h2 className="font-display text-[1.65rem] tracking-tight text-ink">
             <span aria-hidden className="text-clay">
               ~
             </span>{" "}
-            Get to know <em className="text-clay not-italic">{data.givenName}</em>
+            Get to know <em className="text-clay">{data.givenName}</em>
           </h2>
           <p className="mt-1 text-sm text-mute">
             Honest answers, before you ever say hello.
           </p>
           <ul className="mt-5 space-y-3">
-            {data.cards.map((card) => (
-              <li
-                key={card.prompt}
-                className="relative overflow-hidden rounded-3xl bg-paper px-5 py-5 shadow-sm"
-              >
-                <span
-                  className="absolute top-0 left-0 flex h-9 w-9 items-center justify-center rounded-br-2xl rounded-tl-3xl bg-clay/15 text-clay"
-                  aria-hidden
+            {data.cards.map((card) => {
+              const corner = cardCorner(card.tag);
+              return (
+                <li
+                  key={card.prompt}
+                  className="relative overflow-hidden rounded-[1.75rem] bg-paper pt-3.5 pr-5 pb-5 pl-5 shadow-sm"
                 >
-                  {cardIcon(card.tag)}
-                </span>
-                <p className="pt-5 font-display text-[15px] text-clay italic">
-                  {card.prompt}
-                </p>
-                <p className="mt-2 text-[17px] leading-relaxed text-ink">
-                  {card.answer}
-                </p>
-              </li>
-            ))}
+                  <span
+                    className={`absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-br-2xl rounded-tl-[1.75rem] text-lg ${corner.tone}`}
+                    aria-hidden
+                  >
+                    {corner.icon}
+                  </span>
+                  <p className="pl-8 font-display text-[15px] text-clay italic">
+                    {card.prompt}
+                  </p>
+                  <p className="mt-2 text-[17px] leading-relaxed text-ink">
+                    {card.answer}
+                  </p>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}
@@ -280,8 +302,8 @@ function ReviewsPanel({
         <div>
           {average != null ? <StarRow value={average} /> : null}
           <p className="text-sm text-mute">
-            Based on {reviews.length} client review
-            {reviews.length === 1 ? "" : "s"}
+            Based on {reviews.length} client{" "}
+            {reviews.length === 1 ? "review" : "reviews"}
           </p>
         </div>
       </div>
@@ -318,11 +340,65 @@ function StarRow({ value }: { value: number }) {
   );
 }
 
-function cardIcon(tag: string) {
-  if (tag === "approach") return "↑";
-  if (tag === "session_vibe") return "◷";
-  if (tag === "specialty") return "☰";
-  return "✦";
+function cardCorner(tag: string): { icon: ReactNode; tone: string } {
+  if (tag === "approach") {
+    return { icon: "↑", tone: "bg-[#f3ddd3] text-clay" };
+  }
+  if (tag === "session_vibe") {
+    return { icon: "◷", tone: "bg-[#dceee6] text-[#3f6d5c]" };
+  }
+  if (tag === "specialty") {
+    return {
+      icon: (
+        <svg
+          viewBox="0 0 24 24"
+          className="h-4 w-4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
+          <path d="M8 4.5h6.5L18 8v11.5H8A1.5 1.5 0 0 1 6.5 18V6A1.5 1.5 0 0 1 8 4.5Z" />
+          <path d="M14.5 4.5V8H18" />
+        </svg>
+      ),
+      tone: "bg-[#f6e4d8] text-clay",
+    };
+  }
+  return { icon: "✦", tone: "bg-ink/10 text-ink" };
+}
+
+function ConsultIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-[18px] w-[18px]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden
+    >
+      <path
+        d="M6 7.25A3.25 3.25 0 0 1 9.25 4h5.5A3.25 3.25 0 0 1 18 7.25v4.5A3.25 3.25 0 0 1 14.75 15H11l-3.5 3v-3H9.25A3.25 3.25 0 0 1 6 11.75v-4.5Z"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function BookIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-[18px] w-[18px]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden
+    >
+      <rect x="4.5" y="5.5" width="15" height="14" rx="2" />
+      <path d="M4.5 10h15M8 3.5v4M16 3.5v4" strokeLinecap="round" />
+    </svg>
+  );
 }
 
 export function ProfileNotFound() {

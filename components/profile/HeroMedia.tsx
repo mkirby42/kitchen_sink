@@ -37,7 +37,7 @@ export function HeroMedia({
       <div className="relative aspect-[3/4] min-h-[28rem] w-full">
         {showVideo && videoUrl ? (
           <video
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
             src={videoUrl}
             poster={photoUrl ?? undefined}
             controls
@@ -50,7 +50,7 @@ export function HeroMedia({
           <img
             src={photoUrl}
             alt={name}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
           />
         ) : (
           <div
@@ -64,24 +64,24 @@ export function HeroMedia({
         )}
 
         {!showVideo ? (
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/90 from-5% via-ink/35 via-40% to-transparent" />
         ) : null}
 
         {videoUrl && !showVideo ? (
           <>
-            <p className="absolute top-4 left-4 flex items-center rounded-full bg-paper/90 px-3 py-1 text-xs font-medium text-ink">
+            <p className="absolute top-4 left-4 flex items-center rounded-full bg-paper/95 px-3 py-1 text-xs font-medium text-ink shadow-sm">
               <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-clay" />
               1 min intro
             </p>
             <button
               type="button"
               onClick={() => setPlaying(true)}
-              className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-paper shadow-md"
+              className="absolute top-[42%] left-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-paper shadow-[0_8px_28px_rgba(27,39,68,0.28)]"
               aria-label={`Play intro video for ${name}`}
             >
               <svg
                 viewBox="0 0 24 24"
-                className="ml-0.5 h-7 w-7 fill-clay"
+                className="ml-1 h-6 w-6 fill-clay"
                 aria-hidden
               >
                 <path d="M8 5.5v13l11-6.5-11-6.5z" />

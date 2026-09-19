@@ -13,6 +13,11 @@ function navClass(active: boolean) {
 export function SiteHeader() {
   const path = usePathname();
 
+  // Profile and join use their own phone-width chrome (back + wordmark / stepper).
+  if (path.startsWith("/t/") || path === routes.join) {
+    return null;
+  }
+
   return (
     <header className="border-b border-line bg-paper">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
