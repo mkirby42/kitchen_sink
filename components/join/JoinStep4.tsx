@@ -28,9 +28,11 @@ const underlineClass =
 export function JoinStep4({
   draft,
   setDraft,
+  hideFeedback = false,
 }: {
   draft: JoinDraft;
   setDraft: Dispatch<SetStateAction<JoinDraft>>;
+  hideFeedback?: boolean;
 }) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number][0]>("all");
   const [showCustom, setShowCustom] = useState(false);
@@ -444,21 +446,26 @@ export function JoinStep4({
         ) : null}
       </section>
 
-      <label className="block">
-        <span className={labelClass}>Feedback for us</span>
-        <p className="mt-1 text-sm text-mute">
-          Optional — we&apos;re in testing, so anything you&apos;d flag is welcome.
-        </p>
-        <textarea
-          rows={3}
-          value={draft.feedback}
-          onChange={(event) =>
-            setDraft((current) => ({ ...current, feedback: event.target.value }))
-          }
-          className="mt-3 w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none placeholder:text-mute/80 focus:border-clay"
-          placeholder="Confusing steps, missing fields, bugs, ideas — anything at all."
-        />
-      </label>
+      {hideFeedback ? null : (
+        <label className="block">
+          <span className={labelClass}>Feedback for us</span>
+          <p className="mt-1 text-sm text-mute">
+            Optional — we&apos;re in testing, so anything you&apos;d flag is welcome.
+          </p>
+          <textarea
+            rows={3}
+            value={draft.feedback}
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                feedback: event.target.value,
+              }))
+            }
+            className="mt-3 w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none placeholder:text-mute/80 focus:border-clay"
+            placeholder="Confusing steps, missing fields, bugs, ideas — anything at all."
+          />
+        </label>
+      )}
     </div>
   );
 }

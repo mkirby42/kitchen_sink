@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type { JoinDraft } from "@/lib/join/types";
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { createClient } from "@/lib/supabase/client";
+import { storagePublicUrl } from "@/lib/therapists/display";
 
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
@@ -123,8 +124,12 @@ export function JoinStep2({
   setDraft: Dispatch<SetStateAction<JoinDraft>>;
   onBusyChange?: (busy: boolean) => void;
 }) {
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(
+    () => storagePublicUrl("photos", draft.photoKey),
+  );
+  const [videoPreview, setVideoPreview] = useState<string | null>(
+    () => storagePublicUrl("videos", draft.videoKey),
+  );
   const [uploading, setUploading] = useState({ photo: false, video: false });
   const [error, setError] = useState("");
 

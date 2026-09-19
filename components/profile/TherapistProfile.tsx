@@ -53,10 +53,10 @@ export function TherapistProfile({
         aria-hidden
       />
 
-      <header className="relative z-10 grid grid-cols-[2.75rem_1fr_2.75rem] items-center py-4">
+      <header className="relative z-10 flex items-center justify-center py-4">
         <Link
           href={backHref}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-paper text-ink shadow-sm"
+          className="absolute left-0 flex h-11 w-11 items-center justify-center rounded-full bg-paper text-ink shadow-sm"
           aria-label="Back to search"
         >
           <svg
@@ -72,14 +72,22 @@ export function TherapistProfile({
         </Link>
         <Link
           href={routes.home}
-          className="justify-self-center font-display text-[1.65rem] leading-none tracking-tight text-ink italic"
+          className="font-display text-[1.65rem] leading-none tracking-tight text-ink italic"
         >
           Kitchen Sink
           <span className="ml-1 inline-block text-base not-italic text-clay" aria-hidden>
             ♡
           </span>
         </Link>
-        <span />
+        {viewer.isOwner ? (
+          <Link
+            href={routes.joinEdit}
+            className="absolute right-0 rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink shadow-sm"
+            aria-label="Edit profile"
+          >
+            Edit
+          </Link>
+        ) : null}
       </header>
 
       <HeroMedia

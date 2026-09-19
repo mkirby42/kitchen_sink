@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { JoinShell } from "./JoinShell";
 
-export function JoinAuth() {
+export function JoinAuth({
+  initialMode = "signup",
+}: {
+  initialMode?: "signup" | "signin";
+}) {
   const router = useRouter();
-  const [mode, setMode] = useState<"signup" | "signin">("signup");
+  const [mode, setMode] = useState<"signup" | "signin">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");

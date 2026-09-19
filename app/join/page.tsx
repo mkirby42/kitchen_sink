@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { JoinAuth } from "@/components/join/JoinAuth";
 import { JoinWizard } from "@/components/join/JoinWizard";
+import { fetchJoinDraft } from "@/lib/join/load-draft";
 import { routes } from "@/lib/routes";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 export default async function JoinPage({
   searchParams,
 }: {
-  searchParams: Promise<{ step?: string }>;
+  searchParams: Promise<{ step?: string; mode?: string; edit?: string }>;
 }) {
   if (!supabasePublicConfig()) {
     return (
@@ -25,12 +26,17 @@ export default async function JoinPage({
     );
   }
 
+  const params = await searchParams;
+  const editing = params.edit === "1";
+  const initialMode =
+    params.mode === "signin" || editing ? "signin" : "signup";
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return <JoinAuth />;
+  if (!user) return <JoinAuth initialMode={initialMode} />;
 
   const { data: therapist } = await supabase
     .from("therapists")
@@ -38,7 +44,7 @@ export default async function JoinPage({
     .eq("profile_id", user.id)
     .maybeSingle();
 
-  if (therapist) redirect(routes.therapist(user.id));
+  if (therapist && !editing) redirect(routes.therapist(user.id));
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -71,17 +77,26 @@ export default async function JoinPage({
     );
   }
 
-  const rawStep = Number((await searchParams).step);
+  const rawStep = Number(params.step);
   const initialStep =
     Number.isInteger(rawStep) && rawStep >= 1 && rawStep <= 4
       ? (rawStep as 1 | 2 | 3 | 4)
       : 1;
+
+  const loadedDraft =
+    therapist && editing
+      ? await fetchJoinDraft(supabase, user.id, user.email ?? "")
+      : undefined;
+
+  if (editing && !loadedDraft) redirect(routes.join);
 
   return (
     <JoinWizard
       userId={user.id}
       email={user.email ?? ""}
       initialStep={initialStep}
+      initialDraft={loadedDraft ?? undefined}
+      editing={Boolean(loadedDraft)}
     />
   );
 }

@@ -6,11 +6,13 @@ import { routes } from "@/lib/routes";
 export function JoinShell({
   step,
   onBack,
+  closeHref = routes.home,
   children,
   footer,
 }: {
   step?: 1 | 2 | 3 | 4;
   onBack?: () => void;
+  closeHref?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
@@ -50,7 +52,7 @@ export function JoinShell({
             ))}
           </div>
 
-          <Link href={routes.home} aria-label="Close" className={chromeBtn}>
+          <Link href={closeHref} aria-label="Close" className={chromeBtn}>
             ×
           </Link>
         </div>

@@ -24,10 +24,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Route | What |
 | --- | --- |
-| `/` | Home |
+| `/` | Home (Find, Join, **Log in as a therapist**) |
 | `/find` | Public search |
-| `/t/maya` | Seeded Maya Chen profile |
-| `/join` | Therapist onboarding (auth) |
+| `/t/maya` | Seeded Maya Chen profile (owner sees **Edit**) |
+| `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile |
 | `/matches` | Therapist interest inbox (auth) |
 
 ```bash
@@ -48,8 +48,8 @@ flowchart LR
 ```
 
 - `/find` calls one RPC, `search_therapists` — OR overlap on selected tags, ranked by match count, page size 24.
-- `/t/[id]` loads one therapist (photo + native `<video>` intro). **I'm interested** writes an `interest` row.
-- `/join` is a 4-step therapist wizard; photo required, intro video optional (50MB).
+- `/t/[id]` loads one therapist (photo + native `<video>` intro). **I'm interested** writes an `interest` row. The owner sees **Edit** (header, top right).
+- `/join` is a 4-step therapist wizard; photo required, intro video optional (50MB). Returning therapists sign in from home and land on their profile; **Save changes** calls `update_therapist_profile`.
 - `/matches` calls `list_my_interest()` and shows aliases only (`Patient ·` + last 4 hex of the patient UUID).
 - `proxy.ts` refreshes the Supabase session. Schema lives in `supabase/migrations/`.
 
@@ -60,7 +60,8 @@ flowchart LR
 1. Open [kitchen-sink-tau.vercel.app/find](https://kitchen-sink-tau.vercel.app/find).
 2. Tap **Anxiety**. Maya Chen is in the results (ranked by overlap).
 3. Open her profile (`/t/maya`). Play the intro video. Read cards and seed reviews.
-4. Sign in as a seed patient and tap **I'm interested**. Sign in as Maya and open `/matches`.
+4. From home, **Log in as a therapist** as Maya (`maya@kitchensink.demo` / `seed-only`). You land on her profile; **Edit** is top-right.
+5. Sign in as a seed patient and tap **I'm interested**. Sign in as Maya and open `/matches`.
 
 ### Option B — local app, same hosted data
 
