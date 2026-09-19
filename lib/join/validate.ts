@@ -1,6 +1,6 @@
 import { startDateFromYears } from "@/lib/join/dates";
 import type { JoinDraft } from "@/lib/join/types";
-import { needsSupervisor } from "@/lib/therapists/load";
+import { needsSupervisor } from "@/lib/therapists/credential";
 import {
   CREDENTIALS,
   LICENSE_STATES,

@@ -128,29 +128,44 @@ export function JoinStep2({
       </section>
 
       <section className="grid items-center gap-6 border-t border-line pt-10 sm:grid-cols-[18rem_1fr]">
-        <label className="group flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-clay/50 bg-cream text-center text-sm font-semibold text-clay hover:border-clay">
-          {videoPreview ? (
+        {videoPreview ? (
+          <div>
             <video
               src={videoPreview}
               controls
-              className="size-full bg-ink object-contain"
+              className="aspect-video w-full rounded-2xl bg-ink object-contain"
             />
-          ) : (
+            <label className="mt-2 block cursor-pointer text-center text-sm font-semibold text-clay hover:text-clay-dark">
+              {uploading.video ? "Uploading video…" : "Choose another video"}
+              <input
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime"
+                disabled={uploading.video}
+                onChange={(event) => {
+                  void chooseFile("video", event.target.files?.[0]);
+                  event.target.value = "";
+                }}
+                className="sr-only"
+              />
+            </label>
+          </div>
+        ) : (
+          <label className="group flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-clay/50 bg-cream text-center text-sm font-semibold text-clay hover:border-clay">
             <span className="px-6">
               {uploading.video ? "Uploading video…" : "Choose an intro video…"}
             </span>
-          )}
-          <input
-            type="file"
-            accept="video/mp4,video/webm,video/quicktime"
-            disabled={uploading.video}
-            onChange={(event) => {
-              void chooseFile("video", event.target.files?.[0]);
-              event.target.value = "";
-            }}
-            className="sr-only"
-          />
-        </label>
+            <input
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime"
+              disabled={uploading.video}
+              onChange={(event) => {
+                void chooseFile("video", event.target.files?.[0]);
+                event.target.value = "";
+              }}
+              className="sr-only"
+            />
+          </label>
+        )}
         <div>
           <h2 className="font-display text-2xl">Your intro video</h2>
           <p className="mt-2 leading-7 text-mute">

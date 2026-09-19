@@ -72,10 +72,17 @@ function currentErrors(step: Step, draft: JoinDraft) {
 
 function Heading({ step }: { step: Step }) {
   const eyebrow = {
-    1: "ABOUT YOU",
-    2: "PHOTO + VIDEO",
-    3: "YOUR PRACTICE",
-    4: "YOUR VOICE",
+    1: "BASIC INFO",
+    2: "PHOTO",
+    3: "PRACTICE DETAILS",
+    4: "CONVERSATION CARDS & CONTACT",
+  }[step];
+
+  const subcopy = {
+    1: "This is how clients will find and recognize you across Kitchen Sink.",
+    2: "A clear, friendly photo is often the first thing a client notices — profiles with one get noticed a lot more than initials on a colored circle.",
+    3: "Everything below powers client search filters.",
+    4: "Pick a few prompts and answer in your own voice — this is usually the first thing a client reads.",
   }[step];
 
   return (
@@ -102,6 +109,7 @@ function Heading({ step }: { step: Step }) {
           </>
         )}
       </h1>
+      <p className="mt-3 text-mute">{subcopy}</p>
     </div>
   );
 }

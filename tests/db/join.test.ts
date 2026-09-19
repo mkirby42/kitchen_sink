@@ -3,7 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { createAnonClient, dbConfigured, search } from "./client";
 
 describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
-  const email = `join-test-${randomUUID()}@kitchensink.demo`;
+  const email = `join-test-${randomUUID()}@gmail.com`;
   const password = "join-test-pass-1";
   let joinedUserId: string | null = null;
 

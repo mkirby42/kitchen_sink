@@ -15,7 +15,7 @@ export function JoinShell({
   footer?: React.ReactNode;
 }) {
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+    <main className="mx-auto w-full max-w-lg px-4 py-8 sm:px-6 sm:py-12">
       <section className="overflow-hidden rounded-[2rem] bg-paper shadow-[0_24px_70px_rgba(27,39,68,0.12)]">
         <div className="flex items-center gap-5 px-6 pt-6 sm:px-10 sm:pt-8">
           {onBack ? (

@@ -6,7 +6,10 @@ import {
   storagePublicUrl,
   yearsPracticing,
 } from "./display";
+import { needsSupervisor } from "./credential";
 import { resolveTherapistId } from "./ids";
+
+export { needsSupervisor } from "./credential";
 
 export type ProfileLicense = {
   number: string;
@@ -77,11 +80,6 @@ export type TherapistProfileData = {
 };
 
 const SUPERBILL_LABEL = "out-of-network superbill";
-
-export function needsSupervisor(credential: string | null | undefined) {
-  if (!credential) return false;
-  return /associate|trainee/i.test(credential);
-}
 
 export function givenName(name: string) {
   const parts = name.split(/\s+/).filter(Boolean);
