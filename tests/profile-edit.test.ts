@@ -1,7 +1,11 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh() {}, push() {}, replace() {} }),
+}));
 import type { InterestViewer } from "@/lib/interest/viewer";
 import { routes } from "@/lib/routes";
 import type { TherapistProfileData } from "@/lib/therapists/load";
