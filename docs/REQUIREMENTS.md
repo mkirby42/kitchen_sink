@@ -9,8 +9,8 @@ Patients find a therapist by must-have filters. Therapists publish a profile cli
 ## Must ship
 
 1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties (preset chips **plus** free-text “Add your own”), insurance, license state. OR semantics: therapist must match **some** selected tag. Empty filters = all therapists open to new clients.
-2. **Therapist profile** — photo, **intro video**, name, credential, **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile), about, conversation cards, reviews (read-only seed data), contact (email / phone / text as listed). If credential is associate or trainee, collect and show **supervising clinician name** (required) and **supervisor license #**; show a pre-license note on profile. Profile hero plays the intro video.
-3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (incl. repeatable state-license rows) → **photo + intro video** → practice tags → cards + contact + optional product feedback.
+2. **Therapist profile** — photo, **optional intro video**, name, credential, **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile), about, conversation cards, reviews (read-only seed data), contact (email / phone / text as listed). If credential is associate or trainee, collect and show **supervising clinician name** (required) and **supervisor license #**; show a pre-license note on profile. Profile hero plays the intro video when one is uploaded.
+3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (incl. repeatable state-license rows) → **photo (required) + intro video (optional, up to 50MB)** → practice tags → cards + contact + optional product feedback.
 4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
@@ -35,7 +35,7 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | --- | --- |
 | Nav | Home, Find a Therapist, Join as a Therapist |
 | Therapist onboarding 1 | Name, credential dropdown, years practicing, **State license(s)** repeater (license # + state per row, remove row, “+ Add another state license”); if associate/trainee credential, supervising clinician name + supervisor license # |
-| Therapist onboarding 2 | Photo + intro video upload (prototype shows photo; profile hero has a 1 min intro play button — collect both here) |
+| Therapist onboarding 2 | Photo (required) + intro video (optional, up to 50MB; prototype shows photo; profile hero plays intro when present) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
 | Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
 | Search | Must-have chips (specialties: presets + free-text custom). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price) |
@@ -54,7 +54,7 @@ profiles
   id uuid PK = auth.uid()
   role text check (therapist | patient)
   name, email, phone, about_me
-  photo_key, video_key          -- Supabase Storage keys; intro video required for ship
+  photo_key, video_key          -- Supabase Storage keys; photo required, intro video optional (max 50MB)
   created_at
 
 therapists                      -- 1:1 with therapist profiles
@@ -191,4 +191,4 @@ Sequential where files collide; parallel otherwise.
 
 ## Done when
 
-A judge can open `/find`, tap Anxiety, see Maya, open her profile, play the intro video, read cards and reviews, and (as a new user) join as a therapist with photo + video and appear in search. CI is green. Match is one indexed query.
+A judge can open `/find`, tap Anxiety, see Maya, open her profile, play the intro video, read cards and reviews, and (as a new user) join as a therapist with a photo (intro video optional) and appear in search. CI is green. Match is one indexed query.

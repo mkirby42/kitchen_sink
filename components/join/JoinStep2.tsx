@@ -8,15 +8,19 @@ import { createClient } from "@/lib/supabase/client";
 
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+const VIDEO_MAX_BYTES = 50 * 1024 * 1024;
 
 export function JoinStep2({
   userId,
   draft,
   setDraft,
+  onBusyChange,
 }: {
   userId: string;
   draft: JoinDraft;
   setDraft: Dispatch<SetStateAction<JoinDraft>>;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
@@ -37,10 +41,15 @@ export function JoinStep2({
     [videoPreview],
   );
 
+  useEffect(() => {
+    onBusyChange?.(uploading.photo || uploading.video);
+    return () => onBusyChange?.(false);
+  }, [onBusyChange, uploading.photo, uploading.video]);
+
   async function chooseFile(kind: "photo" | "video", file?: File) {
     if (!file) return;
 
-    const maxBytes = kind === "photo" ? 5 * 1024 * 1024 : 50 * 1024 * 1024;
+    const maxBytes = kind === "photo" ? PHOTO_MAX_BYTES : VIDEO_MAX_BYTES;
     const allowedTypes = kind === "photo" ? PHOTO_TYPES : VIDEO_TYPES;
     if (!allowedTypes.includes(file.type)) {
       setError(
@@ -169,10 +178,12 @@ export function JoinStep2({
         <div>
           <h2 className="font-display text-2xl">Your intro video</h2>
           <p className="mt-2 leading-7 text-mute">
-            One short intro clip. We&apos;ll play it as uploaded on your public
-            profile — no editing.
+            Optional. One short intro clip. We&apos;ll play it as uploaded on
+            your public profile — no editing.
           </p>
-          <p className="mt-2 text-sm text-mute">MP4, WebM, or MOV · up to 50MB</p>
+          <p className="mt-2 text-sm text-mute">
+            MP4, WebM, or MOV · up to 50MB
+          </p>
           {draft.videoKey ? (
             <p className="mt-3 text-sm font-semibold text-clay">Video uploaded.</p>
           ) : null}

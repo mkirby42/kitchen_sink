@@ -128,6 +128,7 @@ export function JoinWizard({
   const [draft, setDraft] = useState<JoinDraft>(() => initialDraft(email));
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [mediaBusy, setMediaBusy] = useState(false);
 
   function moveTo(nextStep: Step) {
     setStep(nextStep);
@@ -197,7 +198,7 @@ export function JoinWizard({
           </div>
           <button
             type="button"
-            disabled={blocked || submitting}
+            disabled={blocked || submitting || mediaBusy}
             onClick={() => void continueOrSubmit()}
             className="shrink-0 rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-45"
           >
@@ -214,7 +215,12 @@ export function JoinWizard({
       {step === 1 ? (
         <JoinStep1 draft={draft} setDraft={setDraft} />
       ) : step === 2 ? (
-        <JoinStep2 userId={userId} draft={draft} setDraft={setDraft} />
+        <JoinStep2
+          userId={userId}
+          draft={draft}
+          setDraft={setDraft}
+          onBusyChange={setMediaBusy}
+        />
       ) : step === 3 ? (
         <JoinStep3 draft={draft} setDraft={setDraft} />
       ) : (

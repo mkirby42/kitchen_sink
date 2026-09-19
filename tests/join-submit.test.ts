@@ -76,4 +76,11 @@ describe("toRpcArgs", () => {
     expect(args.p_photo_key).toBe("user-id/photo.jpg");
     expect(args.p_video_key).toBe("user-id/intro.mp4");
   });
+
+  it("passes a null intro video key through when omitted", () => {
+    const payload = buildJoinPayload({ ...draft, videoKey: null });
+    const args = toRpcArgs(payload);
+
+    expect(args.p_video_key).toBeNull();
+  });
 });
