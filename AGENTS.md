@@ -21,3 +21,7 @@ Short. No essays. Update REQUIREMENTS only if behavior changes.
 ## Git
 
 Commit when asked. Repo: `mkirby42/kitchen_sink`, not the org. Never commit `.env` or the service role key.
+
+## Next.js 16
+
+Request interceptor file is `proxy.ts`, not `middleware.ts`. Do not re-enable `agentRules` in `next.config.ts` — it overwrites this file.

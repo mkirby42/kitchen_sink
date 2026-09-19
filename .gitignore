@@ -3,11 +3,14 @@
 
 # Dependencies
 node_modules/
+.pnp
+.pnp.*
 
 # Next.js
 .next/
 out/
 dist/
+*.tsbuildinfo
 
 # Env and secrets
 .env
@@ -34,3 +37,4 @@ supabase/.branches/
 .idea/
 *.swp
 *.swo
+*.pem

@@ -12,9 +12,15 @@ Next.js (App Router) · TypeScript · Tailwind · Supabase (Auth, Postgres, Stor
 
 ```bash
 cp .env.example .env.local
-# fill Supabase URL + anon key
+# fill Supabase URL + anon key (pages render without them)
 npm install
 npm run dev
+```
+
+`/` home · `/find` search · `/t/[id]` profile · `/join` therapist signup. Shell only until schema lands.
+
+```bash
+npm run lint && npm run typecheck && npm test && npm run build
 ```
 
 Needs a local or hosted Supabase project. Apply migrations from `supabase/migrations/` once they exist.
