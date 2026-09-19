@@ -20,6 +20,13 @@ const FILTERS = [
   ["outcome", "Outcome"],
 ] as const;
 
+const pillClass =
+  "rounded-full border border-line bg-paper px-4 py-2.5 outline-none focus:border-clay";
+const labelClass =
+  "text-xs font-semibold tracking-[0.16em] text-mute uppercase";
+const underlineClass =
+  "mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay";
+
 export function JoinStep4({
   draft,
   setDraft,
@@ -28,13 +35,8 @@ export function JoinStep4({
   setDraft: Dispatch<SetStateAction<JoinDraft>>;
 }) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number][0]>("all");
-  const [activePrompt, setActivePrompt] = useState<{
-    prompt: string;
-    tag: string;
-  } | null>(null);
   const [showCustom, setShowCustom] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
-  const [customAnswer, setCustomAnswer] = useState("");
 
   const usedServices = new Set(draft.rates.map((rate) => rate.service_type));
   const availableService = RATE_SERVICE_TYPES.find(
@@ -43,51 +45,175 @@ export function JoinStep4({
   const filteredPrompts = CONVERSATION_PROMPTS.filter(
     (item) => filter === "all" || item.tag === filter,
   );
+  const answeredCount = draft.cards.filter((card) => card.answer.trim()).length;
 
-  function setPromptAnswer(prompt: string, tag: string, answer: string) {
+  function addPrompt(prompt: string, tag: string) {
     setDraft((current) => {
-      const existing = current.cards.findIndex((card) => card.prompt === prompt);
-      if (existing === -1) {
-        return {
-          ...current,
-          cards: [...current.cards, { prompt, tag, answer }],
-        };
-      }
+      if (current.cards.some((card) => card.prompt === prompt)) return current;
       return {
         ...current,
-        cards: current.cards.map((card, index) =>
-          index === existing ? { ...card, answer } : card,
-        ),
+        cards: [...current.cards, { prompt, tag, answer: "" }],
       };
     });
   }
 
   function addCustomCard() {
     const prompt = customPrompt.trim();
-    const answer = customAnswer.trim();
-    if (!prompt || !answer) return;
-    setDraft((current) => ({
-      ...current,
-      cards: [...current.cards, { prompt, answer, tag: "custom" }],
-    }));
+    if (!prompt) return;
+    setDraft((current) => {
+      if (current.cards.some((card) => card.prompt === prompt)) return current;
+      return {
+        ...current,
+        cards: [...current.cards, { prompt, answer: "", tag: "custom" }],
+      };
+    });
     setCustomPrompt("");
-    setCustomAnswer("");
     setShowCustom(false);
   }
 
   return (
-    <div className="space-y-10">
-      <fieldset>
-        <legend className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Rates
-        </legend>
-        <div className="mt-4 space-y-4">
-          {draft.rates.map((rate, index) => (
+    <div className="space-y-8">
+      <p className="text-sm text-mute">{answeredCount} of 3 added</p>
+
+      {draft.cards.length ? (
+        <div className="space-y-3">
+          {draft.cards.map((card, index) => (
             <div
-              key={index}
-              className="grid gap-4 rounded-2xl bg-cream p-4 sm:grid-cols-[1fr_7rem_8rem_auto]"
+              key={`${card.prompt}-${index}`}
+              className="flex gap-3 rounded-2xl border border-line px-4 py-4"
             >
-              <label>
+              <span
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-clay text-sm text-paper"
+                aria-hidden
+              >
+                ✦
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-display italic text-clay">{card.prompt}</p>
+                <textarea
+                  rows={2}
+                  value={card.answer}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      cards: current.cards.map((item, itemIndex) =>
+                        itemIndex === index
+                          ? { ...item, answer: event.target.value }
+                          : item,
+                      ),
+                    }))
+                  }
+                  placeholder="Write 1–2 sentences in your own voice…"
+                  className="mt-2 w-full resize-y bg-transparent text-sm leading-6 outline-none placeholder:text-mute/80"
+                />
+              </div>
+              <button
+                type="button"
+                aria-label={`Remove ${card.prompt}`}
+                onClick={() =>
+                  setDraft((current) => ({
+                    ...current,
+                    cards: current.cards.filter(
+                      (_, itemIndex) => itemIndex !== index,
+                    ),
+                  }))
+                }
+                className="grid size-8 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="flex flex-wrap gap-2">
+        {FILTERS.map(([value, label]) => {
+          const selected = filter === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => setFilter(value)}
+              className={
+                selected
+                  ? "rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper"
+                  : "rounded-full bg-cream px-4 py-2 text-sm font-medium text-ink hover:bg-line"
+              }
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="space-y-2">
+        {filteredPrompts.map((item) => {
+          const added = draft.cards.some((card) => card.prompt === item.prompt);
+          return (
+            <button
+              key={item.prompt}
+              type="button"
+              disabled={added}
+              onClick={() => addPrompt(item.prompt, item.tag)}
+              className="flex w-full items-center justify-between gap-4 rounded-2xl border border-line px-5 py-3 text-left disabled:opacity-50"
+            >
+              <span className="font-display italic text-clay">{item.prompt}</span>
+              <span
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-cream text-lg text-clay"
+                aria-hidden
+              >
+                +
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setShowCustom(true)}
+        className="w-full rounded-full border border-dashed border-clay/60 px-5 py-3 text-sm font-medium text-clay hover:bg-cream"
+      >
+        ✎ Write your own prompt
+      </button>
+      {showCustom ? (
+        <div className="space-y-4 rounded-2xl border border-line px-5 py-5">
+          <label className="block">
+            <span className={labelClass}>Your question</span>
+            <input
+              value={customPrompt}
+              onChange={(event) => setCustomPrompt(event.target.value)}
+              placeholder="e.g. what surprises new clients about me…"
+              className={underlineClass}
+            />
+          </label>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={addCustomCard}
+              className="rounded-full bg-clay px-5 py-2 text-sm font-semibold text-paper"
+            >
+              Add card
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowCustom(false)}
+              className="rounded-full border border-line bg-paper px-5 py-2 text-sm font-semibold text-ink"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <fieldset>
+        <legend className={labelClass}>Rates</legend>
+        <div className="mt-4 space-y-3">
+          {draft.rates.map((rate, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <label className="min-w-0 flex-1">
                 <span className="sr-only">Service type</span>
                 <select
                   aria-label={`Rate ${index + 1} service type`}
@@ -102,7 +228,7 @@ export function JoinStep4({
                       ),
                     }))
                   }
-                  className="w-full border-b border-line bg-transparent py-2 outline-none focus:border-clay"
+                  className={`w-full ${pillClass}`}
                 >
                   {RATE_SERVICE_TYPES.map((service) => (
                     <option
@@ -117,7 +243,7 @@ export function JoinStep4({
                   ))}
                 </select>
               </label>
-              <label>
+              <label className="w-[6.5rem] shrink-0">
                 <span className="sr-only">Duration</span>
                 <select
                   aria-label={`Rate ${index + 1} duration`}
@@ -135,7 +261,7 @@ export function JoinStep4({
                       ),
                     }))
                   }
-                  className="w-full border-b border-line bg-transparent py-2 outline-none focus:border-clay"
+                  className={`w-full ${pillClass}`}
                 >
                   {RATE_DURATIONS.map((duration) => (
                     <option key={duration} value={duration}>
@@ -144,8 +270,10 @@ export function JoinStep4({
                   ))}
                 </select>
               </label>
-              <label className="relative">
-                <span className="absolute left-0 top-2 text-mute">$</span>
+              <label className="relative w-[6.5rem] shrink-0">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-mute">
+                  $
+                </span>
                 <span className="sr-only">Price in dollars</span>
                 <input
                   aria-label={`Rate ${index + 1} price in dollars`}
@@ -168,7 +296,7 @@ export function JoinStep4({
                       ),
                     }))
                   }
-                  className="w-full border-b border-line bg-transparent py-2 pl-4 outline-none focus:border-clay"
+                  className={`w-full ${pillClass} pl-7`}
                 />
               </label>
               <button
@@ -183,7 +311,7 @@ export function JoinStep4({
                     ),
                   }))
                 }
-                className="size-9 rounded-full text-xl text-mute hover:bg-paper hover:text-clay disabled:cursor-not-allowed disabled:opacity-30"
+                className="grid size-9 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay disabled:cursor-not-allowed disabled:opacity-30"
               >
                 ×
               </button>
@@ -207,167 +335,32 @@ export function JoinStep4({
               ],
             }));
           }}
-          className="mt-4 w-full rounded-2xl border border-dashed border-clay/50 px-5 py-3 text-sm font-semibold text-clay hover:bg-cream disabled:cursor-not-allowed disabled:opacity-40"
+          className="mt-3 w-full rounded-full border border-dashed border-clay/50 px-5 py-2.5 text-sm font-medium text-clay hover:bg-cream disabled:cursor-not-allowed disabled:opacity-40"
         >
           + Add another rate
         </button>
       </fieldset>
 
-      <section className="border-t border-line pt-9">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-              Conversation cards
-            </p>
-            <h2 className="mt-2 font-display text-2xl">Give clients a feel for you</h2>
-          </div>
-          <p className="text-sm text-mute">
-            {draft.cards.filter((card) => card.answer.trim()).length} of 3 added
-          </p>
-        </div>
-
-        {draft.cards.length ? (
-          <div className="mt-5 space-y-3">
-            {draft.cards.map((card, index) => (
-              <div
-                key={`${card.prompt}-${index}`}
-                className="flex gap-4 rounded-2xl border border-line bg-paper p-4"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="font-display italic text-clay">{card.prompt}</p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6">
-                    {card.answer || "Add your answer below."}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  aria-label={`Remove ${card.prompt}`}
-                  onClick={() =>
-                    setDraft((current) => ({
-                      ...current,
-                      cards: current.cards.filter(
-                        (_, itemIndex) => itemIndex !== index,
-                      ),
-                    }))
-                  }
-                  className="size-8 shrink-0 rounded-full text-xl text-mute hover:bg-cream hover:text-clay"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        <div className="mt-6 flex flex-wrap gap-2">
-          {FILTERS.map(([value, label]) => (
-            <Chip
-              key={value}
-              selected={filter === value}
-              onClick={() => setFilter(value)}
-            >
-              {label}
-            </Chip>
-          ))}
-        </div>
-
-        <div className="mt-5 divide-y divide-line rounded-2xl border border-line">
-          {filteredPrompts.map((item) => {
-            const isActive = activePrompt?.prompt === item.prompt;
-            const answer =
-              draft.cards.find((card) => card.prompt === item.prompt)?.answer ?? "";
-            return (
-              <div key={item.prompt} className="p-4">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActivePrompt(isActive ? null : { ...item })
-                  }
-                  className="flex w-full items-center justify-between gap-4 text-left"
-                >
-                  <span className="font-display italic text-clay">{item.prompt}</span>
-                  <span className="text-xl">{isActive ? "−" : "+"}</span>
-                </button>
-                {isActive ? (
-                  <textarea
-                    autoFocus
-                    rows={3}
-                    value={answer}
-                    onChange={(event) =>
-                      setPromptAnswer(item.prompt, item.tag, event.target.value)
-                    }
-                    placeholder="Write your answer…"
-                    className="mt-4 w-full rounded-2xl bg-cream p-4 outline-none focus:ring-1 focus:ring-clay"
-                  />
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-
-        {!showCustom ? (
-          <button
-            type="button"
-            onClick={() => setShowCustom(true)}
-            className="mt-4 w-full rounded-2xl border border-dashed border-clay/50 px-5 py-3 text-sm font-semibold text-clay hover:bg-cream"
-          >
-            + Write your own prompt
-          </button>
-        ) : (
-          <div className="mt-4 space-y-3 rounded-2xl bg-cream p-5">
-            <input
-              value={customPrompt}
-              onChange={(event) => setCustomPrompt(event.target.value)}
-              placeholder="Your question"
-              className="w-full border-b border-line bg-transparent py-2 outline-none focus:border-clay"
-            />
-            <textarea
-              rows={3}
-              value={customAnswer}
-              onChange={(event) => setCustomAnswer(event.target.value)}
-              placeholder="Your answer"
-              className="w-full rounded-2xl bg-paper p-4 outline-none focus:ring-1 focus:ring-clay"
-            />
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={addCustomCard}
-                className="rounded-full bg-clay px-4 py-2 text-sm font-semibold text-paper"
-              >
-                Add card
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowCustom(false)}
-                className="text-sm font-semibold text-mute"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-      </section>
-
-      <label className="block border-t border-line pt-9">
-        <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          About you
-        </span>
+      <label className="block">
+        <span className={labelClass}>About you</span>
         <textarea
           rows={5}
           value={draft.about}
           onChange={(event) =>
             setDraft((current) => ({ ...current, about: event.target.value }))
           }
-          className="mt-3 w-full rounded-2xl bg-cream p-5 outline-none focus:ring-1 focus:ring-clay"
-          placeholder="Share what you want clients to know about you."
+          className="mt-3 w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none placeholder:text-mute/80 focus:border-clay"
+          placeholder='Write this in the first person — e.g. "I work with adults navigating anxiety and big life transitions…" (shown at the top of your profile).'
         />
       </label>
 
-      <section className="space-y-6 border-t border-line pt-9">
+      <section className="space-y-6">
         <label className="block">
-          <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-            Your email
-          </span>
+          <span className={labelClass}>Your email</span>
+          <p className="mt-1 text-sm text-mute">
+            For our records; this is also the public email when email outreach is
+            selected.
+          </p>
           <input
             type="email"
             autoComplete="email"
@@ -375,18 +368,16 @@ export function JoinStep4({
             onChange={(event) =>
               setDraft((current) => ({ ...current, email: event.target.value }))
             }
-            className="mt-2 w-full border-b border-line bg-transparent py-3 text-lg outline-none focus:border-clay"
+            className={underlineClass}
           />
-          <span className="mt-2 block text-sm text-mute">
-            For our records; this is also the public email when email outreach is
-            selected.
-          </span>
         </label>
 
         <fieldset>
-          <legend className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-            How can clients reach you?
-          </legend>
+          <legend className={labelClass}>How should clients reach you?</legend>
+          <p className="mt-1 text-sm text-mute">
+            Select all that apply — shown on your public profile so clients can
+            contact you directly. Kitchen Sink doesn&apos;t handle introductions.
+          </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {OUTREACH_OPTIONS.map((option) => (
               <Chip
@@ -411,9 +402,7 @@ export function JoinStep4({
           (option) => option === "phone" || option === "text",
         ) ? (
           <label className="block">
-            <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-              Phone number
-            </span>
+            <span className={labelClass}>Phone</span>
             <input
               type="tel"
               autoComplete="tel"
@@ -421,24 +410,25 @@ export function JoinStep4({
               onChange={(event) =>
                 setDraft((current) => ({ ...current, phone: event.target.value }))
               }
-              className="mt-2 w-full border-b border-line bg-transparent py-3 text-lg outline-none focus:border-clay"
+              className={underlineClass}
             />
           </label>
         ) : null}
       </section>
 
-      <label className="block border-t border-line pt-9">
-        <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Optional product feedback
-        </span>
+      <label className="block">
+        <span className={labelClass}>Feedback for us</span>
+        <p className="mt-1 text-sm text-mute">
+          Optional — we&apos;re in testing, so anything you&apos;d flag is welcome.
+        </p>
         <textarea
           rows={3}
           value={draft.feedback}
           onChange={(event) =>
             setDraft((current) => ({ ...current, feedback: event.target.value }))
           }
-          className="mt-3 w-full rounded-2xl bg-cream p-5 outline-none focus:ring-1 focus:ring-clay"
-          placeholder="What would make this easier?"
+          className="mt-3 w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none placeholder:text-mute/80 focus:border-clay"
+          placeholder="Confusing steps, missing fields, bugs, ideas — anything at all."
         />
       </label>
     </div>

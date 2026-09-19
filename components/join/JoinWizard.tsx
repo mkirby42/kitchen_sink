@@ -185,16 +185,16 @@ export function JoinWizard({
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <p className="text-sm text-mute">{hint}</p>
-            {submitError ? (
-              <p role="alert" className="mt-1 text-sm font-medium text-clay-dark">
-                {submitError}
-              </p>
-            ) : blocked && errors[0] ? (
-              <p className="mt-1 text-sm font-medium text-clay-dark">
-                {errors[0]}
-              </p>
-            ) : null}
+            <p
+              role={submitError ? "alert" : undefined}
+              className={`text-sm ${
+                submitError || (!hint && blocked)
+                  ? "font-medium text-clay-dark"
+                  : "text-mute"
+              }`}
+            >
+              {submitError || hint || (blocked ? errors[0] : "")}
+            </p>
           </div>
           <button
             type="button"

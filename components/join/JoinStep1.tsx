@@ -80,16 +80,12 @@ export function JoinStep1({
       </div>
 
       {requiresSupervisor ? (
-        <div className="space-y-6">
-          <div className="rounded-2xl bg-cream px-5 py-4 text-sm leading-6 text-mute">
-            Since you&apos;re practicing under supervision, we&apos;ll note your
-            supervisor&apos;s name and license alongside your profile, as most
-            states require.
-          </div>
+        <div className="space-y-5">
           <div className="grid gap-8 sm:grid-cols-2">
             <label className="block">
-              <span className={labelClass}>Supervisor name *</span>
+              <span className={labelClass}>Supervising clinician&apos;s name *</span>
               <input
+                placeholder="e.g. Jordan Ellis, LMFT"
                 value={draft.supervisorName}
                 onChange={(event) =>
                   setDraft((current) => ({
@@ -101,8 +97,9 @@ export function JoinStep1({
               />
             </label>
             <label className="block">
-              <span className={labelClass}>Supervisor license # *</span>
+              <span className={labelClass}>Supervisor&apos;s license #</span>
               <input
+                placeholder="MFC 55210"
                 value={draft.supervisorLicense}
                 onChange={(event) =>
                   setDraft((current) => ({
@@ -114,27 +111,24 @@ export function JoinStep1({
               />
             </label>
           </div>
-          {!draft.supervisorName.trim() || !draft.supervisorLicense.trim() ? (
-            <p className="text-sm font-medium text-clay-dark">
-              Associate and trainee credentials require both supervisor fields.
-            </p>
-          ) : null}
+          <div className="rounded-2xl bg-cream px-5 py-4 text-sm leading-6 text-mute">
+            Since you&apos;re practicing under supervision, we&apos;ll note your
+            supervisor&apos;s name and license alongside your profile, as most
+            states require.
+          </div>
         </div>
       ) : null}
 
       <fieldset>
         <legend className={labelClass}>State license(s)</legend>
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 space-y-3">
           {draft.licenses.map((license, index) => (
-            <div
-              key={index}
-              className="grid gap-4 rounded-2xl bg-cream p-4 sm:grid-cols-[1fr_8rem_auto]"
-            >
-              <label>
+            <div key={index} className="flex items-center gap-2">
+              <label className="min-w-0 flex-1">
                 <span className="sr-only">License number</span>
                 <input
                   aria-label={`License ${index + 1} number`}
-                  placeholder="License #"
+                  placeholder="License # (e.g. MFC 112938)"
                   value={license.number}
                   onChange={(event) =>
                     setDraft((current) => ({
@@ -146,10 +140,10 @@ export function JoinStep1({
                       ),
                     }))
                   }
-                  className="w-full border-b border-line bg-transparent py-2 outline-none focus:border-clay"
+                  className="w-full rounded-full border border-line bg-paper px-4 py-2.5 outline-none placeholder:text-mute/70 focus:border-clay"
                 />
               </label>
-              <label>
+              <label className="w-[5.5rem] shrink-0">
                 <span className="sr-only">License state</span>
                 <select
                   aria-label={`License ${index + 1} state`}
@@ -164,7 +158,7 @@ export function JoinStep1({
                       ),
                     }))
                   }
-                  className="w-full border-b border-line bg-transparent py-2 outline-none focus:border-clay"
+                  className="w-full rounded-full border border-line bg-paper px-3 py-2.5 outline-none focus:border-clay"
                 >
                   <option value="">State</option>
                   {LICENSE_STATES.map((state) => (
@@ -186,7 +180,7 @@ export function JoinStep1({
                     ),
                   }))
                 }
-                className="size-9 rounded-full text-xl text-mute hover:bg-paper hover:text-clay disabled:cursor-not-allowed disabled:opacity-30"
+                className="grid size-9 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay disabled:cursor-not-allowed disabled:opacity-30"
               >
                 ×
               </button>
@@ -201,7 +195,7 @@ export function JoinStep1({
               licenses: [...current.licenses, { number: "", state: "" }],
             }))
           }
-          className="mt-4 w-full rounded-2xl border border-dashed border-clay/50 px-5 py-3 text-sm font-semibold text-clay hover:bg-cream"
+          className="mt-3 w-full rounded-full border border-dashed border-clay/50 px-5 py-2.5 text-sm font-medium text-clay hover:bg-cream"
         >
           + Add another state license
         </button>
