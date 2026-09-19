@@ -61,7 +61,10 @@ export default async function FindPage({ searchParams }: FindPageProps) {
             <ul className="space-y-4">
               {rows.map((row) => (
                 <li key={row.profile_id}>
-                  <TherapistCard row={row} />
+                  <TherapistCard
+                    row={row}
+                    selectedCount={filters.tags.length}
+                  />
                 </li>
               ))}
             </ul>
