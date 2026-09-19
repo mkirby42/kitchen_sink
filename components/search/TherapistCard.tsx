@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { routes } from "@/lib/routes";
-import type { SearchRow } from "@/lib/search/rpc";
+import { buildTherapistHref } from "@/components/search/query";
+import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import {
   formatStartingRate,
   initials,
@@ -49,7 +49,13 @@ function Avatar({ name, photo }: { name: string; photo: string | null }) {
   );
 }
 
-export function TherapistCard({ row }: { row: SearchRow }) {
+export function TherapistCard({
+  row,
+  filters,
+}: {
+  row: SearchRow;
+  filters: SearchFilters;
+}) {
   const photo = storagePublicUrl("photos", row.photo_key);
   const years = yearsPracticing(row.start_date_of_practice);
   const rate = formatStartingRate(
@@ -67,7 +73,7 @@ export function TherapistCard({ row }: { row: SearchRow }) {
 
   return (
     <Link
-      href={routes.therapist(row.profile_id)}
+      href={buildTherapistHref(row.profile_id, filters)}
       className="block rounded-3xl border border-line bg-paper p-6 shadow-sm transition hover:border-ink/15"
     >
       <div className="flex items-start gap-4">

@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import { buildFindHref } from "@/components/search/query";
 import {
   ProfileNotFound,
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
+import { parseFindSearchParams } from "@/lib/search/rpc";
 import { loadTherapistProfile } from "@/lib/therapists/load";
 
 type ProfilePageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({
@@ -20,11 +23,13 @@ export async function generateMetadata({
 
 export default async function TherapistProfilePage({
   params,
+  searchParams,
 }: ProfilePageProps) {
   const { id } = await params;
+  const backHref = buildFindHref(parseFindSearchParams(await searchParams));
   const data = await loadTherapistProfile(id);
 
-  if (!data) return <ProfileNotFound />;
+  if (!data) return <ProfileNotFound backHref={backHref} />;
 
-  return <TherapistProfile data={data} />;
+  return <TherapistProfile data={data} backHref={backHref} />;
 }

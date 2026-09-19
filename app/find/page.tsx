@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { FindFilters } from "@/components/search/FindFilters";
 import { TherapistCard } from "@/components/search/TherapistCard";
+import { resultCountLabel } from "@/components/search/query";
 import { parseFindSearchParams, searchTherapists } from "@/lib/search/rpc";
-import { MAYA_ID } from "@/lib/therapists/ids";
 
 export const metadata: Metadata = {
   title: "Find a therapist",
@@ -16,7 +16,6 @@ type FindPageProps = {
 export default async function FindPage({ searchParams }: FindPageProps) {
   const filters = parseFindSearchParams(await searchParams);
   const rows = await searchTherapists(filters);
-  const showSampleNote = rows?.some((row) => row.profile_id === MAYA_ID);
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -48,20 +47,13 @@ export default async function FindPage({ searchParams }: FindPageProps) {
           </p>
         ) : (
           <>
-            {showSampleNote ? (
-              <p className="rounded-full bg-clay/25 px-6 py-2.5 text-center text-sm leading-snug text-clay">
-                Kitchen Sink just launched, so you&apos;re seeing a sample
-                profile marked SAMPLE below to show what&apos;s possible. Real
-                founding therapists will appear here as they join.
-              </p>
-            ) : null}
             <p className="text-sm text-mute">
-              {rows.length} therapist{rows.length === 1 ? "" : "s"}
+              {resultCountLabel(rows.length)}
             </p>
             <ul className="space-y-4">
               {rows.map((row) => (
                 <li key={row.profile_id}>
-                  <TherapistCard row={row} />
+                  <TherapistCard row={row} filters={filters} />
                 </li>
               ))}
             </ul>
