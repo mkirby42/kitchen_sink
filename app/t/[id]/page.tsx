@@ -1,4 +1,9 @@
 import type { Metadata } from "next";
+import {
+  ProfileNotFound,
+  TherapistProfile,
+} from "@/components/profile/TherapistProfile";
+import { loadTherapistProfile } from "@/lib/therapists/load";
 
 type ProfilePageProps = {
   params: Promise<{ id: string }>;
@@ -8,22 +13,18 @@ export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
   const { id } = await params;
-  return { title: `Therapist ${id}` };
+  const data = await loadTherapistProfile(id);
+  if (!data) return { title: "Therapist not found" };
+  return { title: data.name };
 }
 
 export default async function TherapistProfilePage({
   params,
 }: ProfilePageProps) {
   const { id } = await params;
+  const data = await loadTherapistProfile(id);
 
-  return (
-    <main className="mx-auto max-w-lg px-6 py-12">
-      <p className="text-sm text-mute">Therapist profile</p>
-      <h1 className="mt-2 font-display text-4xl tracking-tight">{id}</h1>
-      <p className="mt-4 text-mute">
-        Photo, intro video, cards, rates, and reviews load here once the
-        database is in.
-      </p>
-    </main>
-  );
+  if (!data) return <ProfileNotFound />;
+
+  return <TherapistProfile data={data} />;
 }

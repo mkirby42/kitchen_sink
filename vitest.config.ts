@@ -6,6 +6,7 @@ export default defineConfig({
     environment: "node",
     setupFiles: ["tests/db/load-env.ts"],
     testTimeout: 15000,
+    fileParallelism: false,
   },
   resolve: {
     alias: {

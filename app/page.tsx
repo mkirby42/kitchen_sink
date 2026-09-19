@@ -10,7 +10,7 @@ export default function HomePage() {
         <em className="text-clay">fits</em>.
       </h1>
       <p className="mt-6 max-w-xl text-lg text-mute">
-        Tap the tags you need. We only show therapists who match every one.
+        Tap the tags you need. We show therapists who match some of them.
       </p>
       <div className="mt-10 flex flex-wrap gap-3">
         <Link
