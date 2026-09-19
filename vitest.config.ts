@@ -4,6 +4,8 @@ import path from "node:path";
 export default defineConfig({
   test: {
     environment: "node",
+    setupFiles: ["tests/db/load-env.ts"],
+    testTimeout: 15000,
   },
   resolve: {
     alias: {

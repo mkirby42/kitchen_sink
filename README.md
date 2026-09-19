@@ -35,4 +35,4 @@ Needs a local or hosted Supabase project. Apply migrations from `supabase/migrat
 
 ## CI
 
-GitHub Actions on PR and `main`: typecheck, lint, tests. Vercel deploys previews and production. Details in the requirements doc.
+GitHub Actions on PR and `main`: typecheck, lint, tests. Repo secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Never put the service role key in CI. Vercel deploys previews and production. Details in the requirements doc.
