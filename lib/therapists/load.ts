@@ -141,6 +141,38 @@ export function contactActions(input: {
   return actions;
 }
 
+export type ConsultBookAction = {
+  kind: "consult" | "book";
+  label: string;
+  href: string;
+};
+
+/** Screenshot CTAs: still mailto/tel, never a calendar. */
+export function consultBookActions(
+  contact: ContactAction[],
+): ConsultBookAction[] {
+  const email = contact.find((item) => item.kind === "email");
+  const phone =
+    contact.find((item) => item.kind === "phone") ??
+    contact.find((item) => item.kind === "text");
+  const actions: ConsultBookAction[] = [];
+  if (email) {
+    actions.push({
+      kind: "consult",
+      label: "Free Consult",
+      href: email.href,
+    });
+  }
+  if (phone) {
+    actions.push({
+      kind: "book",
+      label: "Book a Session",
+      href: phone.href,
+    });
+  }
+  return actions;
+}
+
 export function inNetworkInsurance(labels: string[]) {
   return labels.filter(
     (label) =>

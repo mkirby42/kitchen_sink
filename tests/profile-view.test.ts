@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  consultBookActions,
   contactActions,
   givenName,
   inNetworkInsurance,
@@ -50,6 +51,28 @@ describe("profile view helpers", () => {
     expect(actions.some((a) => /book a session|calendar/i.test(a.label))).toBe(
       false,
     );
+  });
+
+  it("maps outreach to screenshot consult/book pills over mailto and tel", () => {
+    const ctas = consultBookActions(
+      contactActions({
+        email: "maya@kitchensink.demo",
+        phone: "(415) 555-0199",
+        outreach: ["email", "phone", "text"],
+      }),
+    );
+    expect(ctas).toEqual([
+      {
+        kind: "consult",
+        label: "Free Consult",
+        href: "mailto:maya@kitchensink.demo",
+      },
+      {
+        kind: "book",
+        label: "Book a Session",
+        href: "tel:+14155550199",
+      },
+    ]);
   });
 
   it("builds a tel href from a formatted US number", () => {
