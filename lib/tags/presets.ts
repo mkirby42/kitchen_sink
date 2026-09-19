@@ -46,6 +46,43 @@ export function specialtyFilterChips(selected: string[]) {
   return [...SPECIALTY_PRESETS, ...custom];
 }
 
+export const CREDENTIALS = [
+  "Associate MFT (AMFT)",
+  "Associate CSW (ACSW)",
+  "Associate PC (APCC)",
+  "Registered Associate / Trainee",
+  "LMFT",
+  "LCSW",
+  "LPC",
+  "PsyD",
+  "PhD",
+  "MD",
+] as const;
+
+export const MODALITY_PRESETS = [
+  "CBT",
+  "DBT",
+  "EMDR",
+  "Psychodynamic",
+  "ACT",
+  "Somatic",
+  "Narrative",
+  "Attachment-Based",
+] as const;
+
+export const IDENTITY_PRESETS = [
+  "BIPOC",
+  "LGBTQ+",
+  "Immigrant",
+  "First-generation",
+  "Veteran",
+  "Disabled",
+] as const;
+
+export const RATE_SERVICE_TYPES = ["Individual", "Couples", "Family", "Group"] as const;
+export const RATE_DURATIONS = [30, 45, 50, 60, 90] as const;
+export const OUTREACH_OPTIONS = ["email", "phone", "text"] as const;
+
 export const LICENSE_STATES = [
   "AL",
   "AK",
