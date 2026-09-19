@@ -104,5 +104,23 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
       .single();
     expect(profile.error).toBeNull();
     expect(profile.data?.video_key).toBe(videoKey);
+
+    const updated = await supabase.rpc("update_therapist_profile", {
+      ...baseArgs,
+      p_name: "Join Test Therapist Updated",
+      p_tags: [{ kind: "specialty", label: "ADHD" }],
+    });
+    expect(updated.error).toBeNull();
+    expect(updated.data).toBe(userId);
+
+    const renamed = await anon
+      .from("profiles")
+      .select("name")
+      .eq("id", userId)
+      .single();
+    expect(renamed.data?.name).toBe("Join Test Therapist Updated");
+
+    const afterUpdate = await search(anon, { p_tags: ["ADHD"] });
+    expect(afterUpdate.some((row) => row.profile_id === userId)).toBe(true);
   });
 });

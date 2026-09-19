@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-`/` home · `/find` search · `/t/maya` (or `/t/[id]`) profile · `/join` therapist onboarding.
+`/` home · `/find` search · `/t/maya` (or `/t/[id]`) profile · `/join` therapist onboarding (sign in from home if you already have a profile).
 
 ```bash
 npm run lint && npm run typecheck && npm test && npm run build

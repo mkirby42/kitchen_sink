@@ -68,4 +68,15 @@ describe("JoinStep4 contact and rates", () => {
     expect(html).not.toContain("Phone number");
     expect(html).not.toContain("Number for texts");
   });
+
+  it("hides product feedback when editing an existing profile", () => {
+    const html = renderToStaticMarkup(
+      createElement(JoinStep4, {
+        draft: draft(),
+        setDraft: () => {},
+        hideFeedback: true,
+      }),
+    );
+    expect(html).not.toContain("Feedback for us");
+  });
 });

@@ -13,7 +13,7 @@ import {
   step3Errors,
   step4Errors,
 } from "@/lib/join/validate";
-import { routes } from "@/lib/routes";
+import { joinPath, routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { JoinShell } from "./JoinShell";
 import { JoinStep1 } from "./JoinStep1";
@@ -23,7 +23,7 @@ import { JoinStep4 } from "./JoinStep4";
 
 type Step = 1 | 2 | 3 | 4;
 
-function initialDraft(email: string): JoinDraft {
+function emptyDraft(email: string): JoinDraft {
   return {
     name: "",
     credential: "",
@@ -118,14 +118,20 @@ export function JoinWizard({
   userId,
   email,
   initialStep,
+  initialDraft,
+  editing = false,
 }: {
   userId: string;
   email: string;
   initialStep: Step;
+  initialDraft?: JoinDraft;
+  editing?: boolean;
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initialStep);
-  const [draft, setDraft] = useState<JoinDraft>(() => initialDraft(email));
+  const [draft, setDraft] = useState<JoinDraft>(
+    () => initialDraft ?? emptyDraft(email),
+  );
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [mediaBusy, setMediaBusy] = useState(false);
@@ -133,13 +139,15 @@ export function JoinWizard({
   function moveTo(nextStep: Step) {
     setStep(nextStep);
     setSubmitError("");
-    router.replace(`${routes.join}?step=${nextStep}`, { scroll: false });
+    router.replace(joinPath({ step: nextStep, edit: editing }), {
+      scroll: false,
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function goBack() {
     if (step === 1) {
-      router.push(routes.home);
+      router.push(editing ? routes.therapist(userId) : routes.home);
       return;
     }
     moveTo((step - 1) as Step);
@@ -157,7 +165,7 @@ export function JoinWizard({
     try {
       const payload = buildJoinPayload(draft);
       const { error } = await createClient().rpc(
-        "complete_therapist_join",
+        editing ? "update_therapist_profile" : "complete_therapist_join",
         toRpcArgs(payload),
       );
       if (error) {
@@ -182,6 +190,7 @@ export function JoinWizard({
     <JoinShell
       step={step}
       onBack={goBack}
+      closeHref={editing ? routes.therapist(userId) : routes.home}
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
@@ -203,9 +212,13 @@ export function JoinWizard({
             className="shrink-0 rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-45"
           >
             {submitting
-              ? "Submitting…"
+              ? editing
+                ? "Saving…"
+                : "Submitting…"
               : step === 4
-                ? "Submit application →"
+                ? editing
+                  ? "Save changes →"
+                  : "Submit application →"
                 : "Continue →"}
           </button>
         </div>
@@ -224,7 +237,11 @@ export function JoinWizard({
       ) : step === 3 ? (
         <JoinStep3 draft={draft} setDraft={setDraft} />
       ) : (
-        <JoinStep4 draft={draft} setDraft={setDraft} />
+        <JoinStep4
+          draft={draft}
+          setDraft={setDraft}
+          hideFeedback={editing}
+        />
       )}
     </JoinShell>
   );

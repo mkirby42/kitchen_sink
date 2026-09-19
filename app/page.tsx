@@ -1,7 +1,35 @@
 import Link from "next/link";
-import { routes } from "@/lib/routes";
+import { homeCtas } from "@/lib/home";
+import { supabasePublicConfig } from "@/lib/supabase/env";
+import { createClient } from "@/lib/supabase/server";
 
-export default function HomePage() {
+export default async function HomePage() {
+  let signedIn = false;
+  let therapistId: string | null = null;
+
+  if (supabasePublicConfig()) {
+    try {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      signedIn = Boolean(user);
+      if (user) {
+        const { data: therapist } = await supabase
+          .from("therapists")
+          .select("profile_id")
+          .eq("profile_id", user.id)
+          .maybeSingle();
+        if (therapist) therapistId = user.id;
+      }
+    } catch {
+      signedIn = false;
+      therapistId = null;
+    }
+  }
+
+  const ctas = homeCtas({ signedIn, therapistId });
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-20">
       <p className="font-display text-lg text-clay">Kitchen Sink</p>
@@ -13,18 +41,19 @@ export default function HomePage() {
         Tap the tags you need. We show therapists who match some of them.
       </p>
       <div className="mt-10 flex flex-wrap gap-3">
-        <Link
-          href={routes.find}
-          className="rounded-full bg-clay px-5 py-3 font-medium text-paper hover:bg-clay-dark"
-        >
-          Find a therapist
-        </Link>
-        <Link
-          href={routes.join}
-          className="rounded-full border border-line bg-paper px-5 py-3 font-medium text-ink hover:border-ink/20"
-        >
-          Join as a therapist
-        </Link>
+        {ctas.map((cta) => (
+          <Link
+            key={cta.label}
+            href={cta.href}
+            className={
+              cta.variant === "primary"
+                ? "rounded-full bg-clay px-5 py-3 font-medium text-paper hover:bg-clay-dark"
+                : "rounded-full border border-line bg-paper px-5 py-3 font-medium text-ink hover:border-ink/20"
+            }
+          >
+            {cta.label}
+          </Link>
+        ))}
       </div>
     </main>
   );
