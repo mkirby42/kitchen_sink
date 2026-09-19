@@ -9,9 +9,9 @@ Patients find a therapist by must-have filters. Therapists publish a profile cli
 ## Must ship
 
 1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties, insurance, license state. AND semantics: therapist must match every selected tag. Empty filters = all therapists open to new clients.
-2. **Therapist profile** — photo, name, credential, licenses, years practicing, format, modalities, insurance, cash-pay rate, about, conversation cards, reviews (read-only seed data), contact (email / phone / text as listed).
-3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info → photo → practice tags → cards + contact + optional product feedback.
-4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) so search and profile work with no signups.
+2. **Therapist profile** — photo, **intro video**, name, credential, licenses, years practicing, format, modalities, insurance, cash-pay rate, about, conversation cards, reviews (read-only seed data), contact (email / phone / text as listed).
+3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info → **photo + intro video** → practice tags → cards + contact + optional product feedback.
+4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
 
@@ -20,7 +20,7 @@ Patients find a therapist by must-have filters. Therapists publish a profile cli
 - Booking, calendars, “Free Consult” / “Book a Session” as real scheduling. Buttons may `mailto:` / `tel:` the listed contact.
 - Patient accounts, patient profiles, patient onboarding.
 - Review **write** UI. Seed reviews and display them.
-- Video upload. Profile may show a play affordance; skip real video if it costs time.
+- Video transcoding, multiple videos, or a video CMS. One intro clip per therapist, stored as uploaded, played with a native `<video>` player.
 - Maps, geocoding, distance search. If in-person is selected, **store** location. Search uses license state, not lat/lon.
 - Messaging, likes/hearts, admin moderation, realtime.
 - Supervisor license as a hard legal workflow. Store name + license # when credential is associate/pre-license; show a note. Do not block the rest of the form.
@@ -35,11 +35,11 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | --- | --- |
 | Nav | Home, Find a Therapist, Join as a Therapist |
 | Therapist onboarding 1 | Name, credential, years practicing, optional supervisor, 1..n state licenses |
-| Therapist onboarding 2 | Photo upload |
+| Therapist onboarding 2 | Photo + intro video upload (prototype shows photo; profile hero has a 1 min intro play button — collect both here) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties, modalities, identity (tags) |
 | Therapist onboarding 4 | Conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
 | Search | Must-have chips. Result card: photo/initials, name, credential, years, tags, rate |
-| Profile | Hero + rates + cards + about + reviews |
+| Profile | Hero (photo + playable intro video) + rates + cards + about + reviews |
 
 Match visual tone: cream page, navy type, terracotta buttons, rounded cards. Do not invent a second design system.
 
@@ -110,7 +110,7 @@ Identity tags: include a small fixed set if shown in onboarding; not a search mu
 
 **In-person rule:** if `in_person_practice` (therapist) is true, a location row must exist. Patient in-person is a search toggle, not a stored patient location this weekend.
 
-RLS: public can `select` therapists who are `open_to_new_clients`. Owner can insert/update own rows. Reviews public read. Feedback insert by owner. Storage: public read for photos; write only to own prefix.
+RLS: public can `select` therapists who are `open_to_new_clients`. Owner can insert/update own rows. Reviews public read. Feedback insert by owner. Storage: public read for photos and intro videos; write only to own prefix (`photos/{uid}/`, `videos/{uid}/`). Video is not part of the search card query.
 
 ## Matching
 
@@ -150,7 +150,7 @@ App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboa
 - Match query < 50ms on seeded data; write an `explain analyze` fixture test or SQL comment with the plan.
 - Indexes on every FK and every WHERE/JOIN column used by search.
 - RLS policies wrap `auth.uid()` in `(select auth.uid())`.
-- Images via Supabase public URL; next/image if it is free, skip if it fights Storage.
+- Images via Supabase public URL; next/image if it is free, skip if it fights Storage. Intro video loads only on the profile page, not on `/find`.
 - No ORM waterfall. Server components fetch; no client waterfall of sequential supabase calls.
 
 ## CI / CD
@@ -173,11 +173,11 @@ Sequential where files collide; parallel otherwise.
 4. Search UI (`/find`).
 5. Profile UI (`/t/[id]`).
 6. Auth + onboarding (`/join`).
-7. Storage photo upload.
+7. Storage photo + intro video upload.
 8. Polish to screenshots + Vercel project.
 
-2 and 3 before any UI that reads therapists. 4 and 5 can run in parallel after 3. 6 after 2.
+2 and 3 before any UI that reads therapists. 4 and 5 can run in parallel after 3. 6 after 2. 7 with 6.
 
 ## Done when
 
-A judge can open `/find`, tap Anxiety, see Maya, open her profile, read cards and reviews, and (as a new user) join as a therapist and appear in search. CI is green. Match is one indexed query.
+A judge can open `/find`, tap Anxiety, see Maya, open her profile, play the intro video, read cards and reviews, and (as a new user) join as a therapist with photo + video and appear in search. CI is green. Match is one indexed query.

@@ -42,6 +42,6 @@ If explain shows a slow join, add `therapists.specialty_labels text[]` + GIN and
 
 ## RLS / perf
 
-Enable RLS on every public table. `(select auth.uid())` in policies. Public read of open therapists + their tags/licenses/items/reviews. Owner writes own rows.
+Enable RLS on every public table. `(select auth.uid())` in policies. Public read of open therapists + their tags/licenses/items/reviews. Owner writes own rows. Storage: public read photos/videos; write `photos/{uid}/` and `videos/{uid}/` only. Do not fetch video on `/find`.
 
 No N+1: search cards come from one query (or one RPC).

@@ -16,12 +16,13 @@ Read `docs/REQUIREMENTS.md` **Must ship** and **Cut**. Build only Must ship.
 - Booking, calendars, payments, in-app messaging
 - Patient signup, patient profiles, patient location UI
 - Review create/edit (seed + display only)
-- Video upload, maps, distance search, likes
+- Maps, distance search, likes
+- Video transcoding or more than one intro clip per therapist
 - New tag kinds, new pages, new design system
 - Extra libraries when the stack already covers it
 
 ## If tempted
 
-Ask: does a judge need this to complete Find → Profile → Join? If no, stop.
+Ask: does a judge need this to complete Find → Profile (play intro) → Join (photo + video)? If no, stop.
 
 Booking buttons on the profile screenshot become `mailto:` / `tel:` using outreach tags. That is enough.

@@ -17,7 +17,7 @@ From `docs/REQUIREMENTS.md` Build order:
 4. Search UI
 5. Profile UI
 6. Auth + onboarding
-7. Photo upload
+7. Photo + intro video upload
 8. Visual polish + Vercel
 
 `2 → 3` sequential. `4` and `5` parallel after `3`. `6` after `2`. `7` with `6`.
@@ -39,4 +39,4 @@ Skip a second style-only review unless the code is messy enough to slow the next
 
 ## Done
 
-Judge path works: `/find` → Maya profile → `/join`. CI green. Match is one indexed query. Then stop.
+Judge path works: `/find` → Maya profile (play intro) → `/join` (photo + video). CI green. Match is one indexed query. Then stop.
