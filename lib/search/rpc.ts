@@ -8,6 +8,7 @@ export type SearchRow = {
   credential: string | null;
   start_date_of_practice: string | null;
   min_price_cents: number | null;
+  min_duration_minutes: number | null;
   virtual_practice: boolean;
   in_person_practice: boolean;
   specialty_labels: string[];

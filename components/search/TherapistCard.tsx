@@ -2,7 +2,7 @@ import Link from "next/link";
 import { routes } from "@/lib/routes";
 import type { SearchRow } from "@/lib/search/rpc";
 import {
-  formatUsdFromCents,
+  formatStartingRate,
   initials,
   storagePublicUrl,
   yearsPracticing,
@@ -23,10 +23,39 @@ function cardTags(row: SearchRow) {
   return labels;
 }
 
+function Avatar({ name, photo }: { name: string; photo: string | null }) {
+  const classes =
+    "size-16 shrink-0 overflow-hidden rounded-full";
+  if (photo) {
+    return (
+      // Public Storage URLs; next/image is out of scope this weekend.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={photo}
+        alt=""
+        width={64}
+        height={64}
+        className={`${classes} object-cover object-center`}
+      />
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      className={`flex items-center justify-center bg-clay font-display text-lg text-paper ${classes}`}
+    >
+      {cardInitials(name)}
+    </span>
+  );
+}
+
 export function TherapistCard({ row }: { row: SearchRow }) {
   const photo = storagePublicUrl("photos", row.photo_key);
   const years = yearsPracticing(row.start_date_of_practice);
-  const rate = formatUsdFromCents(row.min_price_cents);
+  const rate = formatStartingRate(
+    row.min_price_cents,
+    row.min_duration_minutes,
+  );
   const meta = [
     row.credential,
     years != null ? `${years} yr${years === 1 ? "" : "s"}` : null,
@@ -42,29 +71,14 @@ export function TherapistCard({ row }: { row: SearchRow }) {
       className="block rounded-3xl border border-line bg-paper p-6 shadow-sm transition hover:border-ink/15"
     >
       <div className="flex items-start gap-4">
-        {photo ? (
-          // Public Storage URLs; next/image is out of scope this weekend.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={photo}
-            alt=""
-            className="size-16 shrink-0 rounded-full object-cover"
-          />
-        ) : (
-          <span
-            aria-hidden
-            className="flex size-16 shrink-0 items-center justify-center rounded-full bg-clay font-display text-lg text-paper"
-          >
-            {cardInitials(row.name)}
-          </span>
-        )}
+        <Avatar name={row.name} photo={photo} />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <h2 className="font-display text-xl tracking-tight text-ink">
               {row.name}
             </h2>
             {sample ? (
-              <span className="shrink-0 rounded-full bg-amber-200 px-2.5 py-0.5 text-xs font-medium text-ink">
+              <span className="shrink-0 rounded-full bg-[#f3dc6b] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
                 SAMPLE
               </span>
             ) : null}
@@ -82,7 +96,14 @@ export function TherapistCard({ row }: { row: SearchRow }) {
               ))}
             </ul>
           ) : null}
-          {rate ? <p className="mt-4 text-ink">{rate}</p> : null}
+          {rate ? (
+            <p className="mt-4 text-ink">
+              {rate.price}
+              {rate.duration ? (
+                <span className="text-clay"> / {rate.duration}</span>
+              ) : null}
+            </p>
+          ) : null}
         </div>
       </div>
     </Link>

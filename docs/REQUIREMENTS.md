@@ -38,12 +38,12 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | Therapist onboarding 2 | Photo (required) + intro video (optional, up to 50MB; prototype shows photo; profile hero plays intro when present) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
 | Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
-| Search | Must-have chips (specialties: presets + free-text custom). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price) |
+| Search | Must-have chips (specialties: presets + free-text custom). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price / duration) |
 | Profile | Hero (photo + playable intro video) + credential + all state licenses (# + state per row) + supervisor (if associate/trainee) + all rates (service + duration + price) + cards + about + reviews |
 
 Match visual tone: cream page, navy type, terracotta buttons, rounded cards. Do not invent a second design system.
 
-Rates appear on search cards and profile. They are **not** in the original data notes. Store in `rates` (1:n per therapist). Search card shows lowest price as “starting rate”.
+Rates appear on search cards and profile. They are **not** in the original data notes. Store in `rates` (1:n per therapist). Search card shows lowest price and its duration as “starting rate” (`$165 / 50 min`).
 
 ## Data
 

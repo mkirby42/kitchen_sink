@@ -35,6 +35,7 @@ describe.skipIf(!dbConfigured())("search_therapists match model", () => {
     const rows = await search(createAnonClient(), { p_tags: ["Anxiety"] });
     const maya = rows.find((row) => row.profile_id === MAYA_ID);
     expect(maya?.min_price_cents).toBe(16500);
+    expect(maya?.min_duration_minutes).toBe(50);
     expect(maya?.photo_key).toBe(`${MAYA_ID}/photo.jpg`);
     expect(maya).not.toHaveProperty("video_key");
   });

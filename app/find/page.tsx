@@ -49,7 +49,7 @@ export default async function FindPage({ searchParams }: FindPageProps) {
         ) : (
           <>
             {showSampleNote ? (
-              <p className="rounded-full bg-clay/10 px-5 py-3 text-sm text-mute">
+              <p className="rounded-full bg-clay/25 px-6 py-2.5 text-center text-sm leading-snug text-clay">
                 Kitchen Sink just launched, so you&apos;re seeing a sample
                 profile marked SAMPLE below to show what&apos;s possible. Real
                 founding therapists will appear here as they join.
