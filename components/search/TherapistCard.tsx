@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { routes } from "@/lib/routes";
+import {
+  isMatchedLabel,
+  overlapCopy,
+  searchCardLabels,
+} from "@/lib/search/overlap";
 import type { SearchRow } from "@/lib/search/rpc";
 import {
   formatStartingRate,
@@ -13,14 +18,10 @@ function cardInitials(name: string) {
   return initials(name.replace(/^(dr\.?|prof\.?)\s+/i, ""));
 }
 
-function cardTags(row: SearchRow) {
-  const labels: string[] = [];
-  if (row.virtual_practice) labels.push("Virtual");
-  if (row.in_person_practice) labels.push("In-Person");
-  for (const label of row.specialty_labels ?? []) {
-    if (!labels.includes(label)) labels.push(label);
-  }
-  return labels;
+function tagClass(hit: boolean) {
+  return hit
+    ? "rounded-full border border-clay bg-clay px-3 py-1 text-xs text-paper"
+    : "rounded-full border border-line bg-cream px-3 py-1 text-xs text-ink";
 }
 
 function Avatar({ name, photo }: { name: string; photo: string | null }) {
@@ -49,7 +50,13 @@ function Avatar({ name, photo }: { name: string; photo: string | null }) {
   );
 }
 
-export function TherapistCard({ row }: { row: SearchRow }) {
+export function TherapistCard({
+  row,
+  selectedCount,
+}: {
+  row: SearchRow;
+  selectedCount: number;
+}) {
   const photo = storagePublicUrl("photos", row.photo_key);
   const years = yearsPracticing(row.start_date_of_practice);
   const rate = formatStartingRate(
@@ -63,7 +70,9 @@ export function TherapistCard({ row }: { row: SearchRow }) {
     .filter(Boolean)
     .join(" · ");
   const sample = row.profile_id === MAYA_ID;
-  const tags = cardTags(row);
+  const tags = searchCardLabels(row);
+  const hits = overlapCopy(row.match_count, selectedCount);
+  const matched = row.matched_labels ?? [];
 
   return (
     <Link
@@ -84,12 +93,15 @@ export function TherapistCard({ row }: { row: SearchRow }) {
             ) : null}
           </div>
           {meta ? <p className="mt-1 text-sm text-mute">{meta}</p> : null}
+          {hits ? (
+            <p className="mt-3 text-sm font-medium text-clay">{hits}</p>
+          ) : null}
           {tags.length > 0 ? (
-            <ul className="mt-3 flex flex-wrap gap-2">
+            <ul className={`flex flex-wrap gap-2 ${hits ? "mt-2" : "mt-3"}`}>
               {tags.map((label) => (
                 <li
                   key={label}
-                  className="rounded-full border border-line bg-cream px-3 py-1 text-xs text-ink"
+                  className={tagClass(isMatchedLabel(label, matched))}
                 >
                   {label}
                 </li>

@@ -13,6 +13,8 @@ export type SearchRow = {
   in_person_practice: boolean;
   specialty_labels: string[];
   insurance_labels: string[];
+  match_count: number;
+  matched_labels: string[];
 };
 
 export type SearchFilters = {
