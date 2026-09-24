@@ -3,7 +3,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { JoinAuth } from "@/components/join/JoinAuth";
 import { JoinWizard } from "@/components/join/JoinWizard";
+import { ADMIN_JOIN_NOTICE, joinAccess } from "@/lib/join/access";
 import { fetchJoinDraft } from "@/lib/join/load-draft";
+import { parseProfileRole } from "@/lib/role";
 import { routes } from "@/lib/routes";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
@@ -47,17 +49,22 @@ export default async function JoinPage({
     .eq("profile_id", user.id)
     .maybeSingle();
 
-  if (therapist && !editing) redirect(routes.therapist(user.id));
-
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .maybeSingle();
 
-  if (profile?.role === "admin") redirect(routes.adminMedia);
+  const access = joinAccess({
+    userId: user.id,
+    role: parseProfileRole(profile?.role),
+    hasTherapist: Boolean(therapist),
+    editing,
+  });
 
-  if (profile?.role === "patient") {
+  if (access.kind === "redirect") redirect(access.href);
+
+  if (access.kind === "patient") {
     return (
       <main className="mx-auto max-w-lg px-6 py-16">
         <section className="rounded-[2rem] bg-paper px-6 py-10 shadow-[0_24px_70px_rgba(27,39,68,0.12)]">
@@ -88,12 +95,11 @@ export default async function JoinPage({
       ? (rawStep as 1 | 2 | 3 | 4)
       : 1;
 
-  const loadedDraft =
-    therapist && editing
-      ? await fetchJoinDraft(supabase, user.id, user.email ?? "")
-      : undefined;
+  const loadedDraft = access.editing
+    ? await fetchJoinDraft(supabase, user.id, user.email ?? "")
+    : undefined;
 
-  if (editing && !loadedDraft) redirect(routes.join);
+  if (access.editing && !loadedDraft) redirect(routes.join);
 
   return (
     <JoinWizard
@@ -101,7 +107,9 @@ export default async function JoinPage({
       email={user.email ?? ""}
       initialStep={initialStep}
       initialDraft={loadedDraft ?? undefined}
-      editing={Boolean(loadedDraft)}
+      editing={access.editing}
+      adminTest={access.adminTest}
+      notice={access.adminTest && !access.editing ? ADMIN_JOIN_NOTICE : undefined}
     />
   );
 }

@@ -19,7 +19,7 @@ describe("homeCtas", () => {
     ]);
   });
 
-  it("sends an admin to helper upload instead of join", () => {
+  it("lets an admin open helper upload and therapist join", () => {
     expect(
       homeCtas({
         signedIn: true,
@@ -31,6 +31,38 @@ describe("homeCtas", () => {
       {
         href: routes.adminMedia,
         label: "Upload therapist media",
+        variant: "secondary",
+      },
+      {
+        href: routes.join,
+        label: "Join as a therapist",
+        variant: "secondary",
+      },
+    ]);
+  });
+
+  it("keeps join for an admin who already has a test profile", () => {
+    expect(
+      homeCtas({
+        signedIn: true,
+        therapistId: "11111111-1111-4111-8111-111111111111",
+        admin: true,
+      }),
+    ).toEqual([
+      { href: routes.find, label: "Find a therapist", variant: "primary" },
+      {
+        href: routes.adminMedia,
+        label: "Upload therapist media",
+        variant: "secondary",
+      },
+      {
+        href: routes.join,
+        label: "Join as a therapist",
+        variant: "secondary",
+      },
+      {
+        href: "/t/11111111-1111-4111-8111-111111111111",
+        label: "My profile",
         variant: "secondary",
       },
     ]);

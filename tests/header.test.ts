@@ -24,8 +24,39 @@ describe("site header", () => {
     );
     expect(html).toContain("Find a Therapist");
     expect(html).toContain("My profile");
+    expect(html).not.toContain("Join as a Therapist");
     expect(html).not.toContain("Interest");
     expect(html).not.toContain("/matches");
+  });
+
+  it("lets an admin join as a therapist and keeps Uploads", () => {
+    const html = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+          role: "admin",
+        },
+      }),
+    );
+    expect(html).toContain("Join as a Therapist");
+    expect(html).toContain('href="/join"');
+    expect(html).toContain("Uploads");
+    expect(html).not.toContain("My profile");
+  });
+
+  it("shows My profile for an admin who already published one", () => {
+    const html = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+          role: "admin",
+          hasTherapist: true,
+        },
+      }),
+    );
+    expect(html).toContain("Join as a Therapist");
+    expect(html).toContain("My profile");
+    expect(html).toContain("/t/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1");
   });
 
   it("omits Interest for a signed-out visitor", () => {

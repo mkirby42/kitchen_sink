@@ -7,6 +7,7 @@ export { parseProfileRole };
 export type NavUser = {
   id: string;
   role: ProfileRole | null;
+  hasTherapist?: boolean;
 };
 
 export async function loadNavUser(): Promise<NavUser | null> {
@@ -19,15 +20,18 @@ export async function loadNavUser(): Promise<NavUser | null> {
     } = await supabase.auth.getUser();
     if (!user) return null;
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
+    const [{ data: profile }, { data: therapist }] = await Promise.all([
+      supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
+      supabase
+        .from("therapists")
+        .select("profile_id")
+        .eq("profile_id", user.id)
+        .maybeSingle(),
+    ]);
 
     const role = parseProfileRole(profile?.role);
 
-    return { id: user.id, role };
+    return { id: user.id, role, hasTherapist: Boolean(therapist) };
   } catch {
     return null;
   }
