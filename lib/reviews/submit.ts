@@ -7,6 +7,7 @@ const KNOWN_ERRORS = [
   "Write a short review.",
   "Keep the review under 2000 characters.",
   "Display name must be 80 characters or fewer.",
+  "Rate all three questions from 1 to 5.",
   "Rating must be a whole number from 1 to 5.",
   "Sign in as a client to leave a review.",
   "You cannot review your own profile.",
@@ -61,7 +62,9 @@ export async function submitReview(
     patient_id: patientId,
     author_name: validated.value.authorName,
     anonymous: validated.value.anonymous,
-    stars_avg: validated.value.stars,
+    stars_cat_1: validated.value.ratings.understood,
+    stars_cat_2: validated.value.ratings.communication,
+    stars_cat_3: validated.value.ratings.fit,
     body: validated.value.body,
   };
 
@@ -77,7 +80,9 @@ export async function submitReview(
     .update({
       author_name: payload.author_name,
       anonymous: payload.anonymous,
-      stars_avg: payload.stars_avg,
+      stars_cat_1: payload.stars_cat_1,
+      stars_cat_2: payload.stars_cat_2,
+      stars_cat_3: payload.stars_cat_3,
       body: payload.body,
     })
     .eq("therapist_id", therapistId)

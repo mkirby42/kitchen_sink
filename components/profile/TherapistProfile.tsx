@@ -230,6 +230,7 @@ export function TherapistProfile({
         reviews={
           <ReviewsPanel
             therapistId={data.id}
+            therapistName={data.givenName}
             reviews={data.reviews}
             average={avg}
             viewer={viewer}

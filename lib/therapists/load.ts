@@ -33,6 +33,9 @@ export type ProfileCard = {
 export type ProfileReview = {
   id: string;
   stars: number | null;
+  understood: number | null;
+  communication: number | null;
+  fit: number | null;
   body: string | null;
   session_format: string | null;
   duration_label: string | null;
@@ -221,6 +224,9 @@ type ReviewRow = {
   id?: string;
   patient_id?: string | null;
   stars_avg: number | string | null;
+  stars_cat_1?: number | string | null;
+  stars_cat_2?: number | string | null;
+  stars_cat_3?: number | string | null;
   body: string | null;
   session_format: string | null;
   duration_label: string | null;
@@ -231,9 +237,15 @@ type ReviewRow = {
 };
 
 const REVIEW_COLUMNS =
-  "id, patient_id, stars_avg, body, session_format, duration_label, patient_hidden, anonymous, author_name, created_at";
+  "id, patient_id, stars_avg, stars_cat_1, stars_cat_2, stars_cat_3, body, session_format, duration_label, patient_hidden, anonymous, author_name, created_at";
 const LEGACY_REVIEW_COLUMNS =
   "id, patient_id, stars_avg, body, session_format, duration_label, patient_hidden, created_at";
+
+function numeric(value: number | string | null | undefined) {
+  if (value == null || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
 
 export function toProfileReview(
   row: ReviewRow,
@@ -241,9 +253,20 @@ export function toProfileReview(
 ): ProfileReview {
   const anonymous = Boolean(row.anonymous);
   const author = row.author_name?.trim() || null;
+  const understood = numeric(row.stars_cat_1);
+  const communication = numeric(row.stars_cat_2);
+  const fit = numeric(row.stars_cat_3);
+  const fromCategories = [understood, communication, fit].filter(
+    (n): n is number => n != null,
+  );
   return {
     id: row.id ?? `${row.created_at ?? "review"}-${row.body ?? ""}`,
-    stars: row.stars_avg == null ? null : Number(row.stars_avg),
+    stars:
+      numeric(row.stars_avg) ??
+      (fromCategories.length === 0 ? null : reviewAverage(fromCategories)),
+    understood,
+    communication,
+    fit,
     body: row.body,
     session_format: row.session_format,
     duration_label: row.duration_label,

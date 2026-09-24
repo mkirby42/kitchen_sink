@@ -5,20 +5,50 @@ import { useRouter } from "next/navigation";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import type { ProfileReview } from "@/lib/therapists/load";
 import { createClient } from "@/lib/supabase/client";
+import { REVIEW_QUESTIONS, type ReviewRatingKey, type ReviewRatings } from "@/lib/reviews/questions";
 import { deleteOwnReview, submitReview } from "@/lib/reviews/submit";
+import { validateReview } from "@/lib/reviews/validate";
 import { FormMessage, ReviewAuth } from "./ReviewAuth";
 
 export function ReviewComposer({
   therapistId,
+  therapistName,
   viewer,
   mine,
 }: {
   therapistId: string;
+  therapistName: string;
   viewer: ReviewViewer;
   mine: ProfileReview | null;
 }) {
-  if (!viewer.userId) return <ReviewAuth />;
-  return <ReviewForm therapistId={therapistId} mine={mine} />;
+  return (
+    <section>
+      <SessionHeading name={therapistName} />
+      {viewer.userId ? (
+        <ReviewForm therapistId={therapistId} mine={mine} />
+      ) : (
+        <div className="mt-5">
+          <ReviewAuth />
+        </div>
+      )}
+    </section>
+  );
+}
+
+export function SessionHeading({ name }: { name: string }) {
+  return (
+    <div>
+      <h2 className="font-display text-[1.7rem] leading-tight tracking-tight text-ink">
+        <span aria-hidden className="text-clay">
+          ~{" "}
+        </span>
+        How was your session with <em className="text-clay">{name}</em>?
+      </h2>
+      <p className="mt-2 text-sm text-mute">
+        Your feedback helps other clients find the right fit.
+      </p>
+    </div>
+  );
 }
 
 function ReviewForm({
@@ -33,23 +63,32 @@ function ReviewForm({
     mine && !mine.anonymous ? (mine.reviewer_name ?? "") : "",
   );
   const [anonymous, setAnonymous] = useState(mine?.anonymous ?? false);
-  const [stars, setStars] = useState<number | null>(mine?.stars ?? null);
+  const [ratings, setRatings] = useState<ReviewRatings>({
+    understood: mine?.understood ?? null,
+    communication: mine?.communication ?? null,
+    fit: mine?.fit ?? null,
+  });
   const [body, setBody] = useState(mine?.body ?? "");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  function setRating(key: ReviewRatingKey, value: number) {
+    setRatings((current) => ({ ...current, [key]: value }));
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
+    const draft = { authorName, anonymous, ratings, body };
+    const parsed = validateReview(draft);
+    if (!parsed.ok) {
+      setMessage(parsed.error);
+      return;
+    }
     setSubmitting(true);
     try {
       const supabase = createClient();
-      await submitReview(supabase, therapistId, {
-        authorName,
-        anonymous,
-        stars,
-        body,
-      });
+      await submitReview(supabase, therapistId, draft);
       router.refresh();
     } catch (error) {
       setMessage(
@@ -77,82 +116,66 @@ function ReviewForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-3xl bg-paper px-5 py-5 shadow-sm">
-      <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
-        {mine ? "Your review" : "Leave a review"}
-      </p>
+    <form
+      onSubmit={onSubmit}
+      className="mt-5 rounded-[1.75rem] bg-paper px-5 py-5 shadow-sm"
+    >
+      <div className="divide-y divide-line">
+        {REVIEW_QUESTIONS.map((question) => (
+          <StarPicker
+            key={question.key}
+            label={question.question}
+            value={ratings[question.key]}
+            onChange={(value) => setRating(question.key, value)}
+          />
+        ))}
+      </div>
 
       <label className="mt-4 block">
-        <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Display name
-        </span>
-        <input
-          type="text"
-          value={authorName}
-          maxLength={80}
-          disabled={anonymous}
-          required={!anonymous}
-          autoComplete="nickname"
-          onChange={(event) => setAuthorName(event.target.value)}
-          className="mt-1.5 w-full border-0 border-b border-line bg-transparent px-0 py-2 text-base outline-none focus:border-clay disabled:opacity-40"
-        />
-      </label>
-
-      <label className="mt-3 flex items-center gap-2 text-sm text-ink">
-        <input
-          type="checkbox"
-          checked={anonymous}
-          onChange={(event) => setAnonymous(event.target.checked)}
-          className="accent-clay"
-        />
-        Post anonymously
-      </label>
-
-      <fieldset className="mt-4">
-        <legend className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Rating, optional
-        </legend>
-        <div className="mt-2 flex gap-1" role="radiogroup" aria-label="Rating">
-          {[1, 2, 3, 4, 5].map((value) => {
-            const filled = stars != null && value <= stars;
-            return (
-              <button
-                key={value}
-                type="button"
-                role="radio"
-                aria-checked={stars === value}
-                aria-label={`${value} star${value === 1 ? "" : "s"}`}
-                onClick={() => setStars(stars === value ? null : value)}
-                className="px-1 text-2xl leading-none text-clay"
-              >
-                {filled ? "★" : "☆"}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
-
-      <label className="mt-4 block">
-        <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Review
+        <span className="text-[15px] font-medium text-ink">
+          Anything else you&apos;d like to share?
         </span>
         <textarea
-          required
           rows={4}
           maxLength={2000}
           value={body}
+          placeholder="Optional — share as much or as little as you'd like."
           onChange={(event) => setBody(event.target.value)}
-          className="mt-1.5 w-full rounded-2xl border border-line bg-cream/50 px-3 py-2 text-base text-ink outline-none focus:border-clay"
+          className="mt-3 w-full resize-y rounded-2xl border border-line bg-paper px-4 py-3 text-sm leading-relaxed text-ink outline-none placeholder:text-mute/70 focus:border-clay"
         />
       </label>
 
-      <div className="mt-4 flex items-center gap-4">
+      <div className="mt-4 border-t border-line pt-4">
+        <label className="block">
+          <span className="text-sm text-ink">Display name</span>
+          <input
+            type="text"
+            value={authorName}
+            maxLength={80}
+            disabled={anonymous}
+            autoComplete="nickname"
+            onChange={(event) => setAuthorName(event.target.value)}
+            className="mt-1 w-full border-0 border-b border-line bg-transparent px-0 py-2 text-base outline-none focus:border-clay disabled:opacity-40"
+          />
+        </label>
+        <label className="mt-3 flex items-center gap-2 text-sm text-ink">
+          <input
+            type="checkbox"
+            checked={anonymous}
+            onChange={(event) => setAnonymous(event.target.checked)}
+            className="accent-clay"
+          />
+          Post anonymously
+        </label>
+      </div>
+
+      <div className="mt-5 flex items-center gap-4">
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-clay px-5 py-2.5 text-sm font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-clay px-6 py-3 text-sm font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {submitting ? "Please wait…" : mine ? "Update review" : "Post review"}
+          {submitting ? "Please wait…" : "Submit review"}
         </button>
         {mine ? (
           <button
@@ -168,5 +191,39 @@ function ReviewForm({
 
       {message ? <FormMessage>{message}</FormMessage> : null}
     </form>
+  );
+}
+
+function StarPicker({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number | null;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <fieldset className="py-4 first:pt-1">
+      <legend className="text-[15px] font-medium text-ink">{label}</legend>
+      <div className="mt-2 flex gap-1.5" role="radiogroup" aria-label={label}>
+        {[1, 2, 3, 4, 5].map((n) => {
+          const filled = value != null && n <= value;
+          return (
+            <button
+              key={n}
+              type="button"
+              role="radio"
+              aria-checked={value === n}
+              aria-label={`${n} star${n === 1 ? "" : "s"}`}
+              onClick={() => onChange(n)}
+              className={`text-[1.65rem] leading-none ${filled ? "text-clay" : "text-clay/30"}`}
+            >
+              ★
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }

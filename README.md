@@ -104,7 +104,7 @@ License numbers, phones, and addresses are fake. Reviews are fiction.
 ## Known limitations (today)
 
 - No booking, calendars, or in-app messaging. Contact buttons are `mailto:` / `tel:` from listed outreach.
-- Reviews are one post per signed-in patient (name or anonymous, optional stars). Demo seed reviews are removed with the demo profiles. No approval queue.
+- Reviews are one post per signed-in patient (name or anonymous, three required ratings, optional note). Demo seed reviews are removed with the demo profiles. No approval queue.
 - Search is OR overlap (some tags), not AND. Results cap at 24; no pagination UI.
 - In-person location is stored; search uses license state, not maps or distance.
 - One intro clip per therapist, played as uploaded. No transcoding.

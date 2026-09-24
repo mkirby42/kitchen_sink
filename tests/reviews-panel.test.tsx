@@ -32,6 +32,9 @@ function review(overrides: Partial<ProfileReview> = {}): ProfileReview {
   return {
     id: "rev-1",
     stars: 5,
+    understood: 5,
+    communication: 5,
+    fit: 4,
     body: "She listened.",
     session_format: "Virtual",
     duration_label: "8 months with Maya",
@@ -51,6 +54,7 @@ function render(props: {
   return renderToStaticMarkup(
     createElement(ReviewsPanel, {
       therapistId: "therapist-1",
+      therapistName: "Maya",
       reviews: props.reviews ?? [],
       average: props.average ?? null,
       viewer: props.viewer ?? visitor,
@@ -62,24 +66,41 @@ describe("ReviewsPanel", () => {
   it("keeps the empty state and asks a visitor to sign in", () => {
     const html = render({});
     expect(html).toContain("No reviews yet.");
-    expect(html).toContain("Sign in to post under your name, or anonymously.");
-    expect(html).not.toContain("Post review");
+    expect(html).toContain("How was your session with ");
+    expect(html).toContain(">Maya</em>?");
+    expect(html).toContain("Your feedback helps other clients find the right fit.");
+    expect(html).toContain("Sign in as a client to leave a review.");
+    expect(html).not.toContain("Submit review");
   });
 
-  it("lets a signed-in patient post, and still shows the empty state", () => {
+  it("lets a signed-in patient rate three questions, and still shows the empty state", () => {
     const html = render({ viewer: patient });
     expect(html).toContain("No reviews yet.");
-    expect(html).toContain("Post review");
-    expect(html).toContain("Display name");
+    expect(html).toContain("Do you feel understood?");
+    expect(html).toContain("Does the therapist have good communication?");
+    expect(html).toContain("Do you feel like it was the right fit?");
+    expect(html).toContain("Anything else you&#x27;d like to share?");
+    expect(html).toContain("Optional — share as much or as little as you&#x27;d like.");
+    expect(html).toContain("Submit review");
     expect(html).toContain("Post anonymously");
-    expect(html).toContain("Rating, optional");
+    expect(html).not.toContain("Rating, optional");
+  });
+
+  it("hides the form from any therapist, including one who does not own the profile", () => {
+    const html = render({
+      viewer: { userId: "therapist-2", role: "therapist", isOwner: false },
+    });
+    expect(html).toContain("No reviews yet.");
+    expect(html).not.toContain("Submit review");
+    expect(html).not.toContain("Do you feel understood?");
   });
 
   it("hides the form from the therapist who owns the profile", () => {
     const html = render({ viewer: therapist });
     expect(html).toContain("No reviews yet.");
-    expect(html).not.toContain("Post review");
-    expect(html).not.toContain("Sign in to post");
+    expect(html).not.toContain("Submit review");
+    expect(html).not.toContain("How was your session");
+    expect(html).not.toContain("Sign in as a client");
   });
 
   it("lists a review with the author, stars, and date", () => {
@@ -91,6 +112,11 @@ describe("ReviewsPanel", () => {
     expect(html).toContain("J. R.");
     expect(html).toContain("She listened.");
     expect(html).toContain("★★★★★");
+    expect(html).toContain("5.0");
+    expect(html).toContain("Felt understood");
+    expect(html).toContain("Communication");
+    expect(html).toContain("Right fit");
+    expect(html).toContain("4.0");
     expect(html).toContain("Based on 1 client review");
     expect(html).toContain("Virtual · 8 months with Maya · ");
     expect(html).not.toContain("No reviews yet.");
@@ -105,6 +131,9 @@ describe("ReviewsPanel", () => {
           anonymous: true,
           reviewer_name: null,
           stars: null,
+          understood: null,
+          communication: null,
+          fit: null,
           mine: true,
           body: "Quietly helpful.",
         }),
@@ -112,8 +141,25 @@ describe("ReviewsPanel", () => {
     });
     expect(html).toContain("Anonymous");
     expect(html).not.toContain("J. R.");
-    expect(html).toContain("Update review");
+    expect(html).toContain("Submit review");
     expect(html).toContain("Quietly helpful.");
     expect(html).toContain("Remove");
+    expect(html).not.toContain("Felt understood");
+  });
+
+  it("shows the prototype category split across three reviews", () => {
+    const html = render({
+      viewer: therapist,
+      average: 4.7,
+      reviews: [
+        review({ id: "a", understood: 5, communication: 5, fit: 5, stars: 5 }),
+        review({ id: "b", understood: 5, communication: 5, fit: 4, stars: 14 / 3 }),
+        review({ id: "c", understood: 4, communication: 5, fit: 4, stars: 13 / 3 }),
+      ],
+    });
+    expect(html).toContain("4.7");
+    expect(html).toContain("5.0");
+    expect(html).toContain("4.3");
+    expect(html).toContain("Based on 3 client reviews");
   });
 });

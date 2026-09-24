@@ -1,14 +1,16 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
-import { formatReviewDate, reviewAuthorLabel, reviewMeta } from "@/lib/reviews/format";
+import { categoryAverages, formatReviewDate, reviewAuthorLabel, reviewMeta } from "@/lib/reviews/format";
 import { deleteOwnReview, reviewWriteError, submitReview } from "@/lib/reviews/submit";
 import { validateReview } from "@/lib/reviews/validate";
 import { toProfileReview, type ProfileReview } from "@/lib/therapists/load";
 
+const ratings = { understood: 5, communication: 4, fit: 5 };
+
 const draft = {
   authorName: "A. C.",
   anonymous: false,
-  stars: 5 as number | null,
+  ratings,
   body: "  Clear and kind.  ",
 };
 
@@ -20,42 +22,52 @@ describe("validateReview", () => {
       value: {
         authorName: "A. C.",
         anonymous: false,
-        stars: 5,
+        ratings,
         body: "Clear and kind.",
       },
     });
   });
 
-  it("allows anonymous without a name or rating", () => {
+  it("allows anonymous with no written note", () => {
     const result = validateReview({
       authorName: "ignored",
       anonymous: true,
-      stars: null,
-      body: "No name.",
+      ratings,
+      body: "   ",
     });
     expect(result).toEqual({
       ok: true,
       value: {
         authorName: null,
         anonymous: true,
-        stars: null,
-        body: "No name.",
+        ratings,
+        body: null,
       },
     });
   });
 
-  it("rejects an empty body, a missing name, and a fractional rating", () => {
-    expect(validateReview({ ...draft, body: "  " })).toMatchObject({
-      ok: false,
-      error: "Write a short review.",
-    });
+  it("rejects a missing name and any missing rating", () => {
     expect(validateReview({ ...draft, authorName: " " })).toMatchObject({
       ok: false,
       error: "Add a display name, or post anonymously.",
     });
-    expect(validateReview({ ...draft, stars: 4.5 })).toMatchObject({
+    expect(
+      validateReview({
+        ...draft,
+        ratings: { understood: 5, communication: null, fit: 4 },
+      }),
+    ).toMatchObject({
       ok: false,
-      error: "Rating must be a whole number from 1 to 5.",
+      error: "Rate all three questions from 1 to 5.",
+    });
+    expect(
+      validateReview({
+        ...draft,
+        ratings: { understood: 4.5, communication: 5, fit: 5 },
+      }),
+    ).toMatchObject({
+      ok: false,
+      error: "Rate all three questions from 1 to 5.",
     });
   });
 });
@@ -79,6 +91,9 @@ describe("review display", () => {
         id: "rev-1",
         patient_id: "patient-1",
         stars_avg: "4",
+        stars_cat_1: "5",
+        stars_cat_2: 5,
+        stars_cat_3: 4,
         body: "Helpful.",
         session_format: "Virtual",
         duration_label: null,
@@ -93,6 +108,9 @@ describe("review display", () => {
     expect(review).toMatchObject({
       id: "rev-1",
       stars: 4,
+      understood: 5,
+      communication: 5,
+      fit: 4,
       reviewer_name: null,
       anonymous: true,
       mine: true,
@@ -120,6 +138,19 @@ describe("review display", () => {
     expect(formatReviewDate("nope")).toBeNull();
     expect(reviewMeta(review)).toContain("Virtual · 8 months with Maya · ");
   });
+
+  it("averages each question into the reviews-tab breakdown", () => {
+    const rows = categoryAverages([
+      { understood: 5, communication: 5, fit: 5 },
+      { understood: 5, communication: 5, fit: 4 },
+      { understood: 4, communication: 5, fit: 4 },
+    ]);
+    expect(rows.map((row) => [row.label, row.average])).toEqual([
+      ["Felt understood", 4.7],
+      ["Communication", 5],
+      ["Right fit", 4.3],
+    ]);
+  });
 });
 
 describe("submitReview", () => {
@@ -140,7 +171,9 @@ describe("submitReview", () => {
         patient_id: "patient-1",
         author_name: "A. C.",
         anonymous: false,
-        stars_avg: 5,
+        stars_cat_1: 5,
+        stars_cat_2: 4,
+        stars_cat_3: 5,
         body: "Clear and kind.",
       },
     ]);
@@ -165,7 +198,9 @@ describe("submitReview", () => {
       {
         author_name: null,
         anonymous: true,
-        stars_avg: 5,
+        stars_cat_1: 5,
+        stars_cat_2: 4,
+        stars_cat_3: 5,
         body: "Clear and kind.",
       },
     ]);
