@@ -2,5 +2,5 @@
 --
 -- Do not insert demo therapists here. A full migrate already inserts the
 -- historical seed rows and then 20260925003000_remove_seed_demo_profiles.sql
--- deletes them. Re-inserting @kitchensink.demo profiles fails the trigger
--- in that migration.
+-- plus 20260925043000_finish_demo_profile_removal.sql delete them. Re-inserting
+-- @kitchensink.demo profiles fails the trigger in those migrations.

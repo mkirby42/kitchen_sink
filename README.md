@@ -9,7 +9,7 @@ Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). Prototype shots: [prototype_
 
 ## Quick start
 
-Node 22. Uses the hosted Supabase project. Demo seed therapists are removed by `supabase/migrations/20260925003000_remove_seed_demo_profiles.sql`.
+Node 22. Uses the hosted Supabase project. Demo seed therapists are removed by `supabase db query --linked -f supabase/migrations/20260925043000_finish_demo_profile_removal.sql`.
 
 ```bash
 git clone https://github.com/mkirby42/kitchen_sink.git
@@ -91,7 +91,7 @@ Nothing here is a real clinician, patient, license, review, or clinical dataset.
 | 10 more open therapists + reviews | `supabase/migrations/20260919184500_seed_demo_therapists.sql` | Synthetic profiles. Same removal rule: seed UUID and `*@kitchensink.demo` email. |
 | Seed patients J.R., Priya S., D.M. | same Maya seed | Prototype reviewer names. Removed with the same id + email rule. |
 | Tag / credential / insurance chips | `lib/tags/presets.ts` + requirements | Prototype + spec labels, not a published taxonomy |
-| Headshots + intro clips | `supabase/seed/media/<uuid>/` | Synthetic portraits generated for the demo (not real people). The removal migration deletes Storage objects whose first path segment is a matched seed id. |
+| Headshots + intro clips | `supabase/seed/media/<uuid>/` | Synthetic portraits. The removal migration nulls Storage ownership for matched seed ids. Hosted Storage rejects SQL deletes; remove the objects with the Storage API. |
 
 License numbers, phones, and addresses are fake. Reviews are fiction.
 
