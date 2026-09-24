@@ -65,6 +65,7 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Practicing under supervision");
     expect(html).not.toContain("I'm interested");
     expect(html).toContain(routes.joinEdit);
+    expect(html).not.toContain("Delete profile");
   });
 
   it("shows sliding scale on the public profile when it is offered", () => {
@@ -127,5 +128,6 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Edit profile");
     expect(html).not.toContain("I'm interested");
     expect(html).not.toContain(routes.joinEdit);
+    expect(html).not.toContain("Delete profile");
   });
 });
