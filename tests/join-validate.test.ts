@@ -98,6 +98,47 @@ describe("join validation", () => {
     expect(step1Errors(draft).some((e) => /credential/i.test(e))).toBe(true);
   });
 
+  it("requires name, license number, and state, and allows blank education and certificates", () => {
+    const ready = validStep1({
+      education: ["", "   "],
+      credentials: [],
+      licenses: [
+        { number: "MFC 112938", state: "CA" },
+        { number: "", state: "" },
+      ],
+    });
+
+    expect(canContinue(1, ready)).toBe(true);
+    expect(step1Errors(ready)).toEqual([]);
+    expect(continueHint(1, ready)).toBe("");
+
+    expect(step1Errors(validStep1({ name: "  " }))).toContain("Name is required");
+    expect(continueHint(1, validStep1({ name: " " }))).toBe(
+      "Add your name to continue",
+    );
+
+    expect(
+      step1Errors(validStep1({ licenses: [{ number: "", state: "" }] })),
+    ).toContain("At least one state license is required");
+    expect(
+      continueHint(1, validStep1({ licenses: [] })),
+    ).toBe("Add a license number to continue");
+
+    expect(
+      step1Errors(validStep1({ licenses: [{ number: "MFC 1", state: "" }] })),
+    ).toContain("License state is required");
+    expect(
+      continueHint(1, validStep1({ licenses: [{ number: "MFC 1", state: " " }] })),
+    ).toBe("Choose a license state to continue");
+
+    expect(
+      step1Errors(validStep1({ licenses: [{ number: "  ", state: "CA" }] })),
+    ).toContain("License number is required");
+    expect(
+      continueHint(1, validStep1({ licenses: [{ number: "", state: "CA" }] })),
+    ).toBe("Add a license number to continue");
+  });
+
   it("allows LMFT to continue step 1 with optional education rows", () => {
     const draft = validStep1({
       credential: "LMFT",
@@ -304,6 +345,24 @@ describe("buildJoinPayload", () => {
 
   it("throws when draft is incomplete", () => {
     expect(() => buildJoinPayload(emptyDraft())).toThrow();
+  });
+
+  it("omits blank education and certificates", () => {
+    const payload = buildJoinPayload(
+      validStep4({
+        name: "  Maya Chen  ",
+        education: ["", "  "],
+        credentials: [""],
+        licenses: [
+          { number: " MFC 112938 ", state: "CA" },
+          { number: "", state: "" },
+        ],
+      }),
+    );
+
+    expect(payload.name).toBe("Maya Chen");
+    expect(payload.qualifications).toEqual([]);
+    expect(payload.licenses).toEqual([{ number: "MFC 112938", state: "CA" }]);
   });
 
   it("allows a null intro video key", () => {

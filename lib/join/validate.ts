@@ -51,6 +51,40 @@ function validateTagList(labels: string[], kind: string, errors: string[]) {
   }
 }
 
+function licenseErrors(
+  licenses: JoinDraft["licenses"],
+  errors: string[],
+) {
+  const started = licenses.filter(
+    (license) => license.number.trim() || license.state.trim(),
+  );
+  if (started.length === 0) {
+    errors.push("At least one state license is required");
+    return;
+  }
+
+  let missingNumber = false;
+  let missingState = false;
+  for (const license of started) {
+    const number = license.number.trim();
+    const state = license.state.trim();
+    if (!number) missingNumber = true;
+    if (!state) missingState = true;
+    else if (!LICENSE_STATE_SET.has(state)) {
+      errors.push(`Invalid license state: ${state}`);
+    }
+  }
+  if (missingNumber) errors.push("License number is required");
+  if (missingState) errors.push("License state is required");
+
+  const states = started
+    .map((license) => license.state.trim())
+    .filter(Boolean);
+  if (hasDuplicateValues(states)) {
+    errors.push("License states must be unique");
+  }
+}
+
 function qualificationListErrors(
   items: string[],
   kind: string,
@@ -93,23 +127,7 @@ export function step1Errors(draft: JoinDraft): string[] {
     errors.push("Years practicing must be an integer from 0 to 70");
   }
 
-  const validLicenses = draft.licenses.filter(
-    (license) => license.number.trim() && license.state.trim(),
-  );
-  if (validLicenses.length === 0) {
-    errors.push("At least one state license is required");
-  }
-
-  for (const license of validLicenses) {
-    if (!LICENSE_STATE_SET.has(license.state)) {
-      errors.push(`Invalid license state: ${license.state}`);
-    }
-  }
-
-  const states = validLicenses.map((license) => license.state);
-  if (hasDuplicateValues(states)) {
-    errors.push("License states must be unique");
-  }
+  licenseErrors(draft.licenses, errors);
 
   qualificationListErrors(draft.education, "Education", errors);
   qualificationListErrors(draft.credentials, "Credential", errors);
@@ -244,11 +262,17 @@ export function continueHint(step: 1 | 2 | 3 | 4, draft: JoinDraft): string {
       if (!draft.name.trim()) {
         return "Add your name to continue";
       }
-      const hasLicense = draft.licenses.some(
-        (license) => license.number.trim() && license.state.trim(),
+      const started = draft.licenses.filter(
+        (license) => license.number.trim() || license.state.trim(),
       );
-      if (!hasLicense) {
-        return "Add a state license to continue";
+      if (
+        started.length === 0 ||
+        started.some((license) => !license.number.trim())
+      ) {
+        return "Add a license number to continue";
+      }
+      if (started.some((license) => !license.state.trim())) {
+        return "Choose a license state to continue";
       }
       return "";
     }
