@@ -70,16 +70,18 @@ function validStep3(overrides: Partial<JoinDraft> = {}): JoinDraft {
   });
 }
 
+function sampleCards(count: number): JoinDraft["cards"] {
+  return Array.from({ length: count }, (_, index) => ({
+    prompt: `prompt ${index + 1}`,
+    answer: `answer ${index + 1}`,
+    tag: "custom",
+  }));
+}
+
 function validStep4(overrides: Partial<JoinDraft> = {}): JoinDraft {
   return validStep3({
     rates: [{ service_type: "Individual", duration_minutes: 50, price_cents: 16500 }],
-    cards: [
-      {
-        prompt: "my approach to therapy is...",
-        answer: "Collaborative and warm.",
-        tag: "approach",
-      },
-    ],
+    cards: sampleCards(3),
     email: "maya@example.com",
     outreach: ["email"],
     ...overrides,
@@ -94,6 +96,47 @@ describe("join validation", () => {
 
     expect(canContinue(1, draft)).toBe(false);
     expect(step1Errors(draft).some((e) => /credential/i.test(e))).toBe(true);
+  });
+
+  it("requires name, license number, and state, and allows blank education and certificates", () => {
+    const ready = validStep1({
+      education: ["", "   "],
+      credentials: [],
+      licenses: [
+        { number: "MFC 112938", state: "CA" },
+        { number: "", state: "" },
+      ],
+    });
+
+    expect(canContinue(1, ready)).toBe(true);
+    expect(step1Errors(ready)).toEqual([]);
+    expect(continueHint(1, ready)).toBe("");
+
+    expect(step1Errors(validStep1({ name: "  " }))).toContain("Name is required");
+    expect(continueHint(1, validStep1({ name: " " }))).toBe(
+      "Add your name to continue",
+    );
+
+    expect(
+      step1Errors(validStep1({ licenses: [{ number: "", state: "" }] })),
+    ).toContain("At least one state license is required");
+    expect(
+      continueHint(1, validStep1({ licenses: [] })),
+    ).toBe("Add a license number to continue");
+
+    expect(
+      step1Errors(validStep1({ licenses: [{ number: "MFC 1", state: "" }] })),
+    ).toContain("License state is required");
+    expect(
+      continueHint(1, validStep1({ licenses: [{ number: "MFC 1", state: " " }] })),
+    ).toBe("Choose a license state to continue");
+
+    expect(
+      step1Errors(validStep1({ licenses: [{ number: "  ", state: "CA" }] })),
+    ).toContain("License number is required");
+    expect(
+      continueHint(1, validStep1({ licenses: [{ number: "", state: "CA" }] })),
+    ).toBe("Add a license number to continue");
   });
 
   it("allows LMFT to continue step 1 with optional education rows", () => {
@@ -215,7 +258,24 @@ describe("join validation", () => {
       outreach: ["email"],
     });
 
-    expect(continueHint(4, draft)).toBe("1 of 3 cards");
+    expect(continueHint(4, draft)).toBe("1 of 6 cards");
+  });
+
+  it("requires 3 to 6 answered conversation cards", () => {
+    const tooFew = validStep4({ cards: sampleCards(2) });
+    expect(canContinue(4, tooFew)).toBe(false);
+    expect(step4Errors(tooFew)).toContain(
+      "At least 3 conversation cards are required",
+    );
+
+    expect(canContinue(4, validStep4())).toBe(true);
+    expect(step4Errors(validStep4())).toEqual([]);
+
+    const tooMany = validStep4({ cards: sampleCards(7) });
+    expect(canContinue(4, tooMany)).toBe(false);
+    expect(step4Errors(tooMany)).toContain(
+      "At most 6 conversation cards are allowed",
+    );
   });
 });
 
@@ -285,6 +345,24 @@ describe("buildJoinPayload", () => {
 
   it("throws when draft is incomplete", () => {
     expect(() => buildJoinPayload(emptyDraft())).toThrow();
+  });
+
+  it("omits blank education and certificates", () => {
+    const payload = buildJoinPayload(
+      validStep4({
+        name: "  Maya Chen  ",
+        education: ["", "  "],
+        credentials: [""],
+        licenses: [
+          { number: " MFC 112938 ", state: "CA" },
+          { number: "", state: "" },
+        ],
+      }),
+    );
+
+    expect(payload.name).toBe("Maya Chen");
+    expect(payload.qualifications).toEqual([]);
+    expect(payload.licenses).toEqual([{ number: "MFC 112938", state: "CA" }]);
   });
 
   it("allows a null intro video key", () => {

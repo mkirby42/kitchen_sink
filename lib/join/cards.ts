@@ -1,3 +1,13 @@
+export const MIN_CONVERSATION_CARDS = 3;
+export const MAX_CONVERSATION_CARDS = 6;
+
+export function answeredConversationCardCount(
+  cards: readonly { prompt: string; answer: string }[],
+): number {
+  return cards.filter((card) => card.prompt.trim() && card.answer.trim())
+    .length;
+}
+
 export const CONVERSATION_PROMPTS = [
   { prompt: "my approach to therapy is...", tag: "approach" },
   { prompt: "a session with me feels like...", tag: "session_vibe" },

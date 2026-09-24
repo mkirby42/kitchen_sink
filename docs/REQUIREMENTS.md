@@ -12,7 +12,7 @@ The current app does **not** book sessions or broker intros. Those are on the ba
 
 1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties (preset chips **plus** free-text “Add your own”), insurance, license state. OR semantics: therapist must match **some** selected tag. Rank by overlap count, then name; cards highlight hits (“3 of 4 tags”). Empty filters = all therapists open to new clients.
 2. **Therapist profile** — photo, **optional intro video**, name, credential (licensed dropdown), **education** and **additional credentials** (freeform text, 0–n rows each), **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile), about, conversation cards, reviews (read-only seed data today), contact (email / phone / text as listed). Profile hero plays the intro video when one is uploaded. The owning therapist sees **Edit** (header, top right) and updates the same fields as join.
-3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (incl. repeatable state-license rows) → **photo (required) + intro video (optional, up to 50MB)** → practice tags → cards + contact + optional product feedback. Returning therapists sign in from home (`/join?mode=signin`) and land on their profile.
+3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (name, license number, and state required; education and certificates optional; repeatable state-license rows) → **photo (required) + intro video (optional, up to 50MB)** → practice tags → cards + contact + optional product feedback. Returning therapists sign in from home (`/join?mode=signin`) and land on their profile.
 4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
@@ -40,10 +40,10 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | Flow | What it is |
 | --- | --- |
 | Nav | Home, Find a Therapist, Join as a Therapist |
-| Therapist onboarding 1 | Name, licensed credential dropdown, years practicing, **Education** repeater, **Credentials & certificates** repeater, **State license(s)** repeater (license # + state per row, remove row, “+ Add another state license”) |
+| Therapist onboarding 1 | **Name (required)**, licensed credential dropdown, years practicing, **Education (optional)**, **Credentials & certificates (optional)**, **State license(s)** (min 1; license # and state both required on each kept row; blank extra rows ignored) |
 | Therapist onboarding 2 | Photo (required) + intro video (optional, up to 50MB; prototype shows photo; profile hero plays intro when present) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
-| Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
+| Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 3, max 6), about, private email, outreach (email / phone / text), optional feedback |
 | Search | Must-have chips (specialties: presets + free-text custom). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price / duration) |
 | Profile | Hero (photo + playable intro video) + credential + education + additional credentials + all state licenses (# + state per row) + all rates (service + duration + price) + **I'm interested** + cards + about + reviews |
 | Interest inbox | Therapist-only `/matches`: anonymous aliases + timestamp. Empty state if none. |
@@ -60,7 +60,7 @@ One `profiles` row per auth user. Role is `therapist` or `patient`. Tag kinds sh
 profiles
   id uuid PK = auth.uid()
   role text check (therapist | patient)
-  name, email, phone, about_me
+  name, email, phone, about_me   -- therapist name required (non-blank)
   photo_key, video_key          -- Supabase Storage keys; photo required, intro video optional (max 50MB)
   created_at
 
@@ -101,7 +101,7 @@ tags
   kind: specialty | modality | identity | insurance | outreach
   unique (profile_id, kind, label)
 
-profile_items                   -- conversation cards
+profile_items                   -- conversation cards; 3–6 rows per therapist
   id, therapist_id, prompt, answer, tag
   tag: approach | session_vibe | specialty | about | outcome | custom
 

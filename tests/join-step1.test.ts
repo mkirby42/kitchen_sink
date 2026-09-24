@@ -39,9 +39,29 @@ describe("JoinStep1 qualifications", () => {
       createElement(JoinStep1, { draft: draft(), setDraft: () => {} }),
     );
 
-    expect(html).toContain("Education");
-    expect(html).toContain("Credentials &amp; certificates");
+    expect(html).toContain("Education (optional)");
+    expect(html).toContain("Credentials &amp; certificates (optional)");
     expect(html).toContain("B.A. Psychology");
+
+    const tags = html.match(/<[^>]+>/g) ?? [];
+    const tag = (marker: string) =>
+      tags.find((item) => item.includes(marker)) ?? "";
+
+    const name = tag('autoComplete="name"');
+    expect(name).toContain('required=""');
+    expect(name).toContain('aria-required="true"');
+
+    const licenseNumber = tag('aria-label="License 1 number"');
+    expect(licenseNumber).toContain('required=""');
+    const licenseState = tag('aria-label="License 1 state"');
+    expect(licenseState).toContain('required=""');
+
+    const education = tag('aria-label="Education (optional) 1"');
+    expect(education).not.toContain("required");
+    const certificates = tag(
+      'aria-label="Credentials &amp; certificates (optional) 1"',
+    );
+    expect(certificates).not.toContain("required");
     expect(html).toContain("EMDR trained");
     expect(html).toContain("LMFT");
     expect(html).not.toContain("Associate MFT");

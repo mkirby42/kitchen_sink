@@ -80,6 +80,16 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
           answer: "A collaborative and practical conversation.",
           tag: "approach",
         },
+        {
+          prompt: "A session with me feels like...",
+          answer: "Direct and unhurried.",
+          tag: "session_vibe",
+        },
+        {
+          prompt: "I specialize in unpacking...",
+          answer: "Anxiety that shows up as over-functioning.",
+          tag: "specialty",
+        },
       ],
       p_feedback: "Atomic join RPC integration test.",
     };
@@ -114,9 +124,17 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
       ...baseArgs,
       p_name: "Join Test Therapist Updated",
       p_tags: [{ kind: "specialty", label: "ADHD" }],
+      p_qualifications: [],
     });
     expect(updated.error).toBeNull();
     expect(updated.data).toBe(userId);
+
+    const qualifications = await supabase
+      .from("qualifications")
+      .select("label")
+      .eq("therapist_id", userId);
+    expect(qualifications.error).toBeNull();
+    expect(qualifications.data).toEqual([]);
 
     const renamed = await anon
       .from("profiles")

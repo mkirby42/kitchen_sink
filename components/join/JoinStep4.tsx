@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { CONVERSATION_PROMPTS } from "@/lib/join/cards";
+import {
+  answeredConversationCardCount,
+  CONVERSATION_PROMPTS,
+  MAX_CONVERSATION_CARDS,
+} from "@/lib/join/cards";
 import type { JoinDraft } from "@/lib/join/types";
 import {
   OUTREACH_OPTIONS,
@@ -46,10 +50,12 @@ export function JoinStep4({
   const filteredPrompts = CONVERSATION_PROMPTS.filter(
     (item) => filter === "all" || item.tag === filter,
   );
-  const answeredCount = draft.cards.filter((card) => card.answer.trim()).length;
+  const answeredCount = answeredConversationCardCount(draft.cards);
+  const atCardMax = draft.cards.length >= MAX_CONVERSATION_CARDS;
 
   function addPrompt(prompt: string, tag: string) {
     setDraft((current) => {
+      if (current.cards.length >= MAX_CONVERSATION_CARDS) return current;
       if (current.cards.some((card) => card.prompt === prompt)) return current;
       return {
         ...current,
@@ -62,6 +68,7 @@ export function JoinStep4({
     const prompt = customPrompt.trim();
     if (!prompt) return;
     setDraft((current) => {
+      if (current.cards.length >= MAX_CONVERSATION_CARDS) return current;
       if (current.cards.some((card) => card.prompt === prompt)) return current;
       return {
         ...current,
@@ -74,7 +81,9 @@ export function JoinStep4({
 
   return (
     <div className="space-y-8">
-      <p className="text-sm text-mute">{answeredCount} of 3 added</p>
+      <p className="text-sm text-mute">
+        {answeredCount} of {MAX_CONVERSATION_CARDS} added
+      </p>
 
       {draft.cards.length ? (
         <div className="space-y-3">
@@ -156,7 +165,7 @@ export function JoinStep4({
             <button
               key={item.prompt}
               type="button"
-              disabled={added}
+              disabled={added || atCardMax}
               onClick={() => addPrompt(item.prompt, item.tag)}
               className="flex w-full items-center justify-between gap-4 rounded-2xl border border-line px-5 py-3 text-left disabled:opacity-50"
             >
@@ -174,8 +183,9 @@ export function JoinStep4({
 
       <button
         type="button"
+        disabled={atCardMax}
         onClick={() => setShowCustom(true)}
-        className="w-full rounded-full border border-dashed border-clay/60 px-5 py-3 text-sm font-medium text-clay hover:bg-cream"
+        className="w-full rounded-full border border-dashed border-clay/60 px-5 py-3 text-sm font-medium text-clay hover:bg-cream disabled:cursor-not-allowed disabled:opacity-40"
       >
         ✎ Write your own prompt
       </button>
@@ -193,8 +203,9 @@ export function JoinStep4({
           <div className="flex gap-3">
             <button
               type="button"
+              disabled={atCardMax}
               onClick={addCustomCard}
-              className="rounded-full bg-clay px-5 py-2 text-sm font-semibold text-paper"
+              className="rounded-full bg-clay px-5 py-2 text-sm font-semibold text-paper disabled:cursor-not-allowed disabled:opacity-40"
             >
               Add card
             </button>

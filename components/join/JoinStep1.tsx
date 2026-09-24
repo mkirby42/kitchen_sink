@@ -21,6 +21,8 @@ export function JoinStep1({
       <label className="block">
         <span className={labelClass}>Full name</span>
         <input
+          required
+          aria-required="true"
           autoComplete="name"
           value={draft.name}
           onChange={(event) =>
@@ -74,7 +76,7 @@ export function JoinStep1({
       </div>
 
       <StringListField
-        legend="Education"
+        legend="Education (optional)"
         items={draft.education}
         placeholder="e.g. M.A. Counseling Psychology"
         addLabel="+ Add another degree"
@@ -84,7 +86,7 @@ export function JoinStep1({
       />
 
       <StringListField
-        legend="Credentials & certificates"
+        legend="Credentials & certificates (optional)"
         items={draft.credentials}
         placeholder="e.g. EMDR trained"
         addLabel="+ Add another credential"
@@ -96,70 +98,79 @@ export function JoinStep1({
       <fieldset>
         <legend className={labelClass}>State license(s)</legend>
         <div className="mt-4 space-y-3">
-          {draft.licenses.map((license, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <label className="min-w-0 flex-1">
-                <span className="sr-only">License number</span>
-                <input
-                  aria-label={`License ${index + 1} number`}
-                  placeholder="License # (e.g. MFC 112938)"
-                  value={license.number}
-                  onChange={(event) =>
+          {draft.licenses.map((license, index) => {
+            const rowRequired =
+              index === 0 ||
+              Boolean(license.number.trim() || license.state.trim());
+            return (
+              <div key={index} className="flex items-center gap-2">
+                <label className="min-w-0 flex-1">
+                  <span className="sr-only">License number</span>
+                  <input
+                    required={rowRequired}
+                    aria-required={rowRequired}
+                    aria-label={`License ${index + 1} number`}
+                    placeholder="License # (e.g. MFC 112938)"
+                    value={license.number}
+                    onChange={(event) =>
+                      setDraft((current) => ({
+                        ...current,
+                        licenses: current.licenses.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? { ...item, number: event.target.value }
+                            : item,
+                        ),
+                      }))
+                    }
+                    className="w-full rounded-full border border-line bg-paper px-4 py-2.5 outline-none placeholder:text-mute/70 focus:border-clay"
+                  />
+                </label>
+                <label className="w-[5.5rem] shrink-0">
+                  <span className="sr-only">License state</span>
+                  <select
+                    required={rowRequired}
+                    aria-required={rowRequired}
+                    aria-label={`License ${index + 1} state`}
+                    value={license.state}
+                    onChange={(event) =>
+                      setDraft((current) => ({
+                        ...current,
+                        licenses: current.licenses.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? { ...item, state: event.target.value }
+                            : item,
+                        ),
+                      }))
+                    }
+                    className="w-full rounded-full border border-line bg-paper px-3 py-2.5 outline-none focus:border-clay"
+                  >
+                    <option value="">State</option>
+                    {LICENSE_STATES.map((state) => (
+                      <option key={state} value={state}>
+                        {state}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  aria-label={`Remove license ${index + 1}`}
+                  disabled={draft.licenses.length === 1}
+                  onClick={() =>
                     setDraft((current) => ({
                       ...current,
-                      licenses: current.licenses.map((item, itemIndex) =>
-                        itemIndex === index
-                          ? { ...item, number: event.target.value }
-                          : item,
+                      licenses: current.licenses.filter(
+                        (_, itemIndex) => itemIndex !== index,
                       ),
                     }))
                   }
-                  className="w-full rounded-full border border-line bg-paper px-4 py-2.5 outline-none placeholder:text-mute/70 focus:border-clay"
-                />
-              </label>
-              <label className="w-[5.5rem] shrink-0">
-                <span className="sr-only">License state</span>
-                <select
-                  aria-label={`License ${index + 1} state`}
-                  value={license.state}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      licenses: current.licenses.map((item, itemIndex) =>
-                        itemIndex === index
-                          ? { ...item, state: event.target.value }
-                          : item,
-                      ),
-                    }))
-                  }
-                  className="w-full rounded-full border border-line bg-paper px-3 py-2.5 outline-none focus:border-clay"
+                  className="grid size-9 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay disabled:cursor-not-allowed disabled:opacity-30"
                 >
-                  <option value="">State</option>
-                  {LICENSE_STATES.map((state) => (
-                    <option key={state} value={state}>
-                      {state}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                aria-label={`Remove license ${index + 1}`}
-                disabled={draft.licenses.length === 1}
-                onClick={() =>
-                  setDraft((current) => ({
-                    ...current,
-                    licenses: current.licenses.filter(
-                      (_, itemIndex) => itemIndex !== index,
-                    ),
-                  }))
-                }
-                className="grid size-9 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                ×
-              </button>
-            </div>
-          ))}
+                  ×
+                </button>
+              </div>
+            );
+          })}
         </div>
         <button
           type="button"

@@ -43,6 +43,29 @@ function render(overrides: Partial<JoinDraft> = {}) {
   );
 }
 
+function isDisabled(buttonHtml: string) {
+  return /(?:^|\s)disabled(?:=|\s|>)/.test(buttonHtml);
+}
+
+function promptButton(html: string, prompt: string) {
+  const index = html.indexOf(`>${prompt}</span>`);
+  const start = html.lastIndexOf("<button", index);
+  return html.slice(start, index);
+}
+
+function ownPromptButton(html: string) {
+  const index = html.indexOf("Write your own prompt");
+  const start = html.lastIndexOf("<button", index);
+  return html.slice(start, index);
+}
+
+function removeButton(html: string, prompt: string) {
+  const marker = `aria-label="Remove ${prompt}"`;
+  const index = html.indexOf(marker);
+  const start = html.lastIndexOf("<button", index);
+  return html.slice(start, index + marker.length);
+}
+
 describe("JoinStep4 contact and rates", () => {
   it("renders the full service type, not a clipped label", () => {
     const html = render();
@@ -79,6 +102,29 @@ describe("JoinStep4 contact and rates", () => {
     expect(html).toContain("Email");
     expect(html).not.toContain("Phone number");
     expect(html).not.toContain("Number for texts");
+  });
+
+  it("counts conversation cards out of 6 and stops adds at the max", () => {
+    const one = render();
+    expect(one).toContain("1 of 6 added");
+    expect(
+      isDisabled(promptButton(one, "a session with me feels like...")),
+    ).toBe(false);
+    expect(isDisabled(ownPromptButton(one))).toBe(false);
+
+    const six = render({
+      cards: Array.from({ length: 6 }, (_, index) => ({
+        prompt: `prompt ${index + 1}`,
+        answer: `answer ${index + 1}`,
+        tag: "custom",
+      })),
+    });
+    expect(six).toContain("6 of 6 added");
+    expect(isDisabled(promptButton(six, "my approach to therapy is..."))).toBe(
+      true,
+    );
+    expect(isDisabled(ownPromptButton(six))).toBe(true);
+    expect(isDisabled(removeButton(six, "prompt 1"))).toBe(false);
   });
 
   it("hides product feedback when editing an existing profile", () => {
