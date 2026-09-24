@@ -43,7 +43,7 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | Therapist onboarding 1 | Name, licensed credential dropdown, years practicing, **Education** repeater, **Credentials & certificates** repeater, **State license(s)** repeater (license # + state per row, remove row, “+ Add another state license”) |
 | Therapist onboarding 2 | Photo (required) + intro video (optional, up to 50MB; prototype shows photo; profile hero plays intro when present) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
-| Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 1, target 3), about, private email, outreach (email / phone / text), optional feedback |
+| Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 3, max 6), about, private email, outreach (email / phone / text), optional feedback |
 | Search | Must-have chips (specialties: presets + free-text custom). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price / duration) |
 | Profile | Hero (photo + playable intro video) + credential + education + additional credentials + all state licenses (# + state per row) + all rates (service + duration + price) + **I'm interested** + cards + about + reviews |
 | Interest inbox | Therapist-only `/matches`: anonymous aliases + timestamp. Empty state if none. |
@@ -101,7 +101,7 @@ tags
   kind: specialty | modality | identity | insurance | outreach
   unique (profile_id, kind, label)
 
-profile_items                   -- conversation cards
+profile_items                   -- conversation cards; 3–6 rows per therapist
   id, therapist_id, prompt, answer, tag
   tag: approach | session_vibe | specialty | about | outcome | custom
 

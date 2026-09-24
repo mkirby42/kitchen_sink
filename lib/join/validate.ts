@@ -1,3 +1,8 @@
+import {
+  answeredConversationCardCount,
+  MAX_CONVERSATION_CARDS,
+  MIN_CONVERSATION_CARDS,
+} from "@/lib/join/cards";
 import { startDateFromYears } from "@/lib/join/dates";
 import {
   QUALIFICATION_MAX_LENGTH,
@@ -175,11 +180,15 @@ export function step4Errors(draft: JoinDraft): string[] {
     errors.push("Rate service types must be unique");
   }
 
-  const answeredCards = draft.cards.filter(
-    (card) => card.prompt.trim() && card.answer.trim(),
-  );
-  if (answeredCards.length === 0) {
-    errors.push("At least one conversation card is required");
+  const answeredCards = answeredConversationCardCount(draft.cards);
+  if (answeredCards < MIN_CONVERSATION_CARDS) {
+    errors.push("At least 3 conversation cards are required");
+  }
+  if (
+    draft.cards.length > MAX_CONVERSATION_CARDS ||
+    answeredCards > MAX_CONVERSATION_CARDS
+  ) {
+    errors.push("At most 6 conversation cards are allowed");
   }
 
   for (const card of draft.cards) {
@@ -258,8 +267,8 @@ export function continueHint(step: 1 | 2 | 3 | 4, draft: JoinDraft): string {
       return `${count} tags selected`;
     }
     case 4: {
-      const count = draft.cards.filter((card) => card.answer.trim()).length;
-      return `${count} of 3 cards`;
+      const count = answeredConversationCardCount(draft.cards);
+      return `${count} of ${MAX_CONVERSATION_CARDS} cards`;
     }
   }
 }

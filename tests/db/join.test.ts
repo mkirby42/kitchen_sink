@@ -80,6 +80,16 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
           answer: "A collaborative and practical conversation.",
           tag: "approach",
         },
+        {
+          prompt: "A session with me feels like...",
+          answer: "Direct and unhurried.",
+          tag: "session_vibe",
+        },
+        {
+          prompt: "I specialize in unpacking...",
+          answer: "Anxiety that shows up as over-functioning.",
+          tag: "specialty",
+        },
       ],
       p_feedback: "Atomic join RPC integration test.",
     };
