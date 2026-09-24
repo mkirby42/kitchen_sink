@@ -11,7 +11,7 @@ Kitchen Sink is a company product. The hackathon **Must ship / Cut** freeze is g
 
 Read `docs/REQUIREMENTS.md`. **Current product** is what exists. **Not built yet** is backlog you may implement when asked.
 
-Update REQUIREMENTS (and `docs/interest.md` if interest/anonymity changes) in the same change as the behavior.
+Update REQUIREMENTS in the same change as the behavior.
 
 ## Do not
 

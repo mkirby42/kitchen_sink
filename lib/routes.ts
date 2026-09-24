@@ -4,7 +4,6 @@ export const routes = {
   join: "/join",
   joinSignIn: "/join?mode=signin",
   joinEdit: "/join?edit=1",
-  matches: "/matches",
   therapist: (id: string) => `/t/${id}`,
 } as const;
 

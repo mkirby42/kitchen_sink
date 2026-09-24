@@ -1,12 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
-
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ refresh() {}, push() {}, replace() {} }),
-}));
-import type { InterestViewer } from "@/lib/interest/viewer";
 import { routes } from "@/lib/routes";
 import type { TherapistProfileData } from "@/lib/therapists/load";
 
@@ -41,33 +36,20 @@ const data: TherapistProfileData = {
   contact: [],
 };
 
-const visitor: InterestViewer = {
-  userId: null,
-  role: null,
-  interested: false,
-  isOwner: false,
-};
-
-const owner: InterestViewer = {
-  userId: data.id,
-  role: "therapist",
-  interested: false,
-  isOwner: true,
-};
-
 describe("profile edit control", () => {
   it("shows an Edit button for the owner in the header corner", () => {
     const html = renderToStaticMarkup(
       createElement(TherapistProfile, {
         data,
         backHref: routes.find,
-        viewer: owner,
+        isOwner: true,
       }),
     );
     expect(html).toContain("Edit profile");
     expect(html).toContain("B.A. Psychology");
     expect(html).toContain("EMDR trained");
     expect(html).not.toContain("Practicing under supervision");
+    expect(html).not.toContain("I'm interested");
     expect(html).toContain(routes.joinEdit);
   });
 
@@ -76,10 +58,11 @@ describe("profile edit control", () => {
       createElement(TherapistProfile, {
         data,
         backHref: routes.find,
-        viewer: visitor,
+        isOwner: false,
       }),
     );
     expect(html).not.toContain("Edit profile");
+    expect(html).not.toContain("I'm interested");
     expect(html).not.toContain(routes.joinEdit);
   });
 });

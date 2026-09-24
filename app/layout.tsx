@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
-import { loadNavUser } from "@/lib/interest/nav";
+import { loadNavUser } from "@/lib/nav";
 import "./globals.css";
 
 const fraunces = Fraunces({

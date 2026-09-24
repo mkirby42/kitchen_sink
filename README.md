@@ -1,6 +1,6 @@
 # Kitchen Sink
 
-Patients tap must-have tags. We show therapists who match **some** selected tag. Therapists publish a readable profile (photo, intro video, licenses, rates, cards). Patients can tap **I'm interested**; the therapist sees an anonymous alias list. No booking.
+Patients tap must-have tags. We show therapists who match **some** selected tag. Therapists publish a readable profile (photo, intro video, licenses, rates, cards). No booking.
 
 Repo: [github.com/mkirby42/kitchen_sink](https://github.com/mkirby42/kitchen_sink)
 Live: [kitchen-sink-tau.vercel.app](https://kitchen-sink-tau.vercel.app)
@@ -28,7 +28,6 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/find` | Public search |
 | `/t/maya` | Seeded Maya Chen profile (owner sees **Edit**) |
 | `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile |
-| `/matches` | Therapist interest inbox (auth) |
 
 ```bash
 npm run lint && npm run typecheck && npm test && npm run build
@@ -44,13 +43,12 @@ flowchart LR
   Next --> Auth[Supabase Auth]
   Next --> RPC["Postgres RPCs + RLS"]
   Next --> Store[Storage photos / videos]
-  RPC --> DB[("profiles · therapists · tags · rates · licenses · interest · reviews")]
+  RPC --> DB[("profiles · therapists · tags · rates · licenses · reviews")]
 ```
 
 - `/find` calls one RPC, `search_therapists` — OR overlap on selected tags, ranked by match count, page size 24.
-- `/t/[id]` loads one therapist (photo + native `<video>` intro). **I'm interested** writes an `interest` row. The owner sees **Edit** (header, top right).
+- `/t/[id]` loads one therapist (photo + native `<video>` intro). The owner sees **Edit** (header, top right).
 - `/join` is a 4-step therapist wizard; photo required, intro video optional (50MB). Returning therapists sign in from home and land on their profile; **Save changes** calls `update_therapist_profile`.
-- `/matches` calls `list_my_interest()` and shows aliases only (`Patient ·` + last 4 hex of the patient UUID).
 - `proxy.ts` refreshes the Supabase session. Schema lives in `supabase/migrations/`.
 
 ## Reproduce the demo
@@ -61,7 +59,6 @@ flowchart LR
 2. Tap **Anxiety**. Maya Chen is in the results (ranked by overlap).
 3. Open her profile (`/t/maya`). Play the intro video. Read cards and seed reviews.
 4. From home, **Log in as a therapist** as Maya (`maya@kitchensink.demo` / `seed-only`). You land on her profile; **Edit** is top-right.
-5. Sign in as a seed patient and tap **I'm interested**. Sign in as Maya and open `/matches`.
 
 ### Option B — local app, same hosted data
 
@@ -79,10 +76,10 @@ Seed accounts (password is always `seed-only`):
 
 | Email | Role | Use |
 | --- | --- | --- |
-| `maya@kitchensink.demo` | therapist | Profile owner; `/matches` already has 3 interests |
-| `jr@kitchensink.demo` | patient | Tap **I'm interested** on a profile |
-| `priya@kitchensink.demo` | patient | Seed reviews + Maya interest |
-| `dm@kitchensink.demo` | patient | Seed reviews + Maya interest |
+| `maya@kitchensink.demo` | therapist | Profile owner |
+| `jr@kitchensink.demo` | patient | Seed patient profile |
+| `priya@kitchensink.demo` | patient | Seed reviews |
+| `dm@kitchensink.demo` | patient | Seed reviews |
 
 Ten more therapists (`jordan@` … `chris@kitchensink.demo`) fill search. Same password.
 
@@ -105,7 +102,6 @@ Nothing here is a real clinician, patient, license, review, or clinical dataset.
 | Maya Chen (LMFT, CA, rates, cards, 3 reviews) | `supabase/migrations/20260919163316_seed_maya_chen.sql` | Written to match [prototype_screenshots/](prototype_screenshots/) |
 | 10 more open therapists + reviews | `supabase/migrations/20260919184500_seed_demo_therapists.sql` | Authored synthetic profiles so `/find` has multiple OR matches |
 | Seed patients J.R., Priya S., D.M. | same Maya seed | Prototype reviewer names; emails are `*@kitchensink.demo` |
-| Interest rows on Maya | later seed / interest migration | J.R., Priya, D.M. already interested so `/matches` is not empty |
 | Tag / credential / insurance chips | `lib/tags/presets.ts` + requirements | Prototype + spec labels, not a published taxonomy |
 | Headshots + intro clips | `supabase/seed/media/<uuid>/` | Synthetic portraits generated for the demo (not real people). `scripts/prepare-demo-media.sh` crops to 720² JPEG and builds a 4s silent Ken Burns MP4 with ffmpeg. Uploaded by `scripts/seed-demo-media.mjs` |
 
@@ -114,20 +110,19 @@ License numbers, phones, and addresses are fake. Reviews are fiction.
 ## Known limitations (today)
 
 - No booking, calendars, or in-app messaging. Contact buttons are `mailto:` / `tel:` from listed outreach.
-- Interest is a persisted anonymous signal. Therapists never see name, email, or photo. Toggle off deletes the row. No realtime.
 - Reviews are read-only seed data.
 - Search is OR overlap (some tags), not AND. Results cap at 24; no pagination UI.
 - In-person location is stored; search uses license state, not maps or distance.
 - One intro clip per therapist, played as uploaded. No transcoding.
 - Associate/trainee credentials are not offered. Education and extra credentials are freeform lists on the profile.
-- Patient UI is only sign-in + **I'm interested** on a profile. No patient onboarding or public patient pages.
+- No patient onboarding or public patient pages.
 
 These are product gaps, not a freeze. See REQUIREMENTS **Not built yet**.
 
 ## Next
 
 - Consult / session booking
-- Opt-in contact reveal or messaging after interest
+- In-app messaging
 - License verification and real identity checks
 - AND filters, pagination, maps
 - Review write path and video transcoding
@@ -138,7 +133,6 @@ These are product gaps, not a freeze. See REQUIREMENTS **Not built yet**.
 | File | What |
 | --- | --- |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Current product, backlog, schema, matching, CI |
-| [docs/interest.md](docs/interest.md) | Anonymous interest rules |
 | [AGENTS.md](AGENTS.md) | How agents work in this repo |
 | [prototype_screenshots/README.md](prototype_screenshots/README.md) | Screen → screenshot map |
 

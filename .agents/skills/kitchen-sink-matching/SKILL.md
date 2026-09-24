@@ -9,7 +9,7 @@ Spec: `docs/REQUIREMENTS.md` (Data + Matching). New tables/kinds only with a mig
 
 ## Shape
 
-- `profiles` + `therapists` (1:1) + `licenses` (1:n, multi-state) + `qualifications` (1:n, education + extra credentials; not searched) + `rates` (1:n, multi-service) + `locations` + `tags` + `profile_items` + `reviews` + `feedback` + `interest` (patient → therapist, unique pair)
+- `profiles` + `therapists` (1:1) + `licenses` (1:n, multi-state) + `qualifications` (1:n, education + extra credentials; not searched) + `rates` (1:n, multi-service) + `locations` + `tags` + `profile_items` + `reviews` + `feedback`
 - Tags: one table, `kind` in `specialty | modality | identity | insurance | outreach`
 - Years practicing = `now - start_date_of_practice`, not a stored int
 

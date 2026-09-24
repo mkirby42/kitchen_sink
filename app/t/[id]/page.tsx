@@ -4,26 +4,21 @@ import {
   ProfileNotFound,
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
-import { loadInterestViewer, type InterestViewer } from "@/lib/interest/viewer";
 import { parseFindSearchParams } from "@/lib/search/rpc";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { loadTherapistProfile } from "@/lib/therapists/load";
 
-const emptyViewer: InterestViewer = {
-  userId: null,
-  role: null,
-  interested: false,
-  isOwner: false,
-};
-
-async function loadViewer(therapistId: string): Promise<InterestViewer> {
-  if (!supabasePublicConfig()) return emptyViewer;
+async function loadIsOwner(therapistId: string): Promise<boolean> {
+  if (!supabasePublicConfig()) return false;
   try {
     const { createClient } = await import("@/lib/supabase/server");
     const supabase = await createClient();
-    return await loadInterestViewer(supabase, therapistId);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user?.id === therapistId;
   } catch {
-    return emptyViewer;
+    return false;
   }
 }
 
@@ -51,7 +46,9 @@ export default async function TherapistProfilePage({
 
   if (!data) return <ProfileNotFound backHref={backHref} />;
 
-  const viewer = await loadViewer(data.id);
+  const isOwner = await loadIsOwner(data.id);
 
-  return <TherapistProfile data={data} backHref={backHref} viewer={viewer} />;
+  return (
+    <TherapistProfile data={data} backHref={backHref} isOwner={isOwner} />
+  );
 }

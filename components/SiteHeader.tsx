@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { NavUser } from "@/lib/interest/nav";
+import type { NavUser } from "@/lib/nav";
 import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
@@ -104,15 +104,6 @@ export function SiteHeader({
           >
             Find a Therapist
           </Link>
-          {therapist ? (
-            <Link
-              href={routes.matches}
-              className={navClass(path === routes.matches)}
-              aria-current={path === routes.matches ? "page" : undefined}
-            >
-              Interest
-            </Link>
-          ) : null}
           {!navUser ? (
             <Link
               href={routes.join}
