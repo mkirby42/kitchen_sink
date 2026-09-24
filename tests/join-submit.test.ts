@@ -33,6 +33,16 @@ const draft: JoinDraft = {
       answer: "Collaborative and warm.",
       tag: "approach",
     },
+    {
+      prompt: "a session with me feels like...",
+      answer: "Unhurried.",
+      tag: "session_vibe",
+    },
+    {
+      prompt: "I specialize in unpacking...",
+      answer: "Anxiety and transitions.",
+      tag: "specialty",
+    },
   ],
   about: "Warm, practical therapy.",
   email: "maya@example.com",

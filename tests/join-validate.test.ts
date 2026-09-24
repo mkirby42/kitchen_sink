@@ -70,16 +70,18 @@ function validStep3(overrides: Partial<JoinDraft> = {}): JoinDraft {
   });
 }
 
+function sampleCards(count: number): JoinDraft["cards"] {
+  return Array.from({ length: count }, (_, index) => ({
+    prompt: `prompt ${index + 1}`,
+    answer: `answer ${index + 1}`,
+    tag: "custom",
+  }));
+}
+
 function validStep4(overrides: Partial<JoinDraft> = {}): JoinDraft {
   return validStep3({
     rates: [{ service_type: "Individual", duration_minutes: 50, price_cents: 16500 }],
-    cards: [
-      {
-        prompt: "my approach to therapy is...",
-        answer: "Collaborative and warm.",
-        tag: "approach",
-      },
-    ],
+    cards: sampleCards(3),
     email: "maya@example.com",
     outreach: ["email"],
     ...overrides,
@@ -256,7 +258,24 @@ describe("join validation", () => {
       outreach: ["email"],
     });
 
-    expect(continueHint(4, draft)).toBe("1 of 3 cards");
+    expect(continueHint(4, draft)).toBe("1 of 6 cards");
+  });
+
+  it("requires 3 to 6 answered conversation cards", () => {
+    const tooFew = validStep4({ cards: sampleCards(2) });
+    expect(canContinue(4, tooFew)).toBe(false);
+    expect(step4Errors(tooFew)).toContain(
+      "At least 3 conversation cards are required",
+    );
+
+    expect(canContinue(4, validStep4())).toBe(true);
+    expect(step4Errors(validStep4())).toEqual([]);
+
+    const tooMany = validStep4({ cards: sampleCards(7) });
+    expect(canContinue(4, tooMany)).toBe(false);
+    expect(step4Errors(tooMany)).toContain(
+      "At most 6 conversation cards are allowed",
+    );
   });
 });
 
