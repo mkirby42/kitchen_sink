@@ -13,6 +13,18 @@ export function dbConfigured() {
   return supabasePublicConfig() !== null;
 }
 
+/** Public read of an open seed therapist. Null after the removal migration. */
+export async function openSeedProfile(id: string) {
+  const supabase = anonClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 function anonClient(): SupabaseClient {
   const config = supabasePublicConfig();
   if (!config) throw new Error("Supabase public env is not set");

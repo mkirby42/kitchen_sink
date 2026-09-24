@@ -1,0 +1,6 @@
+-- Runs on local `supabase db reset` only. `supabase db push` does not run this file.
+--
+-- Do not insert demo therapists here. A full migrate already inserts the
+-- historical seed rows and then 20260925003000_remove_seed_demo_profiles.sql
+-- deletes them. Re-inserting @kitchensink.demo profiles fails the trigger
+-- in that migration.
