@@ -339,6 +339,77 @@ export function JoinStep4({
         >
           + Add another rate
         </button>
+
+        <div className="mt-4 flex items-center justify-between gap-4 rounded-full border border-line bg-paper px-5 py-3">
+          <div>
+            <p id="sliding-scale-label" className="font-medium text-ink">
+              Sliding scale
+            </p>
+            <p className="text-sm text-mute">
+              Reduced fee when a client needs it.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={draft.slidingScale}
+            aria-labelledby="sliding-scale-label"
+            onClick={() =>
+              setDraft((current) => ({
+                ...current,
+                slidingScale: !current.slidingScale,
+              }))
+            }
+            className={`relative h-7 w-12 shrink-0 rounded-full transition ${
+              draft.slidingScale ? "bg-clay" : "bg-line"
+            }`}
+          >
+            <span
+              className={`absolute top-1 size-5 rounded-full bg-paper shadow transition ${
+                draft.slidingScale ? "left-6" : "left-1"
+              }`}
+            />
+          </button>
+        </div>
+
+        {draft.slidingScale ? (
+          <div className="mt-3 space-y-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-2 rounded-full border border-line bg-paper px-4 py-1.5">
+                <span className="shrink-0 text-sm text-mute">Min</span>
+                <RatePriceInput
+                  nullable
+                  cents={draft.slidingScaleMinCents}
+                  ariaLabel="Sliding scale minimum in dollars"
+                  onCents={(cents) =>
+                    setDraft((current) => ({
+                      ...current,
+                      slidingScaleMinCents: cents,
+                    }))
+                  }
+                />
+              </div>
+              <div className="flex items-center gap-2 rounded-full border border-line bg-paper px-4 py-1.5">
+                <span className="shrink-0 text-sm text-mute">Max</span>
+                <RatePriceInput
+                  nullable
+                  cents={draft.slidingScaleMaxCents}
+                  ariaLabel="Sliding scale maximum in dollars"
+                  onCents={(cents) =>
+                    setDraft((current) => ({
+                      ...current,
+                      slidingScaleMaxCents: cents,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <p className="text-sm text-mute">
+              Optional. Leave blank to offer a sliding scale without listing a
+              range.
+            </p>
+          </div>
+        ) : null}
       </fieldset>
 
       <label className="block">

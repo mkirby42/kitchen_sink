@@ -30,6 +30,9 @@ export type JoinDraft = {
   identity: string[];
   location: JoinLocation | null;
   rates: JoinRate[];
+  slidingScale: boolean;
+  slidingScaleMinCents: number | null;
+  slidingScaleMaxCents: number | null;
   cards: JoinCard[];
   about: string;
   email: string;

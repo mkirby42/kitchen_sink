@@ -60,6 +60,7 @@ export type TherapistProfileData = {
   inPerson: boolean;
   education: string[];
   credentials: string[];
+  slidingScale: boolean;
   slidingScaleMinCents: number | null;
   slidingScaleMaxCents: number | null;
   superbill: boolean;
@@ -201,13 +202,15 @@ export function formatLabel(virtual: boolean, inPerson: boolean) {
 }
 
 export function slidingScaleLabel(
+  enabled: boolean,
   minCents: number | null,
   maxCents: number | null,
 ) {
   const min = formatUsdFromCents(minCents);
   const max = formatUsdFromCents(maxCents);
   if (min && max) return `${min}-${max.replace("$", "")}`;
-  return min ?? max;
+  if (min || max) return min ?? max;
+  return enabled ? "Available" : null;
 }
 
 type ReviewRow = {
@@ -307,6 +310,10 @@ export async function fetchTherapistProfile(
       (qualificationsRes.data ?? []) as ProfileTag[],
       "credential",
     ),
+    slidingScale:
+      therapist.sliding_scale === true ||
+      therapist.sliding_scale_min_cents != null ||
+      therapist.sliding_scale_max_cents != null,
     slidingScaleMinCents: therapist.sliding_scale_min_cents,
     slidingScaleMaxCents: therapist.sliding_scale_max_cents,
     superbill: therapist.superbill,

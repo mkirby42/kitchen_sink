@@ -6,6 +6,7 @@ import {
   inNetworkInsurance,
   licenseLine,
   reviewAverage,
+  slidingScaleLabel,
   telHref,
 } from "@/lib/therapists/load";
 
@@ -84,5 +85,13 @@ describe("profile view helpers", () => {
 
   it("averages review stars", () => {
     expect(reviewAverage([5, 5, 4])).toBe(4.7);
+  });
+
+  it("labels a sliding scale range, a single bound, or availability", () => {
+    expect(slidingScaleLabel(true, 9000, 12000)).toBe("$90-120");
+    expect(slidingScaleLabel(false, 9000, 12000)).toBe("$90-120");
+    expect(slidingScaleLabel(true, 8000, null)).toBe("$80");
+    expect(slidingScaleLabel(true, null, null)).toBe("Available");
+    expect(slidingScaleLabel(false, null, null)).toBeNull();
   });
 });
