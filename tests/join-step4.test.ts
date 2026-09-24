@@ -73,6 +73,18 @@ describe("JoinStep4 contact and rates", () => {
     expect(html).toContain('aria-label="Rate 1 service type"');
   });
 
+  it("uses free text for the session price and keeps duration selectable", () => {
+    const html = render();
+    expect(html).toContain('aria-label="Rate 1 price in dollars"');
+    expect(html).toContain('type="text"');
+    expect(html).toContain('inputMode="decimal"');
+    expect(html).toContain('value="165"');
+    expect(html).not.toContain('type="number"');
+    expect(html).toContain('aria-label="Rate 1 duration"');
+    expect(html).toContain(">50 min<");
+    expect(html).toContain(">30 min<");
+  });
+
   it("shows a free-text field for each selected outreach method", () => {
     const html = render({
       outreach: ["email", "phone", "text"],

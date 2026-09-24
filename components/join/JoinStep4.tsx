@@ -14,6 +14,7 @@ import {
   RATE_SERVICE_TYPES,
 } from "@/lib/tags/presets";
 import { Chip } from "./Chip";
+import { RatePriceInput } from "./RatePriceInput";
 
 const FILTERS = [
   ["all", "All"],
@@ -283,35 +284,20 @@ export function JoinStep4({
                     ))}
                   </select>
                 </label>
-                <label className="relative min-w-0">
-                  <span className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-mute">
-                    $
-                  </span>
-                  <span className="sr-only">Price in dollars</span>
-                  <input
-                    aria-label={`Rate ${index + 1} price in dollars`}
-                    type="number"
-                    min={0}
-                    step="0.01"
-                    value={rate.price_cents / 100}
-                    onChange={(event) =>
-                      setDraft((current) => ({
-                        ...current,
-                        rates: current.rates.map((item, itemIndex) =>
-                          itemIndex === index
-                            ? {
-                                ...item,
-                                price_cents: Math.round(
-                                  Number(event.target.value || 0) * 100,
-                                ),
-                              }
-                            : item,
-                        ),
-                      }))
-                    }
-                    className="w-full bg-transparent py-1.5 pl-4 outline-none"
-                  />
-                </label>
+                <RatePriceInput
+                  cents={rate.price_cents}
+                  ariaLabel={`Rate ${index + 1} price in dollars`}
+                  onCents={(priceCents) =>
+                    setDraft((current) => ({
+                      ...current,
+                      rates: current.rates.map((item, itemIndex) =>
+                        itemIndex === index
+                          ? { ...item, price_cents: priceCents }
+                          : item,
+                      ),
+                    }))
+                  }
+                />
               </div>
               <button
                 type="button"
