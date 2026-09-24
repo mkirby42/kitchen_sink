@@ -8,6 +8,7 @@ describe("judge path routes", () => {
     expect(routes.join).toBe("/join");
     expect(routes.joinSignIn).toBe("/join?mode=signin");
     expect(routes.joinEdit).toBe("/join?edit=1");
+    expect(routes.adminMedia).toBe("/admin/media");
     expect(routes.therapist("maya")).toBe("/t/maya");
     expect(routes).not.toHaveProperty("matches");
   });

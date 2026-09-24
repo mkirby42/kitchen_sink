@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { joinMediaPath } from "@/lib/join/media";
 import type { buildJoinPayload } from "@/lib/join/validate";
 
 type JoinPayload = ReturnType<typeof buildJoinPayload>;
@@ -34,8 +35,7 @@ export async function uploadJoinMedia(
   file: File,
 ) {
   const bucket = kind === "photo" ? "photos" : "videos";
-  const safeName = file.name.replace(/[^\w.\-]+/g, "_");
-  const path = `${userId}/${kind}-${Date.now()}-${safeName}`;
+  const path = joinMediaPath(userId, kind, file.name);
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     upsert: true,
     contentType: file.type,

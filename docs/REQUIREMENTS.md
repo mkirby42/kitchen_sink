@@ -16,6 +16,7 @@ The current app does **not** book sessions or broker intros. Those are on the ba
 4. **Demo seeds removed from hosted data** — Maya Chen and the other accounts inserted by the seed migrations are deleted by `supabase/migrations/20260925003000_remove_seed_demo_profiles.sql`. Delete only when `auth.users.id` **and** `lower(email)` both match that seed list (`*@kitchensink.demo`). Any other signup stays. New profiles cannot reuse those ids or that email domain, so a later migrate does not put the fakes back. Search lists therapists who completed join.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
+7. **Admin helper upload** — `/admin/media`. An ops admin signs in, picks a therapist (including not open to new clients), and uploads a photo and/or intro video into that therapist's existing storage prefix. Same buckets, mime types, and size limits as join. Only `photo_key` or `video_key` changes.
 
 ## Not built yet (backlog, allowed)
 
@@ -26,7 +27,7 @@ These existed as hackathon cuts. They are **in play** whenever we take them on. 
 - Review **write** UI. Seed reviews and display them today.
 - Video transcoding, multiple intro clips, a video CMS. Today: one clip per therapist, stored as uploaded, native `<video>`.
 - Maps, geocoding, distance search. If in-person is selected, **store** location. Search uses license state, not lat/lon.
-- Messaging, likes/hearts chrome, admin moderation, realtime.
+- Messaging, likes/hearts chrome, admin moderation queue, realtime. Ops helper upload is shipped (`/admin/media`); approve/reject moderation is not.
 - Supervisor license **verification** (no legal review). Associate/trainee credentials are not offered.
 
 Patient tables stay in the schema. Expand patient UI when the product needs it.
@@ -37,7 +38,7 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 
 | Flow | What it is |
 | --- | --- |
-| Nav | Home, Find a Therapist, Join as a Therapist. Signed-in therapists see My profile and Sign out instead of Join. |
+| Nav | Home, Find a Therapist, Join as a Therapist. Signed-in therapists see My profile and Sign out instead of Join. Signed-in admins see Uploads. |
 | Therapist onboarding 1 | **Name (required)**, licensed credential dropdown, years practicing, **Education (optional)**, **Credentials & certificates (optional)**, **State license(s)** (min 1; license # and state both required on each kept row; blank extra rows ignored) |
 | Therapist onboarding 2 | Photo (required) + intro video (optional, up to 50MB; prototype shows photo; profile hero plays intro when present) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
@@ -51,12 +52,12 @@ Rates appear on search cards and profile. They are **not** in the original data 
 
 ## Data
 
-One `profiles` row per auth user. Role is `therapist` or `patient`. Tag kinds share **one** table, not eight. New kinds need a migration + this doc + the matching skill.
+One `profiles` row per auth user. Role is `therapist`, `patient`, or `admin` (ops). Tag kinds share **one** table, not eight. New kinds need a migration + this doc + the matching skill.
 
 ```
 profiles
   id uuid PK = auth.uid()
-  role text check (therapist | patient)
+  role text check (therapist | patient | admin)
   name, email, phone, about_me   -- therapist name required (non-blank)
   photo_key, video_key          -- Supabase Storage keys; photo required, intro video optional (max 50MB)
   created_at
@@ -131,7 +132,42 @@ Identity tags: small fixed set in onboarding; not a search must-have today.
 
 **In-person rule:** if `in_person_practice` (therapist) is true, a location row must exist. Patient in-person is a search toggle, not a stored patient location today.
 
-RLS: public can `select` therapists who are `open_to_new_clients`. Owner can insert/update own rows. Reviews public read. Feedback insert by owner. Storage: public read for photos and intro videos; write only to own prefix (`photos/{uid}/`, `videos/{uid}/`). Video is not part of the search card query.
+RLS: public can `select` therapists who are `open_to_new_clients`. Owner can insert/update own rows. Reviews public read. Feedback insert by owner. Storage: public read for photos and intro videos; a user writes only their own prefix (`photos/{uid}/`, `videos/{uid}/`). An admin may also write those buckets under an existing therapist id, which is what `/admin/media` uses. Video is not part of the search card query.
+
+**Admin role.** `admin` is ops, not a therapist and not a patient. An API session cannot insert `role = admin` or change its own role (`auth.uid()` is set). Dashboard SQL with no user JWT can. Admins can read therapist profiles and call `admin_set_therapist_media(therapist_id, kind, key)` to set `photo_key` or `video_key` only. Demo login after migrations: `ops@example.com` / `seed-only`. Not a `@kitchensink.demo` address — that domain is rejected for new profiles.
+
+Grant Christine Lo (`chrislo5240@gmail.com`) after you add that Auth user (Dashboard → Authentication → Users, email confirmed). Do not finish therapist join on this account. Run in the SQL editor:
+
+```sql
+do $$
+declare
+  uid uuid;
+  current_role text;
+begin
+  select id into uid
+  from auth.users
+  where lower(email) = lower('chrislo5240@gmail.com');
+
+  if uid is null then
+    raise exception 'No Auth user for chrislo5240@gmail.com. Add the user in Authentication first.';
+  end if;
+
+  select role into current_role from public.profiles where id = uid;
+
+  if current_role in ('therapist', 'patient') then
+    raise exception 'Refusing to turn a % profile into admin. Use a dedicated ops login.', current_role;
+  end if;
+
+  insert into public.profiles (id, role, name, email)
+  values (uid, 'admin', 'Christine Lo', 'chrislo5240@gmail.com')
+  on conflict (id) do update
+  set role = 'admin',
+      name = excluded.name,
+      email = excluded.email;
+end $$;
+```
+
+She signs in at `/admin/media`. The therapist must already have a profile.
 
 ## Matching
 
@@ -165,7 +201,7 @@ Return search cards in **one round trip** (join photo URL, credential, years, a 
 - Supabase hosted Postgres + Auth + Storage
 - Vercel
 
-App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated). `/matches` redirects home.
+App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated), `/admin/media` ops helper upload (auth + admin role). `/matches` redirects home.
 
 ## Performance
 

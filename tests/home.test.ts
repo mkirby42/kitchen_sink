@@ -19,6 +19,23 @@ describe("homeCtas", () => {
     ]);
   });
 
+  it("sends an admin to helper upload instead of join", () => {
+    expect(
+      homeCtas({
+        signedIn: true,
+        therapistId: null,
+        admin: true,
+      }),
+    ).toEqual([
+      { href: routes.find, label: "Find a therapist", variant: "primary" },
+      {
+        href: routes.adminMedia,
+        label: "Upload therapist media",
+        variant: "secondary",
+      },
+    ]);
+  });
+
   it("sends a signed-in therapist to their profile instead of login", () => {
     expect(
       homeCtas({

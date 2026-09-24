@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { NavUser } from "@/lib/nav";
+import { parseProfileRole } from "@/lib/role";
 import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
@@ -44,10 +45,7 @@ export function SiteHeader({
         .eq("id", user.id)
         .maybeSingle();
 
-      const role =
-        profile?.role === "therapist" || profile?.role === "patient"
-          ? profile.role
-          : null;
+      const role = parseProfileRole(profile?.role);
 
       setNavUser({ id: user.id, role });
     }
@@ -76,6 +74,7 @@ export function SiteHeader({
   }
 
   const therapist = navUser?.role === "therapist" ? navUser : null;
+  const admin = navUser?.role === "admin" ? navUser : null;
 
   return (
     <header className="border-b border-line bg-paper">
@@ -104,6 +103,15 @@ export function SiteHeader({
           >
             Find a Therapist
           </Link>
+          {admin ? (
+            <Link
+              href={routes.adminMedia}
+              className={navClass(path === routes.adminMedia)}
+              aria-current={path === routes.adminMedia ? "page" : undefined}
+            >
+              Uploads
+            </Link>
+          ) : null}
           {!navUser ? (
             <Link
               href={routes.join}

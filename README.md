@@ -28,6 +28,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/find` | Public search |
 | `/t/[id]` | Therapist profile (owner sees **Edit**) |
 | `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile |
+| `/admin/media` | Ops helper upload: photo + intro video for an existing therapist (admin) |
 
 ```bash
 npm run lint && npm run typecheck && npm test && npm run build
@@ -69,6 +70,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...   # anon / publishable, not service_
 ```
 
 Then `npm install && npm run dev` and follow Option A on localhost.
+
+Ops helper login, after the admin migration: `ops@example.com` / `seed-only` at `/admin/media`. That account is not a `@kitchensink.demo` seed profile.
 
 ### Option C — empty Supabase project
 

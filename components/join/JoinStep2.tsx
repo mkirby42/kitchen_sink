@@ -3,15 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { JoinDraft } from "@/lib/join/types";
+import { mediaFileError, PHOTO_ACCEPT, VIDEO_ACCEPT } from "@/lib/join/media";
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { createClient } from "@/lib/supabase/client";
 import { storagePublicUrl } from "@/lib/therapists/display";
 import { UploadHelp } from "./UploadHelp";
-
-const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
-const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
-const VIDEO_MAX_BYTES = 50 * 1024 * 1024;
 
 function MediaSlot({
   kind,
@@ -157,22 +153,9 @@ export function JoinStep2({
   async function chooseFile(kind: "photo" | "video", file?: File) {
     if (!file) return;
 
-    const maxBytes = kind === "photo" ? PHOTO_MAX_BYTES : VIDEO_MAX_BYTES;
-    const allowedTypes = kind === "photo" ? PHOTO_TYPES : VIDEO_TYPES;
-    if (!allowedTypes.includes(file.type)) {
-      setError(
-        kind === "photo"
-          ? "Choose a JPEG, PNG, WebP, or GIF photo."
-          : "Choose an MP4, WebM, or QuickTime video.",
-      );
-      return;
-    }
-    if (file.size > maxBytes) {
-      setError(
-        `${kind === "photo" ? "Photo" : "Video"} must be ${
-          kind === "photo" ? "5MB" : "50MB"
-        } or smaller.`,
-      );
+    const fileError = mediaFileError(kind, file);
+    if (fileError) {
+      setError(fileError);
       return;
     }
 
@@ -212,7 +195,7 @@ export function JoinStep2({
         preview={photoPreview}
         uploaded={Boolean(draft.photoKey)}
         uploading={uploading.photo}
-        accept="image/jpeg,image/png,image/webp,image/gif"
+        accept={PHOTO_ACCEPT}
         helpers={[
           "A clear, well-lit headshot — just you, looking at the camera — works best.",
           "JPEG, PNG, WebP, or GIF · up to 5MB. This is the photo clients see first on your profile.",
@@ -225,7 +208,7 @@ export function JoinStep2({
         preview={videoPreview}
         uploaded={Boolean(draft.videoKey)}
         uploading={uploading.video}
-        accept="video/mp4,video/webm,video/quicktime"
+        accept={VIDEO_ACCEPT}
         helpers={[
           "Optional. One short intro clip. We'll play it as uploaded on your public profile — no editing.",
           "MP4, WebM, or MOV · up to 50MB.",

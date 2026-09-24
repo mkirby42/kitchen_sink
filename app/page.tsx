@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 export default async function HomePage() {
   let signedIn = false;
   let therapistId: string | null = null;
+  let admin = false;
 
   if (supabasePublicConfig()) {
     try {
@@ -21,14 +22,21 @@ export default async function HomePage() {
           .eq("profile_id", user.id)
           .maybeSingle();
         if (therapist) therapistId = user.id;
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .maybeSingle();
+        admin = profile?.role === "admin";
       }
     } catch {
       signedIn = false;
       therapistId = null;
+      admin = false;
     }
   }
 
-  const ctas = homeCtas({ signedIn, therapistId });
+  const ctas = homeCtas({ signedIn, therapistId, admin });
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-20">
