@@ -202,7 +202,7 @@ export function JoinStep4({
           <div className="flex gap-3">
             <button
               type="button"
-              disabled={atCardMax || !customPrompt.trim()}
+              disabled={atCardMax}
               onClick={addCustomCard}
               className="rounded-full bg-clay px-5 py-2 text-sm font-semibold text-paper disabled:cursor-not-allowed disabled:opacity-40"
             >
