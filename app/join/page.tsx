@@ -52,6 +52,8 @@ export default async function JoinPage({
     .eq("id", user.id)
     .maybeSingle();
 
+  if (profile?.role === "admin") redirect(routes.adminMedia);
+
   if (profile?.role === "patient") {
     return (
       <main className="mx-auto max-w-lg px-6 py-16">

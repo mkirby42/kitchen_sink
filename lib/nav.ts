@@ -1,8 +1,12 @@
+import { parseProfileRole, type ProfileRole } from "@/lib/role";
 import { supabasePublicConfig } from "@/lib/supabase/env";
+
+export type { ProfileRole };
+export { parseProfileRole };
 
 export type NavUser = {
   id: string;
-  role: "therapist" | "patient" | null;
+  role: ProfileRole | null;
 };
 
 export async function loadNavUser(): Promise<NavUser | null> {
@@ -21,10 +25,7 @@ export async function loadNavUser(): Promise<NavUser | null> {
       .eq("id", user.id)
       .maybeSingle();
 
-    const role =
-      profile?.role === "therapist" || profile?.role === "patient"
-        ? profile.role
-        : null;
+    const role = parseProfileRole(profile?.role);
 
     return { id: user.id, role };
   } catch {
