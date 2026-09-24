@@ -4,22 +4,26 @@ import {
   ProfileNotFound,
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
+import { loadReviewViewer, type ReviewViewer } from "@/lib/reviews/viewer";
 import { parseFindSearchParams } from "@/lib/search/rpc";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { therapistMetaDescription } from "@/lib/site";
 import { loadTherapistProfile } from "@/lib/therapists/load";
 
-async function loadIsOwner(therapistId: string): Promise<boolean> {
-  if (!supabasePublicConfig()) return false;
+const emptyViewer: ReviewViewer = {
+  userId: null,
+  role: null,
+  isOwner: false,
+};
+
+async function loadViewer(therapistId: string): Promise<ReviewViewer> {
+  if (!supabasePublicConfig()) return emptyViewer;
   try {
     const { createClient } = await import("@/lib/supabase/server");
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    return user?.id === therapistId;
+    return await loadReviewViewer(supabase, therapistId);
   } catch {
-    return false;
+    return emptyViewer;
   }
 }
 
@@ -62,9 +66,7 @@ export default async function TherapistProfilePage({
 
   if (!data) return <ProfileNotFound backHref={backHref} />;
 
-  const isOwner = await loadIsOwner(data.id);
+  const viewer = await loadViewer(data.id);
 
-  return (
-    <TherapistProfile data={data} backHref={backHref} isOwner={isOwner} />
-  );
+  return <TherapistProfile data={data} backHref={backHref} viewer={viewer} />;
 }

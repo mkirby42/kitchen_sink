@@ -31,11 +31,15 @@ export type ProfileCard = {
 };
 
 export type ProfileReview = {
+  id: string;
   stars: number | null;
   body: string | null;
   session_format: string | null;
   duration_label: string | null;
   reviewer_name: string | null;
+  anonymous: boolean;
+  created_at: string;
+  mine: boolean;
 };
 
 export type ContactAction = {
@@ -214,11 +218,75 @@ export function slidingScaleLabel(
 }
 
 type ReviewRow = {
+  id?: string;
+  patient_id?: string | null;
   stars_avg: number | string | null;
   body: string | null;
   session_format: string | null;
   duration_label: string | null;
   patient_hidden?: boolean | null;
+  anonymous?: boolean | null;
+  author_name?: string | null;
+  created_at?: string | null;
+};
+
+const REVIEW_COLUMNS =
+  "id, patient_id, stars_avg, body, session_format, duration_label, patient_hidden, anonymous, author_name, created_at";
+const LEGACY_REVIEW_COLUMNS =
+  "id, patient_id, stars_avg, body, session_format, duration_label, patient_hidden, created_at";
+
+export function toProfileReview(
+  row: ReviewRow,
+  viewerId: string | null,
+): ProfileReview {
+  const anonymous = Boolean(row.anonymous);
+  const author = row.author_name?.trim() || null;
+  return {
+    id: row.id ?? `${row.created_at ?? "review"}-${row.body ?? ""}`,
+    stars: row.stars_avg == null ? null : Number(row.stars_avg),
+    body: row.body,
+    session_format: row.session_format,
+    duration_label: row.duration_label,
+    reviewer_name: anonymous ? null : author,
+    anonymous,
+    created_at: row.created_at ?? "",
+    mine: Boolean(viewerId && row.patient_id && row.patient_id === viewerId),
+  };
+}
+
+async function currentUserId(supabase: SupabaseClient) {
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) return null;
+    return data.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchReviewRows(supabase: SupabaseClient, therapistId: string) {
+  const primary = await supabase
+    .from("reviews")
+    .select(REVIEW_COLUMNS)
+    .eq("therapist_id", therapistId)
+    .order("created_at", { ascending: false });
+
+  if (!primary.error) return (primary.data ?? []) as ReviewRow[];
+
+  const missingColumn =
+    primary.error.code === "42703" ||
+    primary.error.code === "PGRST204" ||
+    /author_name|anonymous/i.test(primary.error.message);
+
+  if (!missingColumn) return [];
+
+  const legacy = await supabase
+    .from("reviews")
+    .select(LEGACY_REVIEW_COLUMNS)
+    .eq("therapist_id", therapistId)
+    .order("created_at", { ascending: false });
+
+  return (legacy.data ?? []) as ReviewRow[];
 }
 
 function labelsOf(tags: ProfileTag[], kind: string) {
@@ -239,7 +307,8 @@ export async function fetchTherapistProfile(
     ratesRes,
     tagsRes,
     itemsRes,
-    reviewsRes,
+    reviewRows,
+    viewerId,
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
     supabase.from("therapists").select("*").eq("profile_id", id).maybeSingle(),
@@ -259,13 +328,8 @@ export async function fetchTherapistProfile(
       .from("profile_items")
       .select("prompt, answer, tag")
       .eq("therapist_id", id),
-    supabase
-      .from("reviews")
-      .select(
-        "stars_avg, body, session_format, duration_label, patient_hidden",
-      )
-      .eq("therapist_id", id)
-      .order("created_at", { ascending: true }),
+    fetchReviewRows(supabase, id),
+    currentUserId(supabase),
   ]);
 
   if (profileRes.error || therapistRes.error) return null;
@@ -279,15 +343,9 @@ export async function fetchTherapistProfile(
   const tags = (tagsRes.data ?? []) as ProfileTag[];
   const outreach = labelsOf(tags, "outreach");
   const insurance = labelsOf(tags, "insurance");
-  const reviews = ((reviewsRes.data ?? []) as ReviewRow[])
+  const reviews = reviewRows
     .filter((row) => !row.patient_hidden)
-    .map((row) => ({
-      stars: row.stars_avg == null ? null : Number(row.stars_avg),
-      body: row.body,
-      session_format: row.session_format,
-      duration_label: row.duration_label,
-      reviewer_name: null,
-    }));
+    .map((row) => toProfileReview(row, viewerId));
 
   return {
     id,

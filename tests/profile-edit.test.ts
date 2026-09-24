@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
+import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
 import type { TherapistProfileData } from "@/lib/therapists/load";
 
@@ -37,13 +38,25 @@ const data: TherapistProfileData = {
   contact: [],
 };
 
+const owner: ReviewViewer = {
+  userId: data.id,
+  role: "therapist",
+  isOwner: true,
+};
+
+const visitor: ReviewViewer = {
+  userId: null,
+  role: null,
+  isOwner: false,
+};
+
 describe("profile edit control", () => {
   it("shows an Edit button for the owner in the header corner", () => {
     const html = renderToStaticMarkup(
       createElement(TherapistProfile, {
         data,
         backHref: routes.find,
-        isOwner: true,
+        viewer: owner,
       }),
     );
     expect(html).toContain("Edit profile");
@@ -71,7 +84,7 @@ describe("profile edit control", () => {
           slidingScaleMaxCents: 12000,
         },
         backHref: routes.find,
-        isOwner: false,
+        viewer: visitor,
       }),
     );
     expect(ranged).toContain("sliding scale available");
@@ -87,7 +100,7 @@ describe("profile edit control", () => {
           slidingScaleMaxCents: null,
         },
         backHref: routes.find,
-        isOwner: false,
+        viewer: visitor,
       }),
     );
     expect(bare).toContain("sliding scale available");
@@ -97,7 +110,7 @@ describe("profile edit control", () => {
       createElement(TherapistProfile, {
         data,
         backHref: routes.find,
-        isOwner: false,
+        viewer: visitor,
       }),
     );
     expect(off).not.toContain("sliding scale available");
@@ -108,7 +121,7 @@ describe("profile edit control", () => {
       createElement(TherapistProfile, {
         data,
         backHref: routes.find,
-        isOwner: false,
+        viewer: visitor,
       }),
     );
     expect(html).not.toContain("Edit profile");

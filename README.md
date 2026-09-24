@@ -104,12 +104,12 @@ License numbers, phones, and addresses are fake. Reviews are fiction.
 ## Known limitations (today)
 
 - No booking, calendars, or in-app messaging. Contact buttons are `mailto:` / `tel:` from listed outreach.
-- Reviews are read-only. Demo seed reviews are removed with the demo profiles. No review write UI.
+- Reviews are one post per signed-in patient (name or anonymous, optional stars). Demo seed reviews are removed with the demo profiles. No approval queue.
 - Search is OR overlap (some tags), not AND. Results cap at 24; no pagination UI.
 - In-person location is stored; search uses license state, not maps or distance.
 - One intro clip per therapist, played as uploaded. No transcoding.
 - Associate/trainee credentials are not offered. Education and extra credentials are freeform lists on the profile.
-- No patient onboarding or public patient pages.
+- Patient UI is sign-in and a profile review. No patient onboarding or public patient pages.
 
 These are product gaps, not a freeze. See REQUIREMENTS **Not built yet**.
 
@@ -119,7 +119,7 @@ These are product gaps, not a freeze. See REQUIREMENTS **Not built yet**.
 - In-app messaging
 - License verification and real identity checks
 - AND filters, pagination, maps
-- Review write path and video transcoding
+- Video transcoding
 - Custom domain on Vercel (Auth Site URL + redirect allowlist)
 
 ## Docs

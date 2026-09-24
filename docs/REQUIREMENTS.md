@@ -11,7 +11,7 @@ The current app does **not** book sessions or broker intros. Those are on the ba
 ## Current product (shipped)
 
 1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties (preset chips), insurance, license state. OR semantics: therapist must match **some** selected tag. Rank by overlap count, then name; cards highlight hits (“3 of 4 tags”). Empty filters = all therapists open to new clients.
-2. **Therapist profile** — photo, **optional intro video**, name, credential (licensed dropdown), **education** and **additional credentials** (freeform text, 0–n rows each), **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile; optional **sliding scale** with an optional min/max range), about, conversation cards, reviews (read-only; no write UI), contact (email / phone / text as listed). Profile hero plays the intro video when one is uploaded. The owning therapist sees **Edit** (header, top right) and updates the same fields as join. Sliding scale, when offered, shows on the public profile (range if set, otherwise “Available”).
+2. **Therapist profile** — photo, **optional intro video**, name, credential (licensed dropdown), **education** and **additional credentials** (freeform text, 0–n rows each), **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile; optional **sliding scale** with an optional min/max range), about, conversation cards, reviews (signed-in patients post one review: display name or anonymous, optional 1–5 stars, text, date; public on the Reviews tab; empty state when none; no approval queue), contact (email / phone / text as listed). Profile hero plays the intro video when one is uploaded. The owning therapist sees **Edit** (header, top right) and updates the same fields as join. Sliding scale, when offered, shows on the public profile (range if set, otherwise “Available”).
 3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (name, license number, and state required; education and certificates optional; repeatable state-license rows) → **photo (required) + intro video (optional, up to 50MB)** → practice tags → cards + contact + optional product feedback. Returning therapists sign in from home (`/join?mode=signin`) and land on their profile.
 4. **Demo seeds removed from hosted data** — Maya Chen and the other accounts inserted by the seed migrations are deleted by `supabase/migrations/20260925043000_finish_demo_profile_removal.sql` (same rule in `20260925003000_remove_seed_demo_profiles.sql`). Delete only when `auth.users.id` **and** `lower(email)` both match that seed list (`*@kitchensink.demo`). Any other signup stays. Storage object rows are not deleted in SQL (hosted `storage.protect_delete`); ownership is cleared and bytes go away through the Storage API. New profiles cannot reuse those ids or that email domain, so a later migrate does not put the fakes back. Search lists therapists who completed join.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
@@ -25,7 +25,6 @@ These existed as hackathon cuts. They are **in play** whenever we take them on. 
 
 - Booking, calendars, payments; “Free Consult” / “Book a Session” as real scheduling. Today those buttons `mailto:` / `tel:` listed contact.
 - Patient onboarding, public patient profiles, stored patient location. Seed reviews still use patient `profiles` rows.
-- Review **write** UI. Seed reviews and display them today.
 - Video transcoding, multiple intro clips, a video CMS. Today: one clip per therapist, stored as uploaded, native `<video>`.
 - Maps, geocoding, distance search. If in-person is selected, **store** location. Search uses license state, not lat/lon.
 - Messaging, likes/hearts chrome, admin moderation queue, realtime. Ops helper upload is shipped (`/admin/media`); approve/reject moderation is not.
@@ -108,13 +107,16 @@ profile_items                   -- conversation cards; 3–6 rows per therapist
 feedback
   id, profile_id, body, created_at
 
-reviews
-  id, therapist_id, patient_id (nullable for seed)
-  patient_hidden bool
-  stars_avg numeric             -- display stars
+reviews                         -- one row per patient + therapist
+  id, therapist_id, patient_id (nullable only for a legacy row with no account)
+  author_name text              -- public snapshot; null when anonymous
+  anonymous bool                -- hide the name; the review stays on the profile
+  patient_hidden bool           -- omit the row from the profile (no write UI)
+  stars_avg numeric             -- optional whole stars 1–5
   stars_cat_1, stars_cat_2, stars_cat_3  -- store, no UI
   body, session_format, duration_label
   created_at
+  unique (therapist_id, patient_id)
 ```
 
 Suggested labels (preset chips; therapist may also add custom labels for specialty, modality, insurance):
@@ -134,7 +136,7 @@ Identity tags: small fixed set in onboarding; not a search must-have today.
 
 **In-person rule:** if `in_person_practice` (therapist) is true, a location row must exist. Patient in-person is a search toggle, not a stored patient location today.
 
-RLS: public can `select` therapists who are `open_to_new_clients`. Owner can insert/update own rows. Reviews public read. Feedback insert by owner. Storage: public read for photos and intro videos; a user writes only their own prefix (`photos/{uid}/`, `videos/{uid}/`). An admin may also write those buckets under an existing therapist id, which is what `/admin/media` uses. Video is not part of the search card query.
+RLS: public can `select` therapists who are `open_to_new_clients`. Owner can insert/update own rows. Reviews: public read for open therapists; a signed-in patient inserts, updates, and deletes their own row. Feedback insert by owner. Storage: public read for photos and intro videos; a user writes only their own prefix (`photos/{uid}/`, `videos/{uid}/`). An admin may also write those buckets under an existing therapist id, which is what `/admin/media` uses. Video is not part of the search card query.
 
 **Admin role.** `admin` is ops, not a therapist and not a patient. An API session cannot insert `role = admin` or change its own role (`auth.uid()` is set). Dashboard SQL with no user JWT can. Admins can read therapist profiles and call `admin_set_therapist_media(therapist_id, kind, key)` to set `photo_key` or `video_key` only. Demo login after migrations: `ops@example.com` / `seed-only`. Not a `@kitchensink.demo` address — that domain is rejected for new profiles.
 
@@ -238,4 +240,4 @@ Schema/search query still sequential when both change. New product work does not
 
 ## Demo path
 
-Hosted `/find` lists therapists who completed join and are open to new clients. The Maya Chen walkthrough was demo seed data; it is not on the hosted database after the removal migration. A new therapist can join with a photo (intro video optional) and show up in search. CI is green. Match is one indexed query.
+Hosted `/find` lists therapists who completed join and are open to new clients. The Maya Chen walkthrough was demo seed data; it is not on the hosted database after the removal migration. A signed-in patient can post a review on an open profile. A new therapist can join with a photo (intro video optional) and show up in search. CI is green. Match is one indexed query.

@@ -10,20 +10,23 @@ import {
   slidingScaleLabel,
   type TherapistProfileData,
 } from "@/lib/therapists/load";
+import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
 import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
 import { ProfileTabs } from "./ProfileTabs";
+import { ReviewsPanel } from "./ReviewsPanel";
 
 export function TherapistProfile({
   data,
   backHref,
-  isOwner,
+  viewer,
 }: {
   data: TherapistProfileData;
   backHref: string;
-  isOwner: boolean;
+  viewer: ReviewViewer;
 }) {
+  const isOwner = viewer.isOwner;
   const format = formatLabel(data.virtual, data.inPerson);
   const licenses = licenseLine(data.licenses);
   const cashRate = data.rates[0];
@@ -224,7 +227,14 @@ export function TherapistProfile({
             superbill={superbill}
           />
         }
-        reviews={<ReviewsPanel reviews={data.reviews} average={avg} />}
+        reviews={
+          <ReviewsPanel
+            therapistId={data.id}
+            reviews={data.reviews}
+            average={avg}
+            viewer={viewer}
+          />
+        }
       />
     </main>
   );
@@ -287,64 +297,6 @@ function AboutPanel({
         </dl>
       </div>
     </div>
-  );
-}
-
-function ReviewsPanel({
-  reviews,
-  average,
-}: {
-  reviews: TherapistProfileData["reviews"];
-  average: number | null;
-}) {
-  if (reviews.length === 0) {
-    return <p className="text-mute">No reviews yet.</p>;
-  }
-
-  return (
-    <div>
-      <div className="flex items-end gap-3">
-        {average != null ? (
-          <p className="font-display text-5xl leading-none text-ink">{average}</p>
-        ) : null}
-        <div>
-          {average != null ? <StarRow value={average} /> : null}
-          <p className="text-sm text-mute">
-            Based on {reviews.length} client{" "}
-            {reviews.length === 1 ? "review" : "reviews"}
-          </p>
-        </div>
-      </div>
-      <ul className="mt-6 space-y-3">
-        {reviews.map((review, index) => (
-          <li key={`${review.body}-${index}`} className="rounded-3xl bg-paper px-5 py-5 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
-              <p className="font-medium text-ink">
-                {review.reviewer_name ?? "Client"}
-              </p>
-              {review.stars != null ? <StarRow value={review.stars} /> : null}
-            </div>
-            {review.body ? (
-              <p className="mt-2 leading-relaxed text-ink">{review.body}</p>
-            ) : null}
-            <p className="mt-3 text-sm text-mute">
-              {[review.session_format, review.duration_label]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function StarRow({ value }: { value: number }) {
-  const filled = Math.round(value);
-  return (
-    <p className="text-clay" aria-label={`${value} out of 5 stars`}>
-      {Array.from({ length: 5 }, (_, i) => (i < filled ? "★" : "☆")).join("")}
-    </p>
   );
 }
 
