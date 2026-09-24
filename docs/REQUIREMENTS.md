@@ -11,9 +11,9 @@ The current app does **not** book sessions or broker intros. Those are on the ba
 ## Current product (shipped)
 
 1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties (preset chips **plus** free-text “Add your own”), insurance, license state. OR semantics: therapist must match **some** selected tag. Rank by overlap count, then name; cards highlight hits (“3 of 4 tags”). Empty filters = all therapists open to new clients.
-2. **Therapist profile** — photo, **optional intro video**, name, credential (licensed dropdown), **education** and **additional credentials** (freeform text, 0–n rows each), **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile), about, conversation cards, reviews (read-only seed data today), contact (email / phone / text as listed). Profile hero plays the intro video when one is uploaded. The owning therapist sees **Edit** (header, top right) and updates the same fields as join.
+2. **Therapist profile** — photo, **optional intro video**, name, credential (licensed dropdown), **education** and **additional credentials** (freeform text, 0–n rows each), **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile), about, conversation cards, reviews (read-only; no write UI), contact (email / phone / text as listed). Profile hero plays the intro video when one is uploaded. The owning therapist sees **Edit** (header, top right) and updates the same fields as join.
 3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (name, license number, and state required; education and certificates optional; repeatable state-license rows) → **photo (required) + intro video (optional, up to 50MB)** → practice tags → cards + contact + optional product feedback. Returning therapists sign in from home (`/join?mode=signin`) and land on their profile.
-4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
+4. **Demo seeds removed from hosted data** — Maya Chen and the other accounts inserted by the seed migrations are deleted by `supabase/migrations/20260925003000_remove_seed_demo_profiles.sql`. Delete only when `auth.users.id` **and** `lower(email)` both match that seed list (`*@kitchensink.demo`). Any other signup stays. New profiles cannot reuse those ids or that email domain, so a later migrate does not put the fakes back. Search lists therapists who completed join.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
 
@@ -169,7 +169,7 @@ App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboa
 
 ## Performance
 
-- Match query < 50ms on seeded data; write an `explain analyze` fixture test or SQL comment with the plan.
+- Match query < 50ms on a small directory; write an `explain analyze` fixture test or SQL comment with the plan.
 - Indexes on every FK and every WHERE/JOIN column used by search.
 - RLS policies wrap `auth.uid()` in `(select auth.uid())`.
 - Images via Supabase public URL; next/image if it is free, skip if it fights Storage. Intro video loads only on the profile page, not on `/find`. Video via public Storage URL + native `<video>`; no transcoding today.
@@ -188,7 +188,7 @@ Secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Never comm
 ## Foundations (already shipped)
 
 1. Next.js skeleton + CI
-2. Supabase schema + RLS + indexes + seed (Maya Chen + reviews)
+2. Supabase schema + RLS + indexes. Demo seed rows are removed from hosted data by the later removal migration.
 3. Match query + tests
 4. Search UI (`/find`)
 5. Profile UI (`/t/[id]`)
@@ -198,6 +198,6 @@ Secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Never comm
 
 Schema/search query still sequential when both change. New product work does not have to follow this list.
 
-## Demo path (v1 still works)
+## Demo path
 
-A user can open `/find`, tap Anxiety, see Maya, open her profile, play the intro video, read cards and reviews, and (as a new user) join as a therapist with a photo (intro video optional) and appear in search. CI is green. Match is one indexed query.
+Hosted `/find` lists therapists who completed join and are open to new clients. The Maya Chen walkthrough was demo seed data; it is not on the hosted database after the removal migration. A new therapist can join with a photo (intro video optional) and show up in search. CI is green. Match is one indexed query.

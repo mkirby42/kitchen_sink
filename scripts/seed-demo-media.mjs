@@ -1,3 +1,9 @@
+// Signs in as the demo seed users and uploads their media.
+// Those auth users are deleted by
+// supabase/migrations/20260925003000_remove_seed_demo_profiles.sql
+// (seed UUID and @kitchensink.demo email must both match). After that
+// migration, sign-in fails. Do not recreate the accounts on the hosted project.
+
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";

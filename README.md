@@ -9,7 +9,7 @@ Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). Prototype shots: [prototype_
 
 ## Quick start
 
-Node 22. Uses the hosted Supabase project already seeded for the demo.
+Node 22. Uses the hosted Supabase project. Demo seed therapists are removed by `supabase/migrations/20260925003000_remove_seed_demo_profiles.sql`.
 
 ```bash
 git clone https://github.com/mkirby42/kitchen_sink.git
@@ -26,7 +26,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | --- | --- |
 | `/` | Home (Find, Join, **Log in as a therapist**) |
 | `/find` | Public search |
-| `/t/maya` | Seeded Maya Chen profile (owner sees **Edit**) |
+| `/t/[id]` | Therapist profile (owner sees **Edit**) |
 | `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile |
 
 ```bash
@@ -51,14 +51,12 @@ flowchart LR
 - `/join` is a 4-step therapist wizard; photo required, intro video optional (50MB). Returning therapists sign in from home and land on their profile; **Save changes** calls `update_therapist_profile`.
 - `proxy.ts` refreshes the Supabase session. Schema lives in `supabase/migrations/`.
 
-## Reproduce the demo
+## Run it
 
-### Option A — live app (fastest)
+### Option A — live app
 
 1. Open [kitchen-sink-tau.vercel.app/find](https://kitchen-sink-tau.vercel.app/find).
-2. Tap **Anxiety**. Maya Chen is in the results (ranked by overlap).
-3. Open her profile (`/t/maya`). Play the intro video. Read cards and seed reviews.
-4. From home, **Log in as a therapist** as Maya (`maya@kitchensink.demo` / `seed-only`). You land on her profile; **Edit** is top-right.
+2. Results are therapists who joined and are open to new clients. Demo seed profiles (`*@kitchensink.demo`) are not part of that list once the removal migration has been applied.
 
 ### Option B — local app, same hosted data
 
@@ -72,24 +70,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...   # anon / publishable, not service_
 
 Then `npm install && npm run dev` and follow Option A on localhost.
 
-Seed accounts (password is always `seed-only`):
-
-| Email | Role | Use |
-| --- | --- | --- |
-| `maya@kitchensink.demo` | therapist | Profile owner |
-| `jr@kitchensink.demo` | patient | Seed patient profile |
-| `priya@kitchensink.demo` | patient | Seed reviews |
-| `dm@kitchensink.demo` | patient | Seed reviews |
-
-Ten more therapists (`jordan@` … `chris@kitchensink.demo`) fill search. Same password.
-
 ### Option C — empty Supabase project
 
 1. Create a project. Enable email Auth. Create public Storage buckets `photos` and `videos`.
-2. Apply `supabase/migrations/` in filename order (`supabase db push` against the linked project, or the SQL editor).
+2. Apply `supabase/migrations/` in filename order (`supabase db push` against the linked project, or the SQL editor). The last seed-related migration deletes the demo accounts.
 3. Put the two public env vars in `.env.local`.
-4. Upload seed portraits/videos: `npm run seed:media` (signs in as each seed user; password `seed-only`).
-5. `npm run dev`.
+4. `npm run dev`. Join as a therapist to put a real profile in search.
+
+`npm run seed:media` signs in as the removed demo users and will fail after that migration. Do not re-run the historical seed SQL against production.
 
 `SUPABASE_SERVICE_ROLE_KEY` is **not** required for the app, tests, or `seed:media`. Never put the service role in the browser, Vercel public env, or git.
 
@@ -99,18 +87,18 @@ Nothing here is a real clinician, patient, license, review, or clinical dataset.
 
 | What | Where | Provenance |
 | --- | --- | --- |
-| Maya Chen (LMFT, CA, rates, cards, 3 reviews) | `supabase/migrations/20260919163316_seed_maya_chen.sql` | Written to match [prototype_screenshots/](prototype_screenshots/) |
-| 10 more open therapists + reviews | `supabase/migrations/20260919184500_seed_demo_therapists.sql` | Authored synthetic profiles so `/find` has multiple OR matches |
-| Seed patients J.R., Priya S., D.M. | same Maya seed | Prototype reviewer names; emails are `*@kitchensink.demo` |
+| Maya Chen (LMFT, CA, rates, cards, 3 reviews) | `supabase/migrations/20260919163316_seed_maya_chen.sql` | Written to match [prototype_screenshots/](prototype_screenshots/). Removed from hosted data by `20260925003000_remove_seed_demo_profiles.sql` when id and `maya@kitchensink.demo` both match. |
+| 10 more open therapists + reviews | `supabase/migrations/20260919184500_seed_demo_therapists.sql` | Synthetic profiles. Same removal rule: seed UUID and `*@kitchensink.demo` email. |
+| Seed patients J.R., Priya S., D.M. | same Maya seed | Prototype reviewer names. Removed with the same id + email rule. |
 | Tag / credential / insurance chips | `lib/tags/presets.ts` + requirements | Prototype + spec labels, not a published taxonomy |
-| Headshots + intro clips | `supabase/seed/media/<uuid>/` | Synthetic portraits generated for the demo (not real people). `scripts/prepare-demo-media.sh` crops to 720² JPEG and builds a 4s silent Ken Burns MP4 with ffmpeg. Uploaded by `scripts/seed-demo-media.mjs` |
+| Headshots + intro clips | `supabase/seed/media/<uuid>/` | Synthetic portraits generated for the demo (not real people). The removal migration deletes Storage objects whose first path segment is a matched seed id. |
 
 License numbers, phones, and addresses are fake. Reviews are fiction.
 
 ## Known limitations (today)
 
 - No booking, calendars, or in-app messaging. Contact buttons are `mailto:` / `tel:` from listed outreach.
-- Reviews are read-only seed data.
+- Reviews are read-only. Demo seed reviews are removed with the demo profiles. No review write UI.
 - Search is OR overlap (some tags), not AND. Results cap at 24; no pagination UI.
 - In-person location is stored; search uses license state, not maps or distance.
 - One intro clip per therapist, played as uploaded. No transcoding.

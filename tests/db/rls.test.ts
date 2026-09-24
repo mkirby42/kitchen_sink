@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { createAnonClient, dbConfigured, MAYA_ID } from "./client";
+import { createAnonClient, dbConfigured, MAYA_ID, openSeedProfile } from "./client";
 
 describe.skipIf(!dbConfigured())("public RLS", () => {
-  it("lets anon read Maya's open profile, rates, licenses, and reviews", async () => {
+  it("lets anon read Maya's open profile, rates, licenses, and reviews", async ({
+    skip,
+  }) => {
+    if (!(await openSeedProfile(MAYA_ID))) skip();
     const supabase = createAnonClient();
     const profile = await supabase
       .from("profiles")

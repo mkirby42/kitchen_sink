@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { fetchTherapistProfile } from "@/lib/therapists/load";
-import { createAnonClient, dbConfigured, MAYA_ID } from "./db/client";
+import { createAnonClient, dbConfigured, MAYA_ID, openSeedProfile } from "./db/client";
 
 describe.skipIf(!dbConfigured())("fetchTherapistProfile", () => {
-  it("resolves /t/maya and the seed UUID to the same open therapist", async () => {
+  it("resolves /t/maya and the seed UUID to the same open therapist", async ({
+    skip,
+  }) => {
+    if (!(await openSeedProfile(MAYA_ID))) skip();
     const supabase = createAnonClient();
     const bySlug = await fetchTherapistProfile(supabase, "maya");
     const byId = await fetchTherapistProfile(supabase, MAYA_ID);
