@@ -18,6 +18,9 @@ export type JoinDraftRows = {
     open_to_new_clients: boolean;
     virtual_practice: boolean;
     in_person_practice: boolean;
+    sliding_scale?: boolean | null;
+    sliding_scale_min_cents?: number | null;
+    sliding_scale_max_cents?: number | null;
   };
   licenses: { number: string; state: string }[];
   qualifications: { kind: string; label: string }[];
@@ -79,6 +82,12 @@ export function draftFromRows(rows: JoinDraftRows): JoinDraft {
               price_cents: 0,
             },
           ],
+    slidingScale:
+      rows.therapist.sliding_scale === true ||
+      rows.therapist.sliding_scale_min_cents != null ||
+      rows.therapist.sliding_scale_max_cents != null,
+    slidingScaleMinCents: rows.therapist.sliding_scale_min_cents ?? null,
+    slidingScaleMaxCents: rows.therapist.sliding_scale_max_cents ?? null,
     cards: rows.items,
     about: rows.profile.about_me ?? "",
     email: rows.profile.email ?? rows.email,

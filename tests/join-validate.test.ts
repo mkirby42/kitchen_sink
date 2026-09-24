@@ -31,6 +31,9 @@ function emptyDraft(overrides: Partial<JoinDraft> = {}): JoinDraft {
     identity: [],
     location: null,
     rates: [],
+    slidingScale: false,
+    slidingScaleMinCents: null,
+    slidingScaleMaxCents: null,
     cards: [],
     about: "",
     email: "",
@@ -340,6 +343,53 @@ describe("buildJoinPayload", () => {
         { kind: "outreach", label: "email" },
         { kind: "outreach", label: "phone" },
       ]),
+    );
+  });
+
+  it("publishes a sliding scale and drops the range when the toggle is off", () => {
+    const on = buildJoinPayload(
+      validStep4({
+        slidingScale: true,
+        slidingScaleMinCents: 8000,
+        slidingScaleMaxCents: 12000,
+      }),
+    );
+    expect(on.sliding_scale).toBe(true);
+    expect(on.sliding_scale_min_cents).toBe(8000);
+    expect(on.sliding_scale_max_cents).toBe(12000);
+
+    const bare = buildJoinPayload(
+      validStep4({
+        slidingScale: true,
+        slidingScaleMinCents: null,
+        slidingScaleMaxCents: null,
+      }),
+    );
+    expect(bare.sliding_scale).toBe(true);
+    expect(bare.sliding_scale_min_cents).toBeNull();
+    expect(bare.sliding_scale_max_cents).toBeNull();
+
+    const off = buildJoinPayload(
+      validStep4({
+        slidingScale: false,
+        slidingScaleMinCents: 8000,
+        slidingScaleMaxCents: 12000,
+      }),
+    );
+    expect(off.sliding_scale).toBe(false);
+    expect(off.sliding_scale_min_cents).toBeNull();
+    expect(off.sliding_scale_max_cents).toBeNull();
+  });
+
+  it("rejects a sliding scale minimum above the maximum", () => {
+    const draft = validStep4({
+      slidingScale: true,
+      slidingScaleMinCents: 15000,
+      slidingScaleMaxCents: 8000,
+    });
+    expect(canContinue(4, draft)).toBe(false);
+    expect(step4Errors(draft)).toContain(
+      "Sliding scale minimum cannot exceed the maximum",
     );
   });
 

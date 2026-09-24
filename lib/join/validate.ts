@@ -198,6 +198,20 @@ export function step4Errors(draft: JoinDraft): string[] {
     errors.push("Rate service types must be unique");
   }
 
+  if (draft.slidingScale) {
+    const min = draft.slidingScaleMinCents;
+    const max = draft.slidingScaleMaxCents;
+    if (min != null && (!Number.isInteger(min) || min < 0)) {
+      errors.push("Sliding scale minimum must be zero or more");
+    }
+    if (max != null && (!Number.isInteger(max) || max < 0)) {
+      errors.push("Sliding scale maximum must be zero or more");
+    }
+    if (min != null && max != null && min > max) {
+      errors.push("Sliding scale minimum cannot exceed the maximum");
+    }
+  }
+
   const answeredCards = answeredConversationCardCount(draft.cards);
   if (answeredCards < MIN_CONVERSATION_CARDS) {
     errors.push("At least 3 conversation cards are required");
@@ -332,6 +346,13 @@ export function buildJoinPayload(draft: JoinDraft) {
       duration_minutes: rate.duration_minutes,
       price_cents: rate.price_cents,
     })),
+    sliding_scale: draft.slidingScale,
+    sliding_scale_min_cents: draft.slidingScale
+      ? draft.slidingScaleMinCents
+      : null,
+    sliding_scale_max_cents: draft.slidingScale
+      ? draft.slidingScaleMaxCents
+      : null,
     location: draft.inPerson
       ? {
           address: draft.location!.address.trim(),

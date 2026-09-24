@@ -20,6 +20,7 @@ const data: TherapistProfileData = {
     inPerson: false,
     education: ["B.A. Psychology"],
     credentials: ["EMDR trained"],
+  slidingScale: false,
   slidingScaleMinCents: null,
   slidingScaleMaxCents: null,
   superbill: false,
@@ -51,6 +52,55 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Practicing under supervision");
     expect(html).not.toContain("I'm interested");
     expect(html).toContain(routes.joinEdit);
+  });
+
+  it("shows sliding scale on the public profile when it is offered", () => {
+    const ranged = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          rates: [
+            {
+              service_type: "Individual",
+              duration_minutes: 50,
+              price_cents: 16500,
+            },
+          ],
+          slidingScale: true,
+          slidingScaleMinCents: 9000,
+          slidingScaleMaxCents: 12000,
+        },
+        backHref: routes.find,
+        isOwner: false,
+      }),
+    );
+    expect(ranged).toContain("sliding scale available");
+    expect(ranged).toContain("Sliding scale");
+    expect(ranged).toContain("$90-120");
+
+    const bare = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          slidingScale: true,
+          slidingScaleMinCents: null,
+          slidingScaleMaxCents: null,
+        },
+        backHref: routes.find,
+        isOwner: false,
+      }),
+    );
+    expect(bare).toContain("sliding scale available");
+    expect(bare).toContain("Available");
+
+    const off = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data,
+        backHref: routes.find,
+        isOwner: false,
+      }),
+    );
+    expect(off).not.toContain("sliding scale available");
   });
 
   it("hides Edit from visitors", () => {

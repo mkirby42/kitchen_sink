@@ -29,6 +29,7 @@ export function TherapistProfile({
   const cashRate = data.rates[0];
   const cashPrice = formatUsdFromCents(cashRate?.price_cents);
   const sliding = slidingScaleLabel(
+    data.slidingScale,
     data.slidingScaleMinCents,
     data.slidingScaleMaxCents,
   );
@@ -267,7 +268,7 @@ function AboutPanel({
           ))}
           {sliding ? (
             <div className="flex items-baseline justify-between gap-4 py-3">
-              <dt className="text-ink">Sliding scale slots</dt>
+              <dt className="text-ink">Sliding scale</dt>
               <dd className="font-medium text-ink">{sliding}</dd>
             </div>
           ) : null}

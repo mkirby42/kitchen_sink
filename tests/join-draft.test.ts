@@ -59,5 +59,53 @@ describe("draftFromRows", () => {
     expect(draft.outreach).toEqual(["email"]);
     expect(draft.cards).toHaveLength(1);
     expect(draft.feedback).toBe("");
+    expect(draft.slidingScale).toBe(false);
+    expect(draft.slidingScaleMinCents).toBeNull();
+    expect(draft.slidingScaleMaxCents).toBeNull();
+  });
+
+  it("turns sliding scale on from the flag or a stored range", () => {
+    const base = {
+      email: "fallback@example.com",
+      profile: {
+        name: "Maya Chen",
+        email: "maya@example.com",
+        phone: null,
+        about_me: null,
+        photo_key: null,
+        video_key: null,
+      },
+      therapist: {
+        credential: "LMFT",
+        start_date_of_practice: "2017-01-01",
+        open_to_new_clients: true,
+        virtual_practice: true,
+        in_person_practice: false,
+        sliding_scale: true,
+        sliding_scale_min_cents: null,
+        sliding_scale_max_cents: null,
+      },
+      licenses: [],
+      qualifications: [],
+      rates: [],
+      tags: [],
+      items: [],
+      location: null,
+    };
+
+    expect(draftFromRows(base).slidingScale).toBe(true);
+
+    const ranged = draftFromRows({
+      ...base,
+      therapist: {
+        ...base.therapist,
+        sliding_scale: false,
+        sliding_scale_min_cents: 8000,
+        sliding_scale_max_cents: 12000,
+      },
+    });
+    expect(ranged.slidingScale).toBe(true);
+    expect(ranged.slidingScaleMinCents).toBe(8000);
+    expect(ranged.slidingScaleMaxCents).toBe(12000);
   });
 });

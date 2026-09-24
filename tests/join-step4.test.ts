@@ -25,6 +25,9 @@ function draft(overrides: Partial<JoinDraft> = {}): JoinDraft {
     rates: [
       { service_type: "Individual", duration_minutes: 50, price_cents: 16500 },
     ],
+    slidingScale: false,
+    slidingScaleMinCents: null,
+    slidingScaleMaxCents: null,
     cards: [
       { prompt: "my approach to therapy is...", answer: "Warm.", tag: "approach" },
     ],
@@ -125,6 +128,26 @@ describe("JoinStep4 contact and rates", () => {
     );
     expect(isDisabled(ownPromptButton(six))).toBe(true);
     expect(isDisabled(removeButton(six, "prompt 1"))).toBe(false);
+  });
+
+  it("offers a sliding scale toggle and optional min and max", () => {
+    const off = render();
+    expect(off).toContain("Sliding scale");
+    expect(off).toContain('role="switch"');
+    expect(off).toContain('aria-checked="false"');
+    expect(off).not.toContain("Sliding scale minimum in dollars");
+
+    const on = render({
+      slidingScale: true,
+      slidingScaleMinCents: 8000,
+      slidingScaleMaxCents: 12000,
+    });
+    expect(on).toContain('aria-checked="true"');
+    expect(on).toContain('aria-label="Sliding scale minimum in dollars"');
+    expect(on).toContain('aria-label="Sliding scale maximum in dollars"');
+    expect(on).toContain('value="80"');
+    expect(on).toContain('value="120"');
+    expect(on).toContain("without listing a range");
   });
 
   it("hides product feedback when editing an existing profile", () => {

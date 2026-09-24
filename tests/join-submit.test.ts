@@ -27,6 +27,9 @@ const draft: JoinDraft = {
       price_cents: 16500,
     },
   ],
+  slidingScale: false,
+  slidingScaleMinCents: null,
+  slidingScaleMaxCents: null,
   cards: [
     {
       prompt: "my approach to therapy is...",
@@ -70,6 +73,9 @@ describe("toRpcArgs", () => {
       p_superbill: payload.superbill,
       p_licenses: payload.licenses,
       p_rates: payload.rates,
+      p_sliding_scale: payload.sliding_scale,
+      p_sliding_scale_min_cents: payload.sliding_scale_min_cents,
+      p_sliding_scale_max_cents: payload.sliding_scale_max_cents,
       p_location: payload.location,
       p_tags: payload.tags,
       p_items: payload.items,
