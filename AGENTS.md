@@ -4,7 +4,9 @@ Read [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) before writing code. It wins o
 
 ## Scope
 
-If it is not in **Must ship**, do not add it. No booking, no extra tag kinds. Patient UI is **only** profile interest (sign-in + I'm interested). `/matches` is the therapist inbox. Photo **and** intro video upload are in scope. Skills: `hackathon-scope`.
+Company product. **Current product** in REQUIREMENTS is what already ships; **Not built yet** is backlog, not a veto. Build the feature that was asked for. Update REQUIREMENTS when behavior changes. Skill: `product-scope`.
+
+`/matches` is the therapist interest inbox. Photo **and** intro video upload exist. Matching still uses one `tags` table unless the task changes that.
 
 ## Build
 
@@ -12,11 +14,11 @@ Subagent-driven. Independent tasks in parallel; schema/search query sequential. 
 
 ## Data
 
-One `tags` table. Match is OR on selected tags (some match), one SQL round trip. Skill: `kitchen-sink-matching`.
+One `tags` table. Match is OR on selected tags (some match), one SQL round trip — until we explicitly change matching. Skill: `kitchen-sink-matching`.
 
 ## Docs
 
-Short. No essays. Update REQUIREMENTS only if behavior changes.
+Short. No essays. Update REQUIREMENTS when behavior changes.
 
 ## Git
 
