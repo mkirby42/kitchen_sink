@@ -39,8 +39,9 @@ describe("step 2 upload help", () => {
       <JoinStep2 userId="user-1" draft={emptyDraft()} setDraft={() => {}} />,
     );
 
-    expect(html).toContain(UPLOAD_HELP_EMAIL);
-    expect(html).toContain(`mailto:${UPLOAD_HELP_EMAIL}`);
+    expect(UPLOAD_HELP_EMAIL).toBe("chrislo5240@gmail.com");
+    expect(html).toContain("chrislo5240@gmail.com");
+    expect(html).toContain("mailto:chrislo5240@gmail.com");
     expect(html).toContain("Having trouble uploading?");
     expect(html).toContain("the team will help");
     expect(html).toContain("Need help uploading?");
