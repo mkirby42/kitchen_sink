@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { supabasePublicConfig } from "@/lib/supabase/env";
+import { allowedSearchTags } from "@/lib/tags/presets";
 
 export type SearchRow = {
   profile_id: string;
@@ -40,7 +41,7 @@ export function parseFindSearchParams(
   searchParams: Record<string, string | string[] | undefined>,
 ): SearchFilters {
   return {
-    tags: splitTags(searchParams.tags),
+    tags: allowedSearchTags(splitTags(searchParams.tags)),
     virtual: first(searchParams.virtual) === "1",
     inPerson: first(searchParams.in_person) === "1",
     state: first(searchParams.state)?.trim() || null,

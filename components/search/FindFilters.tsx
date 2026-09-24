@@ -4,12 +4,10 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   INSURANCE_PRESETS,
-  SEARCH_SPECIALTY_MAX_LENGTH,
+  SPECIALTY_PRESETS,
   filterLicenseStates,
   licenseStateLabel,
-  normalizeSpecialtyFilterLabel,
   resolveLicenseState,
-  specialtyFilterChips,
 } from "@/lib/tags/presets";
 import type { SearchFilters } from "@/lib/search/rpc";
 import { buildFindHref, filtersFromSearchParams } from "./query";
@@ -215,20 +213,9 @@ export function FindFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filters = filtersFromSearchParams(searchParams);
-  const [customSpecialty, setCustomSpecialty] = useState("");
 
   function apply(next: SearchFilters) {
     router.push(buildFindHref(next), { scroll: false });
-  }
-
-  function addCustomSpecialty() {
-    const label = normalizeSpecialtyFilterLabel(customSpecialty, [
-      ...specialtyFilterChips(filters.tags),
-      ...INSURANCE_PRESETS,
-    ]);
-    setCustomSpecialty("");
-    if (!label || filters.tags.includes(label)) return;
-    apply({ ...filters, tags: [...filters.tags, label] });
   }
 
   const mustHaveCount = filters.tags.length + (filters.state ? 1 : 0);
@@ -256,7 +243,7 @@ export function FindFilters() {
       </fieldset>
 
       <FilterGroup title="Specialties">
-        {specialtyFilterChips(filters.tags).map((label) => (
+        {SPECIALTY_PRESETS.map((label) => (
           <Chip
             key={label}
             selected={filters.tags.includes(label)}
@@ -267,30 +254,6 @@ export function FindFilters() {
             {label}
           </Chip>
         ))}
-        <form
-          className="inline-flex max-w-full items-center gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            addCustomSpecialty();
-          }}
-        >
-          <label className="sr-only" htmlFor="custom-specialty">
-            Add a specialty
-          </label>
-          <input
-            id="custom-specialty"
-            key={filters.tags.join("|")}
-            value={customSpecialty}
-            onChange={(event) => setCustomSpecialty(event.target.value)}
-            placeholder="Add your own"
-            maxLength={SEARCH_SPECIALTY_MAX_LENGTH}
-            autoComplete="off"
-            className="w-[9.5rem] min-w-0 rounded-full border border-line bg-paper px-3.5 py-1.5 text-sm text-ink placeholder:text-mute"
-          />
-          <button type="submit" className={chipClass(false)}>
-            Add
-          </button>
-        </form>
       </FilterGroup>
 
       <FilterGroup title="Insurance">
