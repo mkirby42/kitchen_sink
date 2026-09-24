@@ -6,7 +6,7 @@ Read [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) before writing code. It wins o
 
 Company product. **Current product** in REQUIREMENTS is what already ships; **Not built yet** is backlog, not a veto. Build the feature that was asked for. Update REQUIREMENTS when behavior changes. Skill: `product-scope`.
 
-`/matches` is the therapist interest inbox. Photo **and** intro video upload exist. Matching still uses one `tags` table unless the task changes that.
+Photo **and** intro video upload exist. Matching still uses one `tags` table unless the task changes that. Interest (`/matches`, I'm interested) is removed.
 
 ## Build
 

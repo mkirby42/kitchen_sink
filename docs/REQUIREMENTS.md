@@ -4,7 +4,7 @@ Company product. Patients find therapists; therapists publish profiles people ca
 
 ## Product
 
-Patients filter therapists by must-have tags. Therapists publish a readable profile (photo, intro video, tags, rates, conversation cards, contact). A patient can tap **I'm interested**; the therapist sees an anonymous list.
+Patients filter therapists by must-have tags. Therapists publish a readable profile (photo, intro video, tags, rates, conversation cards, contact).
 
 The current app does **not** book sessions or broker intros. Those are on the backlog, not forbidden.
 
@@ -16,20 +16,18 @@ The current app does **not** book sessions or broker intros. Those are on the ba
 4. **Seeded demo** — at least one full therapist (Maya Chen from the prototype) with photo and playable intro video so search and profile work with no signups.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
-7. **Interest** — patient (email/password, no wizard) taps **I'm interested** on `/t/[id]`. Therapist opens `/matches` and sees aliases only (`Patient ·` + last 4 hex of patient UUID). No messaging yet. Toggle off deletes the row. See `docs/interest.md`.
 
 ## Not built yet (backlog, allowed)
 
 These existed as hackathon cuts. They are **in play** whenever we take them on. Update this doc when one ships.
 
 - Booking, calendars, payments; “Free Consult” / “Book a Session” as real scheduling. Today those buttons `mailto:` / `tel:` listed contact.
-- Patient onboarding, public patient profiles, stored patient location. Interest still uses a bare `profiles` row (`role = patient`).
+- Patient onboarding, public patient profiles, stored patient location. Seed reviews still use patient `profiles` rows.
 - Review **write** UI. Seed reviews and display them today.
 - Video transcoding, multiple intro clips, a video CMS. Today: one clip per therapist, stored as uploaded, native `<video>`.
 - Maps, geocoding, distance search. If in-person is selected, **store** location. Search uses license state, not lat/lon.
-- Messaging, likes/hearts chrome, admin moderation, realtime. Interest is a persisted row + list.
+- Messaging, likes/hearts chrome, admin moderation, realtime.
 - Supervisor license **verification** (no legal review). Associate/trainee credentials are not offered.
-- Extra patient surfaces beyond sign-in on the profile interest control.
 
 Patient tables stay in the schema. Expand patient UI when the product needs it.
 
@@ -39,14 +37,13 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 
 | Flow | What it is |
 | --- | --- |
-| Nav | Home, Find a Therapist, Join as a Therapist |
+| Nav | Home, Find a Therapist, Join as a Therapist. Signed-in therapists see My profile and Sign out instead of Join. |
 | Therapist onboarding 1 | **Name (required)**, licensed credential dropdown, years practicing, **Education (optional)**, **Credentials & certificates (optional)**, **State license(s)** (min 1; license # and state both required on each kept row; blank extra rows ignored) |
 | Therapist onboarding 2 | Photo (required) + intro video (optional, up to 50MB; prototype shows photo; profile hero plays intro when present) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
 | Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), conversation cards (min 3, max 6), about, private email, outreach (email / phone / text), optional feedback |
 | Search | Must-have chips (specialties: presets + free-text custom). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price / duration) |
-| Profile | Hero (photo + playable intro video) + credential + education + additional credentials + all state licenses (# + state per row) + all rates (service + duration + price) + **I'm interested** + cards + about + reviews |
-| Interest inbox | Therapist-only `/matches`: anonymous aliases + timestamp. Empty state if none. |
+| Profile | Hero (photo + playable intro video) + credential + education + additional credentials + all state licenses (# + state per row) + all rates (service + duration + price) + cards + about + reviews |
 
 Match visual tone: cream page, navy type, terracotta buttons, rounded cards. Do not invent a second design system unless we are deliberately restyling the product.
 
@@ -115,13 +112,7 @@ reviews
   stars_cat_1, stars_cat_2, stars_cat_3  -- store, no UI
   body, session_format, duration_label
   created_at
-
-interest                      -- patient selected this therapist
-  id, patient_id, therapist_id, created_at
-  unique (patient_id, therapist_id)
 ```
-
-Therapist inbox reads `list_my_interest()` (alias + created_at only). Do not join `profiles` for that list unless we change anonymity rules. Alias = `Patient ·` + last 4 hex of `patient_id` (dashes stripped, uppercased).
 
 Suggested labels (preset chips; therapist may also add custom labels for specialty, modality, insurance):
 
@@ -174,7 +165,7 @@ Return search cards in **one round trip** (join photo URL, credential, years, a 
 - Supabase hosted Postgres + Auth + Storage
 - Vercel
 
-App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated), `/matches` therapist interest inbox (auth + therapist role).
+App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated). `/matches` redirects home.
 
 ## Performance
 

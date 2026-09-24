@@ -10,21 +10,19 @@ import {
   slidingScaleLabel,
   type TherapistProfileData,
 } from "@/lib/therapists/load";
-import type { InterestViewer } from "@/lib/interest/viewer";
 import { routes } from "@/lib/routes";
 import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
-import { InterestControl } from "./InterestControl";
 import { ProfileTabs } from "./ProfileTabs";
 
 export function TherapistProfile({
   data,
   backHref,
-  viewer,
+  isOwner,
 }: {
   data: TherapistProfileData;
   backHref: string;
-  viewer: InterestViewer;
+  isOwner: boolean;
 }) {
   const format = formatLabel(data.virtual, data.inPerson);
   const licenses = licenseLine(data.licenses);
@@ -79,7 +77,7 @@ export function TherapistProfile({
             ♡
           </span>
         </Link>
-        {viewer.isOwner ? (
+        {isOwner ? (
           <Link
             href={routes.joinEdit}
             className="absolute right-0 rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink shadow-sm"
@@ -173,12 +171,6 @@ export function TherapistProfile({
           </p>
         </article>
       </div>
-
-      <InterestControl
-        therapistId={data.id}
-        givenName={data.givenName}
-        viewer={viewer}
-      />
 
       <ContactCtas name={data.givenName} actions={ctas} contact={data.contact} />
 
