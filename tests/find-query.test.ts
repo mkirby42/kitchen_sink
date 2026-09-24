@@ -5,10 +5,8 @@ import {
   filtersFromSearchParams,
   resultCountLabel,
 } from "@/components/search/query";
-import {
-  normalizeSpecialtyFilterLabel,
-  specialtyFilterChips,
-} from "@/lib/tags/presets";
+import { allowedSearchTags } from "@/lib/tags/presets";
+import { parseFindSearchParams } from "@/lib/search/rpc";
 
 describe("find result copy", () => {
   it("keeps the plural s in one string so it cannot wrap", () => {
@@ -62,15 +60,16 @@ describe("find search URL", () => {
     });
   });
 
-  it("round-trips a custom specialty tag", () => {
-    const href = buildFindHref({
-      tags: ["Eating Disorders"],
-      virtual: false,
-      inPerson: false,
-      state: null,
-    });
-    const params = new URLSearchParams(href.split("?")[1]);
-    expect(filtersFromSearchParams(params).tags).toEqual(["Eating Disorders"]);
+  it("drops a custom specialty tag and keeps preset filters", () => {
+    const params = new URLSearchParams(
+      "tags=Eating%20Disorders%2CADHD%2CAetna",
+    );
+    expect(filtersFromSearchParams(params).tags).toEqual(["ADHD", "Aetna"]);
+    expect(
+      parseFindSearchParams({
+        tags: "Eating Disorders,ADHD,Aetna",
+      }).tags,
+    ).toEqual(["ADHD", "Aetna"]);
   });
 
   it("carries find filters onto a therapist profile so back can restore them", () => {
@@ -101,33 +100,10 @@ describe("find search URL", () => {
   });
 });
 
-describe("custom specialty search chips", () => {
-  it("trims and maps a typed preset to the canonical chip", () => {
-    expect(normalizeSpecialtyFilterLabel("  adhd  ")).toBe("ADHD");
-  });
-
-  it("keeps a new specialty label after trim", () => {
-    expect(normalizeSpecialtyFilterLabel("  Eating  Disorders  ")).toBe(
-      "Eating Disorders",
-    );
-  });
-
-  it("rejects blank input", () => {
-    expect(normalizeSpecialtyFilterLabel("   ")).toBeNull();
-  });
-
-  it("lists custom selected specialties after presets", () => {
-    expect(specialtyFilterChips(["Aetna", "Eating Disorders", "ADHD"])).toEqual([
-      "Anxiety",
-      "Depression",
-      "Trauma & PTSD",
-      "Couples & Relationships",
-      "ADHD",
-      "Grief & Loss",
-      "Life Transitions",
-      "Teens",
-      "Immigration",
-      "Eating Disorders",
-    ]);
+describe("search filter tags", () => {
+  it("keeps specialty and insurance presets and drops custom labels", () => {
+    expect(
+      allowedSearchTags(["Aetna", "Eating Disorders", "ADHD", ""]),
+    ).toEqual(["Aetna", "ADHD"]);
   });
 });
