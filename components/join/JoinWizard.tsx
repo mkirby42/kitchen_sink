@@ -15,6 +15,7 @@ import {
 } from "@/lib/join/validate";
 import { joinPath, routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
+import { DeleteProfile } from "./DeleteProfile";
 import { JoinShell } from "./JoinShell";
 import { JoinStep1 } from "./JoinStep1";
 import { JoinStep2 } from "./JoinStep2";
@@ -246,6 +247,14 @@ export function JoinWizard({
           hideFeedback={editing}
         />
       )}
+      {editing ? (
+        <DeleteProfile
+          userId={userId}
+          photoKey={draft.photoKey}
+          videoKey={draft.videoKey}
+          disabled={submitting || mediaBusy}
+        />
+      ) : null}
     </JoinShell>
   );
 }

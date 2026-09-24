@@ -44,6 +44,7 @@ describe("sitemap entries", () => {
       `${ORIGIN}/t/${id}`,
     ]);
     expect(urls.some((url) => url.includes("/admin"))).toBe(false);
+    expect(urls.some((url) => url.includes("/profile-deleted"))).toBe(false);
   });
 
   it("only accepts therapist ids that are uuids", () => {
@@ -61,6 +62,7 @@ describe("llms.txt", () => {
     expect(body.startsWith("# Kitchen Sink\n")).toBe(true);
     expect(body).toContain("Kitchen Sink (Talk Shoppe)");
     expect(body).toContain("does not book appointments");
+    expect(body).toContain("delete their own profile");
     expect(body).toContain(`[Home](${ORIGIN})`);
     expect(body).toContain(`[Find a therapist](${ORIGIN}/find)`);
     expect(body).toContain(`[Join as a therapist](${ORIGIN}/join)`);

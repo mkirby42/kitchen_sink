@@ -18,6 +18,7 @@ The current app does **not** book sessions or broker intros. Those are on the ba
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
 7. **Admin helper upload** — `/admin/media`. An ops admin signs in, picks a therapist (including not open to new clients), and uploads a photo and/or intro video into that therapist's existing storage prefix. Same buckets, mime types, and size limits as join. Only `photo_key` or `video_key` changes.
 8. **Discoverability** — `/robots.txt` allows search crawlers and these AI user-agents: GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, Claude-User, PerplexityBot, Perplexity-User, Google-Extended. It disallows `/admin` only. `/sitemap.xml` lists `/`, `/find`, `/join`, and therapists open to new clients. `/llms.txt` is a plain-language summary of the product. Public pages set a canonical URL on `https://kitchen-sink-tau.vercel.app` (override with `SITE_URL`).
+9. **Delete own profile** — On edit profile (`/join?edit=1`), the signed-in therapist deletes that profile from a danger zone under the form. A dialog requires typing `DELETE`. The public page leaves Find and `/t/[id]`. The profile delete cascades therapist-owned rows: licenses, rates, sliding scale, qualifications, tags, conversation cards, location, feedback, and reviews about them. Photo and intro video objects are removed with the Storage API. The auth user stays, so they can join again. Patients, admins, and other therapists cannot delete it. Afterward they land on `/profile-deleted`.
 
 ## Not built yet (backlog, allowed)
 
@@ -45,6 +46,7 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), **sliding scale** toggle with optional min/max, conversation cards (min 3, max 6), about, private email, outreach (email / phone / text), optional feedback |
 | Search | Must-have chips (specialty presets only). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price / duration) |
 | Profile | Hero (photo + playable intro video) + credential + education + additional credentials + all state licenses (# + state per row) + all rates (service + duration + price) + sliding scale when offered + cards + about + reviews (category breakdown + note) |
+| Delete profile | Edit profile only (`/join?edit=1`), under the form. Dialog requires typing `DELETE`. Then `/profile-deleted`. |
 
 Match visual tone: cream page, navy type, terracotta buttons, rounded cards. Do not invent a second design system unless we are deliberately restyling the product.
 
@@ -139,7 +141,7 @@ Identity tags: small fixed set in onboarding; not a search must-have today.
 
 **In-person rule:** if `in_person_practice` (therapist) is true, a location row must exist. Patient in-person is a search toggle, not a stored patient location today.
 
-RLS: public can `select` therapists who are `open_to_new_clients`. Owner can insert/update own rows. Reviews: public read for open therapists; a signed-in patient inserts, updates, and deletes their own row. Feedback insert by owner. Storage: public read for photos and intro videos; a user writes only their own prefix (`photos/{uid}/`, `videos/{uid}/`). An admin may also write those buckets under an existing therapist id, which is what `/admin/media` uses. Video is not part of the search card query.
+RLS: public can `select` therapists who are `open_to_new_clients`. Owner can insert/update own rows. Reviews: public read for open therapists; a signed-in patient inserts, updates, and deletes their own row. Feedback insert by owner. Storage: public read for photos and intro videos; a user writes only their own prefix (`photos/{uid}/`, `videos/{uid}/`). An admin may also write those buckets under an existing therapist id, which is what `/admin/media` uses. Video is not part of the search card query. There is no profiles DELETE policy. `delete_own_therapist_profile('DELETE')` is the delete path: `auth.uid()` must own a therapist profile. It does not delete `auth.users` or any other profile. Child rows cascade, including reviews about that therapist. Storage bytes are removed with the Storage API, not SQL.
 
 **Admin role.** `admin` is ops, not a therapist and not a patient. An API session cannot insert `role = admin` or change its own role (`auth.uid()` is set). Dashboard SQL with no user JWT can. Admins can read therapist profiles and call `admin_set_therapist_media(therapist_id, kind, key)` to set `photo_key` or `video_key` only. Demo login after migrations: `ops@example.com` / `seed-only`. Not a `@kitchensink.demo` address — that domain is rejected for new profiles.
 
@@ -208,7 +210,7 @@ Return search cards in **one round trip** (join photo URL, credential, years, a 
 - Supabase hosted Postgres + Auth + Storage
 - Vercel
 
-App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated), `/admin/media` ops helper upload (auth + admin role). `/matches` redirects home. `/robots.txt`, `/sitemap.xml`, and `/llms.txt` are public discoverability files.
+App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated), `/profile-deleted` after a therapist deletes their profile, `/admin/media` ops helper upload (auth + admin role). `/matches` redirects home. `/robots.txt`, `/sitemap.xml`, and `/llms.txt` are public discoverability files.
 
 ## Performance
 
