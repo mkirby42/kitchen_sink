@@ -102,20 +102,33 @@ export function TherapistProfile({
         modalities={data.modalities}
       />
 
-      {data.showSupervisor ? (
-        <p className="mt-4 rounded-2xl bg-paper px-4 py-3 text-sm text-ink">
-          Practicing under supervision
-          {data.supervisorName ? (
-            <>
-              {" "}
-              by <span className="font-medium">{data.supervisorName}</span>
-            </>
+      {data.education.length > 0 || data.credentials.length > 0 ? (
+        <section className="mt-4 rounded-2xl bg-paper px-4 py-4 shadow-sm">
+          {data.education.length > 0 ? (
+            <div>
+              <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
+                Education
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-ink">
+                {data.education.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
           ) : null}
-          {data.supervisorLicense ? (
-            <> · Supervisor lic. #{data.supervisorLicense}</>
+          {data.credentials.length > 0 ? (
+            <div className={data.education.length > 0 ? "mt-4" : undefined}>
+              <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
+                Credentials
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-ink">
+                {data.credentials.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
           ) : null}
-          . This clinician is not yet independently licensed.
-        </p>
+        </section>
       ) : null}
 
       {data.specialties.length > 0 ? (

@@ -2,7 +2,6 @@
 
 import type { Dispatch, SetStateAction } from "react";
 import type { JoinDraft } from "@/lib/join/types";
-import { needsSupervisor } from "@/lib/therapists/credential";
 import { CREDENTIALS, LICENSE_STATES } from "@/lib/tags/presets";
 
 const fieldClass =
@@ -17,8 +16,6 @@ export function JoinStep1({
   draft: JoinDraft;
   setDraft: Dispatch<SetStateAction<JoinDraft>>;
 }) {
-  const requiresSupervisor = needsSupervisor(draft.credential);
-
   return (
     <div className="space-y-8">
       <label className="block">
@@ -43,9 +40,6 @@ export function JoinStep1({
               setDraft((current) => ({
                 ...current,
                 credential,
-                ...(!needsSupervisor(credential)
-                  ? { supervisorName: "", supervisorLicense: "" }
-                  : {}),
               }));
             }}
             className={fieldClass}
@@ -79,45 +73,25 @@ export function JoinStep1({
         </label>
       </div>
 
-      {requiresSupervisor ? (
-        <div className="space-y-5">
-          <div className="grid gap-8 sm:grid-cols-2">
-            <label className="block">
-              <span className={labelClass}>Supervising clinician&apos;s name *</span>
-              <input
-                placeholder="e.g. Jordan Ellis, LMFT"
-                value={draft.supervisorName}
-                onChange={(event) =>
-                  setDraft((current) => ({
-                    ...current,
-                    supervisorName: event.target.value,
-                  }))
-                }
-                className={fieldClass}
-              />
-            </label>
-            <label className="block">
-              <span className={labelClass}>Supervisor&apos;s license #</span>
-              <input
-                placeholder="MFC 55210"
-                value={draft.supervisorLicense}
-                onChange={(event) =>
-                  setDraft((current) => ({
-                    ...current,
-                    supervisorLicense: event.target.value,
-                  }))
-                }
-                className={fieldClass}
-              />
-            </label>
-          </div>
-          <div className="rounded-2xl bg-cream px-5 py-4 text-sm leading-6 text-mute">
-            Since you&apos;re practicing under supervision, we&apos;ll note your
-            supervisor&apos;s name and license alongside your profile, as most
-            states require.
-          </div>
-        </div>
-      ) : null}
+      <StringListField
+        legend="Education"
+        items={draft.education}
+        placeholder="e.g. M.A. Counseling Psychology"
+        addLabel="+ Add another degree"
+        onChange={(education) =>
+          setDraft((current) => ({ ...current, education }))
+        }
+      />
+
+      <StringListField
+        legend="Credentials & certificates"
+        items={draft.credentials}
+        placeholder="e.g. EMDR trained"
+        addLabel="+ Add another credential"
+        onChange={(credentials) =>
+          setDraft((current) => ({ ...current, credentials }))
+        }
+      />
 
       <fieldset>
         <legend className={labelClass}>State license(s)</legend>
@@ -201,5 +175,67 @@ export function JoinStep1({
         </button>
       </fieldset>
     </div>
+  );
+}
+
+function StringListField({
+  legend,
+  items,
+  placeholder,
+  addLabel,
+  onChange,
+}: {
+  legend: string;
+  items: string[];
+  placeholder: string;
+  addLabel: string;
+  onChange: (items: string[]) => void;
+}) {
+  const rows = items.length > 0 ? items : [""];
+
+  return (
+    <fieldset>
+      <legend className={labelClass}>{legend}</legend>
+      <div className="mt-4 space-y-3">
+        {rows.map((value, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <label className="min-w-0 flex-1">
+              <span className="sr-only">
+                {legend} {index + 1}
+              </span>
+              <input
+                aria-label={`${legend} ${index + 1}`}
+                placeholder={placeholder}
+                value={value}
+                onChange={(event) => {
+                  const next = [...rows];
+                  next[index] = event.target.value;
+                  onChange(next);
+                }}
+                className="w-full rounded-full border border-line bg-paper px-4 py-2.5 outline-none placeholder:text-mute/70 focus:border-clay"
+              />
+            </label>
+            <button
+              type="button"
+              aria-label={`Remove ${legend} ${index + 1}`}
+              disabled={rows.length === 1}
+              onClick={() =>
+                onChange(rows.filter((_, itemIndex) => itemIndex !== index))
+              }
+              className="grid size-9 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => onChange([...rows, ""])}
+        className="mt-3 w-full rounded-full border border-dashed border-clay/50 px-5 py-2.5 text-sm font-medium text-clay hover:bg-cream"
+      >
+        {addLabel}
+      </button>
+    </fieldset>
   );
 }

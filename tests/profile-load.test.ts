@@ -12,7 +12,10 @@ describe.skipIf(!dbConfigured())("fetchTherapistProfile", () => {
     expect(byId?.id).toBe(MAYA_ID);
     expect(bySlug?.name).toBe("Dr. Maya Chen");
     expect(bySlug?.credential).toBe("LMFT");
-    expect(bySlug?.showSupervisor).toBe(false);
+    expect(bySlug?.education).toEqual(
+      expect.arrayContaining(["B.A. Psychology", "M.A. Counseling Psychology"]),
+    );
+    expect(bySlug?.credentials).toEqual(expect.arrayContaining(["EMDR trained"]));
     expect(bySlug?.photoUrl).toContain(
       `/storage/v1/object/public/photos/${MAYA_ID}/photo.jpg`,
     );

@@ -56,9 +56,14 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
       p_open_to_new_clients: true,
       p_virtual: true,
       p_in_person: false,
-      p_supervisor_name: null,
-      p_supervisor_license: null,
       p_superbill: false,
+      p_qualifications: [
+        {
+          kind: "education",
+          label: "M.A. Counseling",
+          position: 0,
+        },
+      ],
       p_licenses: [{ number: "JOIN-WA-001", state: "WA" }],
       p_rates: [
         {

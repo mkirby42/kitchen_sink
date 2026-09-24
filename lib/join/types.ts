@@ -16,8 +16,8 @@ export type JoinDraft = {
   name: string;
   credential: string;
   yearsPracticing: number | "";
-  supervisorName: string;
-  supervisorLicense: string;
+  education: string[];
+  credentials: string[];
   licenses: JoinLicense[];
   photoKey: string | null;
   videoKey: string | null;

@@ -5,11 +5,11 @@ description: Use when writing or changing Kitchen Sink schema, migrations, RLS, 
 
 # Matching and data
 
-Spec: `docs/REQUIREMENTS.md` (Data + Matching). Do not invent tables.
+Spec: `docs/REQUIREMENTS.md` (Data + Matching). New tables/kinds only with a migration + REQUIREMENTS update.
 
 ## Shape
 
-- `profiles` + `therapists` (1:1) + `licenses` (1:n, multi-state) + `rates` (1:n, multi-service) + `locations` + `tags` + `profile_items` + `reviews` + `feedback` + `interest` (patient → therapist, unique pair)
+- `profiles` + `therapists` (1:1) + `licenses` (1:n, multi-state) + `qualifications` (1:n, education + extra credentials; not searched) + `rates` (1:n, multi-service) + `locations` + `tags` + `profile_items` + `reviews` + `feedback` + `interest` (patient → therapist, unique pair)
 - Tags: one table, `kind` in `specialty | modality | identity | insurance | outreach`
 - Years practicing = `now - start_date_of_practice`, not a stored int
 
@@ -37,7 +37,7 @@ If explain shows a slow join, add `therapists.specialty_labels text[]` + GIN and
 
 ## In-person
 
-`in_person_practice` true ⇒ location row required. Search still uses license state, not lat/lon this weekend.
+`in_person_practice` true ⇒ location row required. Search uses license state, not lat/lon, until we add geo.
 
 ## RLS / perf
 

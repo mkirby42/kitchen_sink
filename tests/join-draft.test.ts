@@ -20,10 +20,12 @@ describe("draftFromRows", () => {
         open_to_new_clients: true,
         virtual_practice: true,
         in_person_practice: false,
-        supervisor_name: null,
-        supervisor_license: null,
       },
       licenses: [{ number: "MFC 112938", state: "CA" }],
+      qualifications: [
+        { kind: "education", label: "B.A. Psychology" },
+        { kind: "credential", label: "EMDR trained" },
+      ],
       rates: [
         {
           service_type: "Individual",
@@ -49,6 +51,8 @@ describe("draftFromRows", () => {
     expect(draft.name).toBe("Maya Chen");
     expect(draft.email).toBe("maya@example.com");
     expect(draft.credential).toBe("LMFT");
+    expect(draft.education).toEqual(["B.A. Psychology"]);
+    expect(draft.credentials).toEqual(["EMDR trained"]);
     expect(draft.yearsPracticing).toBe(yearsPracticing("2017-01-01"));
     expect(draft.photoKey).toBe("uid/photo.jpg");
     expect(draft.specialties).toEqual(["Anxiety"]);
