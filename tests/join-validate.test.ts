@@ -17,8 +17,8 @@ function emptyDraft(overrides: Partial<JoinDraft> = {}): JoinDraft {
     name: "",
     credential: "",
     yearsPracticing: "",
-    supervisorName: "",
-    supervisorLicense: "",
+    education: [""],
+    credentials: [""],
     licenses: [],
     photoKey: null,
     videoKey: null,
@@ -87,25 +87,33 @@ function validStep4(overrides: Partial<JoinDraft> = {}): JoinDraft {
 }
 
 describe("join validation", () => {
-  it("requires supervisor fields for associate AMFT on step 1", () => {
+  it("rejects associate credentials on step 1", () => {
     const draft = validStep1({
       credential: "Associate MFT (AMFT)",
-      supervisorName: "",
-      supervisorLicense: "",
     });
 
     expect(canContinue(1, draft)).toBe(false);
-    expect(step1Errors(draft).length).toBeGreaterThan(0);
-    expect(continueHint(1, draft)).toBe(
-      "Add your supervising clinician's name before submitting.",
-    );
+    expect(step1Errors(draft).some((e) => /credential/i.test(e))).toBe(true);
   });
 
-  it("allows LMFT to continue step 1 without supervisor fields", () => {
-    const draft = validStep1({ credential: "LMFT" });
+  it("allows LMFT to continue step 1 with optional education rows", () => {
+    const draft = validStep1({
+      credential: "LMFT",
+      education: ["B.A. Psychology", "M.A. Counseling"],
+      credentials: ["EMDR trained"],
+    });
 
     expect(canContinue(1, draft)).toBe(true);
     expect(step1Errors(draft)).toEqual([]);
+  });
+
+  it("rejects duplicate education labels on step 1", () => {
+    const draft = validStep1({
+      education: ["B.A. Psychology", "b.a. psychology"],
+    });
+
+    expect(canContinue(1, draft)).toBe(false);
+    expect(step1Errors(draft).some((e) => /unique/i.test(e))).toBe(true);
   });
 
   it("fails duplicate license states on step 1", () => {
@@ -242,10 +250,12 @@ describe("normalizeCustomLabel", () => {
 });
 
 describe("buildJoinPayload", () => {
-  it("includes outreach tags and omits supervisor for LMFT", () => {
+  it("includes outreach tags and freeform qualifications for LMFT", () => {
     const draft = validStep4({
       credential: "LMFT",
       yearsPracticing: 9,
+      education: ["B.A. Psychology", "M.A. Counseling"],
+      credentials: ["EMDR trained"],
       outreach: ["email", "phone"],
       phone: "(415) 555-0199",
       insurance: ["Aetna", "Out-of-Network Superbill"],
@@ -253,9 +263,12 @@ describe("buildJoinPayload", () => {
 
     const payload = buildJoinPayload(draft);
 
-    expect(payload.supervisor_name).toBeNull();
-    expect(payload.supervisor_license).toBeNull();
-    expect(payload.start_date).toBe("2017-09-19");
+    expect(payload.qualifications).toEqual([
+      { kind: "education", label: "B.A. Psychology", position: 0 },
+      { kind: "education", label: "M.A. Counseling", position: 1 },
+      { kind: "credential", label: "EMDR trained", position: 0 },
+    ]);
+    expect(payload.start_date).toBe(startDateFromYears(9));
     expect(payload.superbill).toBe(true);
     expect(payload.tags).toEqual(
       expect.arrayContaining([

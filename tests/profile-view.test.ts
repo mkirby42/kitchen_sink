@@ -5,24 +5,11 @@ import {
   givenName,
   inNetworkInsurance,
   licenseLine,
-  needsSupervisor,
   reviewAverage,
   telHref,
 } from "@/lib/therapists/load";
 
 describe("profile view helpers", () => {
-  it("hides supervisor for licensed credentials like LMFT", () => {
-    expect(needsSupervisor("LMFT")).toBe(false);
-    expect(needsSupervisor("LCSW")).toBe(false);
-    expect(needsSupervisor("PhD")).toBe(false);
-  });
-
-  it("shows supervisor for associate and trainee credentials", () => {
-    expect(needsSupervisor("Associate MFT (AMFT)")).toBe(true);
-    expect(needsSupervisor("Associate CSW (ACSW)")).toBe(true);
-    expect(needsSupervisor("Registered Associate / Trainee")).toBe(true);
-  });
-
   it("uses the given name after a title", () => {
     expect(givenName("Dr. Maya Chen")).toBe("Maya");
     expect(givenName("Maya Chen")).toBe("Maya");

@@ -102,7 +102,7 @@ Nothing here is a real clinician, patient, license, review, or clinical dataset.
 
 | What | Where | Provenance |
 | --- | --- | --- |
-| Maya Chen (LMFT, CA, rates, cards, 3 reviews) | `supabase/migrations/20260919163316_seed_maya_chen.sql` | Written for this hackathon to match [prototype_screenshots/](prototype_screenshots/) |
+| Maya Chen (LMFT, CA, rates, cards, 3 reviews) | `supabase/migrations/20260919163316_seed_maya_chen.sql` | Written to match [prototype_screenshots/](prototype_screenshots/) |
 | 10 more open therapists + reviews | `supabase/migrations/20260919184500_seed_demo_therapists.sql` | Authored synthetic profiles so `/find` has multiple OR matches |
 | Seed patients J.R., Priya S., D.M. | same Maya seed | Prototype reviewer names; emails are `*@kitchensink.demo` |
 | Interest rows on Maya | later seed / interest migration | J.R., Priya, D.M. already interested so `/matches` is not empty |
@@ -111,7 +111,7 @@ Nothing here is a real clinician, patient, license, review, or clinical dataset.
 
 License numbers, phones, and addresses are fake. Reviews are fiction.
 
-## Known limitations
+## Known limitations (today)
 
 - No booking, calendars, or in-app messaging. Contact buttons are `mailto:` / `tel:` from listed outreach.
 - Interest is a persisted anonymous signal. Therapists never see name, email, or photo. Toggle off deletes the row. No realtime.
@@ -119,22 +119,25 @@ License numbers, phones, and addresses are fake. Reviews are fiction.
 - Search is OR overlap (some tags), not AND. Results cap at 24; no pagination UI.
 - In-person location is stored; search uses license state, not maps or distance.
 - One intro clip per therapist, played as uploaded. No transcoding.
-- Associate/trainee supervisor fields are collected, not verified.
+- Associate/trainee credentials are not offered. Education and extra credentials are freeform lists on the profile.
 - Patient UI is only sign-in + **I'm interested** on a profile. No patient onboarding or public patient pages.
 
-## Next steps
+These are product gaps, not a freeze. See REQUIREMENTS **Not built yet**.
 
-- Consult / session booking (explicitly cut this weekend).
-- Opt-in contact reveal or messaging after interest.
-- License verification and real identity checks.
-- AND filters, pagination, maps.
-- Review write path and video transcoding.
+## Next
+
+- Consult / session booking
+- Opt-in contact reveal or messaging after interest
+- License verification and real identity checks
+- AND filters, pagination, maps
+- Review write path and video transcoding
+- Custom domain on Vercel (Auth Site URL + redirect allowlist)
 
 ## Docs
 
 | File | What |
 | --- | --- |
-| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Must ship, cut list, schema, matching, CI |
+| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Current product, backlog, schema, matching, CI |
 | [docs/interest.md](docs/interest.md) | Anonymous interest rules |
 | [AGENTS.md](AGENTS.md) | How agents work in this repo |
 | [prototype_screenshots/README.md](prototype_screenshots/README.md) | Screen → screenshot map |

@@ -5,11 +5,11 @@ import { buildJoinPayload } from "@/lib/join/validate";
 
 const draft: JoinDraft = {
   name: "Maya Chen",
-  credential: "LMFT",
-  yearsPracticing: 9,
-  supervisorName: "",
-  supervisorLicense: "",
-  licenses: [{ number: "MFC 112938", state: "CA" }],
+    credential: "LMFT",
+    yearsPracticing: 9,
+    education: ["B.A. Psychology"],
+    credentials: ["EMDR trained"],
+    licenses: [{ number: "MFC 112938", state: "CA" }],
   photoKey: "user-id/photo.jpg",
   videoKey: "user-id/intro.mp4",
   openToNewClients: true,
@@ -57,14 +57,13 @@ describe("toRpcArgs", () => {
       p_open_to_new_clients: payload.open_to_new_clients,
       p_virtual: payload.virtual_practice,
       p_in_person: payload.in_person_practice,
-      p_supervisor_name: payload.supervisor_name,
-      p_supervisor_license: payload.supervisor_license,
       p_superbill: payload.superbill,
       p_licenses: payload.licenses,
       p_rates: payload.rates,
       p_location: payload.location,
       p_tags: payload.tags,
       p_items: payload.items,
+      p_qualifications: payload.qualifications,
       p_feedback: payload.feedback,
     });
   });

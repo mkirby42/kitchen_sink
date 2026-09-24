@@ -47,10 +47,6 @@ export function specialtyFilterChips(selected: string[]) {
 }
 
 export const CREDENTIALS = [
-  "Associate MFT (AMFT)",
-  "Associate CSW (ACSW)",
-  "Associate PC (APCC)",
-  "Registered Associate / Trainee",
   "LMFT",
   "LCSW",
   "LPC",

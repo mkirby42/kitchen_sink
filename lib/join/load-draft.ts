@@ -18,10 +18,9 @@ export type JoinDraftRows = {
     open_to_new_clients: boolean;
     virtual_practice: boolean;
     in_person_practice: boolean;
-    supervisor_name: string | null;
-    supervisor_license: string | null;
   };
   licenses: { number: string; state: string }[];
+  qualifications: { kind: string; label: string }[];
   rates: {
     service_type: string;
     duration_minutes: number;
@@ -49,8 +48,8 @@ export function draftFromRows(rows: JoinDraftRows): JoinDraft {
     name: rows.profile.name ?? "",
     credential: rows.therapist.credential ?? "",
     yearsPracticing: years ?? "",
-    supervisorName: rows.therapist.supervisor_name ?? "",
-    supervisorLicense: rows.therapist.supervisor_license ?? "",
+    education: labelsOf(rows.qualifications, "education"),
+    credentials: labelsOf(rows.qualifications, "credential"),
     licenses:
       rows.licenses.length > 0 ? rows.licenses : [{ number: "", state: "" }],
     photoKey: rows.profile.photo_key,
@@ -98,6 +97,7 @@ export async function fetchJoinDraft(
     profileRes,
     therapistRes,
     licensesRes,
+    qualificationsRes,
     ratesRes,
     tagsRes,
     itemsRes,
@@ -106,6 +106,11 @@ export async function fetchJoinDraft(
     supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
     supabase.from("therapists").select("*").eq("profile_id", userId).maybeSingle(),
     supabase.from("licenses").select("number, state").eq("therapist_id", userId),
+    supabase
+      .from("qualifications")
+      .select("kind, label")
+      .eq("therapist_id", userId)
+      .order("position", { ascending: true }),
     supabase
       .from("rates")
       .select("service_type, duration_minutes, price_cents")
@@ -131,6 +136,7 @@ export async function fetchJoinDraft(
     profile: profileRes.data,
     therapist: therapistRes.data,
     licenses: licensesRes.data ?? [],
+    qualifications: qualificationsRes.data ?? [],
     rates: ratesRes.data ?? [],
     tags: tagsRes.data ?? [],
     items: itemsRes.data ?? [],

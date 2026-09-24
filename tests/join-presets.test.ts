@@ -8,7 +8,7 @@ import {
 describe("join presets", () => {
   it("includes credentials and modalities", () => {
     expect(CREDENTIALS).toContain("LMFT");
-    expect(CREDENTIALS).toContain("Associate MFT (AMFT)");
+    expect(CREDENTIALS).not.toContain("Associate MFT (AMFT)");
     expect(MODALITY_PRESETS).toContain("CBT");
     expect(MODALITY_PRESETS).toContain("EMDR");
   });

@@ -1,6 +1,9 @@
 import { startDateFromYears } from "@/lib/join/dates";
+import {
+  QUALIFICATION_MAX_LENGTH,
+  qualificationRows,
+} from "@/lib/join/qualifications";
 import type { JoinDraft } from "@/lib/join/types";
-import { needsSupervisor } from "@/lib/therapists/credential";
 import {
   CREDENTIALS,
   LICENSE_STATES,
@@ -40,6 +43,26 @@ function validateTagList(labels: string[], kind: string, errors: string[]) {
   }
   if (hasDuplicateValues(trimmed)) {
     errors.push(`${kind} labels must be unique`);
+  }
+}
+
+function qualificationListErrors(
+  items: string[],
+  kind: string,
+  errors: string[],
+) {
+  const filled = items.map((item) => item.trim()).filter(Boolean);
+  for (const item of filled) {
+    if (item.length > QUALIFICATION_MAX_LENGTH) {
+      errors.push(
+        `${kind} entries must be ${QUALIFICATION_MAX_LENGTH} characters or fewer`,
+      );
+      break;
+    }
+  }
+  const keys = filled.map((item) => item.toLowerCase());
+  if (hasDuplicateValues(keys)) {
+    errors.push(`${kind} entries must be unique`);
   }
 }
 
@@ -83,19 +106,8 @@ export function step1Errors(draft: JoinDraft): string[] {
     errors.push("License states must be unique");
   }
 
-  const requiresSupervisor = needsSupervisor(draft.credential);
-  const supervisorName = draft.supervisorName.trim();
-  const supervisorLicense = draft.supervisorLicense.trim();
-
-  if (requiresSupervisor) {
-    if (!supervisorName || !supervisorLicense) {
-      errors.push(
-        "Since you selected an associate/pre-licensure credential, please add your supervising clinician's name before submitting.",
-      );
-    }
-  } else if (supervisorName || supervisorLicense) {
-    errors.push("Supervisor fields are only used for associate credentials");
-  }
+  qualificationListErrors(draft.education, "Education", errors);
+  qualificationListErrors(draft.credentials, "Credential", errors);
 
   return errors;
 }
@@ -223,12 +235,6 @@ export function continueHint(step: 1 | 2 | 3 | 4, draft: JoinDraft): string {
       if (!draft.name.trim()) {
         return "Add your name to continue";
       }
-      if (
-        needsSupervisor(draft.credential) &&
-        (!draft.supervisorName.trim() || !draft.supervisorLicense.trim())
-      ) {
-        return "Add your supervising clinician's name before submitting.";
-      }
       const hasLicense = draft.licenses.some(
         (license) => license.number.trim() && license.state.trim(),
       );
@@ -269,8 +275,6 @@ export function buildJoinPayload(draft: JoinDraft) {
     throw new Error("Join draft is incomplete");
   }
 
-  const requiresSupervisor = needsSupervisor(draft.credential);
-
   return {
     name: draft.name.trim(),
     email: draft.email.trim(),
@@ -283,10 +287,6 @@ export function buildJoinPayload(draft: JoinDraft) {
     open_to_new_clients: draft.openToNewClients,
     virtual_practice: draft.virtual,
     in_person_practice: draft.inPerson,
-    supervisor_name: requiresSupervisor ? draft.supervisorName.trim() : null,
-    supervisor_license: requiresSupervisor
-      ? draft.supervisorLicense.trim()
-      : null,
     superbill: draft.insurance.some((label) => /superbill/i.test(label)),
     licenses: draft.licenses
       .filter((license) => license.number.trim() && license.state.trim())
@@ -336,6 +336,7 @@ export function buildJoinPayload(draft: JoinDraft) {
         answer: card.answer.trim(),
         tag: card.tag,
       })),
+    qualifications: qualificationRows(draft.education, draft.credentials),
     feedback: draft.feedback.trim() || null,
   };
 }

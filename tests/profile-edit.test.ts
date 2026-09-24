@@ -21,11 +21,10 @@ const data: TherapistProfileData = {
   videoUrl: null,
   credential: "LMFT",
   years: 9,
-  virtual: true,
-  inPerson: false,
-  supervisorName: null,
-  supervisorLicense: null,
-  showSupervisor: false,
+    virtual: true,
+    inPerson: false,
+    education: ["B.A. Psychology"],
+    credentials: ["EMDR trained"],
   slidingScaleMinCents: null,
   slidingScaleMaxCents: null,
   superbill: false,
@@ -66,6 +65,9 @@ describe("profile edit control", () => {
       }),
     );
     expect(html).toContain("Edit profile");
+    expect(html).toContain("B.A. Psychology");
+    expect(html).toContain("EMDR trained");
+    expect(html).not.toContain("Practicing under supervision");
     expect(html).toContain(routes.joinEdit);
   });
 

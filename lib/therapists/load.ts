@@ -6,10 +6,7 @@ import {
   storagePublicUrl,
   yearsPracticing,
 } from "./display";
-import { needsSupervisor } from "./credential";
 import { resolveTherapistId } from "./ids";
-
-export { needsSupervisor } from "./credential";
 
 export type ProfileLicense = {
   number: string;
@@ -61,9 +58,8 @@ export type TherapistProfileData = {
   years: number | null;
   virtual: boolean;
   inPerson: boolean;
-  supervisorName: string | null;
-  supervisorLicense: string | null;
-  showSupervisor: boolean;
+  education: string[];
+  credentials: string[];
   slidingScaleMinCents: number | null;
   slidingScaleMaxCents: number | null;
   superbill: boolean;
@@ -236,6 +232,7 @@ export async function fetchTherapistProfile(
     profileRes,
     therapistRes,
     licensesRes,
+    qualificationsRes,
     ratesRes,
     tagsRes,
     itemsRes,
@@ -244,6 +241,11 @@ export async function fetchTherapistProfile(
     supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
     supabase.from("therapists").select("*").eq("profile_id", id).maybeSingle(),
     supabase.from("licenses").select("number, state").eq("therapist_id", id),
+    supabase
+      .from("qualifications")
+      .select("kind, label")
+      .eq("therapist_id", id)
+      .order("position", { ascending: true }),
     supabase
       .from("rates")
       .select("service_type, duration_minutes, price_cents")
@@ -297,9 +299,14 @@ export async function fetchTherapistProfile(
     years: yearsPracticing(therapist.start_date_of_practice),
     virtual: therapist.virtual_practice,
     inPerson: therapist.in_person_practice,
-    supervisorName: therapist.supervisor_name,
-    supervisorLicense: therapist.supervisor_license,
-    showSupervisor: needsSupervisor(therapist.credential),
+    education: labelsOf(
+      (qualificationsRes.data ?? []) as ProfileTag[],
+      "education",
+    ),
+    credentials: labelsOf(
+      (qualificationsRes.data ?? []) as ProfileTag[],
+      "credential",
+    ),
     slidingScaleMinCents: therapist.sliding_scale_min_cents,
     slidingScaleMaxCents: therapist.sliding_scale_max_cents,
     superbill: therapist.superbill,

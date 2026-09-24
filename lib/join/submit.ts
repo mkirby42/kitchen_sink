@@ -16,14 +16,13 @@ export function toRpcArgs(payload: JoinPayload) {
     p_open_to_new_clients: payload.open_to_new_clients,
     p_virtual: payload.virtual_practice,
     p_in_person: payload.in_person_practice,
-    p_supervisor_name: payload.supervisor_name,
-    p_supervisor_license: payload.supervisor_license,
     p_superbill: payload.superbill,
     p_licenses: payload.licenses,
     p_rates: payload.rates,
     p_location: payload.location,
     p_tags: payload.tags,
     p_items: payload.items,
+    p_qualifications: payload.qualifications,
     p_feedback: payload.feedback,
   };
 }
