@@ -21,6 +21,18 @@ export function homeCtas(state: {
       label: "Upload therapist media",
       variant: "secondary",
     });
+    ctas.push({
+      href: routes.join,
+      label: "Join as a therapist",
+      variant: "secondary",
+    });
+    if (state.therapistId) {
+      ctas.push({
+        href: routes.therapist(state.therapistId),
+        label: "My profile",
+        variant: "secondary",
+      });
+    }
     return ctas;
   }
 

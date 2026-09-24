@@ -39,15 +39,18 @@ export function SiteHeader({
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle();
+      const [{ data: profile }, { data: therapist }] = await Promise.all([
+        supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
+        supabase
+          .from("therapists")
+          .select("profile_id")
+          .eq("profile_id", user.id)
+          .maybeSingle(),
+      ]);
 
       const role = parseProfileRole(profile?.role);
 
-      setNavUser({ id: user.id, role });
+      setNavUser({ id: user.id, role, hasTherapist: Boolean(therapist) });
     }
 
     void loadNavUser();
@@ -73,8 +76,12 @@ export function SiteHeader({
     return null;
   }
 
-  const therapist = navUser?.role === "therapist" ? navUser : null;
   const admin = navUser?.role === "admin" ? navUser : null;
+  const therapist =
+    navUser &&
+    (navUser.role === "therapist" || (admin && navUser.hasTherapist))
+      ? navUser
+      : null;
 
   return (
     <header className="border-b border-line bg-paper">
@@ -112,7 +119,7 @@ export function SiteHeader({
               Uploads
             </Link>
           ) : null}
-          {!navUser ? (
+          {!navUser || admin ? (
             <Link
               href={routes.join}
               className="rounded-full bg-clay px-4 py-2 font-medium text-paper hover:bg-clay-dark"

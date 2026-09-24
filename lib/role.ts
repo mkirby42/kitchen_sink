@@ -8,3 +8,8 @@ export function parseProfileRole(
   }
   return null;
 }
+
+/** Public therapist pages. An admin may publish one test profile and keep admin. */
+export function isPublicTherapistRole(role: string | null | undefined) {
+  return role === "therapist" || role === "admin";
+}

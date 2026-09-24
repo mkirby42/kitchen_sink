@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isPublicTherapistRole } from "@/lib/role";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import {
   formatUsdFromCents,
@@ -360,7 +361,7 @@ export async function fetchTherapistProfile(
   const profile = profileRes.data;
   const therapist = therapistRes.data;
   if (!profile || !therapist) return null;
-  if (profile.role !== "therapist") return null;
+  if (!isPublicTherapistRole(profile.role)) return null;
   if (!therapist.open_to_new_clients) return null;
 
   const tags = (tagsRes.data ?? []) as ProfileTag[];

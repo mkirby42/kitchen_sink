@@ -124,12 +124,16 @@ export function JoinWizard({
   initialStep,
   initialDraft,
   editing = false,
+  notice,
+  adminTest = false,
 }: {
   userId: string;
   email: string;
   initialStep: Step;
   initialDraft?: JoinDraft;
   editing?: boolean;
+  notice?: string;
+  adminTest?: boolean;
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initialStep);
@@ -228,6 +232,11 @@ export function JoinWizard({
         </div>
       }
     >
+      {notice ? (
+        <p className="mb-6 rounded-2xl bg-cream px-4 py-3 text-sm text-ink">
+          {notice}
+        </p>
+      ) : null}
       <Heading step={step} />
       {step === 1 ? (
         <JoinStep1 draft={draft} setDraft={setDraft} />
@@ -247,7 +256,7 @@ export function JoinWizard({
           hideFeedback={editing}
         />
       )}
-      {editing ? (
+      {editing && !adminTest ? (
         <DeleteProfile
           userId={userId}
           photoKey={draft.photoKey}

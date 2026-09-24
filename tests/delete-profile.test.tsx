@@ -109,6 +109,17 @@ describe("delete confirmation", () => {
       }),
     );
     expect(joining).not.toContain("Delete profile");
+
+    const adminEdit = renderToStaticMarkup(
+      createElement(JoinWizard, {
+        userId,
+        email: "ops@example.com",
+        initialStep: 1,
+        editing: true,
+        adminTest: true,
+      }),
+    );
+    expect(adminEdit).not.toContain("Delete profile");
   });
 
   it("lands on a confirmation with a way back and a way to join again", () => {
