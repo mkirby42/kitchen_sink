@@ -17,6 +17,7 @@ The current app does **not** book sessions or broker intros. Those are on the ba
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
 6. **CI** — typecheck + lint + tests on every PR. Preview deploy.
 7. **Admin helper upload** — `/admin/media`. An ops admin signs in, picks a therapist (including not open to new clients), and uploads a photo and/or intro video into that therapist's existing storage prefix. Same buckets, mime types, and size limits as join. Only `photo_key` or `video_key` changes.
+8. **Discoverability** — `/robots.txt` allows search crawlers and these AI user-agents: GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, Claude-User, PerplexityBot, Perplexity-User, Google-Extended. It disallows `/admin` only. `/sitemap.xml` lists `/`, `/find`, `/join`, and therapists open to new clients. `/llms.txt` is a plain-language summary of the product. Public pages set a canonical URL on `https://kitchen-sink-tau.vercel.app` (override with `SITE_URL`).
 
 ## Not built yet (backlog, allowed)
 
@@ -201,7 +202,7 @@ Return search cards in **one round trip** (join photo URL, credential, years, a 
 - Supabase hosted Postgres + Auth + Storage
 - Vercel
 
-App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated), `/admin/media` ops helper upload (auth + admin role). `/matches` redirects home.
+App routes: `/` home, `/find` search, `/t/[id]` profile, `/join` therapist onboarding (auth gated), `/admin/media` ops helper upload (auth + admin role). `/matches` redirects home. `/robots.txt`, `/sitemap.xml`, and `/llms.txt` are public discoverability files.
 
 ## Performance
 

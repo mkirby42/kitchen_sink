@@ -7,6 +7,9 @@ import { parseFindSearchParams, searchTherapists } from "@/lib/search/rpc";
 
 export const metadata: Metadata = {
   title: "Find a therapist",
+  description:
+    "Search therapists by specialty, insurance, virtual or in-person, and license state.",
+  alternates: { canonical: "/find" },
 };
 
 type FindPageProps = {
