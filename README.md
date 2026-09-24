@@ -29,6 +29,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/t/[id]` | Therapist profile (owner sees **Edit**) |
 | `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile |
 | `/admin/media` | Ops helper upload: photo + intro video for an existing therapist (admin) |
+| `/robots.txt` | Crawler rules (search + named AI bots allowed; `/admin` disallowed) |
+| `/sitemap.xml` | Public URLs: home, find, join, open therapist profiles |
+| `/llms.txt` | Plain-language summary for AI tools |
 
 ```bash
 npm run lint && npm run typecheck && npm test && npm run build

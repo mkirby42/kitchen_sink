@@ -10,6 +10,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Join as a therapist",
+  description:
+    "Publish a therapist profile with a photo, credentials, rates, and contact info.",
+  alternates: { canonical: "/join" },
 };
 
 export default async function JoinPage({

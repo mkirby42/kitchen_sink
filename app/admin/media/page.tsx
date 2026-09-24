@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Upload media",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "/admin/media" },
 };
 
 export default async function AdminMediaPage() {

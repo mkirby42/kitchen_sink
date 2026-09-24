@@ -6,6 +6,7 @@ import {
 } from "@/components/profile/TherapistProfile";
 import { parseFindSearchParams } from "@/lib/search/rpc";
 import { supabasePublicConfig } from "@/lib/supabase/env";
+import { therapistMetaDescription } from "@/lib/site";
 import { loadTherapistProfile } from "@/lib/therapists/load";
 
 async function loadIsOwner(therapistId: string): Promise<boolean> {
@@ -32,8 +33,23 @@ export async function generateMetadata({
 }: ProfilePageProps): Promise<Metadata> {
   const { id } = await params;
   const data = await loadTherapistProfile(id);
-  if (!data) return { title: "Therapist not found" };
-  return { title: data.name };
+  if (!data) {
+    return {
+      title: "Therapist not found",
+      description: "That therapist profile is not available.",
+      robots: { index: false, follow: true },
+      alternates: { canonical: `/t/${id}` },
+    };
+  }
+  return {
+    title: data.name,
+    description: therapistMetaDescription({
+      name: data.name,
+      credential: data.credential,
+      specialties: data.specialties,
+    }),
+    alternates: { canonical: `/t/${data.id}` },
+  };
 }
 
 export default async function TherapistProfilePage({
