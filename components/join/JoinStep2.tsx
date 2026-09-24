@@ -6,6 +6,7 @@ import type { JoinDraft } from "@/lib/join/types";
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { createClient } from "@/lib/supabase/client";
 import { storagePublicUrl } from "@/lib/therapists/display";
+import { UploadHelp } from "./UploadHelp";
 
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
@@ -132,6 +133,7 @@ export function JoinStep2({
   );
   const [uploading, setUploading] = useState({ photo: false, video: false });
   const [error, setError] = useState("");
+  const [uploadTrouble, setUploadTrouble] = useState(0);
 
   useEffect(
     () => () => {
@@ -197,6 +199,7 @@ export function JoinStep2({
           ? uploadError.message
           : `Unable to upload ${kind}.`,
       );
+      setUploadTrouble((count) => count + 1);
     } finally {
       setUploading((current) => ({ ...current, [kind]: false }));
     }
@@ -235,6 +238,7 @@ export function JoinStep2({
           {error}
         </p>
       ) : null}
+      <UploadHelp troubleToken={uploadTrouble} />
     </div>
   );
 }
