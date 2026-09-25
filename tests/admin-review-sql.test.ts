@@ -5,16 +5,20 @@ import { describe, expect, it } from "vitest";
 const migration = readFileSync(
   resolve(
     process.cwd(),
-    "supabase/migrations/20260925160000_admin_client_reviews.sql",
+    "supabase/migrations/20260925154000_admin_client_reviews.sql",
   ),
   "utf8",
 );
 
 describe("admin client reviews", () => {
-  it("sorts after the directory listing migration", () => {
+  it("sorts between directory listing and review moderation", () => {
     expect(
       "20260925153000_therapist_directory_listing.sql" <
-        "20260925160000_admin_client_reviews.sql",
+        "20260925154000_admin_client_reviews.sql",
+    ).toBe(true);
+    expect(
+      "20260925154000_admin_client_reviews.sql" <
+        "20260925160000_review_moderation.sql",
     ).toBe(true);
   });
 
