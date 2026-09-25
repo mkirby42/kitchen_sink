@@ -3,112 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { JoinDraft } from "@/lib/join/types";
-import { mediaFileError, PHOTO_ACCEPT, VIDEO_ACCEPT } from "@/lib/join/media";
+import { prepareJoinPhoto } from "@/lib/join/compress-photo";
+import {
+  PHOTO_ACCEPT,
+  PHOTO_UNREADABLE,
+  VIDEO_ACCEPT,
+  joinMediaRejection,
+  uploadFailureMessage,
+} from "@/lib/join/media";
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { createClient } from "@/lib/supabase/client";
 import { storagePublicUrl } from "@/lib/therapists/display";
+import { IntroRecorder } from "./IntroRecorder";
+import { MediaSlot } from "./MediaSlot";
 import { UploadHelp } from "./UploadHelp";
-
-function MediaSlot({
-  kind,
-  preview,
-  uploaded,
-  uploading,
-  accept,
-  helpers,
-  onFile,
-}: {
-  kind: "photo" | "video";
-  preview: string | null;
-  uploaded: boolean;
-  uploading: boolean;
-  accept: string;
-  helpers: string[];
-  onFile: (file?: File) => void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const noun = kind === "photo" ? "photo" : "video";
-
-  return (
-    <section className="space-y-3">
-      {kind === "video" ? (
-        <p className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Intro video
-        </p>
-      ) : null}
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          aria-label={`Choose a ${noun}`}
-          disabled={uploading}
-          onClick={() => inputRef.current?.click()}
-          className="grid size-[4.5rem] shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-clay/45 bg-cream disabled:opacity-60"
-        >
-          {preview ? (
-            kind === "photo" ? (
-              // Blob previews cannot use next/image.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={preview}
-                alt="Selected profile preview"
-                className="size-full object-cover"
-              />
-            ) : (
-              <video
-                src={preview}
-                muted
-                playsInline
-                className="size-full object-cover"
-              />
-            )
-          ) : (
-            <span className="text-2xl text-clay/70" aria-hidden>
-              {kind === "photo" ? "+" : "▶"}
-            </span>
-          )}
-        </button>
-        <div>
-          <button
-            type="button"
-            disabled={uploading}
-            onClick={() => inputRef.current?.click()}
-            className="rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium hover:border-ink/20 disabled:opacity-60"
-          >
-            {uploading
-              ? `Uploading ${noun}…`
-              : preview
-                ? `Change ${noun}…`
-                : `Choose a ${noun}…`}
-          </button>
-          <p className="mt-2 text-sm text-mute">
-            {uploaded
-              ? `${kind === "photo" ? "Photo" : "Video"} uploaded.`
-              : `No ${noun} chosen yet.`}
-          </p>
-        </div>
-      </div>
-      {helpers.map((text) => (
-        <p
-          key={text}
-          className="rounded-2xl bg-cream px-5 py-4 text-center text-sm leading-6 text-mute"
-        >
-          {text}
-        </p>
-      ))}
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        disabled={uploading}
-        onChange={(event) => {
-          onFile(event.target.files?.[0]);
-          event.target.value = "";
-        }}
-        className="sr-only"
-      />
-    </section>
-  );
-}
 
 export function JoinStep2({
   userId,
@@ -128,6 +36,8 @@ export function JoinStep2({
     () => storagePublicUrl("videos", draft.videoKey),
   );
   const [uploading, setUploading] = useState({ photo: false, video: false });
+  const [preparingPhoto, setPreparingPhoto] = useState(false);
+  const requestRef = useRef({ photo: 0, video: 0 });
   const [error, setError] = useState("");
   const [uploadTrouble, setUploadTrouble] = useState(0);
 
@@ -146,21 +56,47 @@ export function JoinStep2({
   );
 
   useEffect(() => {
-    onBusyChange?.(uploading.photo || uploading.video);
+    onBusyChange?.(uploading.photo || uploading.video || preparingPhoto);
     return () => onBusyChange?.(false);
-  }, [onBusyChange, uploading.photo, uploading.video]);
+  }, [onBusyChange, preparingPhoto, uploading.photo, uploading.video]);
+
+  function fail(message: string) {
+    setError(message);
+    setUploadTrouble((count) => count + 1);
+  }
 
   async function chooseFile(kind: "photo" | "video", file?: File) {
     if (!file) return;
+    const request = ++requestRef.current[kind];
+    const isCurrent = () => requestRef.current[kind] === request;
+    setError("");
 
-    const fileError = mediaFileError(kind, file);
+    let ready = file;
+    if (kind === "photo") {
+      setPreparingPhoto(true);
+      try {
+        ready = await prepareJoinPhoto(file);
+      } catch (prepareError) {
+        if (!isCurrent()) return;
+        fail(
+          prepareError instanceof Error ? prepareError.message : PHOTO_UNREADABLE,
+        );
+        setUploading((state) => ({ ...state, [kind]: false }));
+        return;
+      } finally {
+        if (isCurrent()) setPreparingPhoto(false);
+      }
+    }
+
+    if (!isCurrent()) return;
+    const fileError = joinMediaRejection(kind, ready);
     if (fileError) {
-      setError(fileError);
+      fail(fileError);
+      setUploading((state) => ({ ...state, [kind]: false }));
       return;
     }
 
-    setError("");
-    const previewUrl = URL.createObjectURL(file);
+    const previewUrl = URL.createObjectURL(ready);
     if (kind === "photo") setPhotoPreview(previewUrl);
     else setVideoPreview(previewUrl);
 
@@ -171,20 +107,17 @@ export function JoinStep2({
     setUploading((current) => ({ ...current, [kind]: true }));
 
     try {
-      const path = await uploadJoinMedia(createClient(), userId, kind, file);
-      setDraft((current) => ({
-        ...current,
+      const path = await uploadJoinMedia(createClient(), userId, kind, ready);
+      if (!isCurrent()) return;
+      setDraft((draft) => ({
+        ...draft,
         [kind === "photo" ? "photoKey" : "videoKey"]: path,
       }));
     } catch (uploadError) {
-      setError(
-        uploadError instanceof Error
-          ? uploadError.message
-          : `Unable to upload ${kind}.`,
-      );
-      setUploadTrouble((count) => count + 1);
+      if (!isCurrent()) return;
+      fail(uploadFailureMessage(kind, uploadError));
     } finally {
-      setUploading((current) => ({ ...current, [kind]: false }));
+      if (isCurrent()) setUploading((state) => ({ ...state, [kind]: false }));
     }
   }
 
@@ -194,11 +127,13 @@ export function JoinStep2({
         kind="photo"
         preview={photoPreview}
         uploaded={Boolean(draft.photoKey)}
-        uploading={uploading.photo}
+        uploading={uploading.photo || preparingPhoto}
+        busyLabel={preparingPhoto ? "Resizing photo…" : undefined}
         accept={PHOTO_ACCEPT}
         helpers={[
           "A clear, well-lit headshot — just you, looking at the camera — works best.",
           "JPEG, PNG, WebP, or GIF · up to 5MB. This is the photo clients see first on your profile.",
+          "Large photos are resized in your browser so they can upload.",
         ]}
         onFile={(file) => void chooseFile("photo", file)}
       />
@@ -213,6 +148,11 @@ export function JoinStep2({
           "Optional. One short intro clip. We'll play it as uploaded on your public profile — no editing.",
           "MP4, WebM, or MOV · up to 50MB.",
         ]}
+        onFile={(file) => void chooseFile("video", file)}
+      />
+
+      <IntroRecorder
+        disabled={uploading.video}
         onFile={(file) => void chooseFile("video", file)}
       />
 
