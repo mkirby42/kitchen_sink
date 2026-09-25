@@ -7,6 +7,7 @@ import {
   isTherapistMediaKey,
   type AdminTherapist,
 } from "@/lib/admin/media";
+import { DirectoryListing } from "@/components/admin/DirectoryListing";
 import { MediaField } from "@/components/admin/MediaField";
 import { mediaFileError } from "@/lib/join/media";
 import { uploadJoinMedia } from "@/lib/join/submit";
@@ -38,14 +39,43 @@ export function HelperUpload({
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId);
   const [uploading, setUploading] = useState<"photo" | "video" | null>(null);
+  const [savingListing, setSavingListing] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const busy = uploading !== null || savingListing;
 
   const visible = useMemo(
     () => filterTherapists(therapists, query),
     [therapists, query],
   );
   const selected = therapists.find((row) => row.id === selectedId) ?? null;
+
+  async function setDirectoryListed(listed: boolean) {
+    if (!selected || busy) return;
+    setError("");
+    setNotice("");
+    setSavingListing(true);
+    try {
+      const supabase = createClient();
+      const saved = await supabase.rpc("admin_set_therapist_listed", {
+        p_therapist_id: selected.id,
+        p_listed: listed,
+      });
+      if (saved.error) throw saved.error;
+      setTherapists((current) =>
+        current.map((row) => (row.id === selected.id ? { ...row, listed } : row)),
+      );
+      setNotice(
+        listed
+          ? `${selected.name} is on Find.`
+          : `${selected.name} is hidden from Find.`,
+      );
+    } catch (toggleError) {
+      setError(errorMessage(toggleError, "Unable to update the listing."));
+    } finally {
+      setSavingListing(false);
+    }
+  }
 
   async function chooseFile(kind: "photo" | "video", file?: File) {
     if (!file || !selected) return;
@@ -149,6 +179,7 @@ export function HelperUpload({
                       .join(" · ") || "No email on file"}
                     {therapist.videoKey ? " · Intro video" : " · No intro video"}
                     {therapist.openToNewClients ? "" : " · Not open to new clients"}
+                    {therapist.listed ? "" : " · Hidden from Find"}
                   </span>
                 </button>
               </li>
@@ -181,15 +212,21 @@ export function HelperUpload({
             uploaded={Boolean(selected.photoKey)}
             preview={storagePublicUrl("photos", selected.photoKey)}
             busy={uploading === "photo"}
-            disabled={uploading !== null}
+            disabled={busy}
             onFile={(file) => void chooseFile("photo", file)}
+          />
+          <DirectoryListing
+            listed={selected.listed}
+            busy={savingListing}
+            disabled={busy}
+            onToggle={() => void setDirectoryListed(!selected.listed)}
           />
           <MediaField
             kind="video"
             uploaded={Boolean(selected.videoKey)}
             preview={storagePublicUrl("videos", selected.videoKey)}
             busy={uploading === "video"}
-            disabled={uploading !== null}
+            disabled={busy}
             onFile={(file) => void chooseFile("video", file)}
           />
         </section>

@@ -22,6 +22,7 @@ One round trip. Filter in SQL, not JS. Page size 24.
 Typical predicates:
 
 - `open_to_new_clients = true`
+- `listed = true` (hidden profiles stay in the table; Find, sitemap, and `/t/[id]` omit them)
 - virtual / in-person flags
 - selected tag labels overlap therapist tags (specialty or insurance)
 - `licenses.state` if a state is selected
@@ -32,6 +33,7 @@ Typical predicates:
 - `(kind, label, profile_id)` on `tags`
 - `licenses (therapist_id)`, `licenses (state)`
 - partial `therapists (profile_id) where open_to_new_clients`
+- partial `therapists (profile_id) where open_to_new_clients and listed`
 
 If explain shows a slow join, add `therapists.specialty_labels text[]` + GIN and keep tags in sync.
 
