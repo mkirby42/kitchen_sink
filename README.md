@@ -77,12 +77,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...   # anon / publishable, not service_
 
 Then `npm install && npm run dev` and follow Option A on localhost.
 
-Ops helper login, after the admin migration: `ops@example.com` / `seed-only` at `/admin/media`. That account is not a `@kitchensink.demo` seed profile.
+`/admin/media` and `/admin/reviews` need an admin you create yourself. In the Supabase Dashboard: Authentication → Users (confirm the email), then grant `role = admin` in the SQL editor. Never commit a password. Migrations do not ship a shared ops login.
 
 ### Option C — empty Supabase project
 
 1. Create a project. Enable email Auth. Create public Storage buckets `photos` and `videos`.
-2. Apply `supabase/migrations/` in filename order (`supabase db push` against the linked project, or the SQL editor). The last seed-related migration deletes the demo accounts.
+2. Apply `supabase/migrations/` in filename order (`supabase db push` against the linked project, or the SQL editor). The demo-account wipe runs in that history. `20260925170000_remove_seeded_ops_admin.sql` deletes a previously seeded ops admin when its id and email both still match, and a fresh apply does not create one. Grant your own admin in the Dashboard. Never commit a password.
 3. Put the two public env vars in `.env.local`.
 4. `npm run dev`. Join as a therapist to put a real profile in search.
 
