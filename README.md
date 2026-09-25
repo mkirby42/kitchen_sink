@@ -60,7 +60,7 @@ flowchart LR
 ### Option A — live app
 
 1. Open [kitchen-sink-tau.vercel.app/find](https://kitchen-sink-tau.vercel.app/find).
-2. Results are therapists who joined and are open to new clients. Demo seed profiles (`*@kitchensink.demo`) are not part of that list once the removal migration has been applied.
+2. Results are therapists who joined, are open to new clients, and are listed. Demo seed profiles (`*@kitchensink.demo`) are not part of that list once the removal migration has been applied. Hidden profiles (`therapists.listed = false`) stay in the database and off Find.
 
 ### Option B — local app, same hosted data
 

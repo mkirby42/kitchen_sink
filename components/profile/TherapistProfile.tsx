@@ -336,8 +336,8 @@ export function ProfileNotFound({ backHref }: { backHref: string }) {
         We couldn&apos;t find that therapist.
       </h1>
       <p className="mt-4 text-mute">
-        They may have closed their practice to new clients, or the link is
-        out of date.
+        They may have closed their practice to new clients, be hidden from
+        Find, or the link is out of date.
       </p>
       <Link
         href={backHref}

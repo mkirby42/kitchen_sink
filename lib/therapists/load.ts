@@ -1,6 +1,7 @@
 import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { isPublicTherapistRole } from "@/lib/role";
+import { isDirectoryListed } from "@/lib/therapists/listing";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import {
   formatUsdFromCents,
@@ -363,6 +364,7 @@ export async function fetchTherapistProfile(
   if (!profile || !therapist) return null;
   if (!isPublicTherapistRole(profile.role)) return null;
   if (!therapist.open_to_new_clients) return null;
+  if (!isDirectoryListed(therapist.listed)) return null;
 
   const tags = (tagsRes.data ?? []) as ProfileTag[];
   const outreach = labelsOf(tags, "outreach");

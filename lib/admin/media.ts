@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isDirectoryListed } from "@/lib/therapists/listing";
 
 export type AdminTherapist = {
   id: string;
@@ -6,6 +7,7 @@ export type AdminTherapist = {
   email: string | null;
   credential: string | null;
   openToNewClients: boolean;
+  listed: boolean;
   photoKey: string | null;
   videoKey: string | null;
 };
@@ -13,6 +15,7 @@ export type AdminTherapist = {
 type PracticeRow = {
   credential: string | null;
   open_to_new_clients: boolean;
+  listed?: boolean | null;
 };
 
 export type TherapistMediaRow = {
@@ -60,6 +63,7 @@ export function normalizeAdminTherapists(rows: TherapistMediaRow[]) {
       email: row.email,
       credential: practice.credential,
       openToNewClients: practice.open_to_new_clients,
+      listed: isDirectoryListed(practice.listed),
       photoKey: row.photo_key,
       videoKey: row.video_key,
     });
@@ -71,9 +75,9 @@ export async function listAdminTherapists(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, name, email, photo_key, video_key, therapists!inner(credential, open_to_new_clients)",
+      "id, name, email, photo_key, video_key, therapists!inner(credential, open_to_new_clients, listed)",
     )
-    .eq("role", "therapist")
+    .in("role", ["therapist", "admin"])
     .order("name");
 
   if (error) throw error;

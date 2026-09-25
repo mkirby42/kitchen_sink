@@ -163,6 +163,7 @@ export async function indexableTherapistIds(): Promise<string[]> {
       .from("therapists")
       .select("profile_id")
       .eq("open_to_new_clients", true)
+      .eq("listed", true)
       .order("profile_id", { ascending: true })
       .limit(1000);
     if (error || !data) return [];
@@ -201,7 +202,7 @@ export function llmsTxt(origin: string): string {
 
 > Kitchen Sink (Talk Shoppe) is a therapist-matching site. People look up therapists by the tags they need. Therapists publish a profile with a photo, an optional intro video, specialties, insurance, licenses, rates, and contact details.
 
-A match is overlap. The person selects tags (for example a specialty or an insurance plan). The directory lists therapists who have at least one of those tags, ranked by how many tags overlap. Session format (virtual, in-person, or both) and license state apply when those filters are set. With no filters, the list is therapists who are open to new clients.
+A match is overlap. The person selects tags (for example a specialty or an insurance plan). The directory lists therapists who have at least one of those tags, ranked by how many tags overlap. Session format (virtual, in-person, or both) and license state apply when those filters are set. With no filters, the list is therapists who are open to new clients and listed in the directory.
 
 The site does not book appointments or take payment. To reach a therapist, use the email, phone, or text number on their profile.
 
@@ -211,7 +212,7 @@ A signed-in therapist can delete their own profile from the edit screen. That re
 
 ${pages}
 
-Therapist profiles are public while that therapist is open to new clients. Each one lives at \`${origin}/t/{id}\` and is listed in the sitemap (${origin}/sitemap.xml).
+Therapist profiles are public while that therapist is open to new clients and listed in the directory. A hidden listing is left off Find and its public page. Each listed profile lives at \`${origin}/t/{id}\` and is in the sitemap (${origin}/sitemap.xml).
 
 ## Profile contents
 

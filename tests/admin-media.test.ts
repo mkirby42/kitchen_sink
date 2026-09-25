@@ -17,6 +17,7 @@ const rows: AdminTherapist[] = [
     email: "maya@kitchensink.demo",
     credential: "LMFT",
     openToNewClients: true,
+    listed: true,
     photoKey: `${MAYA}/photo.jpg`,
     videoKey: null,
   },
@@ -26,6 +27,7 @@ const rows: AdminTherapist[] = [
     email: "jordan@kitchensink.demo",
     credential: "LCSW",
     openToNewClients: false,
+    listed: true,
     photoKey: null,
     videoKey: null,
   },
@@ -72,7 +74,7 @@ describe("admin helper media", () => {
         email: "jordan@kitchensink.demo",
         photo_key: null,
         video_key: null,
-        therapists: [{ credential: "LCSW", open_to_new_clients: false }],
+        therapists: [{ credential: "LCSW", open_to_new_clients: false, listed: false }],
       },
       {
         id: MAYA,
@@ -88,6 +90,8 @@ describe("admin helper media", () => {
       "Jordan Lee",
     ]);
     expect(normalized[1]?.credential).toBe("LCSW");
+    expect(normalized[0]?.listed).toBe(true);
+    expect(normalized[1]?.listed).toBe(false);
   });
 
   it("treats admin as a profile role", () => {

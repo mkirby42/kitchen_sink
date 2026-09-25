@@ -16,6 +16,7 @@ const therapist: AdminTherapist = {
   email: "maya@kitchensink.demo",
   credential: "LMFT",
   openToNewClients: true,
+  listed: true,
   photoKey: "11111111-1111-4111-8111-111111111111/photo.jpg",
   videoKey: null,
 };
@@ -33,6 +34,8 @@ describe("admin helper upload UI", () => {
     const selected = renderToStaticMarkup(
       <HelperUpload therapists={[therapist]} initialSelectedId={therapist.id} />,
     );
+    expect(selected).toContain("Shown on Find");
+    expect(selected).toContain("Hide from Find");
     expect(selected).toContain("Replace photo…");
     expect(selected).toContain("Choose a video…");
     expect(selected).toContain("JPEG, PNG, WebP, or GIF · up to 5MB.");
