@@ -1,4 +1,5 @@
 import { categoryAverages, formatRating, reviewAuthorLabel, reviewMeta } from "@/lib/reviews/format";
+import { publishedReviews } from "@/lib/reviews/publish";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import type { ProfileReview } from "@/lib/therapists/load";
 import { ReviewComposer } from "./ReviewComposer";
@@ -7,18 +8,22 @@ export function ReviewsPanel({
   therapistId,
   therapistName,
   reviews,
+  pendingReview = null,
   average,
   viewer,
 }: {
   therapistId: string;
   therapistName: string;
   reviews: ProfileReview[];
+  pendingReview?: ProfileReview | null;
   average: number | null;
   viewer: ReviewViewer;
 }) {
   const canReview = !viewer.isOwner && viewer.role !== "therapist";
-  const mine = reviews.find((review) => review.mine) ?? null;
-  const categories = categoryAverages(reviews).filter((row) => row.average != null);
+  const published = publishedReviews(reviews);
+  const mine =
+    pendingReview ?? published.find((review) => review.mine) ?? null;
+  const categories = categoryAverages(published).filter((row) => row.average != null);
 
   return (
     <div>
@@ -31,7 +36,7 @@ export function ReviewsPanel({
         />
       ) : null}
 
-      {reviews.length === 0 ? (
+      {published.length === 0 ? (
         <p className={canReview ? "mt-6 text-mute" : "text-mute"}>No reviews yet.</p>
       ) : (
         <div className={canReview ? "mt-10" : undefined}>
@@ -44,8 +49,8 @@ export function ReviewsPanel({
             <div>
               {average != null ? <StarRow value={average} /> : null}
               <p className="text-sm text-mute">
-                Based on {reviews.length} client{" "}
-                {reviews.length === 1 ? "review" : "reviews"}
+                Based on {published.length} client{" "}
+                {published.length === 1 ? "review" : "reviews"}
               </p>
             </div>
           </div>
@@ -74,7 +79,7 @@ export function ReviewsPanel({
             </ul>
           ) : null}
           <ul className="mt-6 space-y-3">
-            {reviews.map((review) => {
+            {published.map((review) => {
               const meta = reviewMeta(review);
               return (
                 <li

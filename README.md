@@ -29,6 +29,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/t/[id]` | Therapist profile (owner sees **Edit**) |
 | `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile |
 | `/admin/media` | Ops helper upload: photo + intro video for an existing therapist (admin) |
+| `/admin/reviews` | Ops review queue: approve to publish, or reject and hard-delete (admin) |
 | `/robots.txt` | Crawler rules (search + named AI bots allowed; `/admin` disallowed) |
 | `/sitemap.xml` | Public URLs: home, find, join, open therapist profiles |
 | `/llms.txt` | Plain-language summary for AI tools |
@@ -104,7 +105,7 @@ License numbers, phones, and addresses are fake. Reviews are fiction.
 ## Known limitations (today)
 
 - No booking, calendars, or in-app messaging. Contact buttons are `mailto:` / `tel:` from listed outreach.
-- Reviews are one post per signed-in patient (name or anonymous, three required ratings, optional note). Demo seed reviews are removed with the demo profiles. No approval queue.
+- Reviews are one post per signed-in patient (name or anonymous, three required ratings, optional note). The form warns against personal health information. New reviews stay pending until an admin approves them at `/admin/reviews`. Reject and delete remove the row; nothing archives it. Demo seed reviews are removed with the demo profiles.
 - Search is OR overlap (some tags), not AND. Results cap at 24; no pagination UI.
 - In-person location is stored; search uses license state, not maps or distance.
 - One intro clip per therapist, played as uploaded. No transcoding.

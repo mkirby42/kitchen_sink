@@ -232,6 +232,7 @@ export function TherapistProfile({
             therapistId={data.id}
             therapistName={data.givenName}
             reviews={data.reviews}
+            pendingReview={data.pendingReview}
             average={avg}
             viewer={viewer}
           />

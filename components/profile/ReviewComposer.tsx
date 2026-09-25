@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { REVIEW_QUESTIONS, type ReviewRatingKey, type ReviewRatings } from "@/lib/reviews/questions";
 import { deleteOwnReview, submitReview } from "@/lib/reviews/submit";
 import { validateReview } from "@/lib/reviews/validate";
+import { PhiNotice, ReviewEditNote, ReviewPendingNote } from "./PhiNotice";
 import { FormMessage, ReviewAuth } from "./ReviewAuth";
 
 export function ReviewComposer({
@@ -27,7 +28,8 @@ export function ReviewComposer({
       {viewer.userId ? (
         <ReviewForm therapistId={therapistId} mine={mine} />
       ) : (
-        <div className="mt-5">
+        <div className="mt-5 space-y-4">
+          <PhiNotice />
           <ReviewAuth />
         </div>
       )}
@@ -118,8 +120,11 @@ function ReviewForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="mt-5 rounded-[1.75rem] bg-paper px-5 py-5 shadow-sm"
+      className="mt-5 space-y-4 rounded-[1.75rem] bg-paper px-5 py-5 shadow-sm"
     >
+      <PhiNotice />
+      {mine?.status === "pending" ? <ReviewPendingNote /> : null}
+      {mine?.status === "approved" ? <ReviewEditNote /> : null}
       <div className="divide-y divide-line">
         {REVIEW_QUESTIONS.map((question) => (
           <StarPicker
@@ -175,7 +180,7 @@ function ReviewForm({
           disabled={submitting}
           className="rounded-full bg-clay px-6 py-3 text-sm font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {submitting ? "Please wait…" : "Submit review"}
+          {submitting ? "Please wait…" : "Submit for review"}
         </button>
         {mine ? (
           <button

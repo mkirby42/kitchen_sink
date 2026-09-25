@@ -22,6 +22,11 @@ export function homeCtas(state: {
       variant: "secondary",
     });
     ctas.push({
+      href: routes.adminReviews,
+      label: "Review queue",
+      variant: "secondary",
+    });
+    ctas.push({
       href: routes.join,
       label: "Join as a therapist",
       variant: "secondary",

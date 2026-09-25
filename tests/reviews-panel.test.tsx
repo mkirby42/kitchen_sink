@@ -42,12 +42,14 @@ function review(overrides: Partial<ProfileReview> = {}): ProfileReview {
     anonymous: false,
     created_at: "2026-03-01T15:00:00.000Z",
     mine: false,
+    status: "approved",
     ...overrides,
   };
 }
 
 function render(props: {
   reviews?: ProfileReview[];
+  pendingReview?: ProfileReview | null;
   viewer?: ReviewViewer;
   average?: number | null;
 }) {
@@ -56,6 +58,7 @@ function render(props: {
       therapistId: "therapist-1",
       therapistName: "Maya",
       reviews: props.reviews ?? [],
+      pendingReview: props.pendingReview ?? null,
       average: props.average ?? null,
       viewer: props.viewer ?? visitor,
     }),
@@ -70,7 +73,9 @@ describe("ReviewsPanel", () => {
     expect(html).toContain(">Maya</em>?");
     expect(html).toContain("Your feedback helps other clients find the right fit.");
     expect(html).toContain("Sign in as a client to leave a review.");
-    expect(html).not.toContain("Submit review");
+    expect(html).toContain("Do not include personal health information");
+    expect(html).toContain("Rejected and deleted reviews are erased and not kept.");
+    expect(html).not.toContain("Submit for review");
   });
 
   it("lets a signed-in patient rate three questions, and still shows the empty state", () => {
@@ -81,7 +86,8 @@ describe("ReviewsPanel", () => {
     expect(html).toContain("Do you feel like it was the right fit?");
     expect(html).toContain("Anything else you&#x27;d like to share?");
     expect(html).toContain("Optional — share as much or as little as you&#x27;d like.");
-    expect(html).toContain("Submit review");
+    expect(html).toContain("Submit for review");
+    expect(html).toContain("Do not include personal health information");
     expect(html).toContain("Post anonymously");
     expect(html).not.toContain("Rating, optional");
   });
@@ -91,7 +97,7 @@ describe("ReviewsPanel", () => {
       viewer: { userId: "therapist-2", role: "therapist", isOwner: false },
     });
     expect(html).toContain("No reviews yet.");
-    expect(html).not.toContain("Submit review");
+    expect(html).not.toContain("Submit for review");
     expect(html).not.toContain("Do you feel understood?");
   });
 
@@ -99,7 +105,8 @@ describe("ReviewsPanel", () => {
     const html = render({
       viewer: { userId: "admin-1", role: "admin", isOwner: false },
     });
-    expect(html).toContain("Submit review");
+    expect(html).toContain("Submit for review");
+    expect(html).toContain("Do not include personal health information");
     expect(html).toContain("Do you feel understood?");
     expect(html).toContain("No reviews yet.");
   });
@@ -109,14 +116,14 @@ describe("ReviewsPanel", () => {
       viewer: { userId: "admin-1", role: "admin", isOwner: true },
     });
     expect(html).toContain("No reviews yet.");
-    expect(html).not.toContain("Submit review");
+    expect(html).not.toContain("Submit for review");
     expect(html).not.toContain("How was your session");
   });
 
   it("hides the form from the therapist who owns the profile", () => {
     const html = render({ viewer: therapist });
     expect(html).toContain("No reviews yet.");
-    expect(html).not.toContain("Submit review");
+    expect(html).not.toContain("Submit for review");
     expect(html).not.toContain("How was your session");
     expect(html).not.toContain("Sign in as a client");
   });
@@ -159,9 +166,10 @@ describe("ReviewsPanel", () => {
     });
     expect(html).toContain("Anonymous");
     expect(html).not.toContain("J. R.");
-    expect(html).toContain("Submit review");
+    expect(html).toContain("Submit for review");
     expect(html).toContain("Quietly helpful.");
     expect(html).toContain("Remove");
+    expect(html).toContain("Saving changes sends this review back for approval");
     expect(html).not.toContain("Felt understood");
   });
 
@@ -179,5 +187,24 @@ describe("ReviewsPanel", () => {
     expect(html).toContain("5.0");
     expect(html).toContain("4.3");
     expect(html).toContain("Based on 3 client reviews");
+  });
+
+  it("hides a pending review from the public list and tells the author it is waiting", () => {
+    const html = render({
+      viewer: patient,
+      reviews: [review({ id: "live", body: "Already public." })],
+      pendingReview: review({
+        id: "wait",
+        body: "Not published yet.",
+        mine: true,
+        status: "pending",
+      }),
+    });
+    expect(html).toContain("Already public.");
+    expect(html.split("Not published yet.").length - 1).toBe(1);
+    expect(html).toContain("Waiting for approval");
+    expect(html).toContain("Remove");
+    expect(html).toContain("Based on 1 client review");
+    expect(html).toContain("Do not include personal health information");
   });
 });

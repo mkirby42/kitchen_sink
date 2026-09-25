@@ -45,6 +45,7 @@ export type ProfileReview = {
   anonymous: boolean;
   created_at: string;
   mine: boolean;
+  status: "pending" | "approved";
 };
 
 export type ContactAction = {
@@ -83,6 +84,7 @@ export type TherapistProfileData = {
   identity: string[];
   cards: ProfileCard[];
   reviews: ProfileReview[];
+  pendingReview: ProfileReview | null;
   contact: ContactAction[];
 };
 
@@ -236,9 +238,12 @@ type ReviewRow = {
   anonymous?: boolean | null;
   author_name?: string | null;
   created_at?: string | null;
+  status?: string | null;
 };
 
 const REVIEW_COLUMNS =
+  "id, patient_id, stars_avg, stars_cat_1, stars_cat_2, stars_cat_3, body, session_format, duration_label, patient_hidden, anonymous, author_name, created_at, status";
+const REVIEW_COLUMNS_NO_STATUS =
   "id, patient_id, stars_avg, stars_cat_1, stars_cat_2, stars_cat_3, body, session_format, duration_label, patient_hidden, anonymous, author_name, created_at";
 const LEGACY_REVIEW_COLUMNS =
   "id, patient_id, stars_avg, body, session_format, duration_label, patient_hidden, created_at";
@@ -276,6 +281,7 @@ export function toProfileReview(
     anonymous,
     created_at: row.created_at ?? "",
     mine: Boolean(viewerId && row.patient_id && row.patient_id === viewerId),
+    status: row.status === "pending" ? "pending" : "approved",
   };
 }
 
@@ -301,9 +307,22 @@ async function fetchReviewRows(supabase: SupabaseClient, therapistId: string) {
   const missingColumn =
     primary.error.code === "42703" ||
     primary.error.code === "PGRST204" ||
-    /author_name|anonymous/i.test(primary.error.message);
+    /author_name|anonymous|status/i.test(primary.error.message);
 
   if (!missingColumn) return [];
+
+  const statusOnly =
+    /status/i.test(primary.error.message) &&
+    !/author_name|anonymous/i.test(primary.error.message);
+
+  if (statusOnly) {
+    const withoutStatus = await supabase
+      .from("reviews")
+      .select(REVIEW_COLUMNS_NO_STATUS)
+      .eq("therapist_id", therapistId)
+      .order("created_at", { ascending: false });
+    if (!withoutStatus.error) return (withoutStatus.data ?? []) as ReviewRow[];
+  }
 
   const legacy = await supabase
     .from("reviews")
@@ -369,9 +388,20 @@ export async function fetchTherapistProfile(
   const tags = (tagsRes.data ?? []) as ProfileTag[];
   const outreach = labelsOf(tags, "outreach");
   const insurance = labelsOf(tags, "insurance");
-  const reviews = reviewRows
-    .filter((row) => !row.patient_hidden)
+  const visibleRows = reviewRows.filter((row) => !row.patient_hidden);
+  const pendingRow =
+    visibleRows.find(
+      (row) =>
+        row.status === "pending" &&
+        viewerId &&
+        row.patient_id === viewerId,
+    ) ?? null;
+  const reviews = visibleRows
+    .filter((row) => row.status !== "pending")
     .map((row) => toProfileReview(row, viewerId));
+  const pendingReview = pendingRow
+    ? toProfileReview(pendingRow, viewerId)
+    : null;
 
   return {
     id,
@@ -411,6 +441,7 @@ export async function fetchTherapistProfile(
     identity: labelsOf(tags, "identity"),
     cards: (itemsRes.data ?? []) as ProfileCard[],
     reviews,
+    pendingReview,
     contact: contactActions({
       email: profile.email,
       phone: profile.phone,

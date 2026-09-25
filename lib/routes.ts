@@ -6,6 +6,7 @@ export const routes = {
   joinEdit: "/join?edit=1",
   profileDeleted: "/profile-deleted",
   adminMedia: "/admin/media",
+  adminReviews: "/admin/reviews",
   therapist: (id: string) => `/t/${id}`,
 } as const;
 

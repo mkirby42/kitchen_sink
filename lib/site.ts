@@ -221,7 +221,7 @@ Therapist profiles are public while that therapist is open to new clients and li
 - Photo (required) and an optional intro video
 - Specialties, modalities, insurance, and identity tags
 - Rates: service type, session length, and price
-- A short about section, conversation cards, and published reviews
+- A short about section, conversation cards, and published reviews. A review is published only after an admin approves it. Clients are told not to include personal health information. Rejected reviews are deleted and not kept.
 - Contact: email, phone, and/or text, as the therapist listed them
 `;
 }
