@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { parseProfileRole, type ProfileRole } from "@/lib/role";
 
-export type ReviewRole = "patient" | "therapist";
+export type ReviewRole = ProfileRole;
 
 export type ReviewViewer = {
   userId: string | null;
@@ -26,10 +27,7 @@ export async function loadReviewViewer(
     .eq("id", user.id)
     .maybeSingle();
 
-  const role =
-    profile?.role === "patient" || profile?.role === "therapist"
-      ? profile.role
-      : null;
+  const role = parseProfileRole(profile?.role);
 
   return {
     userId: user.id,

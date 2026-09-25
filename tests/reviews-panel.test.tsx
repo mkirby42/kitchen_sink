@@ -95,6 +95,24 @@ describe("ReviewsPanel", () => {
     expect(html).not.toContain("Do you feel understood?");
   });
 
+  it("lets an admin review someone else's open profile", () => {
+    const html = render({
+      viewer: { userId: "admin-1", role: "admin", isOwner: false },
+    });
+    expect(html).toContain("Submit review");
+    expect(html).toContain("Do you feel understood?");
+    expect(html).toContain("No reviews yet.");
+  });
+
+  it("hides the form when the admin is reviewing their own test profile", () => {
+    const html = render({
+      viewer: { userId: "admin-1", role: "admin", isOwner: true },
+    });
+    expect(html).toContain("No reviews yet.");
+    expect(html).not.toContain("Submit review");
+    expect(html).not.toContain("How was your session");
+  });
+
   it("hides the form from the therapist who owns the profile", () => {
     const html = render({ viewer: therapist });
     expect(html).toContain("No reviews yet.");
