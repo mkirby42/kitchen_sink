@@ -11,8 +11,8 @@ import {
   openSeedProfile,
 } from "./client";
 
-const OPS_EMAIL = "ops@example.com";
-const OPS_PASSWORD = "seed-only";
+const OPS_EMAIL = process.env.OPS_EMAIL;
+const OPS_PASSWORD = process.env.OPS_PASSWORD;
 
 const PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
@@ -20,6 +20,7 @@ const PNG = Buffer.from(
 );
 
 async function opsClient() {
+  if (!OPS_EMAIL || !OPS_PASSWORD) return null;
   const supabase = createAnonClient();
   const signedIn = await supabase.auth.signInWithPassword({
     email: OPS_EMAIL,
@@ -36,7 +37,7 @@ describe.skipIf(!dbConfigured())("admin helper upload", () => {
     const ops = await opsClient();
     if (!ops) {
       console.warn(
-        "Skipping admin helper upload assertions because ops@example.com cannot sign in. Apply supabase/migrations/20260925003100_admin_helper_upload.sql.",
+        "Skipping admin helper upload assertions. No seeded ops login is shipped. Set OPS_EMAIL and OPS_PASSWORD to an admin you created in the Dashboard.",
       );
       skip();
       return;

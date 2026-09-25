@@ -4,3 +4,6 @@
 -- historical seed rows and then 20260925003000_remove_seed_demo_profiles.sql
 -- plus 20260925043000_finish_demo_profile_removal.sql delete them. Re-inserting
 -- @kitchensink.demo profiles fails the trigger in those migrations.
+--
+-- Do not insert an ops admin. Create one in the Dashboard and grant
+-- role = admin with SQL. Never commit a password.

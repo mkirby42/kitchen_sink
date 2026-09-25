@@ -1,6 +1,8 @@
 -- Ops admin can upload a photo or intro video for an existing therapist.
 -- Same buckets and prefixes as join: photos/{therapist_id}/ and videos/{therapist_id}/.
 -- Admin is a profiles.role, not a JWT user_metadata claim. API sessions cannot self-assign it.
+-- This file does not seed an ops login. Create the Auth user in the Dashboard,
+-- then grant role = admin with SQL. Never commit a password.
 
 do $$
 declare
@@ -228,50 +230,9 @@ grant execute on function public.admin_set_therapist_media(uuid, text, text)
 comment on function public.admin_set_therapist_media(uuid, text, text) is
   'Admin sets photo_key or video_key for one therapist. Key must be a single object under that therapist id. Does not change other profile fields.';
 
--- Demo ops login so the helper page is exercisable. Christine is granted separately
--- (see docs/REQUIREMENTS.md); do not seed her personal password here.
-do $$
-declare
-  ops uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
-  instance uuid := '00000000-0000-0000-0000-000000000000';
-begin
-  if not exists (select 1 from auth.users where id = ops) then
-    insert into auth.users (
-      instance_id, id, aud, role, email, encrypted_password,
-      email_confirmed_at, confirmation_token, recovery_token,
-      email_change_token_new, email_change, raw_app_meta_data,
-      raw_user_meta_data, created_at, updated_at, is_sso_user, is_anonymous
-    )
-    values (
-      instance, ops, 'authenticated', 'authenticated',
-      'ops@example.com',
-      extensions.crypt('seed-only', extensions.gen_salt('bf')),
-      now(), '', '', '', '',
-      '{"provider":"email","providers":["email"]}'::jsonb,
-      '{"name":"Kitchen Sink Ops"}'::jsonb,
-      now(), now(), false, false
-    );
-  end if;
-
-  if not exists (
-    select 1 from auth.identities
-    where user_id = ops and provider = 'email'
-  ) then
-    insert into auth.identities (
-      user_id, identity_data, provider, provider_id, last_sign_in_at,
-      created_at, updated_at
-    )
-    values (
-      ops,
-      jsonb_build_object('sub', ops::text, 'email', 'ops@example.com'),
-      'email', ops::text, now(), now(), now()
-    );
-  end if;
-
-  if not exists (select 1 from public.profiles where id = ops) then
-    insert into public.profiles (id, role, name, email)
-    values (ops, 'admin', 'Kitchen Sink Ops', 'ops@example.com');
-  end if;
-end $$;
+-- No ops seed. A known-password admin in this public repo is a backdoor if
+-- that Auth user exists on hosted Supabase. Grant an admin you created in
+-- the Dashboard (see docs/REQUIREMENTS.md). 20260925170000_remove_seeded_ops_admin.sql
+-- deletes a previously applied copy when id and email both still match.
 
 notify pgrst, 'reload schema';
