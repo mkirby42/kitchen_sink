@@ -346,7 +346,7 @@ describe("buildJoinPayload", () => {
     );
   });
 
-  it("publishes a sliding scale and drops the range when the toggle is off", () => {
+  it("publishes the sliding scale checkbox and clears any stored range", () => {
     const on = buildJoinPayload(
       validStep4({
         slidingScale: true,
@@ -355,19 +355,8 @@ describe("buildJoinPayload", () => {
       }),
     );
     expect(on.sliding_scale).toBe(true);
-    expect(on.sliding_scale_min_cents).toBe(8000);
-    expect(on.sliding_scale_max_cents).toBe(12000);
-
-    const bare = buildJoinPayload(
-      validStep4({
-        slidingScale: true,
-        slidingScaleMinCents: null,
-        slidingScaleMaxCents: null,
-      }),
-    );
-    expect(bare.sliding_scale).toBe(true);
-    expect(bare.sliding_scale_min_cents).toBeNull();
-    expect(bare.sliding_scale_max_cents).toBeNull();
+    expect(on.sliding_scale_min_cents).toBeNull();
+    expect(on.sliding_scale_max_cents).toBeNull();
 
     const off = buildJoinPayload(
       validStep4({
@@ -379,18 +368,48 @@ describe("buildJoinPayload", () => {
     expect(off.sliding_scale).toBe(false);
     expect(off.sliding_scale_min_cents).toBeNull();
     expect(off.sliding_scale_max_cents).toBeNull();
+    expect(
+      canContinue(
+        4,
+        validStep4({
+          slidingScale: true,
+          slidingScaleMinCents: 15000,
+          slidingScaleMaxCents: 8000,
+        }),
+      ),
+    ).toBe(true);
   });
 
-  it("rejects a sliding scale minimum above the maximum", () => {
-    const draft = validStep4({
-      slidingScale: true,
-      slidingScaleMinCents: 15000,
-      slidingScaleMaxCents: 8000,
-    });
-    expect(canContinue(4, draft)).toBe(false);
-    expect(step4Errors(draft)).toContain(
-      "Sliding scale minimum cannot exceed the maximum",
-    );
+  it("accepts any whole session length from 1 to 480 minutes", () => {
+    expect(
+      step4Errors(
+        validStep4({
+          rates: [
+            {
+              service_type: "Individual",
+              duration_minutes: 75,
+              price_cents: 16500,
+            },
+          ],
+        }),
+      ),
+    ).toEqual([]);
+
+    for (const minutes of [0, -5, 1.5, 481]) {
+      expect(
+        step4Errors(
+          validStep4({
+            rates: [
+              {
+                service_type: "Individual",
+                duration_minutes: minutes,
+                price_cents: 16500,
+              },
+            ],
+          }),
+        ),
+      ).toContain("Session length must be a whole number from 1 to 480 minutes");
+    }
   });
 
   it("throws when draft is incomplete", () => {

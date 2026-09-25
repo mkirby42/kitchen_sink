@@ -16,6 +16,7 @@ export type SearchRow = {
   insurance_labels: string[];
   match_count: number;
   matched_labels: string[];
+  sliding_scale: boolean;
 };
 
 export type SearchFilters = {

@@ -13,9 +13,11 @@ import {
   CREDENTIALS,
   LICENSE_STATES,
   OUTREACH_OPTIONS,
-  RATE_DURATIONS,
   RATE_SERVICE_TYPES,
 } from "@/lib/tags/presets";
+
+const MIN_SESSION_MINUTES = 1;
+const MAX_SESSION_MINUTES = 480;
 
 const CARD_TAGS = new Set([
   "approach",
@@ -29,7 +31,6 @@ const CARD_TAGS = new Set([
 const LICENSE_STATE_SET = new Set<string>(LICENSE_STATES);
 const CREDENTIAL_SET = new Set<string>(CREDENTIALS);
 const RATE_SERVICE_TYPE_SET = new Set<string>(RATE_SERVICE_TYPES);
-const RATE_DURATION_SET = new Set<number>(RATE_DURATIONS);
 const OUTREACH_OPTION_SET = new Set<string>(OUTREACH_OPTIONS);
 
 function hasDuplicateValues(values: string[]): boolean {
@@ -185,8 +186,14 @@ export function step4Errors(draft: JoinDraft): string[] {
     if (!RATE_SERVICE_TYPE_SET.has(rate.service_type)) {
       errors.push(`Invalid service type: ${rate.service_type}`);
     }
-    if (!RATE_DURATION_SET.has(rate.duration_minutes)) {
-      errors.push(`Invalid duration: ${rate.duration_minutes}`);
+    if (
+      !Number.isInteger(rate.duration_minutes) ||
+      rate.duration_minutes < MIN_SESSION_MINUTES ||
+      rate.duration_minutes > MAX_SESSION_MINUTES
+    ) {
+      errors.push(
+        "Session length must be a whole number from 1 to 480 minutes",
+      );
     }
     if (!Number.isInteger(rate.price_cents) || rate.price_cents < 0) {
       errors.push("Rate price must be a non-negative integer");
@@ -196,20 +203,6 @@ export function step4Errors(draft: JoinDraft): string[] {
   const serviceTypes = draft.rates.map((rate) => rate.service_type);
   if (hasDuplicateValues(serviceTypes)) {
     errors.push("Rate service types must be unique");
-  }
-
-  if (draft.slidingScale) {
-    const min = draft.slidingScaleMinCents;
-    const max = draft.slidingScaleMaxCents;
-    if (min != null && (!Number.isInteger(min) || min < 0)) {
-      errors.push("Sliding scale minimum must be zero or more");
-    }
-    if (max != null && (!Number.isInteger(max) || max < 0)) {
-      errors.push("Sliding scale maximum must be zero or more");
-    }
-    if (min != null && max != null && min > max) {
-      errors.push("Sliding scale minimum cannot exceed the maximum");
-    }
   }
 
   const answeredCards = answeredConversationCardCount(draft.cards);
@@ -347,12 +340,8 @@ export function buildJoinPayload(draft: JoinDraft) {
       price_cents: rate.price_cents,
     })),
     sliding_scale: draft.slidingScale,
-    sliding_scale_min_cents: draft.slidingScale
-      ? draft.slidingScaleMinCents
-      : null,
-    sliding_scale_max_cents: draft.slidingScale
-      ? draft.slidingScaleMaxCents
-      : null,
+    sliding_scale_min_cents: null,
+    sliding_scale_max_cents: null,
     location: draft.inPerson
       ? {
           address: draft.location!.address.trim(),
