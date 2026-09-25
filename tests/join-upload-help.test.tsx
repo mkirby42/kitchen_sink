@@ -51,6 +51,7 @@ describe("step 2 upload help", () => {
     expect(html).toContain(
       "JPEG, PNG, WebP, or GIF · up to 5MB. This is the photo clients see first on your profile.",
     );
+    expect(html).toContain("Large photos are resized in your browser so they can upload.");
     expect(html).toContain("Optional. One short intro clip.");
     expect(html).toContain("MP4, WebM, or MOV · up to 50MB.");
   });
