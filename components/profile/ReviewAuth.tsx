@@ -1,10 +1,12 @@
 "use client";
 
 import { FormEvent, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 
-export function ReviewAuth() {
+export function ReviewAuth({ returnTo }: { returnTo?: string }) {
   const router = useRouter();
   const [mode, setMode] = useState<"signup" | "signin">("signin");
   const [email, setEmail] = useState("");
@@ -96,6 +98,16 @@ export function ReviewAuth() {
           className="mt-1.5 w-full border-0 border-b border-line bg-transparent px-0 py-2 text-base outline-none focus:border-clay"
         />
       </label>
+      {mode === "signin" ? (
+        <p className="mt-2">
+          <Link
+            href={forgotPasswordPath("review", returnTo)}
+            className="text-sm font-semibold text-clay hover:text-clay-dark"
+          >
+            Forgot password?
+          </Link>
+        </p>
+      ) : null}
 
       <button
         type="submit"
