@@ -30,7 +30,7 @@ export function ReviewComposer({
       ) : (
         <div className="mt-5 space-y-4">
           <PhiNotice />
-          <ReviewAuth />
+          <ReviewAuth returnTo={`/t/${therapistId}`} />
         </div>
       )}
     </section>

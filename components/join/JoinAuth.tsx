@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 import { JoinShell } from "./JoinShell";
 
@@ -112,6 +114,17 @@ export function JoinAuth({
             />
             <span className="mt-2 block text-sm text-mute">At least 6 characters.</span>
           </label>
+
+          {mode === "signin" ? (
+            <p className="-mt-4">
+              <Link
+                href={forgotPasswordPath("join")}
+                className="text-sm font-semibold text-clay hover:text-clay-dark"
+              >
+                Forgot password?
+              </Link>
+            </p>
+          ) : null}
 
           {message ? (
             <p aria-live="polite" className="rounded-2xl bg-cream px-4 py-3 text-sm text-clay-dark">

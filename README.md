@@ -27,9 +27,11 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/` | Home (Find, Join, **Log in as a therapist**) |
 | `/find` | Public search |
 | `/t/[id]` | Therapist profile (owner sees **Edit**) |
-| `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile |
-| `/admin/media` | Ops helper upload: photo + intro video for an existing therapist (admin) |
-| `/admin/reviews` | Ops review queue: approve to publish, or reject and hard-delete (admin) |
+| `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile. Sign-in links to forgot password |
+| `/forgot-password` | Request a password reset email (therapist, client, admin) |
+| `/reset-password` | Set a new password from the email link |
+| `/admin/media` | Ops helper upload: photo + intro video for an existing therapist (admin). Sign-in links to forgot password |
+| `/admin/reviews` | Ops review queue: approve to publish, or reject and hard-delete (admin). Sign-in links to forgot password |
 | `/robots.txt` | Crawler rules (search + named AI bots allowed; `/admin` disallowed) |
 | `/sitemap.xml` | Public URLs: home, find, join, open therapist profiles |
 | `/llms.txt` | Plain-language summary for AI tools |

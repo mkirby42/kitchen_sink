@@ -3,6 +3,8 @@ export const routes = {
   find: "/find",
   join: "/join",
   joinSignIn: "/join?mode=signin",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
   joinEdit: "/join?edit=1",
   profileDeleted: "/profile-deleted",
   adminMedia: "/admin/media",

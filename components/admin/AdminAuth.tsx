@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 
 export function AdminAuth({
@@ -72,6 +74,14 @@ export function AdminAuth({
             className="mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay"
           />
         </label>
+        <p className="-mt-4">
+          <Link
+            href={forgotPasswordPath("admin")}
+            className="text-sm font-semibold text-clay hover:text-clay-dark"
+          >
+            Forgot password?
+          </Link>
+        </p>
         {message ? (
           <p
             role="alert"

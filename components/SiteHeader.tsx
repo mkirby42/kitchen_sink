@@ -26,6 +26,9 @@ export function SiteHeader({
 
   useEffect(() => {
     if (!supabasePublicConfig()) return;
+    // The reset page exchanges the email code itself. A second client would
+    // consume that code first and the form would look expired.
+    if (path === routes.resetPassword) return;
 
     const supabase = createClient();
 
@@ -62,7 +65,7 @@ export function SiteHeader({
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [path]);
 
   async function signOut() {
     const supabase = createClient();
@@ -71,8 +74,13 @@ export function SiteHeader({
     router.refresh();
   }
 
-  // Profile and join use their own phone-width chrome (back + wordmark / stepper).
-  if (path.startsWith("/t/") || path === routes.join) {
+  // Profile, join, and password reset use their own phone-width chrome.
+  if (
+    path.startsWith("/t/") ||
+    path === routes.join ||
+    path === routes.forgotPassword ||
+    path === routes.resetPassword
+  ) {
     return null;
   }
 

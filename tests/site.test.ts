@@ -63,6 +63,7 @@ describe("llms.txt", () => {
     expect(body).toContain("Kitchen Sink (Talk Shoppe)");
     expect(body).toContain("does not book appointments");
     expect(body).toContain("delete their own profile");
+    expect(body).toContain("forgot-password");
     expect(body).toContain(`[Home](${ORIGIN})`);
     expect(body).toContain(`[Find a therapist](${ORIGIN}/find)`);
     expect(body).toContain(`[Join as a therapist](${ORIGIN}/join)`);

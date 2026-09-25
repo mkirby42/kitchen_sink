@@ -7,6 +7,8 @@ describe("judge path routes", () => {
     expect(routes.find).toBe("/find");
     expect(routes.join).toBe("/join");
     expect(routes.joinSignIn).toBe("/join?mode=signin");
+    expect(routes.forgotPassword).toBe("/forgot-password");
+    expect(routes.resetPassword).toBe("/reset-password");
     expect(routes.joinEdit).toBe("/join?edit=1");
     expect(routes.profileDeleted).toBe("/profile-deleted");
     expect(routes.adminMedia).toBe("/admin/media");

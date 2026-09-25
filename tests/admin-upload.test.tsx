@@ -47,6 +47,8 @@ describe("admin helper upload UI", () => {
     const html = renderToStaticMarkup(<AdminAuth />);
     expect(html).toContain("Sign in to upload media");
     expect(html).toContain("Sign in →");
+    expect(html).toContain("Forgot password?");
+    expect(html).toContain('href="/forgot-password?from=admin"');
     expect(html).not.toContain("Sign up");
     expect(html).not.toContain("Create account");
   });
