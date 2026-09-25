@@ -76,16 +76,20 @@ describe("JoinStep4 contact and rates", () => {
     expect(html).toContain('aria-label="Rate 1 service type"');
   });
 
-  it("uses free text for the session price and keeps duration selectable", () => {
+  it("uses free text for the session price and session length", () => {
     const html = render();
     expect(html).toContain('aria-label="Rate 1 price in dollars"');
     expect(html).toContain('type="text"');
     expect(html).toContain('inputMode="decimal"');
+    expect(html).toContain('inputMode="numeric"');
     expect(html).toContain('value="165"');
     expect(html).not.toContain('type="number"');
-    expect(html).toContain('aria-label="Rate 1 duration"');
-    expect(html).toContain(">50 min<");
-    expect(html).toContain(">30 min<");
+    expect(html).toContain('aria-label="Rate 1 service type"');
+    expect(html).toContain('aria-label="Rate 1 duration in minutes"');
+    expect(html).not.toContain(">30 min<");
+    expect(html).not.toContain(">45 min<");
+    expect(html).toContain('value="50"');
+    expect(html).toContain(">min<");
   });
 
   it("shows a free-text field for each selected outreach method", () => {
@@ -130,24 +134,19 @@ describe("JoinStep4 contact and rates", () => {
     expect(isDisabled(removeButton(six, "prompt 1"))).toBe(false);
   });
 
-  it("offers a sliding scale toggle and optional min and max", () => {
+  it("offers sliding scale as a checkbox", () => {
     const off = render();
-    expect(off).toContain("Sliding scale");
-    expect(off).toContain('role="switch"');
-    expect(off).toContain('aria-checked="false"');
-    expect(off).not.toContain("Sliding scale minimum in dollars");
+    expect(off).toContain("Offer sliding scale");
+    expect(off).toContain('type="checkbox"');
+    expect(off).not.toContain("checked=");
+    expect(off).not.toContain('role="switch"');
+    expect(off).not.toContain("Sliding scale minimum");
 
-    const on = render({
-      slidingScale: true,
-      slidingScaleMinCents: 8000,
-      slidingScaleMaxCents: 12000,
-    });
-    expect(on).toContain('aria-checked="true"');
-    expect(on).toContain('aria-label="Sliding scale minimum in dollars"');
-    expect(on).toContain('aria-label="Sliding scale maximum in dollars"');
-    expect(on).toContain('value="80"');
-    expect(on).toContain('value="120"');
-    expect(on).toContain("without listing a range");
+    const on = render({ slidingScale: true });
+    expect(on).toContain("Offer sliding scale");
+    expect(on).toContain("checked");
+    expect(on).not.toContain("Sliding scale minimum");
+    expect(on).not.toContain("Sliding scale maximum");
   });
 
   it("hides product feedback when editing an existing profile", () => {

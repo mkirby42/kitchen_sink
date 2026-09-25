@@ -11,7 +11,7 @@ The current app does **not** book sessions or broker intros. Those are on the ba
 ## Current product (shipped)
 
 1. **Find a therapist** — public search. Filters: session format (virtual / in-person), specialties (preset chips), insurance, license state. OR semantics: therapist must match **some** selected tag. Rank by overlap count, then name; cards highlight hits (“3 of 4 tags”). Empty filters = all therapists open to new clients and listed in the directory.
-2. **Therapist profile** — photo, **optional intro video**, name, credential (licensed dropdown), **education** and **additional credentials** (freeform text, 0–n rows each), **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile; optional **sliding scale** with an optional min/max range), about, conversation cards, reviews (signed-in patients and admins post one review: display name or anonymous; three required 1–5 ratings — felt understood, communication, and right fit — averaged into the Reviews tab breakdown from approved reviews only; optional written note is the review text; date; pending until an admin approves; the profile counts only approved reviews; signup and the form warn not to include personal health information; reject and delete hard-delete the row with no archive; empty state “No reviews yet.”; therapists, including the owner, cannot review; an admin stays admin, can review another open listed profile, and cannot review their own), contact (email / phone / text as listed). Profile hero plays the intro video when one is uploaded. The owning therapist sees **Edit** (header, top right) and updates the same fields as join. Sliding scale, when offered, shows on the public profile (range if set, otherwise “Available”).
+2. **Therapist profile** — photo, **optional intro video**, name, credential (licensed dropdown), **education** and **additional credentials** (freeform text, 0–n rows each), **state license(s)** (min 1, no max — license # + state per row; add/remove rows; show all on profile), years practicing, format, specialties / modalities / insurance (preset chips **plus** therapist-created custom labels; show all on profile), **rates** (min 1, no max — service type + duration + price per row; add/remove rows; show all on profile; optional **sliding scale** checkbox), about, conversation cards, reviews (signed-in patients and admins post one review: display name or anonymous; three required 1–5 ratings — felt understood, communication, and right fit — averaged into the Reviews tab breakdown from approved reviews only; optional written note is the review text; date; pending until an admin approves; the profile counts only approved reviews; signup and the form warn not to include personal health information; reject and delete hard-delete the row with no archive; empty state “No reviews yet.”; therapists, including the owner, cannot review; an admin stays admin, can review another open listed profile, and cannot review their own), contact (email / phone / text as listed). Profile hero plays the intro video when one is uploaded. The owning therapist sees **Edit** (header, top right) and updates the same fields as join. Sliding scale, when offered, shows on the public profile (a previously saved range if one is still stored, otherwise “Available”) and on Find cards (“Sliding scale available”).
 3. **Join as a therapist** — Supabase Auth + 4-step onboarding matching the prototype: basic info (name, license number, and state required; education and certificates optional; repeatable state-license rows) → **photo (required, 5MB; join and edit resize oversized photos in the browser) + intro video (optional, file up to 50MB, or an in-browser recording up to 90 seconds where the browser supports it)** → practice tags → cards + contact + optional product feedback. Returning therapists sign in from home (`/join?mode=signin`) and land on their profile. Edit uses the same photo and video step.
 4. **Demo seeds removed from hosted data** — Maya Chen and the other accounts inserted by the seed migrations are deleted by `supabase/migrations/20260925043000_finish_demo_profile_removal.sql` (same rule in `20260925003000_remove_seed_demo_profiles.sql`). Delete only when `auth.users.id` **and** `lower(email)` both match that seed list (`*@kitchensink.demo`). Any other signup stays. Storage object rows are not deleted in SQL (hosted `storage.protect_delete`); ownership is cleared and bytes go away through the Storage API. New profiles cannot reuse those ids or that email domain, so a later migrate does not put the fakes back. Search lists therapists who completed join, are open to new clients, and are listed.
 5. **Fast match** — one Postgres query, indexed. No N+1. See Matching.
@@ -45,14 +45,14 @@ Prototype PNGs live in `prototype_screenshots/`. Index: `prototype_screenshots/R
 | Therapist onboarding 1 | **Name (required)**, licensed credential dropdown, years practicing, **Education (optional)**, **Credentials & certificates (optional)**, **State license(s)** (min 1; license # and state both required on each kept row; blank extra rows ignored) |
 | Therapist onboarding 2 | Photo (required; oversized photos resized in the browser) + intro video (optional, up to 50MB file, or up to 90s recorded in the browser where supported; profile hero plays intro when present) |
 | Therapist onboarding 3 | Open to new clients, virtual / in-person, specialties / modalities / insurance (preset chips + “Add your own” custom label per section), identity (tags) |
-| Therapist onboarding 4 | **Rates** repeater (service type + duration + price, remove row, “+ Add another rate”), **sliding scale** toggle with optional min/max, conversation cards (min 3, max 6), about, private email, outreach (email / phone / text), optional feedback |
-| Search | Must-have chips (specialty presets only). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price / duration) |
+| Therapist onboarding 4 | **Rates** repeater (service type + session length in minutes + price, remove row, “+ Add another rate”), **Offer sliding scale** checkbox, conversation cards (min 3, max 6), about, private email, outreach (email / phone / text), optional feedback |
+| Search | Must-have chips (specialty presets only). Result card: photo/initials, name, credential, years, tags, starting rate (lowest price / duration), sliding scale when offered |
 | Profile | Hero (photo + playable intro video) + credential + education + additional credentials + all state licenses (# + state per row) + all rates (service + duration + price) + sliding scale when offered + cards + about + reviews (category breakdown + note) |
 | Delete profile | Edit profile only (`/join?edit=1`), under the form. Dialog requires typing `DELETE`. Then `/profile-deleted`. |
 
 Match visual tone: cream page, navy type, terracotta buttons, rounded cards. Do not invent a second design system unless we are deliberately restyling the product.
 
-Rates appear on search cards and profile. They are **not** in the original data notes. Store in `rates` (1:n per therapist). Search card shows lowest price and its duration as “starting rate” (`$165 / 50 min`).
+Rates appear on search cards and profile. They are **not** in the original data notes. Store in `rates` (1:n per therapist). Search card shows lowest price and its duration as “starting rate” (`$165 / 50 min`), plus “Sliding scale available” when offered.
 
 ## Data
 
@@ -74,8 +74,8 @@ therapists                      -- 1:1 with therapist profiles
   listed bool default true          -- false: omit from Find, sitemap, and /t/[id]
   virtual_practice bool
   in_person_practice bool
-  sliding_scale bool default false          -- offer a reduced fee
-  sliding_scale_min_cents, sliding_scale_max_cents  -- nullable optional range
+  sliding_scale bool default false          -- offer sliding scale (checkbox)
+  sliding_scale_min_cents, sliding_scale_max_cents  -- legacy range; the form does not collect these; save clears them
   superbill bool default false
 
 qualifications                -- 1:n; optional education + extra credential/cert rows
@@ -87,7 +87,7 @@ qualifications                -- 1:n; optional education + extra credential/cert
 rates                         -- 1:n; min 1 row per therapist; add/remove in onboarding + profile edit
   id, therapist_id
   service_type text             -- Individual, Couples, Family, Group
-  duration_minutes int          -- e.g. 50
+  duration_minutes int          -- whole minutes, 1–480; form is free text (“50 min”)
   price_cents int               -- e.g. 16500; publish requires >= 100 ($1)
   unique (therapist_id, service_type)
 
@@ -133,7 +133,7 @@ Suggested labels (preset chips; therapist may also add custom labels for special
 - Credentials (fixed dropdown only): LMFT, LCSW, LPC, PsyD, PhD, MD. Shown on search cards and profile as the license type.
 - Education and additional credentials (freeform, optional, 0–n): separate repeaters on join/edit. Stored in `qualifications`, not `tags`. Not used by search.
 - Rate service types (fixed): Individual, Couples, Family, Group
-- Rate durations (minutes, fixed): 30, 45, 50, 60, 90
+- Rate session length: free-text whole minutes, 1–480. Shown as “50 min”.
 - Specialties (preset + custom): Anxiety, Depression, Trauma & PTSD, Couples & Relationships, ADHD, Grief & Loss, Life Transitions, Teens, Immigration
 - Modalities (preset + custom): CBT, DBT, EMDR, Psychodynamic, ACT, Somatic, Narrative, Attachment-Based
 - Insurance (preset + custom): Aetna, BCBS, Cigna, Optum, Cash Pay Only, Out-of-Network Superbill
@@ -206,7 +206,7 @@ Indexes (required, this is the performance story):
 - partial index on `therapists (profile_id) where open_to_new_clients and listed`
 - optional denormalized `therapists.specialty_labels text[]` with GIN if the join is slower in explain. Prefer the array if we touch matching twice.
 
-Return search cards in **one round trip** (join photo URL, credential, years, a few tags, min rate). Cap page size (24). No unbounded select.
+Return search cards in **one round trip** (join photo URL, credential, years, a few tags, min rate and its duration, sliding scale flag). Cap page size (24). No unbounded select.
 
 ## Stack
 

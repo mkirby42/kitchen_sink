@@ -58,7 +58,6 @@ export const IDENTITY_PRESETS = [
 ] as const;
 
 export const RATE_SERVICE_TYPES = ["Individual", "Couples", "Family", "Group"] as const;
-export const RATE_DURATIONS = [30, 45, 50, 60, 90] as const;
 export const OUTREACH_OPTIONS = ["email", "phone", "text"] as const;
 
 export const LICENSE_STATES = [

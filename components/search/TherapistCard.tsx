@@ -116,6 +116,11 @@ export function TherapistCard({
               ) : null}
             </p>
           ) : null}
+          {row.sliding_scale ? (
+            <p className={`${rate ? "mt-1" : "mt-4"} text-sm text-ink`}>
+              Sliding scale available
+            </p>
+          ) : null}
         </div>
       </div>
     </Link>

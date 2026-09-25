@@ -8,12 +8,9 @@ import {
   MAX_CONVERSATION_CARDS,
 } from "@/lib/join/cards";
 import type { JoinDraft } from "@/lib/join/types";
-import {
-  OUTREACH_OPTIONS,
-  RATE_DURATIONS,
-  RATE_SERVICE_TYPES,
-} from "@/lib/tags/presets";
+import { OUTREACH_OPTIONS, RATE_SERVICE_TYPES } from "@/lib/tags/presets";
 import { Chip } from "./Chip";
+import { RateDurationInput } from "./RateDurationInput";
 import { RatePriceInput } from "./RatePriceInput";
 
 const FILTERS = [
@@ -257,33 +254,20 @@ export function JoinStep4({
                     ))}
                   </select>
                 </label>
-                <label className="min-w-0">
-                  <span className="sr-only">Duration</span>
-                  <select
-                    aria-label={`Rate ${index + 1} duration`}
-                    value={rate.duration_minutes}
-                    onChange={(event) =>
-                      setDraft((current) => ({
-                        ...current,
-                        rates: current.rates.map((item, itemIndex) =>
-                          itemIndex === index
-                            ? {
-                                ...item,
-                                duration_minutes: Number(event.target.value),
-                              }
-                            : item,
-                        ),
-                      }))
-                    }
-                    className="w-full bg-transparent py-1.5 outline-none"
-                  >
-                    {RATE_DURATIONS.map((duration) => (
-                      <option key={duration} value={duration}>
-                        {duration} min
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <RateDurationInput
+                  minutes={rate.duration_minutes}
+                  ariaLabel={`Rate ${index + 1} duration in minutes`}
+                  onMinutes={(durationMinutes) =>
+                    setDraft((current) => ({
+                      ...current,
+                      rates: current.rates.map((item, itemIndex) =>
+                        itemIndex === index
+                          ? { ...item, duration_minutes: durationMinutes }
+                          : item,
+                      ),
+                    }))
+                  }
+                />
                 <RatePriceInput
                   cents={rate.price_cents}
                   ariaLabel={`Rate ${index + 1} price in dollars`}
@@ -340,76 +324,20 @@ export function JoinStep4({
           + Add another rate
         </button>
 
-        <div className="mt-4 flex items-center justify-between gap-4 rounded-full border border-line bg-paper px-5 py-3">
-          <div>
-            <p id="sliding-scale-label" className="font-medium text-ink">
-              Sliding scale
-            </p>
-            <p className="text-sm text-mute">
-              Reduced fee when a client needs it.
-            </p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={draft.slidingScale}
-            aria-labelledby="sliding-scale-label"
-            onClick={() =>
+        <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-full border border-line bg-paper px-5 py-3">
+          <input
+            type="checkbox"
+            checked={draft.slidingScale}
+            onChange={(event) =>
               setDraft((current) => ({
                 ...current,
-                slidingScale: !current.slidingScale,
+                slidingScale: event.target.checked,
               }))
             }
-            className={`relative h-7 w-12 shrink-0 rounded-full transition ${
-              draft.slidingScale ? "bg-clay" : "bg-line"
-            }`}
-          >
-            <span
-              className={`absolute top-1 size-5 rounded-full bg-paper shadow transition ${
-                draft.slidingScale ? "left-6" : "left-1"
-              }`}
-            />
-          </button>
-        </div>
-
-        {draft.slidingScale ? (
-          <div className="mt-3 space-y-2">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-2 rounded-full border border-line bg-paper px-4 py-1.5">
-                <span className="shrink-0 text-sm text-mute">Min</span>
-                <RatePriceInput
-                  nullable
-                  cents={draft.slidingScaleMinCents}
-                  ariaLabel="Sliding scale minimum in dollars"
-                  onCents={(cents) =>
-                    setDraft((current) => ({
-                      ...current,
-                      slidingScaleMinCents: cents,
-                    }))
-                  }
-                />
-              </div>
-              <div className="flex items-center gap-2 rounded-full border border-line bg-paper px-4 py-1.5">
-                <span className="shrink-0 text-sm text-mute">Max</span>
-                <RatePriceInput
-                  nullable
-                  cents={draft.slidingScaleMaxCents}
-                  ariaLabel="Sliding scale maximum in dollars"
-                  onCents={(cents) =>
-                    setDraft((current) => ({
-                      ...current,
-                      slidingScaleMaxCents: cents,
-                    }))
-                  }
-                />
-              </div>
-            </div>
-            <p className="text-sm text-mute">
-              Optional. Leave blank to offer a sliding scale without listing a
-              range.
-            </p>
-          </div>
-        ) : null}
+            className="size-4 shrink-0 accent-clay"
+          />
+          <span className="font-medium text-ink">Offer sliding scale</span>
+        </label>
       </fieldset>
 
       <label className="block">
