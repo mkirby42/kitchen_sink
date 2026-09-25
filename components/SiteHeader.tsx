@@ -119,6 +119,15 @@ export function SiteHeader({
               Uploads
             </Link>
           ) : null}
+          {admin ? (
+            <Link
+              href={routes.adminReviews}
+              className={navClass(path === routes.adminReviews)}
+              aria-current={path === routes.adminReviews ? "page" : undefined}
+            >
+              Reviews
+            </Link>
+          ) : null}
           {!navUser || admin ? (
             <Link
               href={routes.join}

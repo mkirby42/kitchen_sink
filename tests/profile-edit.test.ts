@@ -35,6 +35,7 @@ const data: TherapistProfileData = {
   identity: [],
   cards: [],
   reviews: [],
+  pendingReview: null,
   contact: [],
 };
 

@@ -43,6 +43,6 @@ If explain shows a slow join, add `therapists.specialty_labels text[]` + GIN and
 
 ## RLS / perf
 
-Enable RLS on every public table. `(select auth.uid())` in policies. Public read of open therapists + their tags/licenses/items/reviews. Owner writes own rows. A signed-in patient inserts, updates, and deletes their own review (one per therapist). Storage: public read photos/videos; a user writes `photos/{uid}/` and `videos/{uid}/` only. Admins may also write those prefixes for an existing therapist (`/admin/media`). Do not fetch video on `/find`.
+Enable RLS on every public table. `(select auth.uid())` in policies. Public read of open therapists + their tags/licenses/items. Public review read is `approved` rows only. The author can read their own pending row. A signed-in patient or admin inserts, updates, and deletes their own review on an open, listed therapist (one per therapist; role stays put; an admin cannot review their own profile); those writes stay `pending`. An admin approves at `/admin/reviews` or hard-deletes. Rejected reviews are not archived. Storage: public read photos/videos; a user writes `photos/{uid}/` and `videos/{uid}/` only. Admins may also write those prefixes for an existing therapist (`/admin/media`). Do not fetch video on `/find`.
 
 No N+1: search cards come from one query (or one RPC).

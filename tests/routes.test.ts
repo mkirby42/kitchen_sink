@@ -10,6 +10,7 @@ describe("judge path routes", () => {
     expect(routes.joinEdit).toBe("/join?edit=1");
     expect(routes.profileDeleted).toBe("/profile-deleted");
     expect(routes.adminMedia).toBe("/admin/media");
+    expect(routes.adminReviews).toBe("/admin/reviews");
     expect(routes.therapist("maya")).toBe("/t/maya");
     expect(routes).not.toHaveProperty("matches");
   });

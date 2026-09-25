@@ -34,6 +34,11 @@ describe("homeCtas", () => {
         variant: "secondary",
       },
       {
+        href: routes.adminReviews,
+        label: "Review queue",
+        variant: "secondary",
+      },
+      {
         href: routes.join,
         label: "Join as a therapist",
         variant: "secondary",
@@ -53,6 +58,11 @@ describe("homeCtas", () => {
       {
         href: routes.adminMedia,
         label: "Upload therapist media",
+        variant: "secondary",
+      },
+      {
+        href: routes.adminReviews,
+        label: "Review queue",
         variant: "secondary",
       },
       {

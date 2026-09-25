@@ -41,6 +41,8 @@ describe("site header", () => {
     expect(html).toContain("Join as a Therapist");
     expect(html).toContain('href="/join"');
     expect(html).toContain("Uploads");
+    expect(html).toContain("Reviews");
+    expect(html).toContain('href="/admin/reviews"');
     expect(html).not.toContain("My profile");
   });
 

@@ -11,6 +11,11 @@ import {
 const AMARA_ID = "55555555-5555-4555-8555-555555555002";
 const BODY = "Test-suite review. Safe to delete.";
 
+async function moderationReady() {
+  const { error } = await createAnonClient().from("reviews").select("status").limit(1);
+  return !error;
+}
+
 async function ratingsReady() {
   const { data, error } = await createAnonClient()
     .from("reviews")
@@ -59,46 +64,95 @@ describe.skipIf(!dbConfigured())("client reviews", () => {
     expect(inserted.error).toBeNull();
 
     const anon = createAnonClient();
-    const visible = await anon
-      .from("reviews")
-      .select("author_name, anonymous, stars_cat_1, stars_cat_2, stars_cat_3, stars_avg, body")
-      .eq("therapist_id", AMARA_ID)
-      .eq("body", BODY)
-      .maybeSingle();
-    expect(visible.error).toBeNull();
-    expect(visible.data).toMatchObject({
-      author_name: null,
-      anonymous: true,
-      body: BODY,
-    });
-    expect(Number(visible.data?.stars_cat_1)).toBe(5);
-    expect(Number(visible.data?.stars_cat_2)).toBe(4);
-    expect(Number(visible.data?.stars_cat_3)).toBe(5);
-    expect(Number(visible.data?.stars_avg)).toBeCloseTo(14 / 3, 5);
+    const moderated = await moderationReady();
 
-    const named = await jr
-      .from("reviews")
-      .update({
-        anonymous: false,
-        author_name: "J. R.",
-        stars_cat_1: 4,
-        stars_cat_2: 4,
-        stars_cat_3: 4,
-        body: "   ",
-      })
-      .eq("therapist_id", AMARA_ID)
-      .eq("patient_id", JR_ID);
-    expect(named.error).toBeNull();
+    if (moderated) {
+      const own = await jr
+        .from("reviews")
+        .select("status, anonymous, body")
+        .eq("therapist_id", AMARA_ID)
+        .eq("patient_id", JR_ID)
+        .maybeSingle();
+      expect(own.error).toBeNull();
+      expect(own.data).toMatchObject({
+        status: "pending",
+        anonymous: true,
+        body: BODY,
+      });
 
-    const renamed = await anon
-      .from("reviews")
-      .select("author_name, stars_avg, body")
-      .eq("therapist_id", AMARA_ID)
-      .eq("patient_id", JR_ID)
-      .maybeSingle();
-    expect(renamed.data?.author_name).toBe("J. R.");
-    expect(renamed.data?.body).toBeNull();
-    expect(Number(renamed.data?.stars_avg)).toBe(4);
+      const hidden = await anon
+        .from("reviews")
+        .select("id")
+        .eq("therapist_id", AMARA_ID)
+        .eq("body", BODY)
+        .maybeSingle();
+      expect(hidden.error).toBeNull();
+      expect(hidden.data).toBeNull();
+
+      const sneak = await jr
+        .from("reviews")
+        .update({ status: "approved" })
+        .eq("therapist_id", AMARA_ID)
+        .eq("patient_id", JR_ID);
+      expect(sneak.error).toBeNull();
+
+      const stillPending = await jr
+        .from("reviews")
+        .select("status")
+        .eq("therapist_id", AMARA_ID)
+        .eq("patient_id", JR_ID)
+        .maybeSingle();
+      expect(stillPending.data?.status).toBe("pending");
+
+      const stillHidden = await anon
+        .from("reviews")
+        .select("id")
+        .eq("therapist_id", AMARA_ID)
+        .eq("patient_id", JR_ID)
+        .maybeSingle();
+      expect(stillHidden.data).toBeNull();
+    } else {
+      const visible = await anon
+        .from("reviews")
+        .select("author_name, anonymous, stars_cat_1, stars_cat_2, stars_cat_3, stars_avg, body")
+        .eq("therapist_id", AMARA_ID)
+        .eq("body", BODY)
+        .maybeSingle();
+      expect(visible.error).toBeNull();
+      expect(visible.data).toMatchObject({
+        author_name: null,
+        anonymous: true,
+        body: BODY,
+      });
+      expect(Number(visible.data?.stars_cat_1)).toBe(5);
+      expect(Number(visible.data?.stars_cat_2)).toBe(4);
+      expect(Number(visible.data?.stars_cat_3)).toBe(5);
+      expect(Number(visible.data?.stars_avg)).toBeCloseTo(14 / 3, 5);
+
+      const named = await jr
+        .from("reviews")
+        .update({
+          anonymous: false,
+          author_name: "J. R.",
+          stars_cat_1: 4,
+          stars_cat_2: 4,
+          stars_cat_3: 4,
+          body: "   ",
+        })
+        .eq("therapist_id", AMARA_ID)
+        .eq("patient_id", JR_ID);
+      expect(named.error).toBeNull();
+
+      const renamed = await anon
+        .from("reviews")
+        .select("author_name, stars_avg, body")
+        .eq("therapist_id", AMARA_ID)
+        .eq("patient_id", JR_ID)
+        .maybeSingle();
+      expect(renamed.data?.author_name).toBe("J. R.");
+      expect(renamed.data?.body).toBeNull();
+      expect(Number(renamed.data?.stars_avg)).toBe(4);
+    }
 
     const maya = await createMayaClient();
     const therapistInsert = await maya.from("reviews").insert({

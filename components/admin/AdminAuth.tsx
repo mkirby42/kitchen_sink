@@ -4,7 +4,13 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export function AdminAuth() {
+export function AdminAuth({
+  title = "Sign in to upload media",
+  lede = "This page is for Kitchen Sink ops. Pick a therapist and upload the photo or intro video they emailed you.",
+}: {
+  title?: string;
+  lede?: string;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,13 +42,8 @@ export function AdminAuth() {
       <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
         Ops
       </p>
-      <h1 className="mt-3 font-display text-4xl tracking-tight">
-        Sign in to upload media
-      </h1>
-      <p className="mt-4 text-mute">
-        This page is for Kitchen Sink ops. Pick a therapist and upload the
-        photo or intro video they emailed you.
-      </p>
+      <h1 className="mt-3 font-display text-4xl tracking-tight">{title}</h1>
+      <p className="mt-4 text-mute">{lede}</p>
       <form method="post" onSubmit={submit} className="mt-8 space-y-7">
         <label className="block">
           <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { categoryAverages, formatReviewDate, reviewAuthorLabel, reviewMeta } from "@/lib/reviews/format";
 import { deleteOwnReview, reviewWriteError, submitReview } from "@/lib/reviews/submit";
 import { validateReview } from "@/lib/reviews/validate";
+import { publishedReviews } from "@/lib/reviews/publish";
 import { toProfileReview, type ProfileReview } from "@/lib/therapists/load";
 
 const ratings = { understood: 5, communication: 4, fit: 5 };
@@ -114,6 +115,7 @@ describe("review display", () => {
       reviewer_name: null,
       anonymous: true,
       mine: true,
+      status: "approved",
     });
     expect(review).not.toHaveProperty("patient_id");
   });
@@ -137,6 +139,34 @@ describe("review display", () => {
     );
     expect(formatReviewDate("nope")).toBeNull();
     expect(reviewMeta(review)).toContain("Virtual · 8 months with Maya · ");
+  });
+
+  it("keeps pending reviews out of the public list and treats a missing status as published", () => {
+    const pending = toProfileReview(
+      {
+        id: "rev-pending",
+        patient_id: "patient-1",
+        stars_avg: 5,
+        body: "Waiting.",
+        session_format: null,
+        duration_label: null,
+        status: "pending",
+      },
+      "patient-1",
+    );
+    expect(pending.status).toBe("pending");
+    const approved = toProfileReview(
+      {
+        id: "rev-old",
+        stars_avg: 4,
+        body: "Live.",
+        session_format: null,
+        duration_label: null,
+      },
+      null,
+    );
+    expect(approved.status).toBe("approved");
+    expect(publishedReviews([pending, approved])).toEqual([approved]);
   });
 
   it("averages each question into the reviews-tab breakdown", () => {
