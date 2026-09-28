@@ -116,6 +116,14 @@ export const LICENSE_STATES = [
 
 export type LicenseState = (typeof LICENSE_STATES)[number];
 
+const LICENSE_STATE_SET = new Set<string>(LICENSE_STATES);
+
+/** Find sends a state code only. A typed note is not a license-state filter. */
+export function allowedLicenseState(value: string | null | undefined) {
+  const code = value?.trim().toUpperCase() ?? "";
+  return LICENSE_STATE_SET.has(code) ? code : null;
+}
+
 export const LICENSE_STATE_NAMES: Record<LicenseState, string> = {
   AL: "Alabama",
   AK: "Alaska",

@@ -3,6 +3,7 @@ import {
   LICENSE_STATES,
   filterLicenseStates,
   licenseStateLabel,
+  allowedLicenseState,
   resolveLicenseState,
 } from "@/lib/tags/presets";
 
@@ -42,5 +43,12 @@ describe("license state search", () => {
 
   it("does not resolve an ambiguous prefix", () => {
     expect(resolveLicenseState("new")).toBeNull();
+  });
+
+  it("accepts a state code and drops a health note", () => {
+    expect(allowedLicenseState("ca")).toBe("CA");
+    expect(allowedLicenseState(" DC ")).toBe("DC");
+    expect(allowedLicenseState("I have anxiety")).toBeNull();
+    expect(allowedLicenseState("California")).toBeNull();
   });
 });

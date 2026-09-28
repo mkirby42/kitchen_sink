@@ -62,6 +62,8 @@ describe("llms.txt", () => {
     expect(body.startsWith("# Kitchen Sink\n")).toBe(true);
     expect(body).toContain("Kitchen Sink (Talk Shoppe)");
     expect(body).toContain("does not book appointments");
+    expect(body).toContain("Search filters are not stored");
+    expect(body).toContain("client account is only for leaving a review");
     expect(body).toContain("delete their own profile");
     expect(body).toContain("forgot-password");
     expect(body).toContain(`[Home](${ORIGIN})`);

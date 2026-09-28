@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { FindFilters } from "@/components/search/FindFilters";
 import { TherapistCard } from "@/components/search/TherapistCard";
-import { resultCountLabel } from "@/components/search/query";
+import {
+  buildFindHref,
+  requestFindHref,
+  resultCountLabel,
+} from "@/components/search/query";
 import { parseFindSearchParams, searchTherapists } from "@/lib/search/rpc";
 
 export const metadata: Metadata = {
@@ -17,7 +22,10 @@ type FindPageProps = {
 };
 
 export default async function FindPage({ searchParams }: FindPageProps) {
-  const filters = parseFindSearchParams(await searchParams);
+  const raw = await searchParams;
+  const filters = parseFindSearchParams(raw);
+  const clean = buildFindHref(filters);
+  if (requestFindHref(raw) !== clean) redirect(clean);
   const rows = await searchTherapists(filters);
 
   return (

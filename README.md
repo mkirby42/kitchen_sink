@@ -112,7 +112,7 @@ License numbers, phones, and addresses are fake. Reviews are fiction.
 - In-person location is stored; search uses license state, not maps or distance.
 - One intro clip per therapist, played as uploaded. No transcoding.
 - Associate/trainee credentials are not offered. Education and extra credentials are freeform lists on the profile.
-- Patient UI is sign-in and a profile review. No patient onboarding or public patient pages.
+- Patient UI is sign-in and a profile review. Find does not save a search. A client account cannot store phone, about, tags, a location, or uploads. No patient onboarding or public patient pages.
 
 These are product gaps, not a freeze. See REQUIREMENTS **Not built yet**.
 

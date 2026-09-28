@@ -73,6 +73,8 @@ describe("ReviewsPanel", () => {
     expect(html).toContain(">Maya</em>?");
     expect(html).toContain("Your feedback helps other clients find the right fit.");
     expect(html).toContain("Sign in as a client to leave a review.");
+    expect(html).not.toContain("jr@kitchensink.demo");
+    expect(html).not.toContain("seed-only");
     expect(html).toContain("Do not include personal health information");
     expect(html).toContain("Rejected and deleted reviews are erased and not kept.");
     expect(html).not.toContain("Submit for review");
