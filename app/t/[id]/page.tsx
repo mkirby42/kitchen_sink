@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { buildFindHref } from "@/components/search/query";
+import { redirect } from "next/navigation";
+import {
+  buildFindHref,
+  buildTherapistHref,
+  requestFindHref,
+} from "@/components/search/query";
+import { routes } from "@/lib/routes";
 import {
   ProfileNotFound,
   TherapistProfile,
@@ -61,7 +67,15 @@ export default async function TherapistProfilePage({
   searchParams,
 }: ProfilePageProps) {
   const { id } = await params;
-  const backHref = buildFindHref(parseFindSearchParams(await searchParams));
+  const raw = await searchParams;
+  const filters = parseFindSearchParams(raw);
+  const backHref = buildFindHref(filters);
+  const cleanProfile = buildTherapistHref(id, filters);
+  const requestedProfile = requestFindHref(raw).replace(
+    routes.find,
+    routes.therapist(id),
+  );
+  if (requestedProfile !== cleanProfile) redirect(cleanProfile);
   const data = await loadTherapistProfile(id);
 
   if (!data) return <ProfileNotFound backHref={backHref} />;

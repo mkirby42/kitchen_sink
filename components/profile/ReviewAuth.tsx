@@ -48,9 +48,6 @@ export function ReviewAuth({ returnTo }: { returnTo?: string }) {
   return (
     <form onSubmit={submitAuth} className="rounded-3xl bg-paper px-5 py-5 shadow-sm">
       <p className="text-sm text-mute">Sign in as a client to leave a review.</p>
-      <p className="mt-2 text-sm text-mute">
-        Demo client: jr@kitchensink.demo / seed-only
-      </p>
 
       <div className="mt-4 inline-flex rounded-full bg-cream p-1">
         {(["signup", "signin"] as const).map((option) => (

@@ -202,7 +202,7 @@ export function llmsTxt(origin: string): string {
 
 > Kitchen Sink (Talk Shoppe) is a therapist-matching site. People look up therapists by the tags they need. Therapists publish a profile with a photo, an optional intro video, specialties, insurance, licenses, rates, and contact details.
 
-A match is overlap. The person selects tags (for example a specialty or an insurance plan). The directory lists therapists who have at least one of those tags, ranked by how many tags overlap. Session format (virtual, in-person, or both) and license state apply when those filters are set. With no filters, the list is therapists who are open to new clients and listed in the directory.
+A match is overlap. The person selects tags (for example a specialty or an insurance plan). The directory lists therapists who have at least one of those tags, ranked by how many tags overlap. Session format (virtual, in-person, or both) and license state apply when those filters are set. With no filters, the list is therapists who are open to new clients and listed in the directory. Search filters are not stored. A client account is only for leaving a review.
 
 The site does not book appointments or take payment. To reach a therapist, use the email, phone, or text number on their profile.
 

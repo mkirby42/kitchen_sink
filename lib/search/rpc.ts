@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { supabasePublicConfig } from "@/lib/supabase/env";
-import { allowedSearchTags } from "@/lib/tags/presets";
+import { allowedLicenseState, allowedSearchTags } from "@/lib/tags/presets";
 
 export type SearchRow = {
   profile_id: string;
@@ -45,21 +45,28 @@ export function parseFindSearchParams(
     tags: allowedSearchTags(splitTags(searchParams.tags)),
     virtual: first(searchParams.virtual) === "1",
     inPerson: first(searchParams.in_person) === "1",
-    state: first(searchParams.state)?.trim() || null,
+    state: allowedLicenseState(first(searchParams.state)),
+  };
+}
+
+export function searchRpcArgs(filters: SearchFilters) {
+  return {
+    p_tags: allowedSearchTags(filters.tags),
+    p_virtual: filters.virtual,
+    p_in_person: filters.inPerson,
+    p_state: allowedLicenseState(filters.state),
+    p_limit: 24,
+    p_offset: 0,
   };
 }
 
 export async function searchTherapists(filters: SearchFilters) {
   if (!supabasePublicConfig()) return null;
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("search_therapists", {
-    p_tags: filters.tags,
-    p_virtual: filters.virtual,
-    p_in_person: filters.inPerson,
-    p_state: filters.state,
-    p_limit: 24,
-    p_offset: 0,
-  });
+  const { data, error } = await supabase.rpc(
+    "search_therapists",
+    searchRpcArgs(filters),
+  );
   if (error) throw error;
   return (data ?? []) as SearchRow[];
 }

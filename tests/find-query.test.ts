@@ -3,10 +3,11 @@ import {
   buildFindHref,
   buildTherapistHref,
   filtersFromSearchParams,
+  requestFindHref,
   resultCountLabel,
 } from "@/components/search/query";
 import { allowedSearchTags } from "@/lib/tags/presets";
-import { parseFindSearchParams } from "@/lib/search/rpc";
+import { parseFindSearchParams, searchRpcArgs } from "@/lib/search/rpc";
 
 describe("find result copy", () => {
   it("keeps the plural s in one string so it cannot wrap", () => {
@@ -58,6 +59,60 @@ describe("find search URL", () => {
       inPerson: false,
       state: "CA",
     });
+  });
+
+  it("drops free-text state and a symptom note, and keeps a state code", () => {
+    const params = new URLSearchParams(
+      "state=I%20have%20depression&tags=Anxiety",
+    );
+    expect(filtersFromSearchParams(params)).toEqual({
+      tags: ["Anxiety"],
+      virtual: false,
+      inPerson: false,
+      state: null,
+    });
+    expect(
+      parseFindSearchParams({
+        state: "ca",
+        tags: "panic attacks,ADHD",
+      }),
+    ).toEqual({
+      tags: ["ADHD"],
+      virtual: false,
+      inPerson: false,
+      state: "CA",
+    });
+    expect(
+      searchRpcArgs({
+        tags: ["Anxiety", "my ptsd symptoms"],
+        virtual: true,
+        inPerson: false,
+        state: "panic attacks in California",
+      }),
+    ).toEqual({
+      p_tags: ["Anxiety"],
+      p_virtual: true,
+      p_in_person: false,
+      p_state: null,
+      p_limit: 24,
+      p_offset: 0,
+    });
+    expect(
+      requestFindHref({
+        state: "I have depression",
+        tags: "Anxiety",
+      }),
+    ).not.toBe(
+      buildFindHref(
+        parseFindSearchParams({
+          state: "I have depression",
+          tags: "Anxiety",
+        }),
+      ),
+    );
+    expect(requestFindHref({ state: "CA", tags: "Anxiety" })).toBe(
+      "/find?tags=Anxiety&state=CA",
+    );
   });
 
   it("drops a custom specialty tag and keeps preset filters", () => {
