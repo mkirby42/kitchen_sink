@@ -134,6 +134,23 @@ describe("JoinStep4 contact and rates", () => {
     expect(isDisabled(removeButton(six, "prompt 1"))).toBe(false);
   });
 
+  it("keeps rate boxes inside the same column as the other sections", () => {
+    const html = render({
+      rates: [
+        { service_type: "Individual", duration_minutes: 50, price_cents: 0 },
+        { service_type: "Couples", duration_minutes: 80, price_cents: 20000 },
+      ],
+    });
+    const rates = html.slice(html.indexOf("<fieldset"));
+    expect(rates.startsWith("<fieldset")).toBe(true);
+    expect(rates).toContain("min-w-0 w-full");
+    expect(rates).not.toContain("minmax(10.5rem");
+    expect(rates).not.toContain("min-w-[10.5rem]");
+    expect(html).toContain("Individual");
+    expect(html).toContain("Couples");
+    expect(html).toContain('aria-label="Remove rate 1"');
+  });
+
   it("offers sliding scale as a checkbox", () => {
     const off = render();
     expect(off).toContain("Offer sliding scale");
