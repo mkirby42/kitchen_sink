@@ -112,6 +112,17 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
     const rows = await search(anon, { p_tags: ["Teens"] });
     expect(rows.some((row) => row.profile_id === userId)).toBe(true);
 
+    const practice = await anon
+      .from("therapists")
+      .select("listed, open_to_new_clients")
+      .eq("profile_id", userId)
+      .single();
+    expect(practice.error).toBeNull();
+    expect(practice.data).toEqual({
+      listed: true,
+      open_to_new_clients: true,
+    });
+
     const profile = await anon
       .from("profiles")
       .select("video_key")
