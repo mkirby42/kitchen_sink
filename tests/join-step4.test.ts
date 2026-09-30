@@ -149,6 +149,18 @@ describe("JoinStep4 contact and rates", () => {
     expect(on).not.toContain("Sliding scale maximum");
   });
 
+  it("tells the therapist that product feedback is emailed", () => {
+    const html = renderToStaticMarkup(
+      createElement(JoinStep4, {
+        draft: draft({ feedback: "The license step was unclear." }),
+        setDraft: () => {},
+      }),
+    );
+    expect(html).toContain("Feedback for us");
+    expect(html).toContain("We email it to the team when you submit.");
+    expect(html).toContain("The license step was unclear.");
+  });
+
   it("hides product feedback when editing an existing profile", () => {
     const html = renderToStaticMarkup(
       createElement(JoinStep4, {

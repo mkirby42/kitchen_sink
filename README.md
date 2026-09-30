@@ -67,7 +67,7 @@ flowchart LR
 
 ### Option B — local app, same hosted data
 
-Create a `.env.local` from the sample below. Keys come from the Supabase project **API** page (anon / publishable key only). No other API keys.
+Create a `.env.local` from the sample below. Keys come from the Supabase project **API** page (anon / publishable key only). Server-only `RESEND_API_KEY` sends Join “Feedback for us” to the team. Optional `RESEND_FROM` is the verified sender.
 
 ```bash
 # .env.local — copy from .env.example

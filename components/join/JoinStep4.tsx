@@ -447,6 +447,7 @@ export function JoinStep4({
           <span className={labelClass}>Feedback for us</span>
           <p className="mt-1 text-sm text-mute">
             Optional — we&apos;re in testing, so anything you&apos;d flag is welcome.
+            We email it to the team when you submit.
           </p>
           <textarea
             rows={3}

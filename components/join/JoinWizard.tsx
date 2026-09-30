@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { sendJoinFeedback } from "@/lib/feedback/actions";
+import { finishJoin } from "@/lib/join/finish";
 import type { JoinDraft } from "@/lib/join/types";
 import { toRpcArgs } from "@/lib/join/submit";
 import {
@@ -143,6 +145,8 @@ export function JoinWizard({
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [mediaBusy, setMediaBusy] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [savedFeedback, setSavedFeedback] = useState<string | null>(null);
 
   function moveTo(nextStep: Step) {
     setStep(nextStep);
@@ -172,12 +176,25 @@ export function JoinWizard({
     setSubmitting(true);
     try {
       const payload = buildJoinPayload(draft);
-      const { error } = await createClient().rpc(
-        editing ? "update_therapist_profile" : "complete_therapist_join",
-        toRpcArgs(payload),
-      );
-      if (error) {
-        setSubmitError(error.message);
+      const feedback = profileSaved ? savedFeedback : payload.feedback;
+      const result = await finishJoin({
+        alreadySaved: profileSaved,
+        feedback,
+        save: async () => {
+          const { error } = await createClient().rpc(
+            editing ? "update_therapist_profile" : "complete_therapist_join",
+            toRpcArgs(payload),
+          );
+          return error?.message ?? null;
+        },
+        notify: (body) => sendJoinFeedback(body),
+      });
+      if (!result.ok) {
+        if (result.saved) {
+          setProfileSaved(true);
+          setSavedFeedback(feedback);
+        }
+        setSubmitError(result.error);
         return;
       }
       router.push(routes.therapist(userId));
@@ -220,14 +237,18 @@ export function JoinWizard({
             className="shrink-0 rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-45"
           >
             {submitting
-              ? editing
-                ? "Saving…"
-                : "Submitting…"
-              : step === 4
-                ? editing
-                  ? "Save changes →"
-                  : "Submit application →"
-                : "Continue →"}
+              ? profileSaved
+                ? "Sending feedback…"
+                : editing
+                  ? "Saving…"
+                  : "Submitting…"
+              : profileSaved
+                ? "Retry feedback email →"
+                : step === 4
+                  ? editing
+                    ? "Save changes →"
+                    : "Submit application →"
+                  : "Continue →"}
           </button>
         </div>
       }
