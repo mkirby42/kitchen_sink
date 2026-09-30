@@ -217,13 +217,19 @@ export function JoinStep4({
         </div>
       ) : null}
 
-      <fieldset>
+      <fieldset className="min-w-0 w-full">
         <legend className={labelClass}>Rates</legend>
         <div className="mt-4 space-y-3">
-          {draft.rates.map((rate, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div className="grid flex-1 grid-cols-[minmax(10.5rem,1.4fr)_6.75rem_5.75rem] items-center gap-3 rounded-full border border-line bg-paper px-4 py-1.5">
-                <label className="min-w-[10.5rem]">
+          {draft.rates.map((rate, index) => {
+            const canRemove = draft.rates.length > 1;
+            return (
+            <div key={index} className="relative w-full min-w-0">
+              <div
+                className={`grid w-full min-w-0 grid-cols-[minmax(5.75rem,1.4fr)_minmax(3.5rem,5.25rem)_minmax(3.25rem,4.5rem)] items-center gap-x-2 rounded-full border border-line bg-paper py-1.5 pl-4 ${
+                  canRemove ? "pr-10" : "pr-4"
+                }`}
+              >
+                <label className="min-w-0">
                   <span className="sr-only">Service type</span>
                   <select
                     aria-label={`Rate ${index + 1} service type`}
@@ -238,7 +244,7 @@ export function JoinStep4({
                         ),
                       }))
                     }
-                    className="w-full min-w-[10.5rem] bg-transparent py-1.5 outline-none"
+                    className="w-full min-w-0 bg-transparent py-1.5 outline-none"
                   >
                     {RATE_SERVICE_TYPES.map((service) => (
                       <option
@@ -286,7 +292,7 @@ export function JoinStep4({
               <button
                 type="button"
                 aria-label={`Remove rate ${index + 1}`}
-                disabled={draft.rates.length === 1}
+                disabled={!canRemove}
                 onClick={() =>
                   setDraft((current) => ({
                     ...current,
@@ -295,12 +301,13 @@ export function JoinStep4({
                     ),
                   }))
                 }
-                className="grid size-9 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay disabled:cursor-not-allowed disabled:opacity-30"
+                className="absolute top-1/2 right-1 grid size-8 -translate-y-1/2 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay disabled:pointer-events-none disabled:invisible"
               >
                 ×
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
         <button
           type="button"
@@ -324,7 +331,7 @@ export function JoinStep4({
           + Add another rate
         </button>
 
-        <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-full border border-line bg-paper px-5 py-3">
+        <label className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-full border border-line bg-paper px-5 py-3">
           <input
             type="checkbox"
             checked={draft.slidingScale}
