@@ -46,10 +46,15 @@ export function tagClass(selected: boolean, className?: string) {
 export function segmentTrackClass({
   stack = false,
   wrap = false,
+  size = "md",
 }: {
   stack?: boolean;
   wrap?: boolean;
+  size?: "md" | "sm";
 } = {}) {
+  if (size === "sm") {
+    return "inline-flex max-w-full flex-wrap gap-0.5 rounded-full bg-line p-0.5";
+  }
   return cx(
     "inline-flex gap-1 bg-line p-1.5",
     stack
@@ -60,8 +65,9 @@ export function segmentTrackClass({
   );
 }
 
-export function segmentOptionClass(selected: boolean) {
+export function segmentOptionClass(selected: boolean, size: "md" | "sm" = "md") {
+  const pad = size === "sm" ? "px-3 py-1 text-xs" : "px-5 py-2.5 text-sm";
   return selected
-    ? "rounded-full bg-ink px-5 py-2.5 text-center text-sm font-medium text-paper"
-    : "rounded-full px-5 py-2.5 text-center text-sm font-medium text-ink/65 hover:text-ink";
+    ? `rounded-full bg-ink text-center font-medium text-paper ${pad}`
+    : `rounded-full text-center font-medium text-ink/65 hover:text-ink ${pad}`;
 }

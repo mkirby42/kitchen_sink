@@ -10,6 +10,8 @@ export function SegmentedControl<T extends string>({
   className,
   stack = false,
   wrap = false,
+  size = "md",
+  disabled = false,
 }: {
   label: string;
   value: T;
@@ -19,12 +21,15 @@ export function SegmentedControl<T extends string>({
   /** Homepage: column on a phone, pill row from sm up. */
   stack?: boolean;
   wrap?: boolean;
+  /** sm is the header view switcher. md is the homepage switch. */
+  size?: "md" | "sm";
+  disabled?: boolean;
 }) {
   return (
     <div
       role="group"
       aria-label={label}
-      className={cx(segmentTrackClass({ stack, wrap }), className)}
+      className={cx(segmentTrackClass({ stack, wrap, size }), className)}
     >
       {options.map((option) => {
         const selected = option.value === value;
@@ -33,10 +38,12 @@ export function SegmentedControl<T extends string>({
             key={option.value}
             type="button"
             aria-pressed={selected}
+            disabled={disabled}
             onClick={() => onChange(option.value)}
             className={cx(
-              segmentOptionClass(selected),
+              segmentOptionClass(selected, size),
               stack &&
+                size === "md" &&
                 "flex w-full items-center justify-center sm:inline-flex sm:w-auto",
             )}
           >
