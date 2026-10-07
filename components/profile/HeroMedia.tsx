@@ -11,7 +11,6 @@ type HeroMediaProps = {
   licenseCaptions: string[];
   years: number | null;
   formatLabel: string | null;
-  modalities: string[];
 };
 
 export function HeroMedia({
@@ -23,7 +22,6 @@ export function HeroMedia({
   licenseCaptions,
   years,
   formatLabel,
-  modalities,
 }: HeroMediaProps) {
   const [playing, setPlaying] = useState(false);
   const showVideo = Boolean(videoUrl && playing);
@@ -31,7 +29,7 @@ export function HeroMedia({
   const yearsLabel =
     years == null ? null : `${years} yr${years === 1 ? "" : "s"} practicing`;
   const detailLine = [credential, yearsLabel].filter(Boolean).join(" · ");
-  const showChips = Boolean(formatLabel) || modalities.length > 0;
+  const showChips = Boolean(formatLabel);
   const showDetails = showVideo || Boolean(detailLine) || showChips;
 
   return (
@@ -148,11 +146,6 @@ export function HeroMedia({
               {formatLabel ? (
                 <span className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
                   ↑ {formatLabel}
-                </span>
-              ) : null}
-              {modalities.length > 0 ? (
-                <span className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
-                  ♡ {modalities.join(" · ")}
                 </span>
               ) : null}
             </div>

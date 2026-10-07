@@ -3,17 +3,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { HeroMedia } from "@/components/profile/HeroMedia";
 
-const modalities = [
-  "ACT",
-  "Attachment-Based",
-  "CBT",
-  "DBT",
-  "Existential",
-  "Narrative",
-  "Solution Focused Brief (SFBT)",
-  "Strength-Based",
-];
-
 const texasLicense = "Licensed by State of Texas / 38047";
 
 function render(
@@ -22,7 +11,6 @@ function render(
     videoUrl: string | null;
     years: number | null;
     formatLabel: string | null;
-    modalities: string[];
     credential: string | null;
     licenseCaptions: string[];
   }> = {},
@@ -37,7 +25,6 @@ function render(
       licenseCaptions: [texasLicense],
       years: 8,
       formatLabel: "Virtual & In-Person",
-      modalities,
       ...overrides,
     }),
   );
@@ -72,20 +59,20 @@ describe("HeroMedia", () => {
     expect(media).not.toContain("8 yrs practicing");
     expect(media).not.toContain("Virtual");
     expect(media).not.toContain("1 min intro");
-    expect(media).not.toContain("ACT ·");
+    expect(media).not.toContain("ACT");
 
     expect(details).toContain("PsyD");
     expect(details).toContain("8 yrs practicing");
     expect(details).not.toContain("1 min intro");
     expect(details).toContain("Virtual &amp; In-Person");
-    expect(details).toContain("ACT · Attachment-Based · CBT");
+    expect(details).not.toContain("ACT");
     expect(details).not.toContain(texasLicense);
     expect(details).not.toContain(">Travis White<");
   });
 
   it("omits the play control without a video and keeps the license on the photo", () => {
     const { media, details } = splitHero(
-      render({ videoUrl: null, years: 1, modalities: [] }),
+      render({ videoUrl: null, years: 1 }),
     );
 
     expect(media).not.toContain("Play intro video");
@@ -95,7 +82,6 @@ describe("HeroMedia", () => {
     expect(media).toContain(texasLicense);
     expect(details).toContain("1 yr practicing");
     expect(details).toContain("↑ Virtual &amp; In-Person");
-    expect(details).not.toContain("♡");
     expect(details).not.toContain("1 min intro");
   });
 
@@ -107,7 +93,6 @@ describe("HeroMedia", () => {
       licenseCaptions: [],
       years: null,
       formatLabel: null,
-      modalities: [],
     });
     const { media, details } = splitHero(html);
 

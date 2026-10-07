@@ -106,7 +106,6 @@ export function TherapistProfile({
         licenseCaptions={licenses}
         years={data.years}
         formatLabel={format}
-        modalities={data.modalities}
       />
 
       {data.education.length > 0 ||
@@ -156,18 +155,8 @@ export function TherapistProfile({
         </section>
       ) : null}
 
-      {data.specialties.length > 0 ? (
-        <ul className="mt-4 flex flex-wrap gap-2">
-          {data.specialties.map((label) => (
-            <li
-              key={label}
-              className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm"
-            >
-              {label}
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <TagSection title="Modalities" labels={data.modalities} />
+      <TagSection title="Specialties" labels={data.specialties} />
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         <article className="rounded-2xl bg-paper px-4 py-4 shadow-sm">
@@ -322,6 +311,27 @@ function AboutPanel({
         </dl>
       </div>
     </div>
+  );
+}
+
+function TagSection({ title, labels }: { title: string; labels: string[] }) {
+  if (labels.length === 0) return null;
+  return (
+    <section className="mt-4 rounded-2xl bg-paper px-4 py-4 shadow-sm">
+      <h2 className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
+        {title}
+      </h2>
+      <ul className="mt-2 flex flex-wrap gap-2">
+        {labels.map((label) => (
+          <li
+            key={label}
+            className="rounded-full bg-cream px-3 py-1.5 text-sm text-ink"
+          >
+            {label}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
