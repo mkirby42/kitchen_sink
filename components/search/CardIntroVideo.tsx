@@ -16,14 +16,17 @@ export function CardIntroVideo({
   videoUrl,
 }: CardIntroVideoProps) {
   const [playing, setPlaying] = useState(false);
+  // 9:16 column. object-contain keeps a portrait clip whole; landscape letterboxes.
+  // Explicit width so a row layout cannot stretch the frame and crop it.
   const frame =
-    "relative h-44 w-full overflow-hidden rounded-2xl bg-ink sm:h-52";
+    "relative aspect-[9/16] w-40 shrink-0 self-start overflow-hidden rounded-2xl bg-ink sm:w-52";
+  const media = "absolute inset-0 h-full w-full object-contain";
 
   if (playing) {
     return (
       <div className={frame}>
         <video
-          className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
+          className={media}
           src={videoUrl}
           poster={photoUrl ?? undefined}
           preload="none"
@@ -49,11 +52,7 @@ export function CardIntroVideo({
       {photoUrl ? (
         // Public Storage URLs; next/image is out of scope this weekend.
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={photoUrl}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
-        />
+        <img src={photoUrl} alt="" className={media} />
       ) : (
         <span
           aria-hidden
