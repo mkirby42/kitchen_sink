@@ -47,9 +47,11 @@ describe("HeroMedia", () => {
 
     expect(html).toContain('aria-label="Play intro video for Travis White"');
     expect(html).toContain("1 min intro");
-    expect(html).toContain("bg-ink/20");
-    expect(html).toContain("border-paper/95");
-    expect(html).toContain("backdrop-blur-[2px]");
+    expect(html).toContain("bg-transparent");
+    expect(html).toContain("border-paper/80");
+    expect(html).not.toContain("backdrop-blur");
+    expect(html).not.toContain("bg-ink/20");
+    expect(html).not.toContain("bg-paper/10");
     expect(html).not.toContain(
       "bg-paper shadow-[0_8px_28px_rgba(27,39,68,0.28)]",
     );
