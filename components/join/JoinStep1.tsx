@@ -1,13 +1,11 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
+import { fieldClass, fieldLabelClass, selectClass } from "@/components/ui/styles";
 import type { JoinDraft } from "@/lib/join/types";
 import { CREDENTIALS, LICENSE_STATES } from "@/lib/tags/presets";
 
-const fieldClass =
-  "mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay";
-const labelClass =
-  "text-xs font-semibold tracking-[0.16em] text-mute uppercase";
+const labelClass = fieldLabelClass;
 
 export function JoinStep1({
   draft,
@@ -28,7 +26,7 @@ export function JoinStep1({
           onChange={(event) =>
             setDraft((current) => ({ ...current, name: event.target.value }))
           }
-          className={fieldClass}
+          className={`${fieldClass} mt-2`}
         />
       </label>
 
@@ -44,7 +42,7 @@ export function JoinStep1({
                 credential,
               }));
             }}
-            className={fieldClass}
+            className={`${selectClass} mt-2`}
           >
             <option value="">Choose a credential</option>
             {CREDENTIALS.map((credential) => (
@@ -70,7 +68,7 @@ export function JoinStep1({
                   event.target.value === "" ? "" : Number(event.target.value),
               }))
             }
-            className={fieldClass}
+            className={`${fieldClass} mt-2`}
           />
         </label>
       </div>
@@ -122,10 +120,10 @@ export function JoinStep1({
                         ),
                       }))
                     }
-                    className="w-full rounded-full border border-line bg-paper px-4 py-2.5 outline-none placeholder:text-mute/70 focus:border-clay"
+                    className={fieldClass}
                   />
                 </label>
-                <label className="w-[5.5rem] shrink-0">
+                <label className="w-[7.5rem] shrink-0">
                   <span className="sr-only">License state</span>
                   <select
                     required={rowRequired}
@@ -142,7 +140,7 @@ export function JoinStep1({
                         ),
                       }))
                     }
-                    className="w-full rounded-full border border-line bg-paper px-3 py-2.5 outline-none focus:border-clay"
+                    className={selectClass}
                   >
                     <option value="">State</option>
                     {LICENSE_STATES.map((state) => (
@@ -223,7 +221,7 @@ function StringListField({
                   next[index] = event.target.value;
                   onChange(next);
                 }}
-                className="w-full rounded-full border border-line bg-paper px-4 py-2.5 outline-none placeholder:text-mute/70 focus:border-clay"
+                className={fieldClass}
               />
             </label>
             <button

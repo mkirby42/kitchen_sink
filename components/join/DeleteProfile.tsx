@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { fieldClass, fieldLabelClass } from "@/components/ui/styles";
 import {
   deleteOwnTherapistProfile,
   deletePhraseMatches,
@@ -113,7 +115,7 @@ export function DeleteProfileDialog({
         aria-modal="true"
         aria-labelledby="delete-profile-title"
         aria-describedby="delete-profile-copy"
-        className="w-full max-w-md rounded-[1.75rem] bg-paper p-6 shadow-[0_24px_70px_rgba(27,39,68,0.2)]"
+        className="w-full max-w-md rounded-card bg-paper p-6 shadow-overlay"
       >
         <h2
           id="delete-profile-title"
@@ -128,7 +130,7 @@ export function DeleteProfileDialog({
         </p>
         <label
           htmlFor="delete-profile-confirm"
-          className="mt-5 block text-sm font-medium text-ink"
+          className={`mt-5 block ${fieldLabelClass}`}
         >
           Type DELETE to confirm
         </label>
@@ -138,7 +140,7 @@ export function DeleteProfileDialog({
           autoComplete="off"
           autoFocus
           onChange={(event) => onPhrase(event.target.value)}
-          className="mt-2 w-full rounded-xl border border-line bg-cream px-3 py-3 text-ink outline-none focus:border-clay"
+          className={`${fieldClass} mt-2`}
         />
         {error ? (
           <p role="alert" className="mt-3 text-sm font-medium text-clay-dark">
@@ -146,22 +148,12 @@ export function DeleteProfileDialog({
           </p>
         ) : null}
         <div className="mt-6 flex flex-wrap justify-end gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={busy}
-            className="rounded-full px-4 py-2.5 text-sm font-medium text-ink hover:bg-cream disabled:opacity-45"
-          >
+          <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
             Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={!ready || busy}
-            className="rounded-full bg-clay px-5 py-2.5 text-sm font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-45"
-          >
+          </Button>
+          <Button type="button" onClick={onConfirm} disabled={!ready || busy}>
             {busy ? "Deleting…" : "Delete profile"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import {
   approveReview,
   rejectReview,
@@ -42,9 +45,7 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
-      <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
-        Ops
-      </p>
+      <Eyebrow>Ops</Eyebrow>
       <h1 className="mt-3 font-display text-4xl tracking-tight">Review queue</h1>
       <p className="mt-4 max-w-xl text-mute">
         New client reviews stay here until you approve them. Approving posts
@@ -60,7 +61,7 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
             const date = formatReviewDate(review.createdAt);
             const busy = busyId === review.id;
             return (
-              <li key={review.id} className="rounded-[1.75rem] bg-paper px-5 py-5">
+              <Card as="li" key={review.id} className="px-5 py-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-medium text-ink">{review.authorLabel}</p>
@@ -88,14 +89,13 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
                   <p className="mt-3 text-sm text-mute">No written note.</p>
                 )}
                 <div className="mt-5 flex items-center gap-4">
-                  <button
+                  <Button
                     type="button"
                     disabled={busyId !== null}
                     onClick={() => void run(review.id, "approve")}
-                    className="rounded-full bg-clay px-5 py-2.5 text-sm font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {busy ? "Please wait…" : "Approve"}
-                  </button>
+                  </Button>
                   <button
                     type="button"
                     disabled={busyId !== null}
@@ -105,7 +105,7 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
                     Reject and delete
                   </button>
                 </div>
-              </li>
+              </Card>
             );
           })}
         </ul>

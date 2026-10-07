@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { buttonClass, fieldLabelClass } from "@/components/ui/styles";
 
 export function MediaSlot({
   kind,
@@ -27,9 +28,7 @@ export function MediaSlot({
   return (
     <section className="space-y-3">
       {kind === "video" ? (
-        <p className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Intro video
-        </p>
+        <p className={fieldLabelClass}>Intro video</p>
       ) : null}
       <div className="flex items-center gap-4">
         <button
@@ -67,7 +66,7 @@ export function MediaSlot({
             type="button"
             disabled={uploading}
             onClick={() => inputRef.current?.click()}
-            className="rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium hover:border-ink/20 disabled:opacity-60"
+            className={buttonClass("secondary")}
           >
             {uploading
               ? (busyLabel ?? `Uploading ${noun}…`)

@@ -1,3 +1,4 @@
+import { buttonClass } from "@/components/ui/styles";
 import { PHOTO_ACCEPT, VIDEO_ACCEPT } from "@/lib/join/media";
 
 export function MediaField({
@@ -30,7 +31,7 @@ export function MediaField({
         )}
       </div>
       <div>
-        <label className="inline-flex cursor-pointer rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium hover:border-ink/20">
+        <label className={buttonClass("secondary", "cursor-pointer")}>
           {busy ? `Uploading ${noun}…` : uploaded ? `Replace ${noun}…` : `Choose a ${noun}…`}
           <input
             type="file"

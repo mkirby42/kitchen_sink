@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { Button } from "@/components/ui/Button";
+import { Tag } from "@/components/ui/Tag";
+import { Switch } from "@/components/ui/Switch";
+import { fieldClass, fieldLabelClass, selectClass } from "@/components/ui/styles";
 import { normalizeCustomLabel } from "@/lib/join/cards";
 import type { JoinDraft } from "@/lib/join/types";
 import {
@@ -11,7 +15,6 @@ import {
   MODALITY_PRESETS,
   SPECIALTY_PRESETS,
 } from "@/lib/tags/presets";
-import { Chip } from "./Chip";
 
 type TagField = "specialties" | "modalities" | "insurance" | "identity";
 
@@ -57,25 +60,23 @@ function TagGroup({
 
   return (
     <fieldset>
-      <legend className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-        {title}
-      </legend>
+      <legend className={fieldLabelClass}>{title}</legend>
       <div className="mt-3 flex flex-wrap gap-2">
         {labels.map((label) => (
-          <Chip
+          <Tag
             key={label}
             selected={selected.includes(label)}
             onClick={() => toggle(label)}
           >
             {label}
-          </Chip>
+          </Tag>
         ))}
         {selected
           .filter((label) => !labels.includes(label))
           .map((label) => (
-            <Chip key={label} selected onClick={() => toggle(label)}>
+            <Tag key={label} selected onClick={() => toggle(label)}>
               {label} ×
-            </Chip>
+            </Tag>
           ))}
       </div>
       {custom ? (
@@ -90,15 +91,11 @@ function TagGroup({
               }
             }}
             placeholder="Add your own"
-            className="min-w-0 flex-1 rounded-full border border-line bg-paper px-4 py-2 text-sm outline-none focus:border-clay"
+            className={fieldClass}
           />
-          <button
-            type="button"
-            onClick={addCustom}
-            className="rounded-full border border-clay px-4 py-2 text-sm font-semibold text-clay hover:bg-cream"
-          >
+          <Button type="button" variant="secondary" onClick={addCustom}>
             Add
-          </button>
+          </Button>
         </div>
       ) : null}
     </fieldset>
@@ -119,42 +116,27 @@ export function JoinStep3({
           <p className="font-semibold">Currently accepting new clients</p>
           <p className="mt-1 text-sm text-mute">You can update this later.</p>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={draft.openToNewClients}
-          onClick={() =>
-            setDraft((current) => ({
-              ...current,
-              openToNewClients: !current.openToNewClients,
-            }))
+        <Switch
+          label="Currently accepting new clients"
+          checked={draft.openToNewClients}
+          onChange={(openToNewClients) =>
+            setDraft((current) => ({ ...current, openToNewClients }))
           }
-          className={`relative h-7 w-12 rounded-full transition ${
-            draft.openToNewClients ? "bg-clay" : "bg-line"
-          }`}
-        >
-          <span
-            className={`absolute top-1 size-5 rounded-full bg-paper shadow transition ${
-              draft.openToNewClients ? "left-6" : "left-1"
-            }`}
-          />
-        </button>
+        />
       </div>
 
       <fieldset>
-        <legend className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Session format
-        </legend>
+        <legend className={fieldLabelClass}>Session format</legend>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Chip
+          <Tag
             selected={draft.virtual}
             onClick={() =>
               setDraft((current) => ({ ...current, virtual: !current.virtual }))
             }
           >
             Virtual
-          </Chip>
-          <Chip
+          </Tag>
+          <Tag
             selected={draft.inPerson}
             onClick={() =>
               setDraft((current) => {
@@ -174,18 +156,16 @@ export function JoinStep3({
             }
           >
             In-Person
-          </Chip>
+          </Tag>
         </div>
       </fieldset>
 
       {draft.inPerson && draft.location ? (
         <div className="rounded-2xl bg-cream p-5">
-          <p className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-            Practice location
-          </p>
+          <p className={fieldLabelClass}>Practice location</p>
           <div className="mt-4 grid gap-5 sm:grid-cols-2">
             <label className="sm:col-span-2">
-              <span className="text-sm text-mute">Street address</span>
+              <span className={fieldLabelClass}>Street address</span>
               <input
                 value={draft.location.address}
                 onChange={(event) =>
@@ -196,11 +176,11 @@ export function JoinStep3({
                       : null,
                   }))
                 }
-                className="mt-1 w-full border-b border-line bg-transparent py-2 outline-none focus:border-clay"
+                className={`${fieldClass} mt-2`}
               />
             </label>
             <label>
-              <span className="text-sm text-mute">State</span>
+              <span className={fieldLabelClass}>State</span>
               <select
                 value={draft.location.state}
                 onChange={(event) =>
@@ -211,7 +191,7 @@ export function JoinStep3({
                       : null,
                   }))
                 }
-                className="mt-1 w-full border-b border-line bg-transparent py-2 outline-none focus:border-clay"
+                className={`${selectClass} mt-2`}
               >
                 <option value="">Choose state</option>
                 {LICENSE_STATES.map((state) => (
@@ -222,7 +202,7 @@ export function JoinStep3({
               </select>
             </label>
             <label>
-              <span className="text-sm text-mute">ZIP</span>
+              <span className={fieldLabelClass}>ZIP</span>
               <input
                 inputMode="numeric"
                 value={draft.location.zip}
@@ -234,7 +214,7 @@ export function JoinStep3({
                       : null,
                   }))
                 }
-                className="mt-1 w-full border-b border-line bg-transparent py-2 outline-none focus:border-clay"
+                className={`${fieldClass} mt-2`}
               />
             </label>
           </div>

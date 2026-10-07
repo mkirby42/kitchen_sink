@@ -1,11 +1,10 @@
 import type { RefObject } from "react";
 import type { IntroRecordPhase } from "@/components/join/useIntroRecorder";
+import { buttonClass } from "@/components/ui/styles";
 import { formatRecordClock } from "@/lib/join/record-video";
 
-const offerButton =
-  "rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium hover:border-ink/20 disabled:opacity-60";
-const primaryButton =
-  "rounded-full bg-clay px-5 py-2.5 text-sm font-semibold text-paper hover:bg-clay-dark disabled:opacity-60";
+const offerButton = buttonClass("secondary");
+const primaryButton = buttonClass("primary");
 
 export function IntroRecordDialog({
   dialogRef,
@@ -46,7 +45,7 @@ export function IntroRecordDialog({
         event.preventDefault();
         onClose();
       }}
-      className="m-auto w-[min(calc(100%-2rem),28rem)] rounded-[1.75rem] border-0 bg-paper p-6 text-ink shadow-[0_24px_70px_rgba(27,39,68,0.18)] backdrop:bg-ink/40"
+      className="m-auto w-[min(calc(100%-2rem),28rem)] rounded-card border-0 bg-paper p-6 text-ink shadow-overlay backdrop:bg-ink/40"
     >
       <h2 id={titleId} className="font-display text-3xl tracking-tight">
         Record intro

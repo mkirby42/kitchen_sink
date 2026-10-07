@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
+import { Button } from "@/components/ui/Button";
+import { buttonClass } from "@/components/ui/styles";
 
 export const UPLOAD_HELP_EMAIL = "chrislo5240@gmail.com";
 
@@ -36,7 +38,7 @@ export function UploadHelp({ troubleToken }: { troubleToken: number }) {
             const dialog = dialogRef.current;
             if (dialog && !dialog.open) dialog.showModal();
           }}
-          className="rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium hover:border-ink/20"
+          className={buttonClass("secondary")}
         >
           Need help uploading?
         </button>
@@ -47,7 +49,7 @@ export function UploadHelp({ troubleToken }: { troubleToken: number }) {
         onClick={(event) => {
           if (event.target === event.currentTarget) dialogRef.current?.close();
         }}
-        className="m-auto w-[min(calc(100%-2rem),24rem)] rounded-[1.75rem] border-0 bg-paper p-6 text-ink shadow-[0_24px_70px_rgba(27,39,68,0.18)] backdrop:bg-ink/40"
+        className="m-auto w-[min(calc(100%-2rem),24rem)] rounded-card border-0 bg-paper p-6 text-ink shadow-overlay backdrop:bg-ink/40"
       >
         <h2 id={titleId} className="font-display text-3xl tracking-tight">
           Need help uploading?
@@ -60,19 +62,13 @@ export function UploadHelp({ troubleToken }: { troubleToken: number }) {
           and the team will help.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <a
-            href={MAILTO}
-            className="rounded-full bg-clay px-5 py-2.5 text-sm font-semibold text-paper hover:bg-clay-dark"
-          >
+          <a href={MAILTO} className={buttonClass("primary")}>
             Email the team
           </a>
           <form method="dialog">
-            <button
-              type="submit"
-              className="rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium hover:border-ink/20"
-            >
+            <Button type="submit" variant="secondary">
               Close
-            </button>
+            </Button>
           </form>
         </div>
       </dialog>
