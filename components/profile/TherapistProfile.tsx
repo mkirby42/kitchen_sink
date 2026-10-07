@@ -7,10 +7,10 @@ import {
 } from "@/lib/therapists/display";
 import {
   consultBookActions,
-  formatLabel,
   hasSuperbill,
   licenseCaptions,
   reviewAverage,
+  sessionFormatPills,
   slidingScaleLabel,
   type TherapistProfileData,
 } from "@/lib/therapists/load";
@@ -32,7 +32,7 @@ export function TherapistProfile({
   viewer: ReviewViewer;
 }) {
   const isOwner = viewer.isOwner;
-  const format = formatLabel(data.virtual, data.inPerson);
+  const formats = sessionFormatPills(data.virtual, data.inPerson);
   const officeLines = data.inPerson ? officeAddressLines(data.office) : [];
   const licenses = licenseCaptions(data.licenses);
   const sliding = slidingScaleLabel(
@@ -110,12 +110,9 @@ export function TherapistProfile({
         videoUrl={data.videoUrl}
         licenseCaptions={licenses}
         years={data.years}
-        formatLabel={format}
       />
 
-      {data.education.length > 0 ||
-      data.credentials.length > 0 ||
-      officeLines.length > 0 ? (
+      {data.education.length > 0 || data.credentials.length > 0 ? (
         <section className="mt-4 rounded-2xl bg-paper px-4 py-4 shadow-sm">
           <div className="space-y-4">
             {data.education.length > 0 ? (
@@ -140,20 +137,6 @@ export function TherapistProfile({
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-              </div>
-            ) : null}
-            {officeLines.length > 0 ? (
-              <div>
-                <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
-                  Office
-                </p>
-                <address className="mt-2 text-sm text-ink not-italic">
-                  {officeLines.map((line, index) => (
-                    <span key={`${index}-${line}`} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </address>
               </div>
             ) : null}
           </div>
@@ -212,6 +195,8 @@ export function TherapistProfile({
             inNetwork={data.inNetwork}
             sliding={sliding}
             superbill={superbill}
+            formats={formats}
+            officeLines={officeLines}
           />
         }
         reviews={
@@ -235,12 +220,16 @@ function AboutPanel({
   inNetwork,
   sliding,
   superbill,
+  formats,
+  officeLines,
 }: {
   about: string | null;
   rates: TherapistProfileData["rates"];
   inNetwork: string[];
   sliding: string | null;
   superbill: boolean;
+  formats: string[];
+  officeLines: string[];
 }) {
   return (
     <div>
@@ -249,8 +238,29 @@ function AboutPanel({
       ) : null}
       <div className="mt-5 rounded-3xl bg-clay/10 px-5 py-5">
         <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
-          Rates & insurance
+          Logistics
         </p>
+        {formats.length > 0 ? (
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {formats.map((label) => (
+              <li
+                key={label}
+                className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm"
+              >
+                {label}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {officeLines.length > 0 ? (
+          <address className="mt-3 text-sm text-ink not-italic">
+            {officeLines.map((line, index) => (
+              <span key={`${index}-${line}`} className="block">
+                {line}
+              </span>
+            ))}
+          </address>
+        ) : null}
         <dl className="mt-3 divide-y divide-line text-sm">
           {rates.map((rate) => (
             <div

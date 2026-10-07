@@ -11,6 +11,7 @@ import {
   licenseCaptions,
   licenseLine,
   reviewAverage,
+  sessionFormatPills,
   slidingScaleLabel,
   telHref,
 } from "@/lib/therapists/load";
@@ -106,6 +107,13 @@ describe("profile view helpers", () => {
 
   it("averages review stars", () => {
     expect(reviewAverage([5, 5, 4])).toBe(4.7);
+  });
+
+  it("lists in-person and virtual as separate logistics pills", () => {
+    expect(sessionFormatPills(true, true)).toEqual(["In person", "Virtual"]);
+    expect(sessionFormatPills(true, false)).toEqual(["Virtual"]);
+    expect(sessionFormatPills(false, true)).toEqual(["In person"]);
+    expect(sessionFormatPills(false, false)).toEqual([]);
   });
 
   it("shows an in-person office and hides a blank or virtual-only address", () => {
