@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { cardClass, cx } from "@/components/ui/styles";
 import { routes } from "@/lib/routes";
 
 export function JoinShell({
@@ -21,7 +22,7 @@ export function JoinShell({
 
   return (
     <main className="mx-auto w-full max-w-lg px-4 py-10 sm:px-6 sm:py-16">
-      <section className="overflow-hidden rounded-[2rem] bg-paper shadow-[0_24px_70px_rgba(27,39,68,0.12)]">
+      <section className={cx(cardClass, "overflow-hidden")}>
         <div className="flex items-center gap-4 px-5 pt-5 sm:px-8 sm:pt-7">
           {onBack ? (
             <button

@@ -3,10 +3,10 @@
 import { useId } from "react";
 import { IntroRecordDialog } from "@/components/join/IntroRecordDialog";
 import { useIntroRecorder } from "@/components/join/useIntroRecorder";
+import { buttonClass } from "@/components/ui/styles";
 import { INTRO_MAX_SECONDS, formatRecordClock } from "@/lib/join/record-video";
 
-const offerButton =
-  "rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-medium hover:border-ink/20 disabled:opacity-60";
+const offerButton = buttonClass("secondary");
 
 export function IntroRecorder({
   disabled,

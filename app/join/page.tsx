@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { JoinAuth } from "@/components/join/JoinAuth";
 import { JoinWizard } from "@/components/join/JoinWizard";
 import { readAudienceCookie } from "@/lib/audience-cookie";
@@ -68,10 +70,8 @@ export default async function JoinPage({
   if (access.kind === "patient") {
     return (
       <main className="mx-auto max-w-lg px-6 py-16">
-        <section className="rounded-[2rem] bg-paper px-6 py-10 shadow-[0_24px_70px_rgba(27,39,68,0.12)]">
-          <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
-            Patient account
-          </p>
+        <Card className="px-6 py-10">
+          <Eyebrow>Patient account</Eyebrow>
           <h1 className="mt-3 font-display text-4xl tracking-tight">
             You&apos;re signed in as a patient.
           </h1>
@@ -79,13 +79,10 @@ export default async function JoinPage({
             Keep browsing therapists on Kitchen Sink. Sign out if you want to
             join as a therapist.
           </p>
-          <Link
-            href={routes.find}
-            className="mt-8 inline-flex rounded-full bg-clay px-5 py-3 font-medium text-paper hover:bg-clay-dark"
-          >
+          <Button href={routes.find} className="mt-8">
             Find a therapist
-          </Link>
-        </section>
+          </Button>
+        </Card>
       </main>
     );
   }

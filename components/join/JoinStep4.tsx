@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { Button } from "@/components/ui/Button";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Tag } from "@/components/ui/Tag";
+import { fieldClass, fieldLabelClass, textareaClass } from "@/components/ui/styles";
 import {
   answeredConversationCardCount,
   CONVERSATION_PROMPTS,
@@ -9,7 +13,6 @@ import {
 } from "@/lib/join/cards";
 import type { JoinDraft } from "@/lib/join/types";
 import { OUTREACH_OPTIONS, RATE_SERVICE_TYPES } from "@/lib/tags/presets";
-import { Chip } from "./Chip";
 import { RateDurationInput } from "./RateDurationInput";
 import { RatePriceInput } from "./RatePriceInput";
 
@@ -22,10 +25,7 @@ const FILTERS = [
   ["outcome", "Outcome"],
 ] as const;
 
-const labelClass =
-  "text-xs font-semibold tracking-[0.16em] text-mute uppercase";
-const underlineClass =
-  "mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay";
+const labelClass = fieldLabelClass;
 
 export function JoinStep4({
   draft,
@@ -134,26 +134,13 @@ export function JoinStep4({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map(([value, label]) => {
-          const selected = filter === value;
-          return (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => setFilter(value)}
-              className={
-                selected
-                  ? "rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper"
-                  : "rounded-full bg-cream px-4 py-2 text-sm font-medium text-ink hover:bg-line"
-              }
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      <SegmentedControl
+        label="Prompt filters"
+        value={filter}
+        onChange={setFilter}
+        wrap
+        options={FILTERS.map(([value, label]) => ({ value, label }))}
+      />
 
       <div className="space-y-2">
         {filteredPrompts.map((item) => {
@@ -194,25 +181,16 @@ export function JoinStep4({
               value={customPrompt}
               onChange={(event) => setCustomPrompt(event.target.value)}
               placeholder="e.g. what surprises new clients about me…"
-              className={underlineClass}
+              className={`${fieldClass} mt-2`}
             />
           </label>
           <div className="flex gap-3">
-            <button
-              type="button"
-              disabled={atCardMax}
-              onClick={addCustomCard}
-              className="rounded-full bg-clay px-5 py-2 text-sm font-semibold text-paper disabled:cursor-not-allowed disabled:opacity-40"
-            >
+            <Button type="button" disabled={atCardMax} onClick={addCustomCard}>
               Add card
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowCustom(false)}
-              className="rounded-full border border-line bg-paper px-5 py-2 text-sm font-semibold text-ink"
-            >
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => setShowCustom(false)}>
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       ) : null}
@@ -355,7 +333,7 @@ export function JoinStep4({
           onChange={(event) =>
             setDraft((current) => ({ ...current, about: event.target.value }))
           }
-          className="mt-3 w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none placeholder:text-mute/80 focus:border-clay"
+          className={`${textareaClass} mt-3`}
           placeholder='Write this in the first person — e.g. "I work with adults navigating anxiety and big life transitions…" (shown at the top of your profile).'
         />
       </label>
@@ -369,7 +347,7 @@ export function JoinStep4({
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {OUTREACH_OPTIONS.map((option) => (
-              <Chip
+              <Tag
                 key={option}
                 selected={draft.outreach.includes(option)}
                 onClick={() =>
@@ -382,7 +360,7 @@ export function JoinStep4({
                 }
               >
                 {option[0].toUpperCase() + option.slice(1)}
-              </Chip>
+              </Tag>
             ))}
           </div>
         </fieldset>
@@ -397,7 +375,7 @@ export function JoinStep4({
               onChange={(event) =>
                 setDraft((current) => ({ ...current, email: event.target.value }))
               }
-              className={underlineClass}
+              className={`${fieldClass} mt-2`}
             />
           </label>
         ) : (
@@ -413,7 +391,7 @@ export function JoinStep4({
               onChange={(event) =>
                 setDraft((current) => ({ ...current, email: event.target.value }))
               }
-              className={underlineClass}
+              className={`${fieldClass} mt-2`}
             />
           </label>
         )}
@@ -428,7 +406,7 @@ export function JoinStep4({
               onChange={(event) =>
                 setDraft((current) => ({ ...current, phone: event.target.value }))
               }
-              className={underlineClass}
+              className={`${fieldClass} mt-2`}
             />
           </label>
         ) : null}
@@ -443,7 +421,7 @@ export function JoinStep4({
               onChange={(event) =>
                 setDraft((current) => ({ ...current, phone: event.target.value }))
               }
-              className={underlineClass}
+              className={`${fieldClass} mt-2`}
             />
           </label>
         ) : null}
@@ -465,7 +443,7 @@ export function JoinStep4({
                 feedback: event.target.value,
               }))
             }
-            className="mt-3 w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none placeholder:text-mute/80 focus:border-clay"
+            className={`${textareaClass} mt-3`}
             placeholder="Confusing steps, missing fields, bugs, ideas — anything at all."
           />
         </label>

@@ -9,6 +9,9 @@ import {
 } from "@/lib/admin/media";
 import { DirectoryListing } from "@/components/admin/DirectoryListing";
 import { MediaField } from "@/components/admin/MediaField";
+import { Card } from "@/components/ui/Card";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { TextField } from "@/components/ui/Field";
 import { mediaFileError } from "@/lib/join/media";
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { routes } from "@/lib/routes";
@@ -125,9 +128,7 @@ export function HelperUpload({
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
-      <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
-        Ops
-      </p>
+      <Eyebrow>Ops</Eyebrow>
       <h1 className="mt-3 font-display text-4xl tracking-tight">
         Upload therapist media
       </h1>
@@ -136,17 +137,14 @@ export function HelperUpload({
         into the same storage folders their profile already uses.
       </p>
 
-      <label className="mt-8 block">
-        <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Find therapist
-        </span>
-        <input
+      <div className="mt-8">
+        <TextField
+          label="Find therapist"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Name or email"
-          className="mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay"
         />
-      </label>
+      </div>
 
       <ul className="mt-4 max-h-80 space-y-2 overflow-y-auto">
         {visible.length === 0 ? (
@@ -189,7 +187,7 @@ export function HelperUpload({
       </ul>
 
       {selected ? (
-        <section className="mt-8 space-y-6 rounded-[1.75rem] bg-paper p-6">
+        <Card className="mt-8 space-y-6 p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="font-display text-3xl tracking-tight">
@@ -229,7 +227,7 @@ export function HelperUpload({
             disabled={busy}
             onFile={(file) => void chooseFile("video", file)}
           />
-        </section>
+        </Card>
       ) : (
         <p className="mt-8 text-sm text-mute">Pick a therapist to upload.</p>
       )}

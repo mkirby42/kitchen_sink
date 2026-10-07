@@ -3,6 +3,10 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { TextField } from "@/components/ui/Field";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 import { JoinShell } from "./JoinShell";
@@ -54,9 +58,7 @@ export function JoinAuth({
   return (
     <JoinShell>
       <div className="mx-auto max-w-xl">
-        <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
-          Join as a therapist
-        </p>
+        <Eyebrow>Join as a therapist</Eyebrow>
         <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
           Welcome to <em className="text-clay">Kitchen Sink</em>.
         </h1>
@@ -66,54 +68,41 @@ export function JoinAuth({
             : "Sign in to continue your therapist profile."}
         </p>
 
-        <div className="mt-8 inline-flex rounded-full bg-cream p-1">
-          {(["signup", "signin"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => {
-                setMode(option);
-                setMessage("");
-              }}
-              className={`rounded-full px-5 py-2 text-sm font-semibold ${
-                mode === option ? "bg-clay text-paper" : "text-mute"
-              }`}
-            >
-              {option === "signup" ? "Sign up" : "Sign in"}
-            </button>
-          ))}
+        <div className="mt-8">
+          <SegmentedControl
+            label="Create an account or sign in"
+            value={mode}
+            onChange={(option) => {
+              setMode(option);
+              setMessage("");
+            }}
+            options={[
+              { value: "signup", label: "Sign up" },
+              { value: "signin", label: "Sign in" },
+            ]}
+          />
         </div>
 
         <form onSubmit={submit} className="mt-8 space-y-7">
-          <label className="block">
-            <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-              Email
-            </span>
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay"
-            />
-          </label>
+          <TextField
+            label="Email"
+            type="email"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
 
-          <label className="block">
-            <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-              Password
-            </span>
-            <input
-              type="password"
-              required
-              minLength={6}
-              autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay"
-            />
-            <span className="mt-2 block text-sm text-mute">At least 6 characters.</span>
-          </label>
+          <TextField
+            label="Password"
+            type="password"
+            required
+            minLength={6}
+            autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            hint="At least 6 characters."
+          />
 
           {mode === "signin" ? (
             <p className="-mt-4">
@@ -132,17 +121,13 @@ export function JoinAuth({
             </p>
           ) : null}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <Button type="submit" disabled={submitting}>
             {submitting
               ? "Please wait…"
               : mode === "signup"
                 ? "Create account →"
                 : "Sign in →"}
-          </button>
+          </Button>
         </form>
       </div>
     </JoinShell>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AdminAuth } from "@/components/admin/AdminAuth";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { HelperUpload } from "@/components/admin/HelperUpload";
 import { adminToolsVisible } from "@/lib/audience";
 import { readAudienceCookie } from "@/lib/audience-cookie";
@@ -46,9 +47,7 @@ export default async function AdminMediaPage() {
     if (profile?.role === "admin") return <AdminViewHold />;
     return (
       <main className="mx-auto max-w-lg px-6 py-16">
-        <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
-          Ops
-        </p>
+        <Eyebrow>Ops</Eyebrow>
         <h1 className="mt-3 font-display text-4xl tracking-tight">
           Admin access only
         </h1>

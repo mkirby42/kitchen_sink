@@ -3,6 +3,9 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { JoinShell } from "@/components/join/JoinShell";
+import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { TextField } from "@/components/ui/Field";
 import {
   passwordResetRedirect,
   rememberResetReturn,
@@ -13,9 +16,6 @@ import {
   resetSignInPath,
 } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
-
-const inputClass =
-  "mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay";
 
 export function ForgotPasswordForm({
   from,
@@ -62,9 +62,7 @@ export function ForgotPasswordForm({
   return (
     <JoinShell closeHref={signInPath}>
       <div>
-        <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
-          Account
-        </p>
+        <Eyebrow>Account</Eyebrow>
         <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
           {sent ? "Check your email" : "Forgot your password?"}
         </h1>
@@ -75,27 +73,19 @@ export function ForgotPasswordForm({
         </p>
 
         {sent ? (
-          <Link
-            href={signInPath}
-            className="mt-8 inline-flex rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark"
-          >
+          <Button href={signInPath} className="mt-8">
             Back to sign in
-          </Link>
+          </Button>
         ) : (
           <form onSubmit={submit} className="mt-8 space-y-7">
-            <label className="block">
-              <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-                Email
-              </span>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className={inputClass}
-              />
-            </label>
+            <TextField
+              label="Email"
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
 
             {message ? (
               <p
@@ -106,13 +96,9 @@ export function ForgotPasswordForm({
               </p>
             ) : null}
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
-            >
+            <Button type="submit" disabled={submitting}>
               {submitting ? "Please wait…" : "Send reset link"}
-            </button>
+            </Button>
           </form>
         )}
 

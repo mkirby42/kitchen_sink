@@ -11,6 +11,10 @@
   --color-pine: #2f5348;
   --color-mute: #6e675e;
   --color-line: #e8dfd2;
+  --radius-card: 1.75rem;
+  --radius-box: 1.25rem;
+  --shadow-card: 0 18px 50px rgb(27 39 68 / 0.06);
+  --shadow-overlay: 0 24px 70px rgb(27 39 68 / 0.18);
 }
 
 html,
@@ -21,4 +25,24 @@ body {
 
 body {
   font-family: var(--font-sans);
+}
+
+/* Pill selects. The chevron stays inside the rounded end. */
+select.ks-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%231b2744' stroke-width='1.5' stroke-linecap='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.95rem center;
+  background-size: 0.7rem;
+  padding-right: 2.4rem;
+}
+
+input.ks-field[type="number"] {
+  appearance: textfield;
+}
+
+input.ks-field[type="number"]::-webkit-outer-spin-button,
+input.ks-field[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
 }

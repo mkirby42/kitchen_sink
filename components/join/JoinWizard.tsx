@@ -17,6 +17,8 @@ import {
 } from "@/lib/join/validate";
 import { joinPath, routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { DeleteProfile } from "./DeleteProfile";
 import { JoinShell } from "./JoinShell";
 import { JoinStep1 } from "./JoinStep1";
@@ -78,10 +80,10 @@ function currentErrors(step: Step, draft: JoinDraft) {
 
 function Heading({ step }: { step: Step }) {
   const eyebrow = {
-    1: "BASIC INFO",
-    2: "PHOTO",
-    3: "PRACTICE DETAILS",
-    4: "CONVERSATION CARDS & CONTACT",
+    1: "Basic info",
+    2: "Photo",
+    3: "Practice details",
+    4: "Conversation cards and contact",
   }[step];
 
   const subcopy = {
@@ -93,9 +95,9 @@ function Heading({ step }: { step: Step }) {
 
   return (
     <div className="mb-9">
-      <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
+      <Eyebrow>
         Step {step} of 4 · {eyebrow}
-      </p>
+      </Eyebrow>
       <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
         {step === 1 ? (
           <>
@@ -222,11 +224,11 @@ export function JoinWizard({
               {submitError || hint || (blocked ? errors[0] : "")}
             </p>
           </div>
-          <button
+          <Button
             type="button"
             disabled={blocked || submitting || mediaBusy}
             onClick={() => void continueOrSubmit()}
-            className="shrink-0 rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-45"
+            className="shrink-0"
           >
             {submitting
               ? editing
@@ -237,7 +239,7 @@ export function JoinWizard({
                   ? "Save changes →"
                   : "Submit application →"
                 : "Continue →"}
-          </button>
+          </Button>
         </div>
       }
     >

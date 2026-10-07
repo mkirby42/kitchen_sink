@@ -1,8 +1,10 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Link from "next/link";
 import { JoinShell } from "@/components/join/JoinShell";
+import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { TextField } from "@/components/ui/Field";
 import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_UPDATED_MESSAGE,
@@ -18,9 +20,6 @@ import {
 import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
-
-const inputClass =
-  "mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay";
 
 type ResetPhase = "checking" | "ready" | "invalid" | "wrong-browser" | "unconfigured" | "done";
 
@@ -146,9 +145,7 @@ export function ResetPasswordForm() {
   return (
     <JoinShell>
       <div>
-        <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
-          Account
-        </p>
+        <Eyebrow>Account</Eyebrow>
         <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
           {phase === "done"
             ? "Password updated"
@@ -166,58 +163,42 @@ export function ResetPasswordForm() {
             <p role="alert" className="mt-4 text-mute">
               {problem}
             </p>
-            <Link
-              href={routes.forgotPassword}
-              className="mt-8 inline-flex rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark"
-            >
+            <Button href={routes.forgotPassword} className="mt-8">
               Request a new link
-            </Link>
+            </Button>
           </>
         ) : null}
 
         {phase === "done" ? (
           <>
             <p className="mt-4 text-mute">{PASSWORD_UPDATED_MESSAGE}</p>
-            <Link
-              href={continueHref}
-              className="mt-8 inline-flex rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark"
-            >
+            <Button href={continueHref} className="mt-8">
               Continue
-            </Link>
+            </Button>
           </>
         ) : null}
 
         {phase === "ready" ? (
           <form onSubmit={submit} className="mt-8 space-y-7">
             <p className="text-mute">At least {PASSWORD_MIN_LENGTH} characters.</p>
-            <label className="block">
-              <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-                New password
-              </span>
-              <input
-                type="password"
-                required
-                minLength={PASSWORD_MIN_LENGTH}
-                autoComplete="new-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className={inputClass}
-              />
-            </label>
-            <label className="block">
-              <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-                Confirm password
-              </span>
-              <input
-                type="password"
-                required
-                minLength={PASSWORD_MIN_LENGTH}
-                autoComplete="new-password"
-                value={confirm}
-                onChange={(event) => setConfirm(event.target.value)}
-                className={inputClass}
-              />
-            </label>
+            <TextField
+              label="New password"
+              type="password"
+              required
+              minLength={PASSWORD_MIN_LENGTH}
+              autoComplete="new-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+            <TextField
+              label="Confirm password"
+              type="password"
+              required
+              minLength={PASSWORD_MIN_LENGTH}
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(event) => setConfirm(event.target.value)}
+            />
             {message ? (
               <p
                 role="alert"
@@ -226,13 +207,9 @@ export function ResetPasswordForm() {
                 {message}
               </p>
             ) : null}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
-            >
+            <Button type="submit" disabled={submitting}>
               {submitting ? "Please wait…" : "Update password"}
-            </button>
+            </Button>
           </form>
         ) : null}
       </div>

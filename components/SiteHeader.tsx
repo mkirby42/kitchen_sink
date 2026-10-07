@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AudienceSwitcher } from "@/components/AudienceSwitcher";
+import { Button } from "@/components/ui/Button";
 import { headerChrome, type SiteAudience } from "@/lib/audience";
 import type { NavUser } from "@/lib/nav";
 import { parseProfileRole } from "@/lib/role";
@@ -191,12 +192,7 @@ export function SiteHeader({
               </Link>
             ) : null}
             {chrome.myProfile && navUser ? (
-              <Link
-                href={routes.therapist(navUser.id)}
-                className="rounded-full bg-clay px-4 py-2 font-medium text-paper hover:bg-clay-dark"
-              >
-                My profile
-              </Link>
+              <Button href={routes.therapist(navUser.id)}>My profile</Button>
             ) : null}
             {chrome.signOut ? (
               <button

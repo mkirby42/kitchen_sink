@@ -3,6 +3,9 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { TextField } from "@/components/ui/Field";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 
@@ -41,39 +44,27 @@ export function AdminAuth({
 
   return (
     <main className="mx-auto max-w-lg px-6 py-16">
-      <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">
-        Ops
-      </p>
+      <Eyebrow>Ops</Eyebrow>
       <h1 className="mt-3 font-display text-4xl tracking-tight">{title}</h1>
       <p className="mt-4 text-mute">{lede}</p>
       <form method="post" onSubmit={submit} className="mt-8 space-y-7">
-        <label className="block">
-          <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-            Email
-          </span>
-          <input
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className="mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay"
-          />
-        </label>
-        <label className="block">
-          <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-            Password
-          </span>
-          <input
-            type="password"
-            required
-            minLength={6}
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="mt-2 w-full border-0 border-b border-line bg-transparent px-0 py-3 text-lg outline-none focus:border-clay"
-          />
-        </label>
+        <TextField
+          label="Email"
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <TextField
+          label="Password"
+          type="password"
+          required
+          minLength={6}
+          autoComplete="current-password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
         <p className="-mt-4">
           <Link
             href={forgotPasswordPath("admin")}
@@ -90,13 +81,9 @@ export function AdminAuth({
             {message}
           </p>
         ) : null}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-full bg-clay px-6 py-3 font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <Button type="submit" disabled={submitting}>
           {submitting ? "Please wait…" : "Sign in →"}
-        </button>
+        </Button>
       </form>
     </main>
   );
