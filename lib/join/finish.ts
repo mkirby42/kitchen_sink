@@ -1,23 +1,22 @@
 export type FinishJoinResult =
   | { ok: true; saved: true }
-  | { ok: false; saved: boolean; error: string };
+  | { ok: false; saved: false; error: string };
 
 export async function finishJoin(input: {
-  alreadySaved: boolean;
   feedback: string | null;
   save: () => Promise<string | null>;
-  notify: (
-    feedback: string,
-  ) => Promise<{ ok: true } | { ok: false; error: string }>;
+  notify: (feedback: string) => Promise<unknown>;
 }): Promise<FinishJoinResult> {
-  if (!input.alreadySaved) {
-    const error = await input.save();
-    if (error) return { ok: false, saved: false, error };
-  }
+  const error = await input.save();
+  if (error) return { ok: false, saved: false, error };
 
   if (input.feedback) {
-    const mailed = await input.notify(input.feedback);
-    if (!mailed.ok) return { ok: false, saved: true, error: mailed.error };
+    try {
+      await input.notify(input.feedback);
+    } catch {
+      // The note is already stored. Scheduling the ops email must not
+      // keep the therapist on this step.
+    }
   }
 
   return { ok: true, saved: true };

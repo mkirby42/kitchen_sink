@@ -14,7 +14,6 @@ import { loadReviewViewer, type ReviewViewer } from "@/lib/reviews/viewer";
 import { parseFindSearchParams } from "@/lib/search/rpc";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { therapistMetaDescription } from "@/lib/site";
-import { notifyPendingProductFeedback } from "@/lib/feedback/notify";
 import { loadTherapistProfile } from "@/lib/therapists/load";
 
 const emptyViewer: ReviewViewer = {
@@ -82,7 +81,6 @@ export default async function TherapistProfilePage({
   if (!data) return <ProfileNotFound backHref={backHref} />;
 
   const viewer = await loadViewer(data.id);
-  if (viewer.isOwner) await notifyPendingProductFeedback();
 
   return <TherapistProfile data={data} backHref={backHref} viewer={viewer} />;
 }
