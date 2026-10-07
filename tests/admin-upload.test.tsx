@@ -66,7 +66,9 @@ describe("admin helper upload UI", () => {
     expect(html).toContain("Uploads");
     expect(html).toContain('href="/admin/reviews"');
     expect(html).toContain("Reviews");
-    expect(html).toContain("Join as a Therapist");
+    expect(html).toContain("For Therapists");
+    expect(html).toContain('href="/join"');
+    expect(html).not.toContain("Therapist log in");
     expect(html).not.toContain("Interest");
     expect(html).not.toContain("My profile");
   });

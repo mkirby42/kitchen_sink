@@ -10,9 +10,41 @@ import { createClient } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 
 function navClass(active: boolean) {
-  return active
-    ? "text-ink font-medium"
-    : "text-ink/80 hover:text-ink";
+  return active ? "font-medium text-ink" : "text-ink/80 hover:text-ink";
+}
+
+function Sparkle() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      className="ml-1 inline-block h-[0.55em] w-[0.55em] -translate-y-[0.28em] text-clay"
+      aria-hidden
+    >
+      <path
+        fill="currentColor"
+        d="M8 0.4 9.15 6.05 14.8 8 9.15 9.95 8 15.6 6.85 9.95 1.2 8 6.85 6.05Z"
+      />
+    </svg>
+  );
+}
+
+function PersonIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      aria-hidden
+    >
+      <circle cx="12" cy="8" r="3.25" />
+      <path
+        d="M5.5 19.25c1.15-3.05 3.35-4.5 6.5-4.5s5.35 1.45 6.5 4.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export function SiteHeader({
@@ -91,19 +123,19 @@ export function SiteHeader({
       ? navUser
       : null;
 
+  const showTherapistEntry = !navUser || Boolean(admin);
+
   return (
     <header className="border-b border-line bg-paper">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <Link
           href={routes.home}
-          className="font-display text-2xl tracking-tight text-ink"
+          className="shrink-0 font-display text-2xl tracking-tight text-ink"
         >
           Kitchen Sink
-          <span className="ml-1 inline-block text-base text-clay" aria-hidden>
-            ✦
-          </span>
+          <Sparkle />
         </Link>
-        <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm">
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm sm:justify-end sm:gap-x-6">
           <Link
             href={routes.home}
             className={navClass(path === routes.home)}
@@ -136,12 +168,9 @@ export function SiteHeader({
               Reviews
             </Link>
           ) : null}
-          {!navUser || admin ? (
-            <Link
-              href={routes.join}
-              className="rounded-full bg-clay px-4 py-2 font-medium text-paper hover:bg-clay-dark"
-            >
-              Join as a Therapist
+          {showTherapistEntry ? (
+            <Link href={routes.join} className={navClass(false)}>
+              For Therapists
             </Link>
           ) : null}
           {therapist ? (
@@ -160,7 +189,21 @@ export function SiteHeader({
             >
               Sign out
             </button>
-          ) : null}
+          ) : (
+            <>
+              <span
+                className="hidden h-4 w-px shrink-0 bg-ink/20 sm:block"
+                aria-hidden
+              />
+              <Link
+                href={routes.joinSignIn}
+                className="inline-flex items-center gap-1.5 text-ink/80 hover:text-ink"
+              >
+                <PersonIcon />
+                Therapist log in
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>

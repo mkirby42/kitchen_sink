@@ -24,7 +24,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Route | What |
 | --- | --- |
-| `/` | Home (Find, Join, **Log in as a therapist**) |
+| `/` | Home. Find a therapist, or create a therapist profile / log in |
 | `/find` | Public search |
 | `/t/[id]` | Therapist profile (owner sees **Edit**) |
 | `/join` | Therapist onboarding (auth). Returning therapists sign in from home and land on their profile. Sign-in links to forgot password |

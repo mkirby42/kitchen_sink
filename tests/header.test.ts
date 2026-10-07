@@ -24,6 +24,8 @@ describe("site header", () => {
     );
     expect(html).toContain("Find a Therapist");
     expect(html).toContain("My profile");
+    expect(html).not.toContain("For Therapists");
+    expect(html).not.toContain("Therapist log in");
     expect(html).not.toContain("Join as a Therapist");
     expect(html).not.toContain("Interest");
     expect(html).not.toContain("/matches");
@@ -38,11 +40,12 @@ describe("site header", () => {
         },
       }),
     );
-    expect(html).toContain("Join as a Therapist");
+    expect(html).toContain("For Therapists");
     expect(html).toContain('href="/join"');
     expect(html).toContain("Uploads");
     expect(html).toContain("Reviews");
     expect(html).toContain('href="/admin/reviews"');
+    expect(html).not.toContain("Therapist log in");
     expect(html).not.toContain("My profile");
   });
 
@@ -56,7 +59,7 @@ describe("site header", () => {
         },
       }),
     );
-    expect(html).toContain("Join as a Therapist");
+    expect(html).toContain("For Therapists");
     expect(html).toContain("My profile");
     expect(html).toContain("/t/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1");
   });
@@ -66,7 +69,11 @@ describe("site header", () => {
       createElement(SiteHeader, { initialNavUser: null }),
     );
     expect(html).toContain("Find a Therapist");
-    expect(html).toContain("Join as a Therapist");
+    expect(html).toContain("For Therapists");
+    expect(html).toContain('href="/join"');
+    expect(html).toContain("Therapist log in");
+    expect(html).toContain('href="/join?mode=signin"');
+    expect(html).not.toContain("Join as a Therapist");
     expect(html).not.toContain("Interest");
     expect(html).not.toContain("/matches");
   });
