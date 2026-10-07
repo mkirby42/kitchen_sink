@@ -52,7 +52,6 @@ function PersonIcon() {
 
 function hidesSiteNav(path: string) {
   return (
-    path.startsWith("/t/") ||
     path === routes.join ||
     path === routes.forgotPassword ||
     path === routes.resetPassword
@@ -129,8 +128,9 @@ export function SiteHeader({
     <AudienceSwitcher audience={audience} />
   ) : null;
 
-  // Profile, join, and password reset use their own phone-width chrome.
-  // Admins still get the switcher so Therapist/Client preview can return.
+  // Join and password reset use their own phone-width chrome.
+  // Admins still get the switcher there so Therapist/Client preview can return.
+  // Therapist profiles use this header.
   if (hidesSiteNav(path)) {
     if (!switcher) return null;
     return (

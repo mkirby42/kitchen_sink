@@ -4,8 +4,12 @@ import { describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "@/components/SiteHeader";
 import { routes } from "@/lib/routes";
 
+const nav = vi.hoisted(() => ({
+  pathname: vi.fn(() => "/"),
+}));
+
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/",
+  usePathname: () => nav.pathname(),
   useRouter: () => ({ push() {}, refresh() {}, replace() {} }),
 }));
 
@@ -161,5 +165,51 @@ describe("site header", () => {
     expect(html).not.toContain("Join as a Therapist");
     expect(html).not.toContain("Interest");
     expect(html).not.toContain("/matches");
+  });
+
+  it("uses the full header on a therapist profile", () => {
+    nav.pathname.mockReturnValue("/t/11111111-1111-4111-8111-111111111111");
+    const visitor = renderToStaticMarkup(
+      createElement(SiteHeader, { initialNavUser: null }),
+    );
+    expect(visitor).toContain("Find a Therapist");
+    expect(visitor).toContain("For Therapists");
+    expect(visitor).toContain("Therapist log in");
+    expect(visitor).not.toContain("Admin view");
+
+    const admin = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+          role: "admin",
+          hasTherapist: true,
+        },
+        audience: "admin",
+      }),
+    );
+    expect(admin).toContain("Find a Therapist");
+    expect(admin).toContain("Uploads");
+    expect(admin).toContain('aria-label="Site view"');
+    expect(admin).toContain("Admin view");
+    expect(admin).toContain("Client view");
+
+    nav.pathname.mockReturnValue("/join");
+    const joinAdmin = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+          role: "admin",
+        },
+        audience: "therapist",
+      }),
+    );
+    expect(joinAdmin).toContain('aria-label="Site view"');
+    expect(joinAdmin).not.toContain("Find a Therapist");
+
+    const joinVisitor = renderToStaticMarkup(
+      createElement(SiteHeader, { initialNavUser: null }),
+    );
+    expect(joinVisitor).toBe("");
+    nav.pathname.mockReturnValue("/");
   });
 });

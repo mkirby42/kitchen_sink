@@ -30,6 +30,19 @@ describe("shared ui", () => {
     expect(secondary).not.toContain("bg-clay");
     expect(buttonClass("primary")).toContain("py-2.5");
     expect(buttonClass("secondary")).toContain("py-2.5");
+    expect(buttonClass("secondary", undefined, "sm")).toContain("px-3");
+    expect(buttonClass("secondary", undefined, "sm")).toContain("py-2.5");
+    expect(buttonClass("primary", undefined, "sm")).toContain("bg-clay");
+
+    const labeled = html(
+      createElement(
+        Button,
+        { href: "/join?edit=1", "aria-label": "Edit profile" },
+        "Edit",
+      ),
+    );
+    expect(labeled).toContain('aria-label="Edit profile"');
+    expect(labeled).toContain('href="/join?edit=1"');
   });
 
   it("uses the homepage card surface", () => {
@@ -57,6 +70,22 @@ describe("shared ui", () => {
     expect(control).toContain('aria-pressed="true"');
     expect(control).not.toContain("bg-clay");
     expect(control).toContain("Sign in");
+
+    const filled = html(
+      createElement(SegmentedControl, {
+        label: "Profile sections",
+        value: "profile",
+        fill: true,
+        onChange() {},
+        options: [
+          { value: "profile", label: "Profile" },
+          { value: "reviews", label: "Reviews" },
+        ],
+      }),
+    );
+    expect(filled).toContain("w-full");
+    expect(filled).toContain("flex-1");
+    expect(filled).toContain("bg-ink");
   });
 
   it("renders one tag pill and sentence-case fields", () => {

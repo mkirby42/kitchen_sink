@@ -41,9 +41,6 @@ export function SessionHeading({ name }: { name: string }) {
   return (
     <div>
       <h2 className="font-display text-[1.7rem] leading-tight tracking-tight text-ink">
-        <span aria-hidden className="text-clay">
-          ~{" "}
-        </span>
         How was your session with <em className="text-clay">{name}</em>?
       </h2>
       <p className="mt-2 text-sm text-mute">
