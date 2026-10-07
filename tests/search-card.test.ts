@@ -125,6 +125,8 @@ describe("Find therapist card", () => {
     expect(html).not.toContain("Play intro video");
     expect(html).not.toContain("<video");
     expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
+    expect(html).not.toContain("aspect-[9/16]");
+    expect(html).not.toContain("sm:flex-row");
   });
 
   it("shows a poster and play control without loading the video file", () => {
@@ -146,6 +148,15 @@ describe("Find therapist card", () => {
     expect(html).not.toContain("autoPlay");
     expect(html).not.toContain("autoplay");
     expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
+    expect(html).toContain("aspect-[9/16]");
+    expect(html).toContain("object-contain");
+    expect(html).not.toContain("object-cover");
+    expect(html).toContain("sm:flex-row");
+    expect(html).toContain("sm:w-52");
+    expect(html.match(/<article/g)).toHaveLength(1);
+    const nameAt = html.indexOf(">Maya Chen<");
+    expect(nameAt).toBeGreaterThan(playAt);
+    expect(nameAt).toBeGreaterThan(linkAt);
   });
 
   it("shows the first conversation card and skips a blank one", () => {

@@ -72,57 +72,68 @@ export function TherapistCard({
   const hits = overlapCopy(row.match_count, filters.tags.length);
   const card = conversationPeek(row);
   const href = buildTherapistHref(row.profile_id, filters);
+  const details = (
+    <>
+      <div className="flex items-start gap-4">
+        {videoUrl ? null : <Avatar name={row.name} photo={photo} />}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="font-display text-xl tracking-tight text-ink">
+              {row.name}
+            </h2>
+            {sample ? (
+              <span className="shrink-0 rounded-full bg-[#f3dc6b] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
+                SAMPLE
+              </span>
+            ) : null}
+          </div>
+          {meta ? <p className="mt-1 text-sm text-mute">{meta}</p> : null}
+          {row.listed === false ? (
+            <HiddenFromPublicBadge variant="card" />
+          ) : null}
+          {hits ? (
+            <p className="mt-3 text-sm font-medium text-clay">{hits}</p>
+          ) : null}
+          {tags.length > 0 ? (
+            <ul className={`flex flex-wrap gap-2 ${hits ? "mt-2" : "mt-3"}`}>
+              {tags.map((label) => (
+                <li key={label} className={tagClass}>
+                  {label}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      </div>
+      {card ? (
+        <ConversationPeek
+          prompt={card.prompt}
+          answer={card.answer}
+          tag={card.tag}
+        />
+      ) : null}
+    </>
+  );
 
   return (
     <article className="rounded-3xl border border-line bg-paper p-6 shadow-sm transition hover:border-ink/15">
       {videoUrl ? (
-        <CardIntroVideo
-          name={row.name}
-          initials={cardInitials(row.name)}
-          photoUrl={photo}
-          videoUrl={videoUrl}
-        />
-      ) : null}
-      <Link href={href} className={videoUrl ? "mt-4 block" : "block"}>
-        <div className="flex items-start gap-4">
-          {videoUrl ? null : <Avatar name={row.name} photo={photo} />}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-3">
-              <h2 className="font-display text-xl tracking-tight text-ink">
-                {row.name}
-              </h2>
-              {sample ? (
-                <span className="shrink-0 rounded-full bg-[#f3dc6b] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
-                  SAMPLE
-                </span>
-              ) : null}
-            </div>
-            {meta ? <p className="mt-1 text-sm text-mute">{meta}</p> : null}
-            {row.listed === false ? (
-              <HiddenFromPublicBadge variant="card" />
-            ) : null}
-            {hits ? (
-              <p className="mt-3 text-sm font-medium text-clay">{hits}</p>
-            ) : null}
-            {tags.length > 0 ? (
-              <ul className={`flex flex-wrap gap-2 ${hits ? "mt-2" : "mt-3"}`}>
-                {tags.map((label) => (
-                  <li key={label} className={tagClass}>
-                    {label}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        </div>
-        {card ? (
-          <ConversationPeek
-            prompt={card.prompt}
-            answer={card.answer}
-            tag={card.tag}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+          <CardIntroVideo
+            name={row.name}
+            initials={cardInitials(row.name)}
+            photoUrl={photo}
+            videoUrl={videoUrl}
           />
-        ) : null}
-      </Link>
+          <Link href={href} className="block w-full min-w-0 sm:w-auto sm:flex-1">
+            {details}
+          </Link>
+        </div>
+      ) : (
+        <Link href={href} className="block">
+          {details}
+        </Link>
+      )}
     </article>
   );
 }
