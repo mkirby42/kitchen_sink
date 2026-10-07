@@ -10,6 +10,8 @@ import {
   ProfileNotFound,
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
+import { presentProfileData, presentReviewViewer } from "@/lib/audience";
+import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadReviewViewer, type ReviewViewer } from "@/lib/reviews/viewer";
 import { parseFindSearchParams } from "@/lib/search/rpc";
 import { supabasePublicConfig } from "@/lib/supabase/env";
@@ -44,7 +46,8 @@ export async function generateMetadata({
   params,
 }: ProfilePageProps): Promise<Metadata> {
   const { id } = await params;
-  const data = await loadTherapistProfile(id);
+  const audience = await readAudienceCookie();
+  const data = await loadTherapistProfile(id, audience);
   if (!data) {
     return {
       title: "Therapist not found",
@@ -89,11 +92,18 @@ export default async function TherapistProfilePage({
     routes.therapist(id),
   );
   if (requestedProfile !== cleanProfile) redirect(cleanProfile);
-  const data = await loadTherapistProfile(id);
+  const audience = await readAudienceCookie();
+  const data = await loadTherapistProfile(id, audience);
 
   if (!data) return <ProfileNotFound backHref={backHref} />;
 
   const viewer = await loadViewer(data.id);
 
-  return <TherapistProfile data={data} backHref={backHref} viewer={viewer} />;
+  return (
+    <TherapistProfile
+      data={presentProfileData(data, viewer.role, audience)}
+      backHref={backHref}
+      viewer={presentReviewViewer(viewer, audience)}
+    />
+  );
 }

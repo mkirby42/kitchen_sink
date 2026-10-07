@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { AdminAuth } from "@/components/admin/AdminAuth";
+import { AdminViewHold } from "@/components/admin/AdminViewHold";
 import { HelperUpload } from "@/components/admin/HelperUpload";
+import { adminToolsVisible } from "@/lib/audience";
+import { readAudienceCookie } from "@/lib/audience-cookie";
 import { listAdminTherapists } from "@/lib/admin/media";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
@@ -34,7 +37,13 @@ export default async function AdminMediaPage() {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (profile?.role !== "admin") {
+  if (
+    !adminToolsVisible({
+      role: profile?.role,
+      audience: await readAudienceCookie(),
+    })
+  ) {
+    if (profile?.role === "admin") return <AdminViewHold />;
     return (
       <main className="mx-auto max-w-lg px-6 py-16">
         <p className="text-xs font-semibold tracking-[0.2em] text-clay uppercase">

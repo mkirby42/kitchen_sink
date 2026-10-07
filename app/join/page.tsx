@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { JoinAuth } from "@/components/join/JoinAuth";
 import { JoinWizard } from "@/components/join/JoinWizard";
+import { readAudienceCookie } from "@/lib/audience-cookie";
 import { ADMIN_JOIN_NOTICE, joinAccess } from "@/lib/join/access";
 import { fetchJoinDraft } from "@/lib/join/load-draft";
 import { parseProfileRole } from "@/lib/role";
@@ -109,7 +110,13 @@ export default async function JoinPage({
       initialDraft={loadedDraft ?? undefined}
       editing={access.editing}
       adminTest={access.adminTest}
-      notice={access.adminTest && !access.editing ? ADMIN_JOIN_NOTICE : undefined}
+      notice={
+        access.adminTest &&
+        !access.editing &&
+        (await readAudienceCookie()) === "admin"
+          ? ADMIN_JOIN_NOTICE
+          : undefined
+      }
     />
   );
 }

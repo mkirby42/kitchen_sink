@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { previewDirectoryAccess, type SiteAudience } from "@/lib/audience";
 import { isPublicTherapistRole, parseProfileRole } from "@/lib/role";
 import {
   canonicalSpecialtyLabels,
@@ -381,6 +382,7 @@ function labelsOf(tags: ProfileTag[], kind: string) {
 export async function fetchTherapistProfile(
   supabase: SupabaseClient,
   rawId: string,
+  options?: { audience?: SiteAudience },
 ): Promise<TherapistProfileData | null> {
   const id = resolveTherapistId(rawId);
 
@@ -433,8 +435,11 @@ export async function fetchTherapistProfile(
     !canViewDirectoryProfile({
       openToNewClients: therapist.open_to_new_clients === true,
       listed: therapist.listed,
-      viewerIsAdmin: viewer.isAdmin,
-      viewerIsOwner: viewer.userId === id,
+      ...previewDirectoryAccess({
+        roleIsAdmin: viewer.isAdmin,
+        viewerIsOwner: viewer.userId === id,
+        audience: options?.audience ?? "admin",
+      }),
     })
   ) {
     return null;
@@ -510,13 +515,15 @@ export async function fetchTherapistProfile(
   };
 }
 
-export const loadTherapistProfile = cache(async (rawId: string) => {
-  if (!supabasePublicConfig()) return null;
-  try {
-    const { createClient } = await import("@/lib/supabase/server");
-    const supabase = await createClient();
-    return await fetchTherapistProfile(supabase, rawId);
-  } catch {
-    return null;
-  }
-});
+export const loadTherapistProfile = cache(
+  async (rawId: string, audience: SiteAudience = "admin") => {
+    if (!supabasePublicConfig()) return null;
+    try {
+      const { createClient } = await import("@/lib/supabase/server");
+      const supabase = await createClient();
+      return await fetchTherapistProfile(supabase, rawId, { audience });
+    } catch {
+      return null;
+    }
+  },
+);

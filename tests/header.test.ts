@@ -70,6 +70,85 @@ describe("site header", () => {
     );
   });
 
+  it("shows the view switcher only for an admin", () => {
+    const admin = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+          role: "admin",
+          hasTherapist: true,
+        },
+        audience: "admin",
+      }),
+    );
+    expect(admin).toContain('aria-label="Site view"');
+    expect(admin).toContain("Admin view");
+    expect(admin).toContain("Therapist view");
+    expect(admin).toContain("Client view");
+    expect(admin).toContain("Uploads");
+    expect(admin).toContain("Reviews");
+
+    const therapist = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "11111111-1111-4111-8111-111111111111",
+          role: "therapist",
+        },
+        audience: "admin",
+      }),
+    );
+    expect(therapist).not.toContain('aria-label="Site view"');
+    expect(therapist).not.toContain("Admin view");
+    expect(therapist).not.toContain("Uploads");
+
+    const visitor = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: null,
+        audience: "client",
+      }),
+    );
+    expect(visitor).not.toContain('aria-label="Site view"');
+    expect(visitor).not.toContain("Uploads");
+    expect(visitor).toContain("Therapist log in");
+  });
+
+  it("uses public nav in client view and therapist nav in therapist view", () => {
+    const client = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+          role: "admin",
+          hasTherapist: true,
+        },
+        audience: "client",
+      }),
+    );
+    expect(client).toContain('aria-label="Site view"');
+    expect(client).toContain("For Therapists");
+    expect(client).toContain("Sign out");
+    expect(client).not.toContain("Uploads");
+    expect(client).not.toContain('href="/admin/reviews"');
+    expect(client).not.toContain("My profile");
+    expect(client).not.toContain("Admin only");
+
+    const therapist = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+          role: "admin",
+          hasTherapist: true,
+        },
+        audience: "therapist",
+      }),
+    );
+    expect(therapist).toContain("My profile");
+    expect(therapist).toContain('aria-label="Site view"');
+    expect(therapist).not.toContain("Uploads");
+    expect(therapist).not.toContain('href="/admin/media"');
+    expect(therapist).not.toContain("For Therapists");
+    expect(therapist).not.toContain("Admin only");
+  });
+
   it("omits Interest for a signed-out visitor", () => {
     const html = renderToStaticMarkup(
       createElement(SiteHeader, { initialNavUser: null }),
