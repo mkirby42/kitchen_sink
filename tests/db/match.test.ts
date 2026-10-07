@@ -69,7 +69,7 @@ describe.skipIf(!dbConfigured())("search_therapists match model", () => {
     expect(ny.length).toBeGreaterThan(0);
   });
 
-  it("returns the lowest rate as starting price and no video key", async ({
+  it("returns the lowest rate, intro video key, and first conversation card", async ({
     skip,
   }) => {
     if (!(await openSeedProfile(MAYA_ID))) skip();
@@ -78,7 +78,9 @@ describe.skipIf(!dbConfigured())("search_therapists match model", () => {
     expect(maya?.min_price_cents).toBe(16500);
     expect(maya?.min_duration_minutes).toBe(50);
     expect(maya?.photo_key).toBe(`${MAYA_ID}/photo.jpg`);
-    expect(maya).not.toHaveProperty("video_key");
+    expect(maya?.video_key).toBe(`${MAYA_ID}/intro.mp4`);
+    expect(maya?.card_prompt).toBe("my approach to therapy is...");
+    expect(maya?.card_tag).toBe("approach");
   });
 
   it("caps page size at 24", async () => {

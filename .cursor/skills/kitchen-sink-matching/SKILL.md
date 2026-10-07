@@ -34,6 +34,7 @@ Typical predicates:
 - `licenses (therapist_id)`, `licenses (state)`
 - partial `therapists (profile_id) where open_to_new_clients`
 - partial `therapists (profile_id) where open_to_new_clients and listed`
+- `profile_items (therapist_id, position)` for the first conversation card on Find
 
 If explain shows a slow join, add `therapists.specialty_labels text[]` + GIN and keep tags in sync.
 
@@ -43,6 +44,6 @@ If explain shows a slow join, add `therapists.specialty_labels text[]` + GIN and
 
 ## RLS / perf
 
-Enable RLS on every public table. `(select auth.uid())` in policies. Public read of open listed therapists + their tags/licenses/items. An admin may also read those practice rows when `listed` is false (not feedback). Public review read is `approved` rows only. The author can read their own pending row. A signed-in patient or admin inserts, updates, and deletes their own review on an open, listed therapist (one per therapist; role stays put; an admin cannot review their own profile); those writes stay `pending`. An admin approves at `/admin/reviews` or hard-deletes. Rejected reviews are not archived. Storage: public read photos/videos; a therapist writes `photos/{uid}/` and `videos/{uid}/` only. A patient account cannot. Admins may also write those prefixes for an existing therapist (`/admin/media`). Do not fetch video on `/find`. A patient profile cannot store phone, about, photo, video, tags, location, or feedback.
+Enable RLS on every public table. `(select auth.uid())` in policies. Public read of open listed therapists + their tags/licenses/items. An admin may also read those practice rows when `listed` is false (not feedback). Public review read is `approved` rows only. The author can read their own pending row. A signed-in patient or admin inserts, updates, and deletes their own review on an open, listed therapist (one per therapist; role stays put; an admin cannot review their own profile); those writes stay `pending`. An admin approves at `/admin/reviews` or hard-deletes. Rejected reviews are not archived. Storage: public read photos/videos; a therapist writes `photos/{uid}/` and `videos/{uid}/` only. A patient account cannot. Admins may also write those prefixes for an existing therapist (`/admin/media`). Find's one search query returns `video_key` and the first `profile_items` row by `position`. The page does not request the video file until play. A patient profile cannot store phone, about, photo, video, tags, location, or feedback.
 
 No N+1: search cards come from one query (or one RPC).

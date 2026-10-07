@@ -70,6 +70,11 @@ export type SearchRow = {
   match_count: number;
   matched_labels: string[];
   sliding_scale: boolean;
+  listed?: boolean;
+  video_key: string | null;
+  card_prompt: string | null;
+  card_answer: string | null;
+  card_tag: string | null;
 };
 
 export async function search(
