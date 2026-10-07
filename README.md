@@ -121,7 +121,7 @@ Demo seed license numbers, phones, and addresses are fake. Reviews on those seed
 - No booking, calendars, or in-app messaging. Contact buttons are `mailto:` / `tel:` from listed outreach.
 - Reviews are one post per signed-in patient (name or anonymous, three required ratings, optional note). The form warns against personal health information. New reviews stay pending until an admin approves them at `/admin/reviews`. Reject and delete remove the row; nothing archives it. Demo seed reviews are removed with the demo profiles.
 - Search is OR overlap (some tags), not AND. Results cap at 24; no pagination UI.
-- In-person location is stored; search uses license state, not maps or distance.
+- In-person location is stored and shown on the public profile when a street address is saved. Search uses license state, not maps or distance.
 - One intro clip per therapist, played as uploaded. No transcoding.
 - Associate/trainee credentials are not offered. Education and extra credentials are freeform lists on the profile.
 - Patient UI is sign-in and a profile review. Find does not save a search. A client account cannot store phone, about, tags, a location, or uploads. No patient onboarding or public patient pages.

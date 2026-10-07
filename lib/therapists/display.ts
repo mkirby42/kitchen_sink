@@ -52,3 +52,37 @@ export function initials(name: string) {
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
 }
+
+export type ProfileOffice = {
+  address: string;
+  address2: string | null;
+  state: string | null;
+  zip: string | null;
+};
+
+/** Public profile address. Virtual-only and blank streets stay hidden. */
+export function profileOffice(
+  inPerson: boolean,
+  row: {
+    address?: string | null;
+    address2?: string | null;
+    state?: string | null;
+    zip?: string | null;
+  } | null,
+): ProfileOffice | null {
+  if (!inPerson || !row) return null;
+  const address = row.address?.trim() ?? "";
+  if (!address) return null;
+  const address2 = row.address2?.trim() || null;
+  const state = row.state?.trim() || null;
+  const zip = row.zip?.trim() || null;
+  return { address, address2, state, zip };
+}
+
+export function officeAddressLines(office: ProfileOffice | null): string[] {
+  if (!office) return [];
+  const region = [office.state, office.zip].filter(Boolean).join(" ");
+  return [office.address, office.address2, region || null].filter(
+    (line): line is string => Boolean(line),
+  );
+}
