@@ -301,4 +301,55 @@ describe("profile edit control", () => {
     expect(modalities).toBeGreaterThan(-1);
     expect(specialties).toBeGreaterThan(modalities);
   });
+
+  it("shows only Find-list specialties and still shows every modality", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          specialties: [
+            "Anxiety",
+            "Career",
+            "College Students",
+            "Trauma & PTSD",
+            "Panic Attacks",
+            "Stress",
+            "Therapy for Men",
+          ],
+          modalities: ["CBT", "IFS"],
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    const specialties = html.indexOf("Specialties");
+    expect(specialties).toBeGreaterThan(-1);
+    expect(html).toContain("Anxiety");
+    expect(html).toContain("Trauma &amp; PTSD");
+    expect(html).not.toContain("Career");
+    expect(html).not.toContain("College Students");
+    expect(html).not.toContain("Panic Attacks");
+    expect(html).not.toContain("Therapy for Men");
+    expect(html).not.toContain(">Stress<");
+    expect(html).toContain("IFS");
+    expect(html.indexOf("CBT")).toBeLessThan(specialties);
+  });
+
+  it("omits the specialties section when none are on the Find list", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          specialties: ["Career", "College Students"],
+          modalities: ["EMDR"],
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(html).not.toContain("Specialties");
+    expect(html).not.toContain("Career");
+    expect(html).toContain("Modalities");
+    expect(html).toContain("EMDR");
+  });
 });
