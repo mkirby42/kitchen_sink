@@ -76,7 +76,7 @@ describe("HeroMedia", () => {
 
     expect(details).toContain("PsyD");
     expect(details).toContain("8 yrs practicing");
-    expect(details).toContain("1 min intro");
+    expect(details).not.toContain("1 min intro");
     expect(details).toContain("Virtual &amp; In-Person");
     expect(details).toContain("ACT · Attachment-Based · CBT");
     expect(details).not.toContain(texasLicense);

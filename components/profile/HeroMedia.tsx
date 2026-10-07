@@ -31,8 +31,7 @@ export function HeroMedia({
   const yearsLabel =
     years == null ? null : `${years} yr${years === 1 ? "" : "s"} practicing`;
   const detailLine = [credential, yearsLabel].filter(Boolean).join(" · ");
-  const showIntroLabel = Boolean(videoUrl && !showVideo);
-  const showChips = showIntroLabel || Boolean(formatLabel) || modalities.length > 0;
+  const showChips = Boolean(formatLabel) || modalities.length > 0;
   const showDetails = showVideo || Boolean(detailLine) || showChips;
 
   return (
@@ -146,12 +145,6 @@ export function HeroMedia({
                   : "flex flex-wrap gap-2"
               }
             >
-              {showIntroLabel ? (
-                <span className="inline-flex items-center rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
-                  <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-clay" />
-                  1 min intro
-                </span>
-              ) : null}
               {formatLabel ? (
                 <span className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
                   ↑ {formatLabel}
