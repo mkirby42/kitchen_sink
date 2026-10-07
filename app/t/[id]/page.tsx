@@ -17,6 +17,8 @@ import { therapistMetaDescription } from "@/lib/site";
 import { notifyPendingProductFeedback } from "@/lib/feedback/notify";
 import { loadTherapistProfile } from "@/lib/therapists/load";
 
+export const dynamic = "force-dynamic";
+
 const emptyViewer: ReviewViewer = {
   userId: null,
   role: null,
@@ -50,6 +52,17 @@ export async function generateMetadata({
       description: "That therapist profile is not available.",
       robots: { index: false, follow: true },
       alternates: { canonical: `/t/${id}` },
+    };
+  }
+  if (data.hiddenFromPublic) {
+    return {
+      title: data.name,
+      description: therapistMetaDescription({
+        name: data.name,
+        credential: data.credential,
+        specialties: data.specialties,
+      }),
+      robots: { index: false, follow: false },
     };
   }
   return {

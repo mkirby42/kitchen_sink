@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { TherapistCard } from "@/components/search/TherapistCard";
+import { ADMIN_ONLY_HIDDEN_LABEL } from "@/lib/therapists/listing";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 
 const filters: SearchFilters = {
@@ -85,5 +86,11 @@ describe("Find therapist card", () => {
       virtual_practice: true,
     });
     expect(chipLabels(html)).toEqual(["Virtual"]);
+  });
+
+  it("badges an unlisted profile and leaves listed cards unmarked", () => {
+    expect(render({ listed: false })).toContain(ADMIN_ONLY_HIDDEN_LABEL);
+    expect(render()).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
+    expect(render({ listed: true })).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
   });
 });

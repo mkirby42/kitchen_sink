@@ -22,7 +22,7 @@ One round trip. Filter in SQL, not JS. Page size 24.
 Typical predicates:
 
 - `open_to_new_clients = true`
-- `listed = true` (hidden profiles stay in the table; Find, sitemap, and `/t/[id]` omit them)
+- `listed = true` for public Find, sitemap, and `/t/[id]`. A signed-in admin also sees `listed = false` there, badged admin-only. Sitemap stays listed-only.
 - virtual / in-person flags
 - selected tag labels overlap therapist tags (specialty or insurance)
 - `licenses.state` if a state is selected
@@ -43,6 +43,6 @@ If explain shows a slow join, add `therapists.specialty_labels text[]` + GIN and
 
 ## RLS / perf
 
-Enable RLS on every public table. `(select auth.uid())` in policies. Public read of open therapists + their tags/licenses/items. Public review read is `approved` rows only. The author can read their own pending row. A signed-in patient or admin inserts, updates, and deletes their own review on an open, listed therapist (one per therapist; role stays put; an admin cannot review their own profile); those writes stay `pending`. An admin approves at `/admin/reviews` or hard-deletes. Rejected reviews are not archived. Storage: public read photos/videos; a therapist writes `photos/{uid}/` and `videos/{uid}/` only. A patient account cannot. Admins may also write those prefixes for an existing therapist (`/admin/media`). Do not fetch video on `/find`. A patient profile cannot store phone, about, photo, video, tags, location, or feedback.
+Enable RLS on every public table. `(select auth.uid())` in policies. Public read of open listed therapists + their tags/licenses/items. An admin may also read those practice rows when `listed` is false (not feedback). Public review read is `approved` rows only. The author can read their own pending row. A signed-in patient or admin inserts, updates, and deletes their own review on an open, listed therapist (one per therapist; role stays put; an admin cannot review their own profile); those writes stay `pending`. An admin approves at `/admin/reviews` or hard-deletes. Rejected reviews are not archived. Storage: public read photos/videos; a therapist writes `photos/{uid}/` and `videos/{uid}/` only. A patient account cannot. Admins may also write those prefixes for an existing therapist (`/admin/media`). Do not fetch video on `/find`. A patient profile cannot store phone, about, photo, video, tags, location, or feedback.
 
 No N+1: search cards come from one query (or one RPC).
