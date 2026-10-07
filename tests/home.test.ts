@@ -7,7 +7,7 @@ import { routes } from "@/lib/routes";
 
 describe("homePanels", () => {
   it("matches the public homepage mock", () => {
-    expect(homePanels({ signedIn: false, therapistId: null })).toEqual({
+    expect(homePanels()).toEqual({
       client: {
         title: "Find a therapist who actually fits.",
         body: "Tap the tags you need. We show therapists who match some of them.",
@@ -29,59 +29,15 @@ describe("homePanels", () => {
     });
   });
 
-  it("keeps admin upload, review, and an existing profile on the therapist card", () => {
-    expect(
-      homePanels({
-        signedIn: true,
-        therapistId: "11111111-1111-4111-8111-111111111111",
-        admin: true,
-      }),
-    ).toEqual({
-      client: {
-        title: "Find a therapist who actually fits.",
-        body: "Tap the tags you need. We show therapists who match some of them.",
-        actions: [
-          { href: routes.find, label: "Find a therapist", variant: "primary" },
-        ],
-      },
-      therapist: {
-        title: "Meet clients who are ready to bring it all.",
-        actions: [
-          { href: routes.join, label: "Create a profile", variant: "primary" },
-          {
-            href: routes.joinSignIn,
-            label: "Log in",
-            variant: "secondary",
-          },
-          {
-            href: "/t/11111111-1111-4111-8111-111111111111",
-            label: "My profile",
-            variant: "secondary",
-          },
-          {
-            href: routes.adminMedia,
-            label: "Upload therapist media",
-            variant: "secondary",
-          },
-          {
-            href: routes.adminReviews,
-            label: "Review queue",
-            variant: "secondary",
-          },
-        ],
-      },
-    });
-  });
-
-  it("adds My profile for a signed-in therapist", () => {
-    const panels = homePanels({
-      signedIn: true,
-      therapistId: "11111111-1111-4111-8111-111111111111",
-    });
+  it("keeps the therapist card to Create a profile and Log in", () => {
+    const panels = homePanels();
     expect(panels.therapist.actions.map((action) => action.label)).toEqual([
       "Create a profile",
       "Log in",
-      "My profile",
+    ]);
+    expect(panels.therapist.actions.map((action) => action.variant)).toEqual([
+      "primary",
+      "secondary",
     ]);
     expect(panels.client.actions[0]?.href).toBe(routes.find);
   });
@@ -90,7 +46,7 @@ describe("homePanels", () => {
 describe("home hero", () => {
   it("renders the mock copy with the therapist path selected", () => {
     const html = renderToStaticMarkup(
-      createElement(HomeHero, homePanels({ signedIn: false, therapistId: null })),
+      createElement(HomeHero, homePanels()),
     );
 
     expect(html).toContain("Bring everything.");
@@ -107,6 +63,10 @@ describe("home hero", () => {
     expect(html).toContain('href="/join"');
     expect(html).toContain("Log in");
     expect(html).toContain('href="/join?mode=signin"');
+    expect(html).toContain("bg-clay");
+    expect(html).not.toContain("My profile");
+    expect(html).not.toContain("Upload therapist media");
+    expect(html).not.toContain("Review queue");
     expect(html).toContain("Find a therapist who actually fits.");
     expect(html).toContain('href="/find"');
     expect(html).toContain('data-audience="client"');
