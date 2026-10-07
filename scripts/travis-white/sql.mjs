@@ -278,6 +278,27 @@ begin
   select uid, item->>'prompt', item->>'answer', item->>'tag'
   from jsonb_array_elements(spec->'cards') item;
 
+  -- Replace-all above drops cards that are no longer in the spec, including
+  -- on a profile that already had them. 5 cards is inside the 3–6 rule.
+  if exists (
+    select 1
+    from public.profile_items
+    where therapist_id = uid
+      and prompt = 'before we start, you should know...'
+  ) then
+    raise exception 'Travis before-we-start card was not removed';
+  end if;
+
+  if (
+    select count(*)
+    from public.profile_items
+    where therapist_id = uid
+  ) is distinct from jsonb_array_length(spec->'cards')
+     or jsonb_array_length(spec->'cards') < 3
+     or jsonb_array_length(spec->'cards') > 6 then
+    raise exception 'Travis conversation cards were not saved';
+  end if;
+
   if known_email is not null and uid is distinct from known then
     raise exception 'Travis profile id changed';
   end if;
