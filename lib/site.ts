@@ -216,7 +216,7 @@ Therapist profiles are public while that therapist is open to new clients and li
 
 ## Profile contents
 
-- Name, license type, years practicing, education, and other credentials
+- Name, years practicing, education, and credentials. The licensed credential is not repeated under the profile photo
 - State licenses (number and state)
 - Office address when the therapist sees people in person and saved a street address
 - Photo (required) and an optional intro video

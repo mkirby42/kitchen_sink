@@ -11,7 +11,6 @@ function render(
     videoUrl: string | null;
     years: number | null;
     formatLabel: string | null;
-    credential: string | null;
     licenseCaptions: string[];
   }> = {},
 ) {
@@ -21,7 +20,6 @@ function render(
       initials: "TW",
       photoUrl: "https://example.com/photo.jpg",
       videoUrl: "https://example.com/intro.mp4",
-      credential: "PsyD",
       licenseCaptions: [texasLicense],
       years: 8,
       formatLabel: "Virtual & In-Person",
@@ -61,12 +59,25 @@ describe("HeroMedia", () => {
     expect(media).not.toContain("1 min intro");
     expect(media).not.toContain("ACT");
 
-    expect(details).toContain("PsyD");
+    expect(details).not.toContain("PsyD");
     expect(details).toContain("8 yrs practicing");
     expect(details).not.toContain("1 min intro");
     expect(details).toContain("Virtual &amp; In-Person");
     expect(details).not.toContain("ACT");
     expect(details).not.toContain(texasLicense);
+    expect(details).not.toContain(">Travis White<");
+  });
+
+  it("keeps session format when years are unpublished", () => {
+    const { media, details } = splitHero(render({ years: null }));
+
+    expect(media).toContain(">Travis White<");
+    expect(media).toContain(texasLicense);
+    expect(details).not.toContain("1 min intro");
+    expect(details).toContain("Virtual &amp; In-Person");
+    expect(details).not.toContain("ACT");
+    expect(details).not.toContain("practicing");
+    expect(details).not.toContain("PsyD");
     expect(details).not.toContain(">Travis White<");
   });
 
@@ -80,6 +91,7 @@ describe("HeroMedia", () => {
     expect(media).toContain('alt="Travis White"');
     expect(media).toContain(">Travis White<");
     expect(media).toContain(texasLicense);
+    expect(details).not.toContain("PsyD");
     expect(details).toContain("1 yr practicing");
     expect(details).toContain("↑ Virtual &amp; In-Person");
     expect(details).not.toContain("1 min intro");
@@ -89,7 +101,6 @@ describe("HeroMedia", () => {
     const html = render({
       photoUrl: null,
       videoUrl: null,
-      credential: null,
       licenseCaptions: [],
       years: null,
       formatLabel: null,

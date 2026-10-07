@@ -7,7 +7,6 @@ type HeroMediaProps = {
   initials: string;
   photoUrl: string | null;
   videoUrl: string | null;
-  credential: string | null;
   licenseCaptions: string[];
   years: number | null;
   formatLabel: string | null;
@@ -18,7 +17,6 @@ export function HeroMedia({
   initials,
   photoUrl,
   videoUrl,
-  credential,
   licenseCaptions,
   years,
   formatLabel,
@@ -28,9 +26,8 @@ export function HeroMedia({
 
   const yearsLabel =
     years == null ? null : `${years} yr${years === 1 ? "" : "s"} practicing`;
-  const detailLine = [credential, yearsLabel].filter(Boolean).join(" · ");
   const showChips = Boolean(formatLabel);
-  const showDetails = showVideo || Boolean(detailLine) || showChips;
+  const showDetails = showVideo || Boolean(yearsLabel) || showChips;
 
   return (
     <div>
@@ -130,15 +127,15 @@ export function HeroMedia({
               ) : null}
             </>
           ) : null}
-          {detailLine ? (
+          {yearsLabel ? (
             <p className={showVideo ? "mt-1 text-sm text-mute" : "text-sm text-mute"}>
-              {detailLine}
+              {yearsLabel}
             </p>
           ) : null}
           {showChips ? (
             <div
               className={
-                detailLine || showVideo
+                yearsLabel || showVideo
                   ? "mt-3 flex flex-wrap gap-2"
                   : "flex flex-wrap gap-2"
               }
