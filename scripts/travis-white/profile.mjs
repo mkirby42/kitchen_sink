@@ -82,6 +82,8 @@ export const travisWhite = {
     { kind: "outreach", label: "phone" },
     { kind: "outreach", label: "text" },
   ],
+  // Christine Lo, 2026-10-07: do not publish "before we start, you should know...".
+  // The other five cards stay. Join still offers that prompt to other therapists.
   cards: [
     {
       prompt: "who I work best with...",
@@ -112,12 +114,6 @@ export const travisWhite = {
       tag: "session_vibe",
       answer:
         "I like run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
-    },
-    {
-      prompt: "before we start, you should know...",
-      tag: "about",
-      answer:
-        "I am a Doctor of Clinical Psychology and a Licensed Psychologist in Texas. Call, text, or email to set up a free 15-minute consultation.",
     },
   ],
 };

@@ -120,8 +120,23 @@ describe("Travis White profile", () => {
     expect(travisWhite.rates).toEqual([
       { service_type: "Individual", duration_minutes: 55, price_cents: 15000 },
     ]);
-    expect(travisWhite.cards.length).toBeGreaterThanOrEqual(3);
-    expect(travisWhite.cards.length).toBeLessThanOrEqual(6);
+    expect(travisWhite.cards.map((card) => card.prompt)).toEqual([
+      "who I work best with...",
+      "my approach to therapy is...",
+      "I specialize in unpacking...",
+      "a session with me feels like...",
+      "outside of session, I...",
+    ]);
+    expect(
+      travisWhite.cards.some((card) =>
+        card.prompt.startsWith("before we start"),
+      ),
+    ).toBe(false);
+    expect(sql).toContain(
+      "delete from public.profile_items where therapist_id = uid",
+    );
+    expect(sql).toContain("Travis before-we-start card was not removed");
+    expect(sql).toContain("Travis conversation cards were not saved");
     expect(sql).toContain("38047");
     expect(sql).toContain("15000");
     expect(travisWhite.location).toMatchObject({
