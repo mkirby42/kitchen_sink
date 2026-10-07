@@ -346,6 +346,22 @@ describe("buildJoinPayload", () => {
     );
   });
 
+  it("keeps a stored specialty that is outside the Find list", () => {
+    const payload = buildJoinPayload(
+      validStep4({
+        specialties: ["Anxiety", "Career", "College Students"],
+      }),
+    );
+    expect(step3Errors(validStep4({ specialties: ["Career"] }))).toEqual([]);
+    expect(payload.tags).toEqual(
+      expect.arrayContaining([
+        { kind: "specialty", label: "Anxiety" },
+        { kind: "specialty", label: "Career" },
+        { kind: "specialty", label: "College Students" },
+      ]),
+    );
+  });
+
   it("publishes the sliding scale checkbox and clears any stored range", () => {
     const on = buildJoinPayload(
       validStep4({

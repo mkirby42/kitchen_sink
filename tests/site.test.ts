@@ -113,4 +113,22 @@ describe("therapist meta description", () => {
       "Maya Chen, LMFT. Specialties include Anxiety, Trauma & PTSD, Grief & Loss. Profile on Kitchen Sink.",
     );
   });
+
+  it("skips specialties that are not on the Find list", () => {
+    expect(
+      therapistMetaDescription({
+        name: "Travis White",
+        credential: "PsyD",
+        specialties: [
+          "Career",
+          "Anxiety",
+          "College Students",
+          "Depression",
+          "Stress",
+        ],
+      }),
+    ).toBe(
+      "Travis White, PsyD. Specialties include Anxiety, Depression. Profile on Kitchen Sink.",
+    );
+  });
 });

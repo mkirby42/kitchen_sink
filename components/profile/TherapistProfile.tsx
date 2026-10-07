@@ -16,6 +16,7 @@ import {
 } from "@/lib/therapists/load";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
+import { directorySpecialties } from "@/lib/tags/presets";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
@@ -144,7 +145,10 @@ export function TherapistProfile({
       ) : null}
 
       <TagSection title="Modalities" labels={data.modalities} />
-      <TagSection title="Specialties" labels={data.specialties} />
+      <TagSection
+        title="Specialties"
+        labels={directorySpecialties(data.specialties)}
+      />
 
       <ContactCtas name={data.givenName} actions={ctas} contact={data.contact} />
 

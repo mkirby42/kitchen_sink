@@ -10,6 +10,13 @@ export const SPECIALTY_PRESETS = [
   "Immigration",
 ] as const;
 
+const SPECIALTY_PRESET_SET = new Set<string>(SPECIALTY_PRESETS);
+
+/** Specialties the public profile may show: the therapist's tags that Find can filter on. */
+export function directorySpecialties(labels: readonly string[]): string[] {
+  return labels.filter((label) => SPECIALTY_PRESET_SET.has(label));
+}
+
 export const INSURANCE_PRESETS = [
   "Aetna",
   "BCBS",
