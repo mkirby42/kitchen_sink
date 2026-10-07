@@ -73,7 +73,7 @@ export function HeroMedia({
               <button
                 type="button"
                 onClick={() => setPlaying(true)}
-                className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-paper/95 bg-ink/20 shadow-[0_6px_18px_rgba(27,39,68,0.22)] backdrop-blur-[2px] hover:bg-ink/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
+                className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-paper/80 bg-paper/10 hover:bg-paper/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
                 aria-label={`Play intro video for ${name}`}
               >
                 <svg
