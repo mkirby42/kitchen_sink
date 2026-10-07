@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "@/components/SiteHeader";
+import { routes } from "@/lib/routes";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
@@ -24,6 +25,9 @@ describe("site header", () => {
     );
     expect(html).toContain("Find a Therapist");
     expect(html).toContain("My profile");
+    expect(html).toContain(
+      `href="${routes.therapist("11111111-1111-4111-8111-111111111111")}"`,
+    );
     expect(html).not.toContain("For Therapists");
     expect(html).not.toContain("Therapist log in");
     expect(html).not.toContain("Join as a Therapist");
@@ -61,7 +65,9 @@ describe("site header", () => {
     );
     expect(html).toContain("For Therapists");
     expect(html).toContain("My profile");
-    expect(html).toContain("/t/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1");
+    expect(html).toContain(
+      `href="${routes.therapist("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1")}"`,
+    );
   });
 
   it("omits Interest for a signed-out visitor", () => {

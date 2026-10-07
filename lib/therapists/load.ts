@@ -431,6 +431,7 @@ export async function fetchTherapistProfile(
       openToNewClients: therapist.open_to_new_clients === true,
       listed: therapist.listed,
       viewerIsAdmin: viewer.isAdmin,
+      viewerIsOwner: viewer.userId === id,
     })
   ) {
     return null;
