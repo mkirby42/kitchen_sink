@@ -2,7 +2,7 @@ import { routes } from "@/lib/routes";
 import type { ProfileRole } from "@/lib/role";
 
 export const ADMIN_JOIN_NOTICE =
-  "This account stays admin. Submitting publishes a therapist profile for testing. If you already have one, this replaces it.";
+  "You're signed in as an admin. Submitting replaces your existing test profile, and it stays hidden from the public Find page. Admins can still see it, marked admin-only, once PR #63 lands. To create a separate public therapist profile, sign out first and sign up with a different email.";
 
 export type JoinAccess =
   | { kind: "patient" }

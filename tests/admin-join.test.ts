@@ -94,7 +94,13 @@ describe("admin join migration", () => {
   });
 
   it("matches the join notice", () => {
-    expect(ADMIN_JOIN_NOTICE).toContain("stays admin");
-    expect(ADMIN_JOIN_NOTICE).toContain("replaces");
+    expect(ADMIN_JOIN_NOTICE).toContain("signed in as an admin");
+    expect(ADMIN_JOIN_NOTICE).toContain("replaces your existing test profile");
+    expect(ADMIN_JOIN_NOTICE).toContain("hidden from the public Find page");
+    expect(ADMIN_JOIN_NOTICE).toContain("marked admin-only, once PR #63 lands");
+    expect(ADMIN_JOIN_NOTICE).toContain(
+      "sign out first and sign up with a different email",
+    );
+    expect(ADMIN_JOIN_NOTICE).not.toContain("publishes");
   });
 });
