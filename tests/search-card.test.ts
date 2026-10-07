@@ -28,6 +28,10 @@ function row(overrides: Partial<SearchRow> = {}): SearchRow {
     match_count: 0,
     matched_labels: [],
     sliding_scale: false,
+    video_key: null,
+    card_prompt: null,
+    card_answer: null,
+    card_tag: null,
     ...overrides,
   };
 }
@@ -97,5 +101,55 @@ describe("Find therapist card", () => {
     expect(render({ listed: false })).toContain(ADMIN_ONLY_HIDDEN_LABEL);
     expect(render()).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
     expect(render({ listed: true })).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
+  });
+
+  it("keeps a circular photo and no play control when there is no intro video", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    const html = render({ photo_key: "maya/photo.jpg", video_key: null });
+    expect(html).toContain("rounded-full");
+    expect(html).toContain("/object/public/photos/maya/photo.jpg");
+    expect(html).not.toContain("Play intro video");
+    expect(html).not.toContain("<video");
+    expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
+  });
+
+  it("shows a poster and play control without loading the video file", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    const html = render({
+      photo_key: "maya/photo.jpg",
+      video_key: "maya/intro.mp4",
+    });
+    const playAt = html.indexOf('aria-label="Play intro video for Maya Chen"');
+    const linkAt = html.indexOf("<a ");
+    expect(playAt).toBeGreaterThan(-1);
+    expect(linkAt).toBeGreaterThan(playAt);
+    expect(html.slice(0, linkAt)).not.toContain("<a ");
+    expect(html).toContain("border-paper/80");
+    expect(html).toContain("bg-transparent");
+    expect(html).toContain("/object/public/photos/maya/photo.jpg");
+    expect(html).not.toContain("intro.mp4");
+    expect(html).not.toContain("<video");
+    expect(html).not.toContain("autoPlay");
+    expect(html).not.toContain("autoplay");
+    expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
+  });
+
+  it("shows the first conversation card and skips a blank one", () => {
+    const withCard = render({
+      card_prompt: "who I work best with...",
+      card_answer: "College students and early-career professionals.",
+      card_tag: "about",
+    });
+    expect(withCard).toContain("who I work best with...");
+    expect(withCard).toContain("College students and early-career professionals.");
+    expect(withCard.indexOf("who I work best with...")).toBeGreaterThan(
+      withCard.indexOf("<a "),
+    );
+
+    const blank = render({
+      card_prompt: "   ",
+      card_answer: "unused",
+    });
+    expect(blank).not.toContain("unused");
   });
 });
