@@ -97,7 +97,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://udgngzzzgrxjxljgtxpf.supabase.co \
 npm run apply:travis-white
 ```
 
-`DATABASE_URL` can replace `SUPABASE_ACCESS_TOKEN` when `psql` is installed. The script creates a therapist auth user for `thetalkshoppeatx@gmail.com` with an unknown password. Claim it from `/forgot-password`, sign in at `/join?mode=signin`, then Edit. Re-runs update the profile and media and do not reset that password.
+`DATABASE_URL` can replace `SUPABASE_ACCESS_TOKEN` when `psql` is installed. The script creates a therapist auth user for `thetalkshoppeatx@gmail.com` with an unknown password. Claim it from `/forgot-password`, sign in at `/join?mode=signin`, then Edit. Re-runs update that profile and media in place and do not reset the password. On the hosted project the auth user is `3b354f1e-50a1-4a17-b536-cc7fce1296fe`; the script refuses to insert a second user for that email or to retarget a different account that already has that id.
 
 `SUPABASE_SERVICE_ROLE_KEY` is **not** required for the app, tests, or `seed:media`. Never put the service role in the browser, Vercel public env, or git. `npm run apply:travis-white` is the exception: it writes one real profile and uploads that therapist's photo and intro video. It needs the service role plus either `SUPABASE_ACCESS_TOKEN` (database write) or `DATABASE_URL`.
 
@@ -114,7 +114,7 @@ Demo seeds are not real clinicians. Travis White is a real therapist, applied wi
 | Headshots + intro clips | `supabase/seed/media/<uuid>/` | Synthetic portraits. The removal migration nulls Storage ownership for matched seed ids. Hosted Storage rejects SQL deletes; remove the objects with the Storage API. |
 | Travis White (PsyD, Austin) | `scripts/apply-travis-white-profile.mjs` | Real profile from thetalkshoppeatx.com and his Psychology Today page. Photo and intro video live in `scripts/travis-white/`. Not a `@kitchensink.demo` account, so the demo wipe does not remove it. |
 
-Demo seed license numbers, phones, and addresses are fake. Reviews on those seeds are fiction. Travis White's license, phone, address, and rates are the ones published on his practice site and Psychology Today.
+Demo seed license numbers, phones, and addresses are fake. Reviews on those seeds are fiction. Travis White's license, phone, address, and rates are the ones published on his practice site and Psychology Today. Those pages do not say how many years he has been practicing, so `start_date_of_practice` stays null.
 
 ## Known limitations (today)
 

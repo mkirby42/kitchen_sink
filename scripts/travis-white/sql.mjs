@@ -1,4 +1,4 @@
-import { travisWhite } from "./profile.mjs";
+import { TRAVIS_PROFILE_ID, travisWhite } from "./profile.mjs";
 
 const DEMO_DOMAIN = "kitchensink.demo";
 
@@ -11,6 +11,7 @@ function dollarQuote(body, tag = "tw") {
 export function applySpec(profile = travisWhite) {
   return {
     email: profile.email.trim().toLowerCase(),
+    profileId: profile.profileId,
     name: profile.name,
     phone: profile.phone,
     about: profile.about,
@@ -31,11 +32,24 @@ export function applySpec(profile = travisWhite) {
   };
 }
 
+function assertProfileId(profileId) {
+  if (
+    typeof profileId !== "string" ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      profileId,
+    )
+  ) {
+    throw new Error("Travis profile id must be a uuid");
+  }
+  return profileId;
+}
+
 export function buildApplySql(profile = travisWhite) {
   const spec = applySpec(profile);
   if (spec.email.endsWith(`@${DEMO_DOMAIN}`)) {
     throw new Error("Refusing to build a demo-seed profile");
   }
+  const profileId = assertProfileId(spec.profileId ?? TRAVIS_PROFILE_ID);
   const literal = dollarQuote(JSON.stringify(spec));
 
   return `
@@ -46,7 +60,10 @@ do $apply$
 declare
   spec jsonb := ${literal}::jsonb;
   v_email text := lower(spec->>'email');
+  known uuid := '${profileId}';
   uid uuid;
+  email_uid uuid;
+  known_email text;
   existing_role text;
   existing_name text;
   instance uuid;
@@ -55,9 +72,42 @@ begin
     raise exception 'demo seed profiles are not created on this database';
   end if;
 
-  select u.id into uid
+  if coalesce((spec->>'virtual')::boolean, false) is not true
+     or coalesce((spec->>'inPerson')::boolean, false) is not true then
+    raise exception 'Travis offers both in-person and virtual sessions';
+  end if;
+
+  if jsonb_typeof(spec->'licenses') is distinct from 'array'
+     or jsonb_array_length(spec->'licenses') < 1
+     or coalesce(btrim(spec->'licenses'->0->>'number'), '') = ''
+     or coalesce(btrim(spec->'licenses'->0->>'state'), '') = '' then
+    raise exception 'At least one state license is required';
+  end if;
+
+  if coalesce(btrim(spec->'location'->>'address'), '') = ''
+     or coalesce(btrim(spec->'location'->>'state'), '') = ''
+     or coalesce(btrim(spec->'location'->>'zip'), '') = '' then
+    raise exception 'In-person practice requires an address, state, and zip';
+  end if;
+
+  select u.id into email_uid
   from auth.users u
   where lower(u.email) = v_email;
+
+  select u.email into known_email
+  from auth.users u
+  where u.id = known;
+
+  if email_uid is not null and known_email is not null and email_uid <> known then
+    raise exception 'Refusing to apply: email % belongs to %, not Travis profile %',
+      v_email, email_uid, known;
+  end if;
+
+  if known_email is not null and lower(known_email) is distinct from v_email then
+    raise exception 'Refusing to retarget profile % (email %)', known, known_email;
+  end if;
+
+  uid := coalesce(email_uid, case when known_email is not null then known else null end);
 
   if uid is null then
     select u.instance_id into instance from auth.users u limit 1;
@@ -227,6 +277,41 @@ begin
   insert into public.profile_items (therapist_id, prompt, answer, tag)
   select uid, item->>'prompt', item->>'answer', item->>'tag'
   from jsonb_array_elements(spec->'cards') item;
+
+  if known_email is not null and uid is distinct from known then
+    raise exception 'Travis profile id changed';
+  end if;
+
+  if not exists (
+    select 1
+    from public.therapists t
+    where t.profile_id = uid
+      and t.virtual_practice
+      and t.in_person_practice
+  ) then
+    raise exception 'Travis session format was not saved';
+  end if;
+
+  if not exists (
+    select 1
+    from public.licenses l
+    where l.therapist_id = uid
+      and l.number = btrim(spec->'licenses'->0->>'number')
+      and l.state = btrim(spec->'licenses'->0->>'state')
+  ) then
+    raise exception 'Travis state license was not saved';
+  end if;
+
+  if not exists (
+    select 1
+    from public.locations loc
+    where loc.profile_id = uid
+      and loc.address = spec->'location'->>'address'
+      and loc.state = spec->'location'->>'state'
+      and loc.zip = spec->'location'->>'zip'
+  ) then
+    raise exception 'Travis office address was not saved';
+  end if;
 end
 $apply$;
 `.trim();

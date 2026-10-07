@@ -1,14 +1,22 @@
 // Real therapist. Not a demo seed. Do not use @kitchensink.demo or a seed UUID.
 // Facts are from thetalkshoppeatx.com (home, fees, services, FAQ, contact)
 // and the Psychology Today profile. Blank means the pages did not say.
+//
+// Hosted auth user. Re-runs update this id in place. A database that does not
+// already have it inserts a new auth user and does not reuse this uuid.
 
 export const TRAVIS_EMAIL = "thetalkshoppeatx@gmail.com";
+export const TRAVIS_PROFILE_ID = "3b354f1e-50a1-4a17-b536-cc7fce1296fe";
 
 export const travisWhite = {
   email: TRAVIS_EMAIL,
+  profileId: TRAVIS_PROFILE_ID,
   name: "Travis White",
   phone: "(512) 554-2231",
   credential: "PsyD",
+  // Join requires years practicing. Neither source publishes a start year
+  // or "in practice for N years". Psychology Today leaves the license issue
+  // date blank. Do not invent a number.
   startDate: null,
   openToNewClients: true,
   listed: true,
@@ -26,6 +34,9 @@ export const travisWhite = {
     { kind: "education", label: "Doctor of Clinical Psychology", position: 0 },
     { kind: "credential", label: "Licensed Psychologist", position: 0 },
   ],
+  // locations has street, state, and zip. No city column, so Austin stays
+  // on the street line the edit form shows.
+  // Talk Shoppe and Psychology Today: 1102 West 6th Street, Austin, TX 78703.
   location: {
     address: "1102 West 6th Street, Austin",
     address2: null,
