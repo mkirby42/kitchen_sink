@@ -28,6 +28,12 @@ describe.skipIf(!dbConfigured())("fetchTherapistProfile", () => {
     expect(bySlug?.licenses).toEqual(
       expect.arrayContaining([{ number: "MFC 112938", state: "CA" }]),
     );
+    expect(bySlug?.office).toEqual({
+      address: "Oakland",
+      address2: null,
+      state: "CA",
+      zip: "94612",
+    });
     expect(bySlug?.rates[0]).toMatchObject({
       service_type: "Individual",
       duration_minutes: 50,

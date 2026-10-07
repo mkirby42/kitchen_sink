@@ -5,8 +5,10 @@ import { isDirectoryListed } from "@/lib/therapists/listing";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import {
   formatUsdFromCents,
+  profileOffice,
   storagePublicUrl,
   yearsPracticing,
+  type ProfileOffice,
 } from "./display";
 import { resolveTherapistId } from "./ids";
 
@@ -68,6 +70,7 @@ export type TherapistProfileData = {
   years: number | null;
   virtual: boolean;
   inPerson: boolean;
+  office: ProfileOffice | null;
   education: string[];
   credentials: string[];
   slidingScale: boolean;
@@ -346,6 +349,7 @@ export async function fetchTherapistProfile(
   const [
     profileRes,
     therapistRes,
+    locationRes,
     licensesRes,
     qualificationsRes,
     ratesRes,
@@ -356,6 +360,11 @@ export async function fetchTherapistProfile(
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
     supabase.from("therapists").select("*").eq("profile_id", id).maybeSingle(),
+    supabase
+      .from("locations")
+      .select("address, address2, state, zip")
+      .eq("profile_id", id)
+      .maybeSingle(),
     supabase.from("licenses").select("number, state").eq("therapist_id", id),
     supabase
       .from("qualifications")
@@ -416,6 +425,7 @@ export async function fetchTherapistProfile(
     years: yearsPracticing(therapist.start_date_of_practice),
     virtual: therapist.virtual_practice,
     inPerson: therapist.in_person_practice,
+    office: profileOffice(therapist.in_person_practice, locationRes.data),
     education: labelsOf(
       (qualificationsRes.data ?? []) as ProfileTag[],
       "education",

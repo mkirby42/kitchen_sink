@@ -1,6 +1,10 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatUsdFromCents, initials } from "@/lib/therapists/display";
+import {
+  formatUsdFromCents,
+  initials,
+  officeAddressLines,
+} from "@/lib/therapists/display";
 import {
   consultBookActions,
   formatLabel,
@@ -28,6 +32,7 @@ export function TherapistProfile({
 }) {
   const isOwner = viewer.isOwner;
   const format = formatLabel(data.virtual, data.inPerson);
+  const officeLines = data.inPerson ? officeAddressLines(data.office) : [];
   const licenses = licenseLine(data.licenses);
   const cashRate = data.rates[0];
   const cashPrice = formatUsdFromCents(cashRate?.price_cents);
@@ -104,32 +109,50 @@ export function TherapistProfile({
         modalities={data.modalities}
       />
 
-      {data.education.length > 0 || data.credentials.length > 0 ? (
+      {data.education.length > 0 ||
+      data.credentials.length > 0 ||
+      officeLines.length > 0 ? (
         <section className="mt-4 rounded-2xl bg-paper px-4 py-4 shadow-sm">
-          {data.education.length > 0 ? (
-            <div>
-              <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
-                Education
-              </p>
-              <ul className="mt-2 space-y-1 text-sm text-ink">
-                {data.education.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          {data.credentials.length > 0 ? (
-            <div className={data.education.length > 0 ? "mt-4" : undefined}>
-              <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
-                Credentials
-              </p>
-              <ul className="mt-2 space-y-1 text-sm text-ink">
-                {data.credentials.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
+          <div className="space-y-4">
+            {data.education.length > 0 ? (
+              <div>
+                <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
+                  Education
+                </p>
+                <ul className="mt-2 space-y-1 text-sm text-ink">
+                  {data.education.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {data.credentials.length > 0 ? (
+              <div>
+                <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
+                  Credentials
+                </p>
+                <ul className="mt-2 space-y-1 text-sm text-ink">
+                  {data.credentials.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {officeLines.length > 0 ? (
+              <div>
+                <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
+                  Office
+                </p>
+                <address className="mt-2 text-sm text-ink not-italic">
+                  {officeLines.map((line, index) => (
+                    <span key={`${index}-${line}`} className="block">
+                      {line}
+                    </span>
+                  ))}
+                </address>
+              </div>
+            ) : null}
+          </div>
         </section>
       ) : null}
 

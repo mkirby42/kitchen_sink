@@ -218,6 +218,7 @@ Therapist profiles are public while that therapist is open to new clients and li
 
 - Name, license type, years practicing, education, and other credentials
 - State licenses (number and state)
+- Office address when the therapist sees people in person and saved a street address
 - Photo (required) and an optional intro video
 - Specialties, modalities, insurance, and identity tags
 - Rates: service type, session length in minutes, and price. Sliding scale when the therapist offers it

@@ -19,6 +19,7 @@ const data: TherapistProfileData = {
   years: 9,
     virtual: true,
     inPerson: false,
+    office: null,
     education: ["B.A. Psychology"],
     credentials: ["EMDR trained"],
   slidingScale: false,
@@ -130,5 +131,68 @@ describe("profile edit control", () => {
     expect(html).not.toContain("I'm interested");
     expect(html).not.toContain(routes.joinEdit);
     expect(html).not.toContain("Delete profile");
+    expect(html).not.toContain("Office");
+  });
+
+  it("shows a saved office address for in-person therapists", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          virtual: true,
+          inPerson: true,
+          office: {
+            address: "1102 West 6th Street, Austin",
+            address2: "Suite 4",
+            state: "TX",
+            zip: "78703",
+          },
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(html).toContain("Office");
+    expect(html).toContain("1102 West 6th Street, Austin");
+    expect(html).toContain("Suite 4");
+    expect(html).toContain("TX 78703");
+  });
+
+  it("omits the office block when no address is saved", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          inPerson: true,
+          office: null,
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(html).not.toContain("Office");
+    expect(html).toContain("Education");
+  });
+
+  it("hides a leftover address when the therapist is virtual only", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          virtual: true,
+          inPerson: false,
+          office: {
+            address: "1102 West 6th Street, Austin",
+            address2: null,
+            state: "TX",
+            zip: "78703",
+          },
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(html).not.toContain("Office");
+    expect(html).not.toContain("1102 West 6th Street");
   });
 });

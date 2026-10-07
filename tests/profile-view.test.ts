@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  officeAddressLines,
+  profileOffice,
+} from "@/lib/therapists/display";
+import {
   consultBookActions,
   contactActions,
   givenName,
@@ -85,6 +89,41 @@ describe("profile view helpers", () => {
 
   it("averages review stars", () => {
     expect(reviewAverage([5, 5, 4])).toBe(4.7);
+  });
+
+  it("shows an in-person office and hides a blank or virtual-only address", () => {
+    const saved = {
+      address: "  1102 West 6th Street, Austin  ",
+      address2: " ",
+      state: "TX",
+      zip: "78703",
+    };
+    expect(profileOffice(true, saved)).toEqual({
+      address: "1102 West 6th Street, Austin",
+      address2: null,
+      state: "TX",
+      zip: "78703",
+    });
+    expect(officeAddressLines(profileOffice(true, saved))).toEqual([
+      "1102 West 6th Street, Austin",
+      "TX 78703",
+    ]);
+    expect(
+      officeAddressLines(
+        profileOffice(true, {
+          address: "1102 West 6th Street, Austin",
+          address2: "Suite 4",
+          state: "TX",
+          zip: "78703",
+        }),
+      ),
+    ).toEqual(["1102 West 6th Street, Austin", "Suite 4", "TX 78703"]);
+    expect(profileOffice(false, saved)).toBeNull();
+    expect(
+      profileOffice(true, { address: "   ", state: "TX", zip: "78703" }),
+    ).toBeNull();
+    expect(profileOffice(true, null)).toBeNull();
+    expect(officeAddressLines(null)).toEqual([]);
   });
 
   it("labels a sliding scale range, a single bound, or availability", () => {
