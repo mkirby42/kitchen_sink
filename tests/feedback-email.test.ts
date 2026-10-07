@@ -133,10 +133,9 @@ describe("sendFeedbackEmail", () => {
 });
 
 describe("finishJoin", () => {
-  it("saves, then emails a non-empty note", async () => {
+  it("saves, then schedules a non-empty note", async () => {
     const calls: string[] = [];
     const result = await finishJoin({
-      alreadySaved: false,
       feedback: "Confusing step",
       save: async () => {
         calls.push("save");
@@ -144,51 +143,55 @@ describe("finishJoin", () => {
       },
       notify: async (feedback) => {
         calls.push(`notify:${feedback}`);
-        return { ok: true };
       },
     });
     expect(result).toEqual({ ok: true, saved: true });
     expect(calls).toEqual(["save", "notify:Confusing step"]);
   });
 
-  it("keeps the profile saved when the email fails and retries the email only", async () => {
+  it("still finishes when scheduling the email throws", async () => {
     let saves = 0;
-    const failed = await finishJoin({
-      alreadySaved: false,
+    const result = await finishJoin({
       feedback: "Confusing step",
       save: async () => {
         saves += 1;
         return null;
       },
-      notify: async () => ({ ok: false, error: "mail down" }),
-    });
-    expect(failed).toEqual({ ok: false, saved: true, error: "mail down" });
-
-    const retried = await finishJoin({
-      alreadySaved: true,
-      feedback: "Confusing step",
-      save: async () => {
-        saves += 1;
-        return "should not save again";
+      notify: async () => {
+        throw new Error("mail down");
       },
-      notify: async () => ({ ok: true }),
     });
-    expect(retried).toEqual({ ok: true, saved: true });
+    expect(result).toEqual({ ok: true, saved: true });
     expect(saves).toBe(1);
+  });
+
+  it("does not email when the profile save fails", async () => {
+    let notified = false;
+    const result = await finishJoin({
+      feedback: "Confusing step",
+      save: async () => "license required",
+      notify: async () => {
+        notified = true;
+      },
+    });
+    expect(result).toEqual({
+      ok: false,
+      saved: false,
+      error: "license required",
+    });
+    expect(notified).toBe(false);
   });
 
   it("skips email when the note is empty", async () => {
     let notified = false;
     const result = await finishJoin({
-      alreadySaved: false,
       feedback: null,
       save: async () => null,
       notify: async () => {
         notified = true;
-        return { ok: true };
       },
     });
-    expect(result.ok).toBe(true);
+    expect(result).toEqual({ ok: true, saved: true });
     expect(notified).toBe(false);
   });
 });
