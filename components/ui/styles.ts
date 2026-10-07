@@ -35,7 +35,7 @@ export function buttonClass(variant: ButtonVariant = "primary", className?: stri
 
 export function tagClass(selected: boolean, className?: string) {
   return cx(
-    "rounded-full px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50",
+    "rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50",
     selected
       ? "bg-clay text-paper hover:bg-clay-dark"
       : "border border-line bg-paper text-ink hover:border-ink/20",

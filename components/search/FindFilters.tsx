@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Tag } from "@/components/ui/Tag";
+import { eyebrowClass, fieldClass } from "@/components/ui/styles";
 import {
   INSURANCE_PRESETS,
   SPECIALTY_PRESETS,
@@ -11,33 +13,6 @@ import {
 } from "@/lib/tags/presets";
 import type { SearchFilters } from "@/lib/search/rpc";
 import { buildFindHref, filtersFromSearchParams } from "./query";
-
-function chipClass(selected: boolean) {
-  return selected
-    ? "rounded-full border border-clay bg-clay px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-paper hover:bg-clay-dark"
-    : "rounded-full border border-line bg-paper px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-ink hover:border-ink/25";
-}
-
-function Chip({
-  selected,
-  onClick,
-  children,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
-      className={chipClass(selected)}
-    >
-      {children}
-    </button>
-  );
-}
 
 function FilterGroup({
   title,
@@ -59,9 +34,9 @@ function FilterGroup({
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen((value) => !value)}
-        className="flex w-full items-center justify-between rounded-full border border-line bg-paper px-5 py-2.5 text-left text-sm font-medium text-ink"
+        className="flex w-full items-center justify-between gap-4 text-left"
       >
-        {title}
+        <span className={eyebrowClass}>{title}</span>
         <span aria-hidden className="text-lg leading-none text-mute">
           {open ? "−" : "+"}
         </span>
@@ -108,9 +83,9 @@ function StateLicensePicker({
 
   if (state) {
     return (
-      <Chip selected onClick={() => onSelect(null)}>
+      <Tag selected onClick={() => onSelect(null)}>
         {licenseStateLabel(state)} · {state}
-      </Chip>
+      </Tag>
     );
   }
 
@@ -171,13 +146,13 @@ function StateLicensePicker({
         }}
         placeholder="Search state (California or CA)"
         autoComplete="off"
-        className="w-full rounded-full border border-line bg-paper px-4 py-2 text-sm text-ink outline-none placeholder:text-mute focus:border-clay"
+        className={fieldClass}
       />
       {open ? (
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-10 mt-2 max-h-64 w-full overflow-auto rounded-2xl border border-line bg-paper py-1 shadow-[0_12px_32px_-16px_rgba(27,39,68,0.35)]"
+          className="absolute z-10 mt-2 max-h-64 w-full overflow-auto rounded-box border border-line bg-paper py-1 shadow-overlay"
         >
           {matches.length === 0 ? (
             <li className="px-4 py-2.5 text-sm text-mute">No matching state</li>
@@ -226,28 +201,26 @@ export function FindFilters() {
   return (
     <div className="space-y-6">
       <fieldset>
-        <legend className="text-xs font-medium uppercase tracking-[0.16em] text-mute">
-          Session format
-        </legend>
+        <legend className={eyebrowClass}>Session format</legend>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Chip
+          <Tag
             selected={filters.virtual}
             onClick={() => apply({ ...filters, virtual: !filters.virtual })}
           >
             Virtual
-          </Chip>
-          <Chip
+          </Tag>
+          <Tag
             selected={filters.inPerson}
             onClick={() => apply({ ...filters, inPerson: !filters.inPerson })}
           >
             In-Person
-          </Chip>
+          </Tag>
         </div>
       </fieldset>
 
       <FilterGroup title="What brings you to therapy?">
         {SPECIALTY_PRESETS.map((label) => (
-          <Chip
+          <Tag
             key={label}
             selected={filters.tags.includes(label)}
             onClick={() =>
@@ -255,13 +228,13 @@ export function FindFilters() {
             }
           >
             {label}
-          </Chip>
+          </Tag>
         ))}
       </FilterGroup>
 
       <FilterGroup title="Insurance">
         {INSURANCE_PRESETS.map((label) => (
-          <Chip
+          <Tag
             key={label}
             selected={filters.tags.includes(label)}
             onClick={() =>
@@ -269,7 +242,7 @@ export function FindFilters() {
             }
           >
             {label}
-          </Chip>
+          </Tag>
         ))}
       </FilterGroup>
 

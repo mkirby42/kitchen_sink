@@ -150,6 +150,9 @@ describe("Find therapist card", () => {
     expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
     expect(html).toContain("aspect-[9/16]");
     expect(html).toContain("object-contain");
+    expect(html).toContain("rounded-card");
+    expect(html).toContain("shadow-card");
+    expect(html.match(/<article[^>]*>/)?.[0]).not.toContain("border");
     expect(html).not.toContain("object-cover");
     expect(html).toContain("sm:flex-row");
     expect(html).toContain("sm:w-52");

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { FindFilters } from "@/components/search/FindFilters";
 import { TherapistCard } from "@/components/search/TherapistCard";
+import { Card } from "@/components/ui/Card";
 import {
   buildFindHref,
   requestFindHref,
@@ -44,39 +45,36 @@ export default async function FindPage({ searchParams }: FindPageProps) {
     : found;
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <p className="font-display text-clay" aria-hidden>
-        ~
-      </p>
-      <h1 className="font-display text-4xl tracking-tight">
+    <main className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
+      <h1 className="text-center font-display text-[clamp(2.15rem,5vw,4.35rem)] leading-[1.05] font-medium tracking-tight text-ink">
         Find your <em className="text-clay">therapist</em>
       </h1>
-      <p className="mt-3 text-mute">
+      <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-mute sm:text-lg">
         Tap your must-haves below — we&apos;ll show therapists who match some
         selected tag.
       </p>
 
-      <div className="mt-10">
+      <Card className="mt-10 px-5 py-8 sm:px-8 sm:py-10">
         <Suspense fallback={null}>
           <FindFilters />
         </Suspense>
-      </div>
+      </Card>
 
-      <div className="mt-8 space-y-6">
+      <div className="mt-10 space-y-6">
         {rows === null ? (
-          <p className="rounded-3xl border border-line bg-paper px-6 py-10 text-center text-mute">
-            Therapist search isn&apos;t available right now.
-          </p>
+          <Card as="div" className="px-6 py-10 text-center text-mute">
+            <p>Therapist search isn&apos;t available right now.</p>
+          </Card>
         ) : rows.length === 0 ? (
-          <p className="rounded-3xl border border-line bg-paper px-6 py-10 text-center text-mute">
-            No therapists match
-          </p>
+          <Card as="div" className="px-6 py-10 text-center text-mute">
+            <p>No therapists match</p>
+          </Card>
         ) : (
           <>
             <p className="text-sm text-mute">
               {resultCountLabel(rows.length)}
             </p>
-            <ul className="space-y-4">
+            <ul className="space-y-6">
               {rows.map((row) => (
                 <li key={row.profile_id}>
                   <TherapistCard row={row} filters={filters} />

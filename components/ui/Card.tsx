@@ -2,7 +2,7 @@ import type { HTMLAttributes } from "react";
 import { cardClass, cx } from "./styles";
 
 type CardProps = {
-  as?: "section" | "div" | "li";
+  as?: "section" | "div" | "li" | "article";
   className?: string;
 } & Omit<HTMLAttributes<HTMLElement>, "className">;
 
