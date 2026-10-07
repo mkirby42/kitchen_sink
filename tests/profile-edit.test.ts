@@ -195,4 +195,52 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Office");
     expect(html).not.toContain("1102 West 6th Street");
   });
+
+  it("titles modalities above specialties, both below education", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          specialties: ["Anxiety", "Trauma & PTSD"],
+          modalities: ["CBT", "EMDR"],
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    const education = html.indexOf("Education");
+    const modalities = html.indexOf("Modalities");
+    const specialties = html.indexOf("Specialties");
+    const heroDetails = html.indexOf("data-hero-details");
+    expect(education).toBeGreaterThan(-1);
+    expect(modalities).toBeGreaterThan(education);
+    expect(specialties).toBeGreaterThan(modalities);
+    expect(html.indexOf("CBT")).toBeGreaterThan(modalities);
+    expect(html.indexOf("CBT")).toBeLessThan(specialties);
+    expect(html.indexOf("Anxiety")).toBeGreaterThan(specialties);
+    expect(html.slice(heroDetails, education)).not.toContain("CBT");
+    expect(html.slice(heroDetails, education)).not.toContain("EMDR");
+  });
+
+  it("keeps the modality and specialty boxes when education is empty", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          education: [],
+          credentials: [],
+          specialties: ["Anxiety"],
+          modalities: ["CBT"],
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(html).not.toContain("Education");
+    expect(html).not.toContain("Credentials");
+    const modalities = html.indexOf("Modalities");
+    const specialties = html.indexOf("Specialties");
+    expect(modalities).toBeGreaterThan(-1);
+    expect(specialties).toBeGreaterThan(modalities);
+  });
 });
