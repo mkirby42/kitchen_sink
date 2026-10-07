@@ -1,10 +1,6 @@
 import Link from "next/link";
 import { buildTherapistHref } from "@/components/search/query";
-import {
-  isMatchedLabel,
-  overlapCopy,
-  searchCardLabels,
-} from "@/lib/search/overlap";
+import { overlapCopy, searchCardLabels } from "@/lib/search/overlap";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import {
   formatStartingRate,
@@ -18,11 +14,8 @@ function cardInitials(name: string) {
   return initials(name.replace(/^(dr\.?|prof\.?)\s+/i, ""));
 }
 
-function tagClass(hit: boolean) {
-  return hit
-    ? "rounded-full border border-clay bg-clay px-3 py-1 text-xs text-paper"
-    : "rounded-full border border-line bg-cream px-3 py-1 text-xs text-ink";
-}
+const tagClass =
+  "rounded-full border border-line bg-cream px-3 py-1 text-xs text-ink";
 
 function Avatar({ name, photo }: { name: string; photo: string | null }) {
   const classes =
@@ -70,9 +63,8 @@ export function TherapistCard({
     .filter(Boolean)
     .join(" · ");
   const sample = row.profile_id === MAYA_ID;
-  const tags = searchCardLabels(row);
+  const tags = searchCardLabels(row, filters.tags);
   const hits = overlapCopy(row.match_count, filters.tags.length);
-  const matched = row.matched_labels ?? [];
 
   return (
     <Link
@@ -99,10 +91,7 @@ export function TherapistCard({
           {tags.length > 0 ? (
             <ul className={`flex flex-wrap gap-2 ${hits ? "mt-2" : "mt-3"}`}>
               {tags.map((label) => (
-                <li
-                  key={label}
-                  className={tagClass(isMatchedLabel(label, matched))}
-                >
+                <li key={label} className={tagClass}>
                   {label}
                 </li>
               ))}

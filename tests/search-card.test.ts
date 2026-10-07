@@ -31,9 +31,21 @@ function row(overrides: Partial<SearchRow> = {}): SearchRow {
   };
 }
 
-function render(overrides: Partial<SearchRow> = {}) {
+function chipLabels(html: string) {
+  return [...html.matchAll(/<li class="[^"]*">([^<]*)<\/li>/g)].map(
+    (match) => match[1],
+  );
+}
+
+function render(
+  overrides: Partial<SearchRow> = {},
+  filterOverrides: Partial<SearchFilters> = {},
+) {
   return renderToStaticMarkup(
-    createElement(TherapistCard, { row: row(overrides), filters }),
+    createElement(TherapistCard, {
+      row: row(overrides),
+      filters: { ...filters, ...filterOverrides },
+    }),
   );
 }
 
@@ -49,5 +61,29 @@ describe("Find therapist card", () => {
     const html = render({ sliding_scale: true });
     expect(html).toContain("75 min");
     expect(html).toContain("Sliding scale available");
+  });
+
+  it("lists only specialties and insurance that match the filters", () => {
+    const html = render(
+      {
+        specialty_labels: ["Anxiety", "Trauma & PTSD"],
+        insurance_labels: ["Aetna", "Cigna"],
+        matched_labels: ["Anxiety", "Aetna"],
+        match_count: 2,
+      },
+      { tags: ["Anxiety", "Depression", "Aetna"] },
+    );
+    expect(chipLabels(html)).toEqual(["Virtual", "Anxiety", "Aetna"]);
+    expect(html).toContain("2 of 3 tags");
+    expect(html).not.toContain("border-clay bg-clay");
+  });
+
+  it("omits specialty and insurance chips when those filters are empty", () => {
+    const html = render({
+      specialty_labels: ["Anxiety"],
+      insurance_labels: ["Aetna"],
+      virtual_practice: true,
+    });
+    expect(chipLabels(html)).toEqual(["Virtual"]);
   });
 });
