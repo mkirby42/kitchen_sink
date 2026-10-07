@@ -56,7 +56,7 @@ describe.skipIf(!dbConfigured())("search_therapists match model", () => {
   });
 
   it("does not match a tag nobody has", async () => {
-    const rows = await search(createAnonClient(), { p_tags: ["Medicare"] });
+    const rows = await search(createAnonClient(), { p_tags: ["No Such Tag"] });
     expect(rows).toEqual([]);
   });
 
