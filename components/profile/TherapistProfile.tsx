@@ -34,8 +34,6 @@ export function TherapistProfile({
   const format = formatLabel(data.virtual, data.inPerson);
   const officeLines = data.inPerson ? officeAddressLines(data.office) : [];
   const licenses = licenseCaptions(data.licenses);
-  const cashRate = data.rates[0];
-  const cashPrice = formatUsdFromCents(cashRate?.price_cents);
   const sliding = slidingScaleLabel(
     data.slidingScale,
     data.slidingScaleMinCents,
@@ -157,36 +155,6 @@ export function TherapistProfile({
 
       <TagSection title="Modalities" labels={data.modalities} />
       <TagSection title="Specialties" labels={data.specialties} />
-
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <article className="rounded-2xl bg-paper px-4 py-4 shadow-sm">
-          <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
-            Insurance
-          </p>
-          <p className="mt-1 font-medium text-ink">
-            {data.inNetwork.length > 0 ? data.inNetwork.join(", ") : "Cash pay"}
-          </p>
-          {superbill ? (
-            <p className="mt-1 text-sm text-mute">+ out-of-network superbills</p>
-          ) : null}
-        </article>
-        <article className="rounded-2xl bg-paper px-4 py-4 shadow-sm">
-          <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
-            Cash pay fee
-          </p>
-          <p className="mt-1 font-medium text-ink">
-            {cashPrice ? `${cashPrice} / session` : "Ask for rates"}
-          </p>
-          <p className="mt-1 text-sm text-mute">
-            {[
-              cashRate ? `${cashRate.duration_minutes} min` : null,
-              sliding ? "sliding scale available" : null,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-        </article>
-      </div>
 
       <ContactCtas name={data.givenName} actions={ctas} contact={data.contact} />
 
