@@ -26,32 +26,39 @@ export function ContactCtas({
 
   if (actions.length === 0 || contact.length === 0) return null;
 
+  const columns =
+    actions.length > 1 ? "grid-cols-2 gap-3" : "grid-cols-1";
+
   return (
     <>
       <div
-        className={
-          actions.length > 1
-            ? "mt-4 grid grid-cols-2 gap-3"
-            : "mt-4 grid grid-cols-1"
-        }
+        data-cta-placement="inline"
+        className={`mt-4 hidden md:grid ${columns}`}
       >
         {actions.map((action) => (
-          <button
+          <CtaButton
             key={action.kind}
-            type="button"
-            aria-haspopup="dialog"
-            aria-expanded={open}
-            onClick={() => setOpen(true)}
-            className={
-              action.kind === "book"
-                ? "flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-clay px-3 py-[0.95rem] text-[15px] font-semibold text-paper hover:bg-clay-dark"
-                : "flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-pine bg-paper px-3 py-[0.95rem] text-[15px] font-semibold text-pine hover:bg-pine/5"
-            }
-          >
-            {action.kind === "consult" ? <ConsultIcon /> : <BookIcon />}
-            {action.label}
-          </button>
+            action={action}
+            open={open}
+            onOpen={() => setOpen(true)}
+          />
         ))}
+      </div>
+
+      <div
+        data-cta-placement="dock"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(27,39,68,0.06)] md:hidden"
+      >
+        <div className={`mx-auto grid max-w-[26.5rem] px-5 ${columns}`}>
+          {actions.map((action) => (
+            <CtaButton
+              key={action.kind}
+              action={action}
+              open={open}
+              onOpen={() => setOpen(true)}
+            />
+          ))}
+        </div>
       </div>
 
       {open ? (
@@ -109,6 +116,33 @@ export function ContactCtas({
         </div>
       ) : null}
     </>
+  );
+}
+
+function CtaButton({
+  action,
+  open,
+  onOpen,
+}: {
+  action: ConsultBookAction;
+  open: boolean;
+  onOpen: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-haspopup="dialog"
+      aria-expanded={open}
+      onClick={onOpen}
+      className={
+        action.kind === "book"
+          ? "flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-clay px-3 py-[0.95rem] text-[15px] font-semibold text-paper hover:bg-clay-dark"
+          : "flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-pine bg-paper px-3 py-[0.95rem] text-[15px] font-semibold text-pine hover:bg-pine/5"
+      }
+    >
+      {action.kind === "consult" ? <ConsultIcon /> : <BookIcon />}
+      {action.label}
+    </button>
   );
 }
 
