@@ -49,15 +49,20 @@ export function TherapistProfile({
   const ctas = consultBookActions(data.contact);
 
   return (
-    <main className="relative mx-auto max-w-[26.5rem] overflow-hidden px-5 pb-20">
+    <main
+      className={`relative mx-auto max-w-[26.5rem] px-5 ${
+        ctas.length > 0
+          ? "pb-[calc(6.5rem_+_env(safe-area-inset-bottom))] md:pb-20"
+          : "pb-20"
+      }`}
+    >
       <div
-        className="pointer-events-none absolute -top-8 -left-10 h-32 w-40 rounded-[2.5rem] bg-clay/25"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
         aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute -top-4 -right-8 h-28 w-36 rounded-[2.5rem] bg-ink/10"
-        aria-hidden
-      />
+      >
+        <div className="absolute -top-8 -left-10 h-32 w-40 rounded-[2.5rem] bg-clay/25" />
+        <div className="absolute -top-4 -right-8 h-28 w-36 rounded-[2.5rem] bg-ink/10" />
+      </div>
 
       <header className="relative z-10 flex items-center justify-center py-4">
         <Link
