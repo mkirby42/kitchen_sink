@@ -8,6 +8,9 @@ import {
   requestFindHref,
   resultCountLabel,
 } from "@/components/search/query";
+import { narrowSearchRows } from "@/lib/audience";
+import { readAudienceCookie } from "@/lib/audience-cookie";
+import { loadNavUser } from "@/lib/nav";
 import { parseFindSearchParams, searchTherapists } from "@/lib/search/rpc";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +31,17 @@ export default async function FindPage({ searchParams }: FindPageProps) {
   const filters = parseFindSearchParams(raw);
   const clean = buildFindHref(filters);
   if (requestFindHref(raw) !== clean) redirect(clean);
-  const rows = await searchTherapists(filters);
+  const [found, audience, nav] = await Promise.all([
+    searchTherapists(filters),
+    readAudienceCookie(),
+    loadNavUser(),
+  ]);
+  const rows = found
+    ? narrowSearchRows(found, {
+        roleIsAdmin: nav?.role === "admin",
+        audience,
+      })
+    : found;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">

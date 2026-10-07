@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AudienceSwitcher } from "@/components/AudienceSwitcher";
+import { headerChrome, type SiteAudience } from "@/lib/audience";
 import type { NavUser } from "@/lib/nav";
 import { parseProfileRole } from "@/lib/role";
 import { routes } from "@/lib/routes";
@@ -47,10 +49,21 @@ function PersonIcon() {
   );
 }
 
+function hidesSiteNav(path: string) {
+  return (
+    path.startsWith("/t/") ||
+    path === routes.join ||
+    path === routes.forgotPassword ||
+    path === routes.resetPassword
+  );
+}
+
 export function SiteHeader({
   initialNavUser = null,
+  audience = "admin",
 }: {
   initialNavUser?: NavUser | null;
+  audience?: SiteAudience;
 }) {
   const path = usePathname();
   const router = useRouter();
@@ -106,105 +119,112 @@ export function SiteHeader({
     router.refresh();
   }
 
+  const chrome = headerChrome({
+    role: navUser?.role ?? null,
+    hasTherapist: Boolean(navUser?.hasTherapist),
+    audience,
+  });
+  const switcher = chrome.switcher ? (
+    <AudienceSwitcher audience={audience} />
+  ) : null;
+
   // Profile, join, and password reset use their own phone-width chrome.
-  if (
-    path.startsWith("/t/") ||
-    path === routes.join ||
-    path === routes.forgotPassword ||
-    path === routes.resetPassword
-  ) {
-    return null;
+  // Admins still get the switcher so Therapist/Client preview can return.
+  if (hidesSiteNav(path)) {
+    if (!switcher) return null;
+    return (
+      <div className="border-b border-line bg-paper">
+        <div className="mx-auto flex max-w-6xl justify-end px-5 py-2 sm:px-8">
+          {switcher}
+        </div>
+      </div>
+    );
   }
-
-  const admin = navUser?.role === "admin" ? navUser : null;
-  const therapist =
-    navUser &&
-    (navUser.role === "therapist" || (admin && navUser.hasTherapist))
-      ? navUser
-      : null;
-
-  const showTherapistEntry = !navUser || Boolean(admin);
 
   return (
     <header className="border-b border-line bg-paper">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <Link
-          href={routes.home}
-          className="shrink-0 font-display text-2xl tracking-tight text-ink"
-        >
-          Kitchen Sink
-          <Sparkle />
-        </Link>
-        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm sm:justify-end sm:gap-x-6">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-4 sm:px-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href={routes.home}
-            className={navClass(path === routes.home)}
-            aria-current={path === routes.home ? "page" : undefined}
+            className="shrink-0 font-display text-2xl tracking-tight text-ink"
           >
-            Home
+            Kitchen Sink
+            <Sparkle />
           </Link>
-          <Link
-            href={routes.find}
-            className={navClass(path === routes.find)}
-            aria-current={path === routes.find ? "page" : undefined}
-          >
-            Find a Therapist
-          </Link>
-          {admin ? (
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm sm:justify-end sm:gap-x-6">
             <Link
-              href={routes.adminMedia}
-              className={navClass(path === routes.adminMedia)}
-              aria-current={path === routes.adminMedia ? "page" : undefined}
+              href={routes.home}
+              className={navClass(path === routes.home)}
+              aria-current={path === routes.home ? "page" : undefined}
             >
-              Uploads
+              Home
             </Link>
-          ) : null}
-          {admin ? (
             <Link
-              href={routes.adminReviews}
-              className={navClass(path === routes.adminReviews)}
-              aria-current={path === routes.adminReviews ? "page" : undefined}
+              href={routes.find}
+              className={navClass(path === routes.find)}
+              aria-current={path === routes.find ? "page" : undefined}
             >
-              Reviews
+              Find a Therapist
             </Link>
-          ) : null}
-          {showTherapistEntry ? (
-            <Link href={routes.join} className={navClass(false)}>
-              For Therapists
-            </Link>
-          ) : null}
-          {therapist ? (
-            <Link
-              href={routes.therapist(therapist.id)}
-              className="rounded-full bg-clay px-4 py-2 font-medium text-paper hover:bg-clay-dark"
-            >
-              My profile
-            </Link>
-          ) : null}
-          {navUser ? (
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className={navClass(false)}
-            >
-              Sign out
-            </button>
-          ) : (
-            <>
-              <span
-                className="hidden h-4 w-px shrink-0 bg-ink/20 sm:block"
-                aria-hidden
-              />
+            {chrome.uploads ? (
               <Link
-                href={routes.joinSignIn}
-                className="inline-flex items-center gap-1.5 text-ink/80 hover:text-ink"
+                href={routes.adminMedia}
+                className={navClass(path === routes.adminMedia)}
+                aria-current={path === routes.adminMedia ? "page" : undefined}
               >
-                <PersonIcon />
-                Therapist log in
+                Uploads
               </Link>
-            </>
-          )}
-        </nav>
+            ) : null}
+            {chrome.reviews ? (
+              <Link
+                href={routes.adminReviews}
+                className={navClass(path === routes.adminReviews)}
+                aria-current={path === routes.adminReviews ? "page" : undefined}
+              >
+                Reviews
+              </Link>
+            ) : null}
+            {chrome.forTherapists ? (
+              <Link href={routes.join} className={navClass(false)}>
+                For Therapists
+              </Link>
+            ) : null}
+            {chrome.myProfile && navUser ? (
+              <Link
+                href={routes.therapist(navUser.id)}
+                className="rounded-full bg-clay px-4 py-2 font-medium text-paper hover:bg-clay-dark"
+              >
+                My profile
+              </Link>
+            ) : null}
+            {chrome.signOut ? (
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className={navClass(false)}
+              >
+                Sign out
+              </button>
+            ) : null}
+            {chrome.therapistLogin ? (
+              <>
+                <span
+                  className="hidden h-4 w-px shrink-0 bg-ink/20 sm:block"
+                  aria-hidden
+                />
+                <Link
+                  href={routes.joinSignIn}
+                  className="inline-flex items-center gap-1.5 text-ink/80 hover:text-ink"
+                >
+                  <PersonIcon />
+                  Therapist log in
+                </Link>
+              </>
+            ) : null}
+          </nav>
+        </div>
+        {switcher ? <div className="flex sm:justify-end">{switcher}</div> : null}
       </div>
     </header>
   );

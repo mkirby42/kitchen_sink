@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
+import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
 import { canonicalOrigin } from "@/lib/site";
 import "./globals.css";
@@ -41,12 +42,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const navUser = await loadNavUser();
+  const [navUser, audience] = await Promise.all([
+    loadNavUser(),
+    readAudienceCookie(),
+  ]);
 
   return (
     <html lang="en" className={`${fraunces.variable} ${sourceSans.variable}`}>
       <body className="min-h-screen antialiased">
-        <SiteHeader initialNavUser={navUser} />
+        <SiteHeader initialNavUser={navUser} audience={audience} />
         {children}
       </body>
     </html>
