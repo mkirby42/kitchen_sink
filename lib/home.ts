@@ -32,37 +32,8 @@ const logIn: HomeAction = {
   variant: "secondary",
 };
 
-/** Homepage cards. The public therapist card matches the landing mock. Signed-in account links are added on that card. */
-export function homePanels(state: {
-  signedIn: boolean;
-  therapistId: string | null;
-  admin?: boolean;
-}): { client: HomePanel; therapist: HomePanel } {
-  const therapistActions: HomeAction[] = [createProfile, logIn];
-
-  if (state.therapistId) {
-    therapistActions.push({
-      href: routes.therapist(state.therapistId),
-      label: "My profile",
-      variant: "secondary",
-    });
-  }
-
-  if (state.admin) {
-    therapistActions.push(
-      {
-        href: routes.adminMedia,
-        label: "Upload therapist media",
-        variant: "secondary",
-      },
-      {
-        href: routes.adminReviews,
-        label: "Review queue",
-        variant: "secondary",
-      },
-    );
-  }
-
+/** Homepage cards. The therapist card is Create a profile and Log in for every visitor. */
+export function homePanels(): { client: HomePanel; therapist: HomePanel } {
   return {
     client: {
       title: "Find a therapist who actually fits.",
@@ -71,7 +42,7 @@ export function homePanels(state: {
     },
     therapist: {
       title: "Meet clients who are ready to bring it all.",
-      actions: therapistActions,
+      actions: [createProfile, logIn],
     },
   };
 }
