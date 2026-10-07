@@ -100,7 +100,6 @@ export function TherapistProfile({
         initials={initials(data.name.replace(/^dr\.?\s+/i, ""))}
         photoUrl={data.photoUrl}
         videoUrl={data.videoUrl}
-        credential={data.credential}
         licenseCaptions={licenses}
         years={data.years}
         formatLabel={format}
