@@ -1,7 +1,10 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { isDirectoryListed } from "@/lib/therapists/listing";
+import {
+  canViewDirectoryProfile,
+  isDirectoryListed,
+} from "@/lib/therapists/listing";
 
 const migration = readFileSync(
   resolve(
@@ -12,6 +15,37 @@ const migration = readFileSync(
 );
 
 describe("directory listing", () => {
+  it("shows an unlisted open profile only to an admin", () => {
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: true,
+        listed: false,
+        viewerIsAdmin: false,
+      }),
+    ).toBe(false);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: true,
+        listed: false,
+        viewerIsAdmin: true,
+      }),
+    ).toBe(true);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: false,
+        listed: false,
+        viewerIsAdmin: true,
+      }),
+    ).toBe(false);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: true,
+        listed: true,
+        viewerIsAdmin: false,
+      }),
+    ).toBe(true);
+  });
+
   it("treats only an explicit false as hidden", () => {
     expect(isDirectoryListed(true)).toBe(true);
     expect(isDirectoryListed(undefined)).toBe(true);

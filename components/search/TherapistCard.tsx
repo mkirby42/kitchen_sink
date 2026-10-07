@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { buildTherapistHref } from "@/components/search/query";
 import { overlapCopy, searchCardLabels } from "@/lib/search/overlap";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
@@ -85,6 +86,7 @@ export function TherapistCard({
             ) : null}
           </div>
           {meta ? <p className="mt-1 text-sm text-mute">{meta}</p> : null}
+          {row.listed === false ? <HiddenFromPublicBadge variant="card" /> : null}
           {hits ? (
             <p className="mt-3 text-sm font-medium text-clay">{hits}</p>
           ) : null}
