@@ -62,6 +62,6 @@ export function segmentTrackClass({
 
 export function segmentOptionClass(selected: boolean) {
   return selected
-    ? "rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper"
-    : "rounded-full px-5 py-2.5 text-sm font-medium text-ink/65 hover:text-ink";
+    ? "rounded-full bg-ink px-5 py-2.5 text-center text-sm font-medium text-paper"
+    : "rounded-full px-5 py-2.5 text-center text-sm font-medium text-ink/65 hover:text-ink";
 }

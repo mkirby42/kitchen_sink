@@ -34,7 +34,11 @@ export function SegmentedControl<T extends string>({
             type="button"
             aria-pressed={selected}
             onClick={() => onChange(option.value)}
-            className={segmentOptionClass(selected)}
+            className={cx(
+              segmentOptionClass(selected),
+              stack &&
+                "flex w-full items-center justify-center sm:inline-flex sm:w-auto",
+            )}
           >
             {option.label}
           </button>
