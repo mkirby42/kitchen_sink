@@ -21,6 +21,18 @@ describe("find card video and conversation migration", () => {
     expect(migration).toContain("limit 1");
     expect(migration).toContain("video_key text");
     expect(migration).toContain("card_prompt text");
+    const disable =
+      "alter table public.profile_items disable trigger profile_items_card_count;";
+    const enable =
+      "alter table public.profile_items enable trigger profile_items_card_count;";
+    const rankedAt = migration.indexOf("with ranked as (");
+    const filledAt = migration.indexOf("and item.position is null;");
+    expect(migration.slice(0, rankedAt)).toContain(disable);
+    expect(migration.slice(rankedAt, filledAt)).not.toContain(disable);
+    expect(migration.indexOf(enable)).toBeGreaterThan(filledAt);
+    expect(migration.indexOf(enable)).toBeLessThan(
+      migration.indexOf("create sequence public.profile_items_position_seq"),
+    );
     expect(migration).toContain("profile_items_assign_position");
     expect(migration).toContain("profile_items_therapist_position_idx");
     expect(migration.match(/create function public.search_therapists/g)).toHaveLength(

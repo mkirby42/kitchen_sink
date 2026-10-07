@@ -13,6 +13,8 @@ alter table public.profile_items
 comment on column public.profile_items.position is
   'Saved order. Lower is first. Null on insert is filled by profile_items_assign_position.';
 
+alter table public.profile_items disable trigger profile_items_card_count;
+
 with ranked as (
   select
     id,
@@ -27,6 +29,8 @@ set position = ranked.pos
 from ranked
 where item.id = ranked.id
   and item.position is null;
+
+alter table public.profile_items enable trigger profile_items_card_count;
 
 create sequence public.profile_items_position_seq;
 
