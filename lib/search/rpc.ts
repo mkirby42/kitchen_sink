@@ -1,6 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { supabasePublicConfig } from "@/lib/supabase/env";
-import { allowedLicenseState, allowedSearchTags } from "@/lib/tags/presets";
+import {
+  allowedLicenseState,
+  allowedSearchTags,
+  canonicalSpecialtyLabels,
+  searchQueryTags,
+} from "@/lib/tags/presets";
 
 export type SearchRow = {
   profile_id: string;
@@ -57,13 +62,34 @@ export function parseFindSearchParams(
 
 export function searchRpcArgs(filters: SearchFilters) {
   return {
-    p_tags: allowedSearchTags(filters.tags),
+    p_tags: searchQueryTags(filters.tags),
     p_virtual: filters.virtual,
     p_in_person: filters.inPerson,
     p_state: allowedLicenseState(filters.state),
     p_limit: 24,
     p_offset: 0,
   };
+}
+
+export function normalizeSearchRows(rows: SearchRow[], selected: string[]) {
+  const selectedSet = new Set(allowedSearchTags(selected));
+  let countsChanged = false;
+  const mapped = rows.map((row) => {
+    const specialty_labels = canonicalSpecialtyLabels(
+      row.specialty_labels ?? [],
+    );
+    const matched_labels = canonicalSpecialtyLabels(row.matched_labels ?? []);
+    const match_count = matched_labels.filter((label) =>
+      selectedSet.has(label),
+    ).length;
+    if (match_count !== row.match_count) countsChanged = true;
+    return { ...row, specialty_labels, matched_labels, match_count };
+  });
+  if (!countsChanged) return mapped;
+  return mapped.sort((a, b) => {
+    if (b.match_count !== a.match_count) return b.match_count - a.match_count;
+    return a.name.localeCompare(b.name);
+  });
 }
 
 export async function searchTherapists(filters: SearchFilters) {
@@ -74,5 +100,5 @@ export async function searchTherapists(filters: SearchFilters) {
     searchRpcArgs(filters),
   );
   if (error) throw error;
-  return (data ?? []) as SearchRow[];
+  return normalizeSearchRows((data ?? []) as SearchRow[], filters.tags);
 }

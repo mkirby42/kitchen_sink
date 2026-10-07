@@ -47,7 +47,10 @@ function FilterGroup({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(true);
-  const id = `filter-${title.replace(/\s+/g, "-").toLowerCase()}`;
+  const id = `filter-${title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
 
   return (
     <div>
@@ -242,7 +245,7 @@ export function FindFilters() {
         </div>
       </fieldset>
 
-      <FilterGroup title="Specialties">
+      <FilterGroup title="What brings you to therapy?">
         {SPECIALTY_PRESETS.map((label) => (
           <Chip
             key={label}

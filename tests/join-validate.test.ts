@@ -362,6 +362,18 @@ describe("buildJoinPayload", () => {
     );
   });
 
+  it("stores Self Discovery once when the draft still says Teens", () => {
+    const payload = buildJoinPayload(
+      validStep4({
+        specialties: ["Teens", "Self Discovery", "Anxiety"],
+      }),
+    );
+    expect(payload.tags.filter((tag) => tag.kind === "specialty")).toEqual([
+      { kind: "specialty", label: "Self Discovery" },
+      { kind: "specialty", label: "Anxiety" },
+    ]);
+  });
+
   it("publishes the sliding scale checkbox and clears any stored range", () => {
     const on = buildJoinPayload(
       validStep4({

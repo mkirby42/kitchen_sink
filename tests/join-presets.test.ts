@@ -13,7 +13,7 @@ describe("join presets", () => {
     expect(MODALITY_PRESETS).toContain("EMDR");
   });
 
-  it("keeps the existing specialty list unchanged", () => {
+  it("lists specialty presets, with Self Discovery in place of Teens", () => {
     expect(SPECIALTY_PRESETS).toEqual([
       "Anxiety",
       "Depression",
@@ -22,8 +22,9 @@ describe("join presets", () => {
       "ADHD",
       "Grief & Loss",
       "Life Transitions",
-      "Teens",
+      "Self Discovery",
       "Immigration",
     ]);
+    expect(SPECIALTY_PRESETS).not.toContain("Teens");
   });
 });

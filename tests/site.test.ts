@@ -107,7 +107,12 @@ describe("therapist meta description", () => {
       therapistMetaDescription({
         name: "Maya Chen",
         credential: "LMFT",
-        specialties: ["Anxiety", "Trauma & PTSD", "Grief & Loss", "Teens"],
+        specialties: [
+          "Anxiety",
+          "Trauma & PTSD",
+          "Grief & Loss",
+          "Self Discovery",
+        ],
       }),
     ).toBe(
       "Maya Chen, LMFT. Specialties include Anxiety, Trauma & PTSD, Grief & Loss. Profile on Kitchen Sink.",

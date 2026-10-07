@@ -21,6 +21,12 @@ describe("directory specialties", () => {
     ).toEqual(["Anxiety", "Depression", "Couples & Relationships", "Life Transitions"]);
   });
 
+  it("shows a stored Teens specialty as Self Discovery", () => {
+    expect(directorySpecialties(["Teens", "Anxiety", "Self Discovery"])).toEqual(
+      ["Self Discovery", "Anxiety"],
+    );
+  });
+
   it("uses the same list Find filters by", () => {
     expect(directorySpecialties([...SPECIALTY_PRESETS])).toEqual([
       ...SPECIALTY_PRESETS,
