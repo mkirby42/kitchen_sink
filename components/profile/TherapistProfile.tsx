@@ -9,7 +9,7 @@ import {
   consultBookActions,
   formatLabel,
   hasSuperbill,
-  licenseLine,
+  licenseCaptions,
   reviewAverage,
   slidingScaleLabel,
   type TherapistProfileData,
@@ -33,7 +33,7 @@ export function TherapistProfile({
   const isOwner = viewer.isOwner;
   const format = formatLabel(data.virtual, data.inPerson);
   const officeLines = data.inPerson ? officeAddressLines(data.office) : [];
-  const licenses = licenseLine(data.licenses);
+  const licenses = licenseCaptions(data.licenses);
   const cashRate = data.rates[0];
   const cashPrice = formatUsdFromCents(cashRate?.price_cents);
   const sliding = slidingScaleLabel(
@@ -103,7 +103,7 @@ export function TherapistProfile({
         photoUrl={data.photoUrl}
         videoUrl={data.videoUrl}
         credential={data.credential}
-        licenseText={licenses}
+        licenseCaptions={licenses}
         years={data.years}
         formatLabel={format}
         modalities={data.modalities}

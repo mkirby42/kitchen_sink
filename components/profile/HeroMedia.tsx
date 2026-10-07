@@ -8,7 +8,7 @@ type HeroMediaProps = {
   photoUrl: string | null;
   videoUrl: string | null;
   credential: string | null;
-  licenseText: string | null;
+  licenseCaptions: string[];
   years: number | null;
   formatLabel: string | null;
   modalities: string[];
@@ -20,7 +20,7 @@ export function HeroMedia({
   photoUrl,
   videoUrl,
   credential,
-  licenseText,
+  licenseCaptions,
   years,
   formatLabel,
   modalities,
@@ -30,11 +30,17 @@ export function HeroMedia({
 
   const yearsLabel =
     years == null ? null : `${years} yr${years === 1 ? "" : "s"} practicing`;
-  const meta = [licenseText, yearsLabel].filter(Boolean).join(" · ");
+  const detailLine = [credential, yearsLabel].filter(Boolean).join(" · ");
+  const showIntroLabel = Boolean(videoUrl && !showVideo);
+  const showChips = showIntroLabel || Boolean(formatLabel) || modalities.length > 0;
+  const showDetails = showVideo || Boolean(detailLine) || showChips;
 
   return (
     <div>
-      <div className="relative isolate overflow-hidden rounded-[2rem] bg-ink shadow-sm">
+      <div
+        data-hero-media
+        className="relative isolate overflow-hidden rounded-[2rem] bg-ink shadow-sm"
+      >
         <div className="relative aspect-[3/4] min-h-[28rem] w-full">
           {showVideo && videoUrl ? (
             <video
@@ -65,55 +71,101 @@ export function HeroMedia({
           )}
 
           {videoUrl && !showVideo ? (
-            <>
-              <p className="absolute top-4 left-4 flex items-center rounded-full bg-paper/95 px-3 py-1 text-xs font-medium text-ink shadow-sm">
-                <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-clay" />
-                1 min intro
-              </p>
-              <button
-                type="button"
-                onClick={() => setPlaying(true)}
+            <button
+              type="button"
+              onClick={() => setPlaying(true)}
                 className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-paper/80 bg-transparent hover:bg-paper/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
-                aria-label={`Play intro video for ${name}`}
+              aria-label={`Play intro video for ${name}`}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="ml-1 h-7 w-7 fill-paper drop-shadow-[0_1px_2px_rgba(27,39,68,0.7)]"
+                aria-hidden
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="ml-1 h-7 w-7 fill-paper drop-shadow-[0_1px_2px_rgba(27,39,68,0.7)]"
-                  aria-hidden
-                >
-                  <path d="M8 5.5v13l11-6.5-11-6.5z" />
-                </svg>
-              </button>
-            </>
+                <path d="M8 5.5v13l11-6.5-11-6.5z" />
+              </svg>
+            </button>
           ) : null}
+
+          {showVideo ? null : (
+            <>
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink/75 via-ink/40 via-[35%] to-transparent"
+                aria-hidden
+              />
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <h1 className="font-display text-4xl leading-tight tracking-tight text-paper drop-shadow-[0_1px_8px_rgba(27,39,68,0.65)]">
+                  {name}
+                </h1>
+                {licenseCaptions.length > 0 ? (
+                  <div className="mt-1.5 space-y-0.5">
+                    {licenseCaptions.map((line) => (
+                      <p
+                        key={line}
+                        className="text-sm leading-snug text-paper/95 drop-shadow-[0_1px_6px_rgba(27,39,68,0.7)]"
+                      >
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="mt-4">
-        <h1 className="font-display text-4xl leading-tight tracking-tight text-ink">
-          {name}{" "}
-          {credential ? (
-            <span className="font-sans text-xl font-normal tracking-wide text-mute">
-              {credential}
-            </span>
+      {showDetails ? (
+        <div data-hero-details className="mt-4">
+          {showVideo ? (
+            <>
+              <h1 className="font-display text-4xl leading-tight tracking-tight text-ink">
+                {name}
+              </h1>
+              {licenseCaptions.length > 0 ? (
+                <div className="mt-1 space-y-0.5">
+                  {licenseCaptions.map((line) => (
+                    <p key={line} className="text-sm text-mute">
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              ) : null}
+            </>
           ) : null}
-        </h1>
-        {meta ? <p className="mt-1 text-sm text-mute">{meta}</p> : null}
-        {formatLabel || modalities.length > 0 ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {formatLabel ? (
-              <span className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
-                ↑ {formatLabel}
-              </span>
-            ) : null}
-            {modalities.length > 0 ? (
-              <span className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
-                ♡ {modalities.join(" · ")}
-              </span>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
+          {detailLine ? (
+            <p className={showVideo ? "mt-1 text-sm text-mute" : "text-sm text-mute"}>
+              {detailLine}
+            </p>
+          ) : null}
+          {showChips ? (
+            <div
+              className={
+                detailLine || showVideo
+                  ? "mt-3 flex flex-wrap gap-2"
+                  : "flex flex-wrap gap-2"
+              }
+            >
+              {showIntroLabel ? (
+                <span className="inline-flex items-center rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
+                  <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-clay" />
+                  1 min intro
+                </span>
+              ) : null}
+              {formatLabel ? (
+                <span className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
+                  ↑ {formatLabel}
+                </span>
+              ) : null}
+              {modalities.length > 0 ? (
+                <span className="rounded-full bg-paper px-3 py-1.5 text-sm text-ink shadow-sm">
+                  ♡ {modalities.join(" · ")}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
