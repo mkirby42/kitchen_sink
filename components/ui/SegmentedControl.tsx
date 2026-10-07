@@ -11,6 +11,7 @@ export function SegmentedControl<T extends string>({
   stack = false,
   wrap = false,
   size = "md",
+  fill = false,
   disabled = false,
 }: {
   label: string;
@@ -23,13 +24,19 @@ export function SegmentedControl<T extends string>({
   wrap?: boolean;
   /** sm is the header view switcher. md is the homepage switch. */
   size?: "md" | "sm";
+  /** Stretch the track and split the options evenly. */
+  fill?: boolean;
   disabled?: boolean;
 }) {
   return (
     <div
       role="group"
       aria-label={label}
-      className={cx(segmentTrackClass({ stack, wrap, size }), className)}
+      className={cx(
+        segmentTrackClass({ stack, wrap, size }),
+        fill && "flex w-full",
+        className,
+      )}
     >
       {options.map((option) => {
         const selected = option.value === value;
@@ -45,6 +52,7 @@ export function SegmentedControl<T extends string>({
               stack &&
                 size === "md" &&
                 "flex w-full items-center justify-center sm:inline-flex sm:w-auto",
+              fill && "min-w-0 flex-1",
             )}
           >
             {option.label}

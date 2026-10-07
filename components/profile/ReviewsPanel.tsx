@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/Card";
 import { categoryAverages, formatRating, reviewAuthorLabel, reviewMeta } from "@/lib/reviews/format";
 import { publishedReviews } from "@/lib/reviews/publish";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
@@ -82,10 +83,7 @@ export function ReviewsPanel({
             {published.map((review) => {
               const meta = reviewMeta(review);
               return (
-                <li
-                  key={review.id}
-                  className="rounded-3xl bg-paper px-5 py-5 shadow-sm"
-                >
+                <Card as="li" key={review.id} className="px-5 py-5">
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-medium text-ink">{reviewAuthorLabel(review)}</p>
                     {review.stars != null ? <StarRow value={review.stars} /> : null}
@@ -94,7 +92,7 @@ export function ReviewsPanel({
                     <p className="mt-2 leading-relaxed text-ink">{review.body}</p>
                   ) : null}
                   {meta ? <p className="mt-3 text-sm text-mute">{meta}</p> : null}
-                </li>
+                </Card>
               );
             })}
           </ul>
