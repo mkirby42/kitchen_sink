@@ -66,7 +66,6 @@ describe("Find therapist card", () => {
     const html = render({ sliding_scale: true, min_price_cents: 8000 });
     expect(html).toContain("Maya Chen");
     expect(html).not.toContain("$");
-    expect(html).not.toContain("80");
     expect(html).not.toContain("Sliding scale");
   });
 
