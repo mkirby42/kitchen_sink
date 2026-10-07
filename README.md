@@ -88,11 +88,22 @@ Then `npm install && npm run dev` and follow Option A on localhost.
 
 `npm run seed:media` signs in as the removed demo users and will fail after that migration. Do not re-run the historical seed SQL against production.
 
-`SUPABASE_SERVICE_ROLE_KEY` is **not** required for the app, tests, or `seed:media`. Never put the service role in the browser, Vercel public env, or git.
+Travis White is applied separately, and only to project `udgngzzzgrxjxljgtxpf`:
+
+```bash
+SUPABASE_ACCESS_TOKEN=sbp_... \
+SUPABASE_SERVICE_ROLE_KEY=eyJ... \
+NEXT_PUBLIC_SUPABASE_URL=https://udgngzzzgrxjxljgtxpf.supabase.co \
+npm run apply:travis-white
+```
+
+`DATABASE_URL` can replace `SUPABASE_ACCESS_TOKEN` when `psql` is installed. The script creates a therapist auth user for `thetalkshoppeatx@gmail.com` with an unknown password. Claim it from `/forgot-password`, sign in at `/join?mode=signin`, then Edit. Re-runs update the profile and media and do not reset that password.
+
+`SUPABASE_SERVICE_ROLE_KEY` is **not** required for the app, tests, or `seed:media`. Never put the service role in the browser, Vercel public env, or git. `npm run apply:travis-white` is the exception: it writes one real profile and uploads that therapist's photo and intro video. It needs the service role plus either `SUPABASE_ACCESS_TOKEN` (database write) or `DATABASE_URL`.
 
 ## Data and provenance
 
-Nothing here is a real clinician, patient, license, review, or clinical dataset. No third-party health registry was imported.
+Demo seeds are not real clinicians. Travis White is a real therapist, applied with `npm run apply:travis-white`, not by a migration. No third-party health registry was imported.
 
 | What | Where | Provenance |
 | --- | --- | --- |
@@ -101,8 +112,9 @@ Nothing here is a real clinician, patient, license, review, or clinical dataset.
 | Seed patients J.R., Priya S., D.M. | same Maya seed | Prototype reviewer names. Removed with the same id + email rule. |
 | Tag / credential / insurance chips | `lib/tags/presets.ts` + requirements | Prototype + spec labels, not a published taxonomy |
 | Headshots + intro clips | `supabase/seed/media/<uuid>/` | Synthetic portraits. The removal migration nulls Storage ownership for matched seed ids. Hosted Storage rejects SQL deletes; remove the objects with the Storage API. |
+| Travis White (PsyD, Austin) | `scripts/apply-travis-white-profile.mjs` | Real profile from thetalkshoppeatx.com and his Psychology Today page. Photo and intro video live in `scripts/travis-white/`. Not a `@kitchensink.demo` account, so the demo wipe does not remove it. |
 
-License numbers, phones, and addresses are fake. Reviews are fiction.
+Demo seed license numbers, phones, and addresses are fake. Reviews on those seeds are fiction. Travis White's license, phone, address, and rates are the ones published on his practice site and Psychology Today.
 
 ## Known limitations (today)
 

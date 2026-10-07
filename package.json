@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "seed:media": "node scripts/seed-demo-media.mjs"
+    "seed:media": "node scripts/seed-demo-media.mjs",
+    "apply:travis-white": "node scripts/apply-travis-white-profile.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
