@@ -8,6 +8,7 @@ import {
   contactActions,
   givenName,
   inNetworkInsurance,
+  licenseCaptions,
   licenseLine,
   reviewAverage,
   slidingScaleLabel,
@@ -27,6 +28,22 @@ describe("profile view helpers", () => {
         { number: "12345", state: "NY" },
       ]),
     ).toBe("Lic. #MFC 112938 (CA) · #12345 (NY)");
+  });
+
+  it("writes a hero license caption from the state name and number", () => {
+    expect(
+      licenseCaptions([
+        { number: "38047", state: "TX" },
+        { number: " 12345 ", state: "ca" },
+      ]),
+    ).toEqual([
+      "Licensed by State of Texas / 38047",
+      "Licensed by State of California / 12345",
+    ]);
+    expect(licenseCaptions([{ number: "999", state: "DC" }])).toEqual([
+      "Licensed by the District of Columbia / 999",
+    ]);
+    expect(licenseCaptions([{ number: "  ", state: "TX" }])).toEqual([]);
   });
 
   it("builds mailto and tel contact actions from outreach tags", () => {

@@ -1,6 +1,7 @@
 import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { isPublicTherapistRole } from "@/lib/role";
+import { licenseStateLabel } from "@/lib/tags/presets";
 import { isDirectoryListed } from "@/lib/therapists/listing";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import {
@@ -109,6 +110,23 @@ export function licenseLine(licenses: ProfileLicense[]) {
       return index === 0 ? `Lic. ${body}` : body;
     })
     .join(" · ");
+}
+
+/** Hero overlay copy. One line per license, e.g. "Licensed by State of Texas / 38047". */
+export function licenseCaptions(licenses: ProfileLicense[]) {
+  return licenses.flatMap((license) => {
+    const number = license.number.trim();
+    const code = license.state.trim().toUpperCase();
+    if (!number || !code) return [];
+    const name = licenseStateLabel(code);
+    const place =
+      code === "DC"
+        ? "the District of Columbia"
+        : name === code
+          ? code
+          : `State of ${name}`;
+    return [`Licensed by ${place} / ${number}`];
+  });
 }
 
 export function telHref(phone: string) {

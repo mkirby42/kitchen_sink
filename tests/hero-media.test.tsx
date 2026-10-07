@@ -14,6 +14,8 @@ const modalities = [
   "Strength-Based",
 ];
 
+const texasLicense = "Licensed by State of Texas / 38047";
+
 function render(
   overrides: Partial<{
     photoUrl: string | null;
@@ -22,7 +24,7 @@ function render(
     formatLabel: string | null;
     modalities: string[];
     credential: string | null;
-    licenseText: string | null;
+    licenseCaptions: string[];
   }> = {},
 ) {
   return renderToStaticMarkup(
@@ -32,7 +34,7 @@ function render(
       photoUrl: "https://example.com/photo.jpg",
       videoUrl: "https://example.com/intro.mp4",
       credential: "PsyD",
-      licenseText: "Lic. #38047 (TX)",
+      licenseCaptions: [texasLicense],
       years: 8,
       formatLabel: "Virtual & In-Person",
       modalities,
@@ -41,63 +43,79 @@ function render(
   );
 }
 
-describe("HeroMedia", () => {
-  it("keeps a see-through play control and puts identity below the video", () => {
-    const html = render();
+function splitHero(html: string) {
+  const at = html.indexOf("data-hero-details");
+  return {
+    media: at === -1 ? html : html.slice(0, at),
+    details: at === -1 ? "" : html.slice(at),
+  };
+}
 
-    expect(html).toContain('aria-label="Play intro video for Travis White"');
-    expect(html).toContain("1 min intro");
-    expect(html).toContain("bg-transparent");
-    expect(html).toContain("border-paper/80");
-    expect(html).not.toContain("backdrop-blur");
-    expect(html).not.toContain("bg-ink/20");
-    expect(html).not.toContain("bg-paper/10");
-    expect(html).not.toContain(
+describe("HeroMedia", () => {
+  it("overlays only the name and license on the photo", () => {
+    const { media, details } = splitHero(render());
+
+    expect(media).toContain('aria-label="Play intro video for Travis White"');
+    expect(media).toContain("bg-transparent");
+    expect(media).toContain("border-paper/80");
+    expect(media).not.toContain("backdrop-blur");
+    expect(media).not.toContain("bg-ink/20");
+    expect(media).not.toContain("bg-paper/10");
+    expect(media).not.toContain(
       "bg-paper shadow-[0_8px_28px_rgba(27,39,68,0.28)]",
     );
-    expect(html).not.toContain("from-ink/90");
-    expect(html).not.toContain("absolute inset-x-0 bottom-0");
+    expect(media).not.toContain("from-ink/90");
+    expect(media).toContain("from-ink/75");
+    expect(media).toContain(">Travis White<");
+    expect(media).toContain(texasLicense);
+    expect(media).not.toContain("PsyD");
+    expect(media).not.toContain("8 yrs practicing");
+    expect(media).not.toContain("Virtual");
+    expect(media).not.toContain("1 min intro");
+    expect(media).not.toContain("ACT ·");
 
-    const mediaEnd = html.indexOf("1 min intro");
-    const nameAt = html.indexOf(">Travis White");
-    expect(mediaEnd).toBeGreaterThan(-1);
-    expect(nameAt).toBeGreaterThan(mediaEnd);
-
-    expect(html).toContain("PsyD");
-    expect(html).toContain("Lic. #38047 (TX)");
-    expect(html).toContain("8 yrs practicing");
-    expect(html).toContain("Virtual &amp; In-Person");
-    expect(html).toContain("ACT · Attachment-Based · CBT");
-    expect(html).toContain('class="font-display text-4xl leading-tight tracking-tight text-ink"');
+    expect(details).toContain("PsyD");
+    expect(details).toContain("8 yrs practicing");
+    expect(details).toContain("1 min intro");
+    expect(details).toContain("Virtual &amp; In-Person");
+    expect(details).toContain("ACT · Attachment-Based · CBT");
+    expect(details).not.toContain(texasLicense);
+    expect(details).not.toContain(">Travis White<");
   });
 
-  it("omits the play control without a video and still shows the name under the photo", () => {
-    const html = render({ videoUrl: null, years: 1, modalities: [] });
+  it("omits the play control without a video and keeps the license on the photo", () => {
+    const { media, details } = splitHero(
+      render({ videoUrl: null, years: 1, modalities: [] }),
+    );
 
-    expect(html).not.toContain("Play intro video");
-    expect(html).not.toContain("1 min intro");
-    expect(html).toContain('alt="Travis White"');
-    expect(html).toContain(">Travis White");
-    expect(html).toContain("1 yr practicing");
-    expect(html).toContain("↑ Virtual &amp; In-Person");
-    expect(html).not.toContain("♡");
+    expect(media).not.toContain("Play intro video");
+    expect(media).not.toContain("1 min intro");
+    expect(media).toContain('alt="Travis White"');
+    expect(media).toContain(">Travis White<");
+    expect(media).toContain(texasLicense);
+    expect(details).toContain("1 yr practicing");
+    expect(details).toContain("↑ Virtual &amp; In-Person");
+    expect(details).not.toContain("♡");
+    expect(details).not.toContain("1 min intro");
   });
 
-  it("shows initials and the name when there is no photo or video", () => {
+  it("shows initials and the name on the frame when there is no photo or video", () => {
     const html = render({
       photoUrl: null,
       videoUrl: null,
       credential: null,
-      licenseText: null,
+      licenseCaptions: [],
       years: null,
       formatLabel: null,
       modalities: [],
     });
+    const { media, details } = splitHero(html);
 
-    expect(html).toContain(">TW<");
-    expect(html).toContain(">Travis White");
-    expect(html).not.toContain("Play intro video");
-    expect(html).not.toContain("Lic.");
+    expect(media).toContain(">TW<");
+    expect(media).toContain(">Travis White<");
+    expect(media).not.toContain("Play intro video");
+    expect(details).toBe("");
+    expect(html).not.toContain("Licensed by");
     expect(html).not.toContain("↑");
   });
 });
