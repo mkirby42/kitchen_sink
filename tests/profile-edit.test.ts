@@ -70,7 +70,7 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Delete profile");
   });
 
-  it("shows sliding scale on the public profile when it is offered", () => {
+  it("keeps rates and insurance in the lower box and drops the top summary cards", () => {
     const ranged = renderToStaticMarkup(
       createElement(TherapistProfile, {
         data: {
@@ -85,14 +85,26 @@ describe("profile edit control", () => {
           slidingScale: true,
           slidingScaleMinCents: 9000,
           slidingScaleMaxCents: 12000,
+          insurance: ["Aetna", "BCBS", "Out-of-Network Superbill"],
+          inNetwork: ["Aetna", "BCBS"],
+          superbill: true,
         },
         backHref: routes.find,
         viewer: visitor,
       }),
     );
-    expect(ranged).toContain("sliding scale available");
+    expect(ranged).not.toContain("Cash pay fee");
+    expect(ranged).not.toContain(">Insurance<");
+    expect(ranged).not.toContain("sliding scale available");
+    expect(ranged).not.toContain("+ out-of-network superbills");
+    expect(ranged).not.toContain("Aetna, BCBS");
+    expect(ranged).toContain("Rates &amp; insurance");
+    expect(ranged).toContain("Individual session (50 min)");
+    expect(ranged).toContain("$165");
     expect(ranged).toContain("Sliding scale");
     expect(ranged).toContain("$90-120");
+    expect(ranged).toContain("Aetna · BCBS");
+    expect(ranged).toContain("Superbill provided");
 
     const bare = renderToStaticMarkup(
       createElement(TherapistProfile, {
@@ -106,7 +118,8 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(bare).toContain("sliding scale available");
+    expect(bare).not.toContain("Cash pay fee");
+    expect(bare).toContain("Sliding scale");
     expect(bare).toContain("Available");
 
     const off = renderToStaticMarkup(
@@ -117,6 +130,10 @@ describe("profile edit control", () => {
       }),
     );
     expect(off).not.toContain("sliding scale available");
+    expect(off).not.toContain("Cash pay fee");
+    expect(off).not.toContain(">Insurance<");
+    expect(off).toContain("In-network");
+    expect(off).toContain("None listed");
   });
 
   it("hides Edit from visitors", () => {
