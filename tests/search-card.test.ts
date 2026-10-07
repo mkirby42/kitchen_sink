@@ -51,17 +51,22 @@ function render(
 }
 
 describe("Find therapist card", () => {
-  it("shows the starting rate as dollars and minutes", () => {
+  it("shows name and credential without a rate or price", () => {
     const html = render();
-    expect(html).toContain("$165");
-    expect(html).toContain("75 min");
-    expect(html).not.toContain("Sliding scale available");
+    expect(html).toContain("Maya Chen");
+    expect(html).toContain("LMFT");
+    expect(html).toContain("Virtual");
+    expect(html).not.toContain("$");
+    expect(html).not.toContain("165");
+    expect(html).not.toContain("75 min");
+    expect(html).not.toContain("Sliding scale");
   });
 
-  it("shows a sliding scale indicator when offered", () => {
-    const html = render({ sliding_scale: true });
-    expect(html).toContain("75 min");
-    expect(html).toContain("Sliding scale available");
+  it("omits sliding scale even when the therapist offers it", () => {
+    const html = render({ sliding_scale: true, min_price_cents: 8000 });
+    expect(html).toContain("Maya Chen");
+    expect(html).not.toContain("$");
+    expect(html).not.toContain("Sliding scale");
   });
 
   it("lists only specialties and insurance that match the filters", () => {

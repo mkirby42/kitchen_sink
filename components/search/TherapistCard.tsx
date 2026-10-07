@@ -4,7 +4,6 @@ import { buildTherapistHref } from "@/components/search/query";
 import { overlapCopy, searchCardLabels } from "@/lib/search/overlap";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import {
-  formatStartingRate,
   initials,
   storagePublicUrl,
   yearsPracticing,
@@ -53,10 +52,6 @@ export function TherapistCard({
 }) {
   const photo = storagePublicUrl("photos", row.photo_key);
   const years = yearsPracticing(row.start_date_of_practice);
-  const rate = formatStartingRate(
-    row.min_price_cents,
-    row.min_duration_minutes,
-  );
   const meta = [
     row.credential,
     years != null ? `${years} yr${years === 1 ? "" : "s"}` : null,
@@ -98,19 +93,6 @@ export function TherapistCard({
                 </li>
               ))}
             </ul>
-          ) : null}
-          {rate ? (
-            <p className="mt-4 text-ink">
-              {rate.price}
-              {rate.duration ? (
-                <span className="text-clay"> / {rate.duration}</span>
-              ) : null}
-            </p>
-          ) : null}
-          {row.sliding_scale ? (
-            <p className={`${rate ? "mt-1" : "mt-4"} text-sm text-ink`}>
-              Sliding scale available
-            </p>
           ) : null}
         </div>
       </div>
