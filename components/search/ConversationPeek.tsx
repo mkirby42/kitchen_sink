@@ -38,9 +38,9 @@ export function ConversationPeek({
 }) {
   const corner = cardCorner(tag);
   return (
-    <div className="relative mt-4 overflow-hidden rounded-[1.75rem] bg-cream pt-3.5 pr-5 pb-5 pl-5">
+    <div className="relative mt-4 overflow-hidden rounded-box bg-cream pt-3.5 pr-5 pb-5 pl-5">
       <span
-        className={`absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-br-2xl rounded-tl-[1.75rem] text-lg ${corner.tone}`}
+        className={`absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-br-2xl rounded-tl-box text-lg ${corner.tone}`}
         aria-hidden
       >
         {corner.icon}

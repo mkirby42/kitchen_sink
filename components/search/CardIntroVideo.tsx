@@ -19,7 +19,7 @@ export function CardIntroVideo({
   // 9:16 column. object-contain keeps a portrait clip whole; landscape letterboxes.
   // Explicit width so a row layout cannot stretch the frame and crop it.
   const frame =
-    "relative aspect-[9/16] w-40 shrink-0 self-start overflow-hidden rounded-2xl bg-ink sm:w-52";
+    "relative aspect-[9/16] w-40 shrink-0 self-start overflow-hidden rounded-box bg-ink sm:w-52";
   const media = "absolute inset-0 h-full w-full object-contain";
 
   if (playing) {

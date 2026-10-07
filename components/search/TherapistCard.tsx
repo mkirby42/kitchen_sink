@@ -3,6 +3,8 @@ import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { ConversationPeek } from "@/components/search/ConversationPeek";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { buildTherapistHref } from "@/components/search/query";
+import { Card } from "@/components/ui/Card";
+import { tagClass } from "@/components/ui/styles";
 import { overlapCopy, searchCardLabels } from "@/lib/search/overlap";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import {
@@ -15,9 +17,6 @@ import { MAYA_ID } from "@/lib/therapists/ids";
 function cardInitials(name: string) {
   return initials(name.replace(/^(dr\.?|prof\.?)\s+/i, ""));
 }
-
-const tagClass =
-  "rounded-full border border-line bg-cream px-3 py-1 text-xs text-ink";
 
 function conversationPeek(row: SearchRow) {
   const prompt = row.card_prompt?.trim() ?? "";
@@ -97,7 +96,7 @@ export function TherapistCard({
           {tags.length > 0 ? (
             <ul className={`flex flex-wrap gap-2 ${hits ? "mt-2" : "mt-3"}`}>
               {tags.map((label) => (
-                <li key={label} className={tagClass}>
+                <li key={label} className={tagClass(false)}>
                   {label}
                 </li>
               ))}
@@ -116,7 +115,7 @@ export function TherapistCard({
   );
 
   return (
-    <article className="rounded-3xl border border-line bg-paper p-6 shadow-sm transition hover:border-ink/15">
+    <Card as="article" className="p-5 sm:p-6">
       {videoUrl ? (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
           <CardIntroVideo
@@ -134,6 +133,6 @@ export function TherapistCard({
           {details}
         </Link>
       )}
-    </article>
+    </Card>
   );
 }
