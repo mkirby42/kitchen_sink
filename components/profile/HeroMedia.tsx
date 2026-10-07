@@ -91,9 +91,9 @@ export function HeroMedia({
 
       <div className="mt-4">
         <h1 className="font-display text-4xl leading-tight tracking-tight text-ink">
-          {name}
+          {name}{" "}
           {credential ? (
-            <span className="ml-2 font-sans text-xl font-normal tracking-wide text-mute">
+            <span className="font-sans text-xl font-normal tracking-wide text-mute">
               {credential}
             </span>
           ) : null}
