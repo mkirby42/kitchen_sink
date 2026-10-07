@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { headers } from "next/headers";
 import type { MetadataRoute } from "next";
 import { supabasePublicConfig } from "@/lib/supabase/env";
+import { directorySpecialties } from "@/lib/tags/presets";
 
 /** Live site from the README. Override with SITE_URL when the public host changes. */
 export const PRODUCTION_ORIGIN = "https://kitchen-sink-tau.vercel.app";
@@ -181,7 +182,7 @@ export function therapistMetaDescription(input: {
   const who = input.credential
     ? `${input.name}, ${input.credential}`
     : input.name;
-  const focus = input.specialties
+  const focus = directorySpecialties(input.specialties)
     .map((label) => label.trim())
     .filter(Boolean)
     .slice(0, 3)
