@@ -10,7 +10,6 @@ function render(
     photoUrl: string | null;
     videoUrl: string | null;
     years: number | null;
-    formatLabel: string | null;
     licenseCaptions: string[];
   }> = {},
 ) {
@@ -22,7 +21,6 @@ function render(
       videoUrl: "https://example.com/intro.mp4",
       licenseCaptions: [texasLicense],
       years: 8,
-      formatLabel: "Virtual & In-Person",
       ...overrides,
     }),
   );
@@ -62,23 +60,23 @@ describe("HeroMedia", () => {
     expect(details).not.toContain("PsyD");
     expect(details).toContain("8 yrs practicing");
     expect(details).not.toContain("1 min intro");
-    expect(details).toContain("Virtual &amp; In-Person");
+    expect(details).not.toContain("Virtual");
+    expect(details).not.toContain("In person");
     expect(details).not.toContain("ACT");
     expect(details).not.toContain(texasLicense);
     expect(details).not.toContain(">Travis White<");
   });
 
-  it("keeps session format when years are unpublished", () => {
+  it("leaves the hero details empty when years are unpublished", () => {
     const { media, details } = splitHero(render({ years: null }));
 
     expect(media).toContain(">Travis White<");
     expect(media).toContain(texasLicense);
-    expect(details).not.toContain("1 min intro");
-    expect(details).toContain("Virtual &amp; In-Person");
-    expect(details).not.toContain("ACT");
-    expect(details).not.toContain("practicing");
-    expect(details).not.toContain("PsyD");
-    expect(details).not.toContain(">Travis White<");
+    expect(details).toBe("");
+    expect(media).not.toContain("Virtual");
+    expect(media).not.toContain("In person");
+    expect(media).not.toContain("PsyD");
+    expect(media).not.toContain("1 min intro");
   });
 
   it("omits the play control without a video and keeps the license on the photo", () => {
@@ -93,7 +91,8 @@ describe("HeroMedia", () => {
     expect(media).toContain(texasLicense);
     expect(details).not.toContain("PsyD");
     expect(details).toContain("1 yr practicing");
-    expect(details).toContain("↑ Virtual &amp; In-Person");
+    expect(details).not.toContain("Virtual");
+    expect(details).not.toContain("In person");
     expect(details).not.toContain("1 min intro");
   });
 
@@ -103,7 +102,6 @@ describe("HeroMedia", () => {
       videoUrl: null,
       licenseCaptions: [],
       years: null,
-      formatLabel: null,
     });
     const { media, details } = splitHero(html);
 

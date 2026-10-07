@@ -231,11 +231,12 @@ export function reviewAverage(stars: number[]) {
   return Math.round(mean * 10) / 10;
 }
 
-export function formatLabel(virtual: boolean, inPerson: boolean) {
-  if (virtual && inPerson) return "Virtual & In-Person";
-  if (virtual) return "Virtual";
-  if (inPerson) return "In-Person";
-  return null;
+/** Public profile Logistics pills. Both offerings stay two labels. */
+export function sessionFormatPills(virtual: boolean, inPerson: boolean) {
+  const pills: string[] = [];
+  if (inPerson) pills.push("In person");
+  if (virtual) pills.push("Virtual");
+  return pills;
 }
 
 export function slidingScaleLabel(

@@ -118,7 +118,8 @@ describe("profile edit control", () => {
     expect(ranged).not.toContain("sliding scale available");
     expect(ranged).not.toContain("+ out-of-network superbills");
     expect(ranged).not.toContain("Aetna, BCBS");
-    expect(ranged).toContain("Rates &amp; insurance");
+    expect(ranged).toContain("Logistics");
+    expect(ranged).not.toContain("Rates &amp; insurance");
     expect(ranged).toContain("Individual session (50 min)");
     expect(ranged).toContain("$165");
     expect(ranged).toContain("Sliding scale");
@@ -189,8 +190,21 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(html).toContain("Office");
-    expect(html).toContain("1102 West 6th Street, Austin");
+    expect(html).toContain("Logistics");
+    expect(html).not.toContain("Rates &amp; insurance");
+    expect(html).not.toContain(">Office<");
+    expect(html).not.toContain("Virtual &amp; In-Person");
+    expect(html).not.toContain("In-Person");
+    const logisticsAt = html.indexOf("Logistics");
+    const inPersonAt = html.indexOf(">In person</li>");
+    const virtualAt = html.indexOf(">Virtual</li>");
+    const addressAt = html.indexOf("1102 West 6th Street, Austin");
+    expect(inPersonAt).toBeGreaterThan(logisticsAt);
+    expect(virtualAt).toBeGreaterThan(inPersonAt);
+    expect(addressAt).toBeGreaterThan(logisticsAt);
+    expect(html.indexOf("1102 West 6th Street, Austin", addressAt + 1)).toBe(
+      -1,
+    );
     expect(html).toContain("Suite 4");
     expect(html).toContain("TX 78703");
   });
@@ -207,8 +221,12 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(html).not.toContain("Office");
+    expect(html).not.toContain(">Office<");
+    expect(html).not.toContain("1102 West 6th Street");
+    expect(html).toContain(">In person</li>");
+    expect(html).toContain(">Virtual</li>");
     expect(html).toContain("Education");
+    expect(html).toContain("Logistics");
   });
 
   it("hides a leftover address when the therapist is virtual only", () => {
@@ -229,8 +247,11 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(html).not.toContain("Office");
+    expect(html).not.toContain(">Office<");
     expect(html).not.toContain("1102 West 6th Street");
+    expect(html).toContain(">Virtual</li>");
+    expect(html).not.toContain(">In person</li>");
+    expect(html).toContain("Logistics");
   });
 
   it("titles modalities above specialties, both below education", () => {
