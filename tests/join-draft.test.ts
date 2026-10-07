@@ -108,4 +108,37 @@ describe("draftFromRows", () => {
     expect(ranged.slidingScaleMinCents).toBe(8000);
     expect(ranged.slidingScaleMaxCents).toBe(12000);
   });
+
+  it("loads a stored Teens specialty as Self Discovery", () => {
+    const draft = draftFromRows({
+      email: "fallback@example.com",
+      profile: {
+        name: "Maya Chen",
+        email: "maya@example.com",
+        phone: null,
+        about_me: null,
+        photo_key: null,
+        video_key: null,
+      },
+      therapist: {
+        credential: "LMFT",
+        start_date_of_practice: "2017-01-01",
+        open_to_new_clients: true,
+        virtual_practice: true,
+        in_person_practice: false,
+      },
+      licenses: [],
+      qualifications: [],
+      rates: [],
+      tags: [
+        { kind: "specialty", label: "Teens" },
+        { kind: "specialty", label: "Self Discovery" },
+        { kind: "specialty", label: "Anxiety" },
+      ],
+      items: [],
+      location: null,
+    });
+
+    expect(draft.specialties).toEqual(["Self Discovery", "Anxiety"]);
+  });
 });

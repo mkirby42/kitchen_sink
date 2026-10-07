@@ -1,4 +1,8 @@
-import { INSURANCE_PRESETS, SPECIALTY_PRESETS } from "@/lib/tags/presets";
+import {
+  canonicalSpecialtyLabels,
+  INSURANCE_PRESETS,
+  SPECIALTY_PRESETS,
+} from "@/lib/tags/presets";
 
 const SPECIALTY_SET = new Set<string>(SPECIALTY_PRESETS);
 const INSURANCE_SET = new Set<string>(INSURANCE_PRESETS);
@@ -39,7 +43,7 @@ export function searchCardLabels(
   const selected = selectedTags ?? [];
   labels.push(
     ...matchingLabels(
-      row.specialty_labels,
+      canonicalSpecialtyLabels(row.specialty_labels),
       selected.filter((tag) => SPECIALTY_SET.has(tag)),
     ),
     ...matchingLabels(

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { canonicalSpecialtyLabels } from "@/lib/tags/presets";
 import { yearsPracticing } from "@/lib/therapists/display";
 import type { JoinDraft } from "./types";
 
@@ -60,7 +61,7 @@ export function draftFromRows(rows: JoinDraftRows): JoinDraft {
     openToNewClients: rows.therapist.open_to_new_clients,
     virtual: rows.therapist.virtual_practice,
     inPerson: rows.therapist.in_person_practice,
-    specialties: labelsOf(rows.tags, "specialty"),
+    specialties: canonicalSpecialtyLabels(labelsOf(rows.tags, "specialty")),
     modalities: labelsOf(rows.tags, "modality"),
     insurance: labelsOf(rows.tags, "insurance"),
     identity: labelsOf(rows.tags, "identity"),

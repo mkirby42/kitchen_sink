@@ -10,6 +10,7 @@ import {
 } from "@/lib/join/qualifications";
 import type { JoinDraft } from "@/lib/join/types";
 import {
+  canonicalSpecialtyLabels,
   CREDENTIALS,
   LICENSE_STATES,
   OUTREACH_OPTIONS,
@@ -351,9 +352,11 @@ export function buildJoinPayload(draft: JoinDraft) {
         }
       : null,
     tags: [
-      ...draft.specialties.map((label) => ({
+      ...canonicalSpecialtyLabels(
+        draft.specialties.map((label) => label.trim()).filter(Boolean),
+      ).map((label) => ({
         kind: "specialty",
-        label: label.trim(),
+        label,
       })),
       ...draft.modalities.map((label) => ({
         kind: "modality",

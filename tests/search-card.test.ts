@@ -88,6 +88,20 @@ describe("Find therapist card", () => {
     expect(html).not.toContain("border-clay bg-clay");
   });
 
+  it("shows a stored Teens specialty as Self Discovery", () => {
+    const html = render(
+      {
+        specialty_labels: ["Teens"],
+        matched_labels: ["Teens"],
+        match_count: 1,
+      },
+      { tags: ["Self Discovery"] },
+    );
+    expect(chipLabels(html)).toEqual(["Virtual", "Self Discovery"]);
+    expect(html).toContain("1 of 1 tag");
+    expect(html).not.toContain("Teens");
+  });
+
   it("omits specialty and insurance chips when those filters are empty", () => {
     const html = render({
       specialty_labels: ["Anxiety"],

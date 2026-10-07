@@ -73,7 +73,7 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
         },
       ],
       p_location: null,
-      p_tags: [{ kind: "specialty", label: "Teens" }],
+      p_tags: [{ kind: "specialty", label: "Self Discovery" }],
       p_items: [
         {
           prompt: "What can clients expect?",
@@ -109,7 +109,7 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
     expect(joined.data).toBe(userId);
 
     const anon = createAnonClient();
-    const rows = await search(anon, { p_tags: ["Teens"] });
+    const rows = await search(anon, { p_tags: ["Self Discovery"] });
     expect(rows.some((row) => row.profile_id === userId)).toBe(true);
 
     const practice = await anon

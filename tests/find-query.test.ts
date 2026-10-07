@@ -7,7 +7,12 @@ import {
   resultCountLabel,
 } from "@/components/search/query";
 import { allowedSearchTags } from "@/lib/tags/presets";
-import { parseFindSearchParams, searchRpcArgs } from "@/lib/search/rpc";
+import {
+  normalizeSearchRows,
+  parseFindSearchParams,
+  searchRpcArgs,
+  type SearchRow,
+} from "@/lib/search/rpc";
 
 describe("find result copy", () => {
   it("keeps the plural s in one string so it cannot wrap", () => {
@@ -160,5 +165,114 @@ describe("search filter tags", () => {
     expect(
       allowedSearchTags(["Aetna", "Eating Disorders", "ADHD", ""]),
     ).toEqual(["Aetna", "ADHD"]);
+  });
+
+  it("reads a Teens link as the Self Discovery filter", () => {
+    expect(allowedSearchTags(["Teens", "Self Discovery", "Aetna"])).toEqual([
+      "Self Discovery",
+      "Aetna",
+    ]);
+    expect(parseFindSearchParams({ tags: "Teens,Aetna" })).toEqual({
+      tags: ["Self Discovery", "Aetna"],
+      virtual: false,
+      inPerson: false,
+      state: null,
+    });
+    expect(requestFindHref({ tags: "Teens" })).toBe("/find?tags=Teens");
+    expect(buildFindHref(parseFindSearchParams({ tags: "Teens" }))).toBe(
+      "/find?tags=Self+Discovery",
+    );
+  });
+
+  it("asks the match query for Teens when Self Discovery is selected", () => {
+    expect(
+      searchRpcArgs({
+        tags: ["Self Discovery", "Aetna"],
+        virtual: false,
+        inPerson: false,
+        state: null,
+      }).p_tags,
+    ).toEqual(["Self Discovery", "Aetna", "Teens"]);
+  });
+});
+
+function searchRow(overrides: Partial<SearchRow> = {}): SearchRow {
+  return {
+    profile_id: "11111111-1111-4111-8111-111111111111",
+    name: "Zoe",
+    photo_key: null,
+    credential: null,
+    start_date_of_practice: null,
+    min_price_cents: null,
+    min_duration_minutes: null,
+    virtual_practice: false,
+    in_person_practice: false,
+    specialty_labels: [],
+    insurance_labels: [],
+    match_count: 0,
+    matched_labels: [],
+    sliding_scale: false,
+    video_key: null,
+    card_prompt: null,
+    card_answer: null,
+    card_tag: null,
+    ...overrides,
+  };
+}
+
+describe("legacy specialty label", () => {
+  it("shows a stored Teens tag as Self Discovery and counts it once", () => {
+    const [row] = normalizeSearchRows(
+      [
+        searchRow({
+          specialty_labels: ["Teens", "Self Discovery", "Anxiety"],
+          matched_labels: ["Teens", "Self Discovery"],
+          match_count: 2,
+        }),
+      ],
+      ["Self Discovery"],
+    );
+    expect(row.specialty_labels).toEqual(["Self Discovery", "Anxiety"]);
+    expect(row.matched_labels).toEqual(["Self Discovery"]);
+    expect(row.match_count).toBe(1);
+  });
+
+  it("re-ranks when collapsing Teens changes the overlap count", () => {
+    const rows = normalizeSearchRows(
+      [
+        searchRow({
+          profile_id: "22222222-2222-4222-8222-222222222222",
+          name: "Zoe",
+          specialty_labels: ["Teens", "Self Discovery"],
+          matched_labels: ["Teens", "Self Discovery"],
+          match_count: 2,
+        }),
+        searchRow({
+          name: "Amy",
+          specialty_labels: ["Self Discovery"],
+          matched_labels: ["Self Discovery"],
+          match_count: 1,
+        }),
+      ],
+      ["Self Discovery"],
+    );
+    expect(rows.map((row) => row.name)).toEqual(["Amy", "Zoe"]);
+    expect(rows.map((row) => row.match_count)).toEqual([1, 1]);
+  });
+
+  it("keeps SQL order when the overlap count does not change", () => {
+    const rows = normalizeSearchRows(
+      [
+        searchRow({ name: "Zoe", match_count: 1, matched_labels: ["Anxiety"] }),
+        searchRow({
+          profile_id: "22222222-2222-4222-8222-222222222222",
+          name: "Amy",
+          match_count: 0,
+          matched_labels: [],
+        }),
+      ],
+      ["Anxiety"],
+    );
+    expect(rows.map((row) => row.name)).toEqual(["Zoe", "Amy"]);
   });
 });

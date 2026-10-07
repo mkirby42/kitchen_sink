@@ -1,7 +1,10 @@
 import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { isPublicTherapistRole, parseProfileRole } from "@/lib/role";
-import { licenseStateLabel } from "@/lib/tags/presets";
+import {
+  canonicalSpecialtyLabels,
+  licenseStateLabel,
+} from "@/lib/tags/presets";
 import {
   canViewDirectoryProfile,
   isDirectoryListed,
@@ -490,7 +493,7 @@ export async function fetchTherapistProfile(
     licenses: (licensesRes.data ?? []) as ProfileLicense[],
     rates: (ratesRes.data ?? []) as ProfileRate[],
     tags,
-    specialties: labelsOf(tags, "specialty"),
+    specialties: canonicalSpecialtyLabels(labelsOf(tags, "specialty")),
     modalities: labelsOf(tags, "modality"),
     insurance,
     inNetwork: inNetworkInsurance(insurance),

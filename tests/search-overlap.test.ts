@@ -49,6 +49,20 @@ describe("search card labels", () => {
     ).toEqual(["Virtual", "In-Person"]);
   });
 
+  it("shows a stored Teens specialty as Self Discovery when that filter is on", () => {
+    expect(
+      searchCardLabels(
+        {
+          virtual_practice: false,
+          in_person_practice: false,
+          specialty_labels: ["Teens", "Anxiety"],
+          insurance_labels: [],
+        },
+        ["Self Discovery"],
+      ),
+    ).toEqual(["Self Discovery"]);
+  });
+
   it("does not repeat a label", () => {
     expect(
       searchCardLabels(

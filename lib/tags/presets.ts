@@ -6,15 +6,38 @@ export const SPECIALTY_PRESETS = [
   "ADHD",
   "Grief & Loss",
   "Life Transitions",
-  "Teens",
+  "Self Discovery",
   "Immigration",
 ] as const;
 
+/** Specialty chip renamed in place. Stored rows may still say the old label. */
+const LEGACY_SPECIALTY_LABELS: Record<string, string> = {
+  Teens: "Self Discovery",
+};
+
+export function canonicalSpecialtyLabel(label: string) {
+  return LEGACY_SPECIALTY_LABELS[label] ?? label;
+}
+
+export function canonicalSpecialtyLabels(labels: readonly string[]) {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const label of labels) {
+    const next = canonicalSpecialtyLabel(label);
+    if (seen.has(next)) continue;
+    seen.add(next);
+    out.push(next);
+  }
+  return out;
+}
+
 const SPECIALTY_PRESET_SET = new Set<string>(SPECIALTY_PRESETS);
 
-/** Specialties the public profile may show: the therapist's tags that Find can filter on. */
+/** Specialties the public profile may show: Find-list labels, with Teens shown as Self Discovery. */
 export function directorySpecialties(labels: readonly string[]): string[] {
-  return labels.filter((label) => SPECIALTY_PRESET_SET.has(label));
+  return canonicalSpecialtyLabels(labels).filter((label) =>
+    SPECIALTY_PRESET_SET.has(label),
+  );
 }
 
 export const INSURANCE_PRESETS = [
@@ -32,7 +55,21 @@ const SEARCH_FILTER_TAGS = new Set<string>([
 ]);
 
 export function allowedSearchTags(tags: string[]) {
-  return tags.filter((tag) => SEARCH_FILTER_TAGS.has(tag));
+  return canonicalSpecialtyLabels(tags).filter((tag) =>
+    SEARCH_FILTER_TAGS.has(tag),
+  );
+}
+
+/** Query labels. Self Discovery also matches a specialty row still stored as Teens. */
+export function searchQueryTags(tags: string[]) {
+  const selected = allowedSearchTags(tags);
+  const query = [...selected];
+  for (const [legacy, current] of Object.entries(LEGACY_SPECIALTY_LABELS)) {
+    if (selected.includes(current) && !query.includes(legacy)) {
+      query.push(legacy);
+    }
+  }
+  return query;
 }
 
 export const CREDENTIALS = [
