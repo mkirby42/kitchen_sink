@@ -17,6 +17,8 @@ export type SearchRow = {
   match_count: number;
   matched_labels: string[];
   sliding_scale: boolean;
+  /** False when an admin search included an unlisted profile. Absent means listed. */
+  listed?: boolean;
 };
 
 export type SearchFilters = {

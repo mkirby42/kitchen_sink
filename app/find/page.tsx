@@ -10,6 +10,8 @@ import {
 } from "@/components/search/query";
 import { parseFindSearchParams, searchTherapists } from "@/lib/search/rpc";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Find a therapist",
   description:

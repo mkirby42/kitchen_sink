@@ -1,8 +1,11 @@
 import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { isPublicTherapistRole } from "@/lib/role";
+import { isPublicTherapistRole, parseProfileRole } from "@/lib/role";
 import { licenseStateLabel } from "@/lib/tags/presets";
-import { isDirectoryListed } from "@/lib/therapists/listing";
+import {
+  canViewDirectoryProfile,
+  isDirectoryListed,
+} from "@/lib/therapists/listing";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import {
   formatUsdFromCents,
@@ -90,6 +93,8 @@ export type TherapistProfileData = {
   reviews: ProfileReview[];
   pendingReview: ProfileReview | null;
   contact: ContactAction[];
+  /** Unlisted practice shown only because the viewer is an admin. */
+  hiddenFromPublic?: boolean;
 };
 
 const SUPERBILL_LABEL = "out-of-network superbill";
@@ -306,13 +311,24 @@ export function toProfileReview(
   };
 }
 
-async function currentUserId(supabase: SupabaseClient) {
+async function viewerDirectoryAccess(supabase: SupabaseClient): Promise<{
+  userId: string | null;
+  isAdmin: boolean;
+}> {
   try {
     const { data, error } = await supabase.auth.getUser();
-    if (error) return null;
-    return data.user?.id ?? null;
+    if (error || !data.user) return { userId: null, isAdmin: false };
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    return {
+      userId: data.user.id,
+      isAdmin: parseProfileRole(profile?.role) === "admin",
+    };
   } catch {
-    return null;
+    return { userId: null, isAdmin: false };
   }
 }
 
@@ -374,7 +390,7 @@ export async function fetchTherapistProfile(
     tagsRes,
     itemsRes,
     reviewRows,
-    viewerId,
+    viewer,
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
     supabase.from("therapists").select("*").eq("profile_id", id).maybeSingle(),
@@ -400,7 +416,7 @@ export async function fetchTherapistProfile(
       .select("prompt, answer, tag")
       .eq("therapist_id", id),
     fetchReviewRows(supabase, id),
-    currentUserId(supabase),
+    viewerDirectoryAccess(supabase),
   ]);
 
   if (profileRes.error || therapistRes.error) return null;
@@ -409,8 +425,18 @@ export async function fetchTherapistProfile(
   const therapist = therapistRes.data;
   if (!profile || !therapist) return null;
   if (!isPublicTherapistRole(profile.role)) return null;
-  if (!therapist.open_to_new_clients) return null;
-  if (!isDirectoryListed(therapist.listed)) return null;
+  if (
+    !canViewDirectoryProfile({
+      openToNewClients: therapist.open_to_new_clients === true,
+      listed: therapist.listed,
+      viewerIsAdmin: viewer.isAdmin,
+    })
+  ) {
+    return null;
+  }
+
+  const viewerId = viewer.userId;
+  const hiddenFromPublic = !isDirectoryListed(therapist.listed);
 
   const tags = (tagsRes.data ?? []) as ProfileTag[];
   const outreach = labelsOf(tags, "outreach");
@@ -475,6 +501,7 @@ export async function fetchTherapistProfile(
       phone: profile.phone,
       outreach,
     }),
+    hiddenFromPublic,
   };
 }
 

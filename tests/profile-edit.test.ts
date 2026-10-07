@@ -5,6 +5,7 @@ import { TherapistProfile } from "@/components/profile/TherapistProfile";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
 import type { TherapistProfileData } from "@/lib/therapists/load";
+import { ADMIN_ONLY_HIDDEN_LABEL } from "@/lib/therapists/listing";
 
 const data: TherapistProfileData = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -53,6 +54,25 @@ const visitor: ReviewViewer = {
 };
 
 describe("profile edit control", () => {
+  it("banners a hidden profile and stays quiet on a public one", () => {
+    const hidden = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: { ...data, hiddenFromPublic: true },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    const listed = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data,
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(hidden).toContain(ADMIN_ONLY_HIDDEN_LABEL);
+    expect(listed).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
+  });
+
   it("shows an Edit button for the owner in the header corner", () => {
     const html = renderToStaticMarkup(
       createElement(TherapistProfile, {

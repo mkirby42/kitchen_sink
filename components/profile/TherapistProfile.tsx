@@ -16,6 +16,7 @@ import {
 } from "@/lib/therapists/load";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
+import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
 import { ProfileTabs } from "./ProfileTabs";
@@ -94,6 +95,8 @@ export function TherapistProfile({
           </Link>
         ) : null}
       </header>
+
+      {data.hiddenFromPublic ? <HiddenFromPublicBadge variant="banner" /> : null}
 
       <HeroMedia
         name={data.name}
