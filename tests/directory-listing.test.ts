@@ -46,6 +46,41 @@ describe("directory listing", () => {
     ).toBe(true);
   });
 
+  it("lets the owner open their own profile when it is hidden or closed", () => {
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: true,
+        listed: false,
+        viewerIsAdmin: true,
+        viewerIsOwner: true,
+      }),
+    ).toBe(true);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: false,
+        listed: false,
+        viewerIsAdmin: false,
+        viewerIsOwner: true,
+      }),
+    ).toBe(true);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: false,
+        listed: false,
+        viewerIsAdmin: true,
+        viewerIsOwner: false,
+      }),
+    ).toBe(false);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: true,
+        listed: false,
+        viewerIsAdmin: false,
+        viewerIsOwner: false,
+      }),
+    ).toBe(false);
+  });
+
   it("treats only an explicit false as hidden", () => {
     expect(isDirectoryListed(true)).toBe(true);
     expect(isDirectoryListed(undefined)).toBe(true);
