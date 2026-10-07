@@ -45,19 +45,19 @@ export function buildApplySql(profile = travisWhite) {
 do $apply$
 declare
   spec jsonb := ${literal}::jsonb;
-  email text := lower(spec->>'email');
+  v_email text := lower(spec->>'email');
   uid uuid;
   existing_role text;
   existing_name text;
   instance uuid;
 begin
-  if split_part(email, '@', 2) = '${DEMO_DOMAIN}' then
+  if split_part(v_email, '@', 2) = '${DEMO_DOMAIN}' then
     raise exception 'demo seed profiles are not created on this database';
   end if;
 
   select u.id into uid
   from auth.users u
-  where lower(u.email) = email;
+  where lower(u.email) = v_email;
 
   if uid is null then
     select u.instance_id into instance from auth.users u limit 1;
@@ -77,7 +77,7 @@ begin
       uid,
       'authenticated',
       'authenticated',
-      email,
+      v_email,
       extensions.crypt(gen_random_uuid()::text, extensions.gen_salt('bf')),
       now(),
       '',
@@ -102,7 +102,7 @@ begin
       last_sign_in_at, created_at, updated_at
     ) values (
       uid,
-      jsonb_build_object('sub', uid::text, 'email', email),
+      jsonb_build_object('sub', uid::text, 'email', v_email),
       'email',
       uid::text,
       now(),
@@ -116,7 +116,7 @@ begin
   where p.id = uid;
 
   if existing_role is not null and existing_role <> 'therapist' then
-    raise exception 'Refusing to overwrite a % account for %', existing_role, email;
+    raise exception 'Refusing to overwrite a % account for %', existing_role, v_email;
   end if;
 
   if existing_role = 'therapist'
@@ -130,7 +130,7 @@ begin
     uid,
     'therapist',
     btrim(spec->>'name'),
-    email,
+    v_email,
     spec->>'phone',
     spec->>'about',
     uid::text || '/photo.jpg',

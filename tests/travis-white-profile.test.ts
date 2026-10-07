@@ -27,6 +27,10 @@ describe("Travis White profile", () => {
     expect(sql).not.toContain("encrypted_password =");
     expect(sql).toContain("role");
     expect(sql).toContain("'therapist'");
+    expect(sql).toContain("v_email text := lower(spec->>'email')");
+    expect(sql).toContain("where lower(u.email) = v_email");
+    expect(sql).toContain("email = excluded.email");
+    expect(sql).not.toMatch(/^\s*email text :=/m);
   });
 
   it("is listed and open, with the published license and rate", () => {
