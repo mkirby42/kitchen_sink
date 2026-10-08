@@ -70,8 +70,11 @@ describe("Find therapist card", () => {
   it("shows name and credential without a rate or price", () => {
     const html = render();
     expect(html).toContain("Maya Chen");
+    expect(html).toContain(">MC<");
     expect(html).toContain("LMFT");
     expect(html).toContain("Virtual");
+    expect(phone(html)).toContain("Get to know Maya");
+    expect(html).not.toContain("yrs");
     expect(html).not.toContain("$");
     expect(html).not.toContain("165");
     expect(html).not.toContain("75 min");
@@ -95,8 +98,15 @@ describe("Find therapist card", () => {
       },
       { tags: ["Anxiety", "Depression", "Aetna"] },
     );
-    expect(chipLabels(phone(html))).toEqual(["Virtual", "Anxiety", "Aetna"]);
-    expect(html).toContain("2 of 3 tags");
+    expect(chipLabels(desk(html))).toEqual(["Anxiety", "Aetna"]);
+    expect(desk(html)).toContain("2 of 3 tags");
+    const narrow = phone(html);
+    expect(narrow).toContain(">Virtual<");
+    expect(narrow).not.toContain("In-Person");
+    expect(narrow).not.toContain(">Anxiety<");
+    expect(narrow).not.toContain(">Aetna<");
+    expect(narrow).not.toContain("2 of 3 tags");
+    expect(narrow).toContain("tags=Anxiety");
     expect(html).not.toContain("border-clay bg-clay");
   });
 
@@ -109,8 +119,10 @@ describe("Find therapist card", () => {
       },
       { tags: ["Self Discovery"] },
     );
-    expect(chipLabels(phone(html))).toEqual(["Virtual", "Self Discovery"]);
-    expect(html).toContain("1 of 1 tag");
+    expect(chipLabels(desk(html))).toEqual(["Self Discovery"]);
+    expect(desk(html)).toContain("1 of 1 tag");
+    expect(phone(html)).not.toContain("Self Discovery");
+    expect(phone(html)).not.toContain("1 of 1 tag");
     expect(html).not.toContain("Teens");
   });
 
@@ -120,7 +132,11 @@ describe("Find therapist card", () => {
       insurance_labels: ["Aetna"],
       virtual_practice: true,
     });
-    expect(chipLabels(html)).toEqual(["Virtual"]);
+    expect(chipLabels(html)).toEqual([]);
+    expect(phone(html)).toContain(">Virtual<");
+    expect(desk(html)).toContain("Virtual");
+    expect(html).not.toContain("Anxiety");
+    expect(html).not.toContain("Aetna");
   });
 
   it("badges an unlisted profile and leaves listed cards unmarked", () => {
@@ -129,13 +145,17 @@ describe("Find therapist card", () => {
     expect(render({ listed: true })).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
   });
 
-  it("keeps a circular photo and no play control when there is no intro video", () => {
+  it("keeps a full-bleed photo and no play control when there is no intro video", () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     const html = render({ photo_key: "maya/photo.jpg", video_key: null });
-    expect(html).toContain("rounded-full");
-    expect(html).toContain("/object/public/photos/maya/photo.jpg");
-    expect(html).not.toContain("Play intro video");
-    expect(html).not.toContain("<video");
+    const narrow = phone(html);
+    expect(narrow).toContain("aspect-[4/5]");
+    expect(narrow).toContain("object-cover");
+    expect(narrow).toContain("/object/public/photos/maya/photo.jpg");
+    expect(narrow).not.toContain("Play intro video");
+    expect(narrow).not.toContain("<video");
+    expect(narrow).not.toMatch(/<img[^>]*rounded-full/);
+    expect(narrow).toContain("Get to know Maya");
     expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
     expect(html).not.toContain("aspect-[9/16]");
     expect(html).not.toContain("sm:flex-row");
@@ -147,31 +167,34 @@ describe("Find therapist card", () => {
       photo_key: "maya/photo.jpg",
       video_key: "maya/intro.mp4",
     });
-    const playAt = html.indexOf('aria-label="Play intro video for Maya Chen"');
-    const linkAt = html.indexOf("<a ");
+    const narrow = phone(html);
+    const playAt = narrow.indexOf('aria-label="Play intro video for Maya Chen"');
+    const linkAt = narrow.indexOf("<a ");
     expect(playAt).toBeGreaterThan(-1);
     expect(linkAt).toBeGreaterThan(playAt);
-    expect(html.slice(0, linkAt)).not.toContain("<a ");
-    expect(html).toContain("border-paper/80");
-    expect(html).toContain("bg-transparent");
-    expect(html).toContain("/object/public/photos/maya/photo.jpg");
-    expect(html).not.toContain("intro.mp4");
-    expect(html).not.toContain("<video");
-    expect(html).not.toContain("autoPlay");
-    expect(html).not.toContain("autoplay");
+    expect(narrow.slice(0, linkAt)).not.toContain("<a ");
+    expect(narrow).toContain("border-white");
+    expect(narrow).toContain("size-28");
+    expect(narrow).toContain("object-cover");
+    expect(narrow).toContain("aspect-[4/5]");
+    expect(narrow).toContain("/object/public/photos/maya/photo.jpg");
+    expect(narrow).not.toContain("intro.mp4");
+    expect(narrow).not.toContain("<video");
+    expect(narrow).not.toContain("autoPlay");
+    expect(narrow).not.toContain("autoplay");
+    expect(narrow).toContain("Get to know Maya");
+    expect(narrow).not.toContain("→");
     expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
-    expect(html).toContain("aspect-[9/16]");
-    expect(html).toContain("object-contain");
     expect(html).toContain("rounded-card");
     expect(html).toContain("shadow-card");
     expect(html.match(/<article[^>]*>/)?.[0]).not.toContain("border");
-    expect(phone(html)).not.toContain("object-cover");
-    expect(html).toContain("sm:flex-row");
-    expect(html).toContain("sm:w-52");
+    expect(html).not.toContain("aspect-[9/16]");
+    expect(html).not.toContain("sm:flex-row");
+    expect(html).not.toContain("sm:w-52");
     expect(html.match(/<article/g)).toHaveLength(1);
-    const nameAt = html.indexOf(">Maya Chen<");
+    const nameAt = narrow.indexOf(">Maya Chen<");
     expect(nameAt).toBeGreaterThan(playAt);
-    expect(nameAt).toBeGreaterThan(linkAt);
+    expect(nameAt).toBeLessThan(linkAt);
   });
 
   it("shows the first conversation card and skips a blank one", () => {
@@ -182,11 +205,16 @@ describe("Find therapist card", () => {
     });
     expect(withCard).toContain("who I work best with...");
     expect(withCard).toContain("College students and early-career professionals.");
-    expect(withCard).toContain("font-display text-[15px] text-clay italic");
-    expect(withCard).toContain("text-[17px] leading-relaxed text-ink");
-    expect(withCard.indexOf("who I work best with...")).toBeGreaterThan(
-      withCard.indexOf("<a "),
-    );
+    const narrow = phone(withCard);
+    expect(narrow).toContain("font-display text-[1.15rem] leading-snug text-clay italic");
+    expect(narrow).toContain("text-[15px] leading-relaxed text-ink");
+    const promptAt = narrow.indexOf("who I work best with...");
+    const answerAt = narrow.indexOf("College students and early-career professionals.");
+    const ctaAt = narrow.indexOf("Get to know Maya");
+    expect(promptAt).toBeGreaterThan(-1);
+    expect(answerAt).toBeGreaterThan(promptAt);
+    expect(ctaAt).toBeGreaterThan(answerAt);
+    expect(desk(withCard)).toContain("font-display text-[15px] text-clay italic");
 
     const blank = render({
       card_prompt: "   ",
@@ -251,11 +279,32 @@ describe("Find therapist card", () => {
 
     const narrow = phone(html);
     expect(narrow).toContain('aria-label="Play intro video for Dr. Travis White"');
-    expect(narrow).toContain("aspect-[9/16]");
-    expect(narrow).toContain("PsyD");
-    expect(narrow).toContain("yrs");
-    expect(narrow).not.toContain("Watch Travis&#x27;s intro");
-    expect(narrow).not.toContain("Get to know Travis");
+    expect(narrow).toContain("aspect-[4/5]");
+    expect(narrow).toContain("object-cover");
+    expect(narrow).toContain("size-28");
+    expect(narrow).toContain(">PsyD<");
+    expect(narrow).not.toContain("Licensed Psychologist");
+    expect(narrow).not.toContain("yrs");
+    expect(narrow).not.toContain("Watch Travis");
+    expect(narrow).toContain("Get to know Travis");
+    expect(narrow).not.toContain("→");
+    expect(narrow).toContain("who I work best with...");
+    expect(narrow).toContain("I help college students find their way.");
+    expect(narrow).not.toContain("1 of 1 tag");
+    expect(narrow).not.toContain(">Anxiety<");
+    const phoneFormats = narrow.slice(
+      narrow.indexOf('data-find-formats'),
+      narrow.indexOf("who I work best with..."),
+    );
+    expect(phoneFormats).toContain(">Virtual<");
+    expect(phoneFormats).toContain(">In-Person<");
+    expect(narrow.indexOf(">PsyD<")).toBeLessThan(narrow.indexOf("data-find-formats"));
+    expect(narrow.indexOf("Get to know Travis")).toBeGreaterThan(
+      narrow.indexOf("I help college students find their way."),
+    );
+    expect(narrow).toContain(
+      'href="/t/11111111-1111-4111-8111-111111111111?tags=Anxiety"',
+    );
   });
 
   it("drops the desktop portrait when there is no photo or video", () => {
