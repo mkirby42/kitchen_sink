@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/Card";
 import { mobileStreamAfterHero } from "@/lib/profile/mobile-stream";
 import type { ProfileCard } from "@/lib/therapists/load";
 import { HeroMedia } from "./HeroMedia";
+import { promptAnswerClass, promptLabelClass } from "./prompt-type";
 
 export function MobileProfileStream({
   name,
@@ -99,10 +100,8 @@ export function MobileProfileStream({
                 data-prompt-variant="hinge"
                 className="px-6 py-8"
               >
-                <p className="text-sm leading-snug text-ink">{item.prompt.prompt}</p>
-                <p className="mt-3 font-display text-[1.7rem] leading-tight font-semibold tracking-tight text-ink">
-                  {item.prompt.answer}
-                </p>
+                <p className={promptLabelClass}>{item.prompt.prompt}</p>
+                <p className={promptAnswerClass}>{item.prompt.answer}</p>
               </Card>
             ),
           )}

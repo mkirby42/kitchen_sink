@@ -170,6 +170,8 @@ describe("Find therapist card", () => {
     });
     expect(withCard).toContain("who I work best with...");
     expect(withCard).toContain("College students and early-career professionals.");
+    expect(withCard).toContain("font-display text-[15px] text-clay italic");
+    expect(withCard).toContain("text-[17px] leading-relaxed text-ink");
     expect(withCard.indexOf("who I work best with...")).toBeGreaterThan(
       withCard.indexOf("<a "),
     );
