@@ -9,7 +9,7 @@ describe("homePanels", () => {
   it("matches the public homepage mock", () => {
     expect(homePanels()).toEqual({
       client: {
-        title: "Find a therapist who actually fits.",
+        title: "Find a therapist who Gets You.",
         body: "Tap the tags you need. We show therapists who match some of them.",
         actions: [
           { href: routes.find, label: "Find a therapist", variant: "primary" },
@@ -67,7 +67,7 @@ describe("home hero", () => {
     expect(html).not.toContain("My profile");
     expect(html).not.toContain("Upload therapist media");
     expect(html).not.toContain("Review queue");
-    expect(html).toContain("Find a therapist who actually fits.");
+    expect(html).toContain("Find a therapist who Gets You.");
     expect(html).toContain('href="/find"');
     expect(html).toContain('data-audience="client"');
     expect(html).toContain('data-audience="therapist"');

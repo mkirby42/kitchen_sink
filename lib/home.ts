@@ -36,7 +36,7 @@ const logIn: HomeAction = {
 export function homePanels(): { client: HomePanel; therapist: HomePanel } {
   return {
     client: {
-      title: "Find a therapist who actually fits.",
+      title: "Find a therapist who Gets You.",
       body: "Tap the tags you need. We show therapists who match some of them.",
       actions: [findAction],
     },
