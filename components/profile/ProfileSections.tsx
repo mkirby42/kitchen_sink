@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { eyebrowClass, tagClass } from "@/components/ui/styles";
 
 export function TagSection({ title, labels }: { title: string; labels: string[] }) {
@@ -49,18 +49,14 @@ export function cardCorner(tag: string): { icon: ReactNode; tone: string } {
 
 export function ProfileNotFound({ backHref }: { backHref: string }) {
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8">
-      <Eyebrow>Therapist profile</Eyebrow>
-      <h1 className="mt-3 max-w-xl font-display text-4xl tracking-tight text-ink">
-        We couldn&apos;t find that therapist.
-      </h1>
-      <p className="mt-4 max-w-xl text-mute">
-        They may have closed their practice to new clients, be hidden from
-        Find, or the link is out of date.
-      </p>
-      <Button href={backHref} className="mt-8">
-        Back to search
-      </Button>
-    </main>
+    <AccountShell
+      eyebrow="Therapist profile"
+      title="We couldn't find that therapist."
+      lede="They may have closed their practice to new clients, be hidden from Find, or the link is out of date."
+    >
+      <div className="flex justify-center">
+        <Button href={backHref}>Back to search</Button>
+      </div>
+    </AccountShell>
   );
 }
