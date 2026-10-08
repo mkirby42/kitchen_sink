@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { AccountShell } from "@/components/auth/AccountShell";
 import { AdminAuth } from "@/components/admin/AdminAuth";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ReviewQueue } from "@/components/admin/ReviewQueue";
 import { adminToolsVisible } from "@/lib/audience";
 import { readAudienceCookie } from "@/lib/audience-cookie";
@@ -18,10 +18,11 @@ export const metadata: Metadata = {
 export default async function AdminReviewsPage() {
   if (!supabasePublicConfig()) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16 text-center">
-        <h1 className="font-display text-4xl">Review queue</h1>
-        <p className="mt-4 text-mute">Auth isn&apos;t configured yet.</p>
-      </main>
+      <AccountShell
+        eyebrow="Ops"
+        title="Review queue"
+        lede="Auth isn't configured yet."
+      />
     );
   }
 
@@ -53,16 +54,11 @@ export default async function AdminReviewsPage() {
   ) {
     if (profile?.role === "admin") return <AdminViewHold />;
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
-        <Eyebrow>Ops</Eyebrow>
-        <h1 className="mt-3 font-display text-4xl tracking-tight">
-          Admin access only
-        </h1>
-        <p className="mt-4 text-mute">
-          This queue is for Kitchen Sink ops. A therapist or patient login
-          cannot approve or reject reviews.
-        </p>
-      </main>
+      <AccountShell
+        eyebrow="Ops"
+        title="Admin access only"
+        lede="This queue is for Kitchen Sink ops. A therapist or patient login cannot approve or reject reviews."
+      />
     );
   }
 
@@ -71,10 +67,11 @@ export default async function AdminReviewsPage() {
     reviews = await listPendingReviews(supabase);
   } catch {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
-        <h1 className="font-display text-4xl">Review queue</h1>
-        <p className="mt-4 text-mute">The review queue isn&apos;t available right now.</p>
-      </main>
+      <AccountShell
+        eyebrow="Ops"
+        title="Review queue"
+        lede="The review queue isn't available right now."
+      />
     );
   }
 

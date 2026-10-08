@@ -3,9 +3,11 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { TextField } from "@/components/ui/Field";
+import { Notice } from "@/components/ui/Notice";
+import { textLinkClass } from "@/components/ui/styles";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 
@@ -43,11 +45,8 @@ export function AdminAuth({
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-16">
-      <Eyebrow>Ops</Eyebrow>
-      <h1 className="mt-3 font-display text-4xl tracking-tight">{title}</h1>
-      <p className="mt-4 text-mute">{lede}</p>
-      <form method="post" onSubmit={submit} className="mt-8 space-y-7">
+    <AccountShell eyebrow="Ops" title={title} lede={lede}>
+      <form method="post" onSubmit={submit} className="space-y-5">
         <TextField
           label="Email"
           type="email"
@@ -65,26 +64,18 @@ export function AdminAuth({
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
-        <p className="-mt-4">
-          <Link
-            href={forgotPasswordPath("admin")}
-            className="text-sm font-semibold text-clay hover:text-clay-dark"
-          >
+        <p className="text-center">
+          <Link href={forgotPasswordPath("admin")} className={textLinkClass}>
             Forgot password?
           </Link>
         </p>
-        {message ? (
-          <p
-            role="alert"
-            className="rounded-2xl bg-paper px-4 py-3 text-sm text-clay-dark"
-          >
-            {message}
-          </p>
-        ) : null}
-        <Button type="submit" disabled={submitting}>
-          {submitting ? "Please wait…" : "Sign in →"}
-        </Button>
+        {message ? <Notice role="alert">{message}</Notice> : null}
+        <div className="flex justify-center pt-2">
+          <Button type="submit" disabled={submitting}>
+            {submitting ? "Please wait…" : "Sign in →"}
+          </Button>
+        </div>
       </form>
-    </main>
+    </AccountShell>
   );
 }

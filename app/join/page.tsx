@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { JoinAuth } from "@/components/join/JoinAuth";
 import { JoinWizard } from "@/components/join/JoinWizard";
 import { readAudienceCookie } from "@/lib/audience-cookie";
@@ -27,10 +26,11 @@ export default async function JoinPage({
 }) {
   if (!supabasePublicConfig()) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16 text-center">
-        <h1 className="font-display text-4xl">Join as a therapist</h1>
-        <p className="mt-4 text-mute">Auth isn&apos;t configured yet.</p>
-      </main>
+      <AccountShell
+        eyebrow="Join as a therapist"
+        title="Join as a therapist"
+        lede="Auth isn't configured yet."
+      />
     );
   }
 
@@ -69,21 +69,15 @@ export default async function JoinPage({
 
   if (access.kind === "patient") {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
-        <Card className="px-6 py-10">
-          <Eyebrow>Patient account</Eyebrow>
-          <h1 className="mt-3 font-display text-4xl tracking-tight">
-            You&apos;re signed in as a patient.
-          </h1>
-          <p className="mt-4 text-mute">
-            Keep browsing therapists on Kitchen Sink. Sign out if you want to
-            join as a therapist.
-          </p>
-          <Button href={routes.find} className="mt-8">
-            Find a therapist
-          </Button>
-        </Card>
-      </main>
+      <AccountShell
+        eyebrow="Patient account"
+        title="You're signed in as a patient."
+        lede="Keep browsing therapists on Kitchen Sink. Sign out if you want to join as a therapist."
+      >
+        <div className="flex justify-center">
+          <Button href={routes.find}>Find a therapist</Button>
+        </div>
+      </AccountShell>
     );
   }
 

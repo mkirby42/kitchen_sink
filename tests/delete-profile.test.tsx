@@ -128,6 +128,8 @@ describe("delete confirmation", () => {
     expect(html).toContain(routes.home);
     expect(html).toContain(routes.join);
     expect(html).toContain("Find");
+    expect(html).toContain("rounded-card");
+    expect(html).not.toContain("uppercase");
   });
 });
 

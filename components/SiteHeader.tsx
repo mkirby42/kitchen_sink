@@ -50,12 +50,12 @@ function PersonIcon() {
   );
 }
 
-function hidesSiteNav(path: string) {
-  return (
-    path === routes.join ||
-    path === routes.forgotPassword ||
-    path === routes.resetPassword
-  );
+/** Join steps hide the site header. Account pages and therapist profiles do not. */
+export function siteNavHidden(
+  path: string,
+  user: { role: string | null } | null,
+) {
+  return path === routes.join && user != null && user.role !== "patient";
 }
 
 export function SiteHeader({
@@ -128,10 +128,10 @@ export function SiteHeader({
     <AudienceSwitcher audience={audience} />
   ) : null;
 
-  // Join and password reset use their own phone-width chrome.
+  // Join steps use their own chrome.
   // Admins still get the switcher there so Therapist/Client preview can return.
-  // Therapist profiles use this header.
-  if (hidesSiteNav(path)) {
+  // Therapist profiles and account pages use this header.
+  if (siteNavHidden(path, navUser)) {
     if (!switcher) return null;
     return (
       <div className="border-b border-line bg-paper">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { AccountShell } from "@/components/auth/AccountShell";
 import { AdminAuth } from "@/components/admin/AdminAuth";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { HelperUpload } from "@/components/admin/HelperUpload";
 import { adminToolsVisible } from "@/lib/audience";
 import { readAudienceCookie } from "@/lib/audience-cookie";
@@ -18,10 +18,11 @@ export const metadata: Metadata = {
 export default async function AdminMediaPage() {
   if (!supabasePublicConfig()) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16 text-center">
-        <h1 className="font-display text-4xl">Upload media</h1>
-        <p className="mt-4 text-mute">Auth isn&apos;t configured yet.</p>
-      </main>
+      <AccountShell
+        eyebrow="Ops"
+        title="Upload media"
+        lede="Auth isn't configured yet."
+      />
     );
   }
 
@@ -46,16 +47,11 @@ export default async function AdminMediaPage() {
   ) {
     if (profile?.role === "admin") return <AdminViewHold />;
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
-        <Eyebrow>Ops</Eyebrow>
-        <h1 className="mt-3 font-display text-4xl tracking-tight">
-          Admin access only
-        </h1>
-        <p className="mt-4 text-mute">
-          This upload page is for Kitchen Sink ops. A therapist or patient
-          login cannot upload media for someone else.
-        </p>
-      </main>
+      <AccountShell
+        eyebrow="Ops"
+        title="Admin access only"
+        lede="This upload page is for Kitchen Sink ops. A therapist or patient login cannot upload media for someone else."
+      />
     );
   }
 
@@ -64,10 +60,11 @@ export default async function AdminMediaPage() {
     therapists = await listAdminTherapists(supabase);
   } catch {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
-        <h1 className="font-display text-4xl">Upload media</h1>
-        <p className="mt-4 text-mute">Therapist list isn&apos;t available right now.</p>
-      </main>
+      <AccountShell
+        eyebrow="Ops"
+        title="Upload media"
+        lede="Therapist list isn't available right now."
+      />
     );
   }
 

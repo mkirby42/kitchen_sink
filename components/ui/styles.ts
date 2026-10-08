@@ -44,6 +44,9 @@ export function buttonClass(
   return cx(buttonBase, buttonSizes[size], buttonVariants[variant], className);
 }
 
+/** Clay text link. Same weight as the pill buttons. */
+export const textLinkClass = "text-sm font-medium text-clay hover:text-clay-dark";
+
 export function tagClass(selected: boolean, className?: string) {
   return cx(
     "rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50",

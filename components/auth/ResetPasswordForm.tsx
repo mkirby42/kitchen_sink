@@ -1,10 +1,10 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { JoinShell } from "@/components/join/JoinShell";
+import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { TextField } from "@/components/ui/Field";
+import { Notice } from "@/components/ui/Notice";
 import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_UPDATED_MESSAGE,
@@ -142,77 +142,66 @@ export function ResetPasswordForm() {
           ? "Auth isn't configured yet."
           : null;
 
+  const lede = problem
+    ? problem
+    : phase === "done"
+      ? PASSWORD_UPDATED_MESSAGE
+      : phase === "checking"
+        ? "Checking your reset link…"
+        : `At least ${PASSWORD_MIN_LENGTH} characters.`;
+
   return (
-    <JoinShell>
-      <div>
-        <Eyebrow>Account</Eyebrow>
-        <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
-          {phase === "done"
-            ? "Password updated"
-            : problem
-              ? "Reset link"
-              : "Choose a new password"}
-        </h1>
+    <AccountShell
+      eyebrow="Account"
+      title={
+        phase === "done"
+          ? "Password updated"
+          : problem
+            ? "Reset link"
+            : "Choose a new password"
+      }
+      lede={problem ? <p role="alert">{lede}</p> : lede}
+    >
+      {problem ? (
+        <div className="flex justify-center">
+          <Button href={routes.forgotPassword}>Request a new link</Button>
+        </div>
+      ) : null}
 
-        {phase === "checking" ? (
-          <p className="mt-4 text-mute">Checking your reset link…</p>
-        ) : null}
+      {phase === "done" ? (
+        <div className="flex justify-center">
+          <Button href={continueHref}>Continue</Button>
+        </div>
+      ) : null}
 
-        {problem ? (
-          <>
-            <p role="alert" className="mt-4 text-mute">
-              {problem}
-            </p>
-            <Button href={routes.forgotPassword} className="mt-8">
-              Request a new link
-            </Button>
-          </>
-        ) : null}
-
-        {phase === "done" ? (
-          <>
-            <p className="mt-4 text-mute">{PASSWORD_UPDATED_MESSAGE}</p>
-            <Button href={continueHref} className="mt-8">
-              Continue
-            </Button>
-          </>
-        ) : null}
-
-        {phase === "ready" ? (
-          <form onSubmit={submit} className="mt-8 space-y-7">
-            <p className="text-mute">At least {PASSWORD_MIN_LENGTH} characters.</p>
-            <TextField
-              label="New password"
-              type="password"
-              required
-              minLength={PASSWORD_MIN_LENGTH}
-              autoComplete="new-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-            <TextField
-              label="Confirm password"
-              type="password"
-              required
-              minLength={PASSWORD_MIN_LENGTH}
-              autoComplete="new-password"
-              value={confirm}
-              onChange={(event) => setConfirm(event.target.value)}
-            />
-            {message ? (
-              <p
-                role="alert"
-                className="rounded-2xl bg-cream px-4 py-3 text-sm text-clay-dark"
-              >
-                {message}
-              </p>
-            ) : null}
+      {phase === "ready" ? (
+        <form onSubmit={submit} className="space-y-5">
+          <TextField
+            label="New password"
+            type="password"
+            required
+            minLength={PASSWORD_MIN_LENGTH}
+            autoComplete="new-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+          <TextField
+            label="Confirm password"
+            type="password"
+            required
+            minLength={PASSWORD_MIN_LENGTH}
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(event) => setConfirm(event.target.value)}
+          />
+          {message ? <Notice role="alert">{message}</Notice> : null}
+          <div className="flex justify-center pt-2">
             <Button type="submit" disabled={submitting}>
               {submitting ? "Please wait…" : "Update password"}
             </Button>
-          </form>
-        ) : null}
-      </div>
-    </JoinShell>
+          </div>
+        </form>
+      ) : null}
+    </AccountShell>
   );
 }

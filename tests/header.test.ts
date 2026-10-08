@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteHeader, siteNavHidden } from "@/components/SiteHeader";
 import { routes } from "@/lib/routes";
 
 const nav = vi.hoisted(() => ({
@@ -16,6 +16,22 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/supabase/env", () => ({
   supabasePublicConfig: () => null,
 }));
+
+describe("site header visibility", () => {
+  it("keeps the header on account pages and therapist profiles, and hides it on join steps", () => {
+    expect(siteNavHidden("/join", null)).toBe(false);
+    expect(siteNavHidden("/forgot-password", null)).toBe(false);
+    expect(siteNavHidden("/reset-password", { role: "admin" })).toBe(false);
+    expect(siteNavHidden("/profile-deleted", null)).toBe(false);
+    expect(siteNavHidden("/admin/media", null)).toBe(false);
+    expect(siteNavHidden("/join", { role: "patient" })).toBe(false);
+    expect(siteNavHidden("/join", { role: "therapist" })).toBe(true);
+    expect(siteNavHidden("/join", { role: "admin" })).toBe(true);
+    expect(siteNavHidden("/join", { role: null })).toBe(true);
+    expect(siteNavHidden("/t/abc", null)).toBe(false);
+    expect(siteNavHidden("/t/abc", { role: "therapist" })).toBe(false);
+  });
+});
 
 describe("site header", () => {
   it("omits Interest for a signed-in therapist", () => {
@@ -209,7 +225,9 @@ describe("site header", () => {
     const joinVisitor = renderToStaticMarkup(
       createElement(SiteHeader, { initialNavUser: null }),
     );
-    expect(joinVisitor).toBe("");
+    expect(joinVisitor).toContain("Find a Therapist");
+    expect(joinVisitor).toContain("Therapist log in");
+    expect(joinVisitor).not.toContain("Admin view");
     nav.pathname.mockReturnValue("/");
   });
 });

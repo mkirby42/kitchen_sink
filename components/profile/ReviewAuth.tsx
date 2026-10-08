@@ -3,6 +3,12 @@
 import { FormEvent, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { TextField } from "@/components/ui/Field";
+import { Notice } from "@/components/ui/Notice";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { textLinkClass } from "@/components/ui/styles";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 
@@ -46,80 +52,64 @@ export function ReviewAuth({ returnTo }: { returnTo?: string }) {
   }
 
   return (
-    <form onSubmit={submitAuth} className="rounded-3xl bg-paper px-5 py-5 shadow-sm">
-      <p className="text-sm text-mute">Sign in as a client to leave a review.</p>
+    <Card as="div" className="px-5 py-6 sm:px-6">
+      <p className="text-center text-mute">Sign in as a client to leave a review.</p>
 
-      <div className="mt-4 inline-flex rounded-full bg-cream p-1">
-        {(["signup", "signin"] as const).map((option) => (
-          <button
-            key={option}
-            type="button"
-            onClick={() => {
-              setMode(option);
-              setMessage("");
-            }}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
-              mode === option ? "bg-clay text-paper" : "text-mute"
-            }`}
-          >
-            {option === "signup" ? "Sign up" : "Sign in"}
-          </button>
-        ))}
+      <div className="mt-5 flex justify-center">
+        <SegmentedControl
+          label="Create an account or sign in"
+          value={mode}
+          onChange={(option) => {
+            setMode(option);
+            setMessage("");
+          }}
+          options={[
+            { value: "signup", label: "Sign up" },
+            { value: "signin", label: "Sign in" },
+          ]}
+        />
       </div>
 
-      <label className="mt-4 block">
-        <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Email
-        </span>
-        <input
+      <form onSubmit={submitAuth} className="mt-6 space-y-5">
+        <TextField
+          label="Email"
           type="email"
           required
           autoComplete="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="mt-1.5 w-full border-0 border-b border-line bg-transparent px-0 py-2 text-base outline-none focus:border-clay"
         />
-      </label>
-
-      <label className="mt-4 block">
-        <span className="text-xs font-semibold tracking-[0.16em] text-mute uppercase">
-          Password
-        </span>
-        <input
+        <TextField
+          label="Password"
           type="password"
           required
           minLength={6}
           autoComplete={mode === "signup" ? "new-password" : "current-password"}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="mt-1.5 w-full border-0 border-b border-line bg-transparent px-0 py-2 text-base outline-none focus:border-clay"
         />
-      </label>
-      {mode === "signin" ? (
-        <p className="mt-2">
-          <Link
-            href={forgotPasswordPath("review", returnTo)}
-            className="text-sm font-semibold text-clay hover:text-clay-dark"
-          >
-            Forgot password?
-          </Link>
-        </p>
-      ) : null}
-
-      <button
-        type="submit"
-        disabled={submitting}
-        className="mt-4 rounded-full bg-clay px-5 py-2.5 text-sm font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {submitting
-          ? "Please wait…"
-          : mode === "signup"
-            ? "Create account"
-            : "Sign in"}
-      </button>
-
-      {message ? <FormMessage>{message}</FormMessage> : null}
-    </form>
+        {mode === "signin" ? (
+          <p className="text-center">
+            <Link
+              href={forgotPasswordPath("review", returnTo)}
+              className={textLinkClass}
+            >
+              Forgot password?
+            </Link>
+          </p>
+        ) : null}
+        {message ? <Notice>{message}</Notice> : null}
+        <div className="flex justify-center pt-2">
+          <Button type="submit" disabled={submitting}>
+            {submitting
+              ? "Please wait…"
+              : mode === "signup"
+                ? "Create account"
+                : "Sign in"}
+          </Button>
+        </div>
+      </form>
+    </Card>
   );
 }
 
