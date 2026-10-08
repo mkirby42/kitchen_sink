@@ -1,11 +1,11 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
-import { fieldClass, fieldLabelClass, selectClass } from "@/components/ui/styles";
+import { Button } from "@/components/ui/Button";
+import { SelectField, TextField } from "@/components/ui/Field";
+import { eyebrowClass, fieldClass, selectClass } from "@/components/ui/styles";
 import type { JoinDraft } from "@/lib/join/types";
 import { CREDENTIALS, LICENSE_STATES } from "@/lib/tags/presets";
-
-const labelClass = fieldLabelClass;
 
 export function JoinStep1({
   draft,
@@ -16,61 +16,52 @@ export function JoinStep1({
 }) {
   return (
     <div className="space-y-8">
-      <label className="block">
-        <span className={labelClass}>Full name</span>
-        <input
-          required
-          aria-required="true"
-          autoComplete="name"
-          value={draft.name}
-          onChange={(event) =>
-            setDraft((current) => ({ ...current, name: event.target.value }))
-          }
-          className={`${fieldClass} mt-2`}
-        />
-      </label>
+      <TextField
+        label="Full name"
+        required
+        aria-required="true"
+        autoComplete="name"
+        value={draft.name}
+        onChange={(event) =>
+          setDraft((current) => ({ ...current, name: event.target.value }))
+        }
+      />
 
       <div className="grid gap-8 sm:grid-cols-2">
-        <label className="block">
-          <span className={labelClass}>Credential</span>
-          <select
-            value={draft.credential}
-            onChange={(event) => {
-              const credential = event.target.value;
-              setDraft((current) => ({
-                ...current,
-                credential,
-              }));
-            }}
-            className={`${selectClass} mt-2`}
-          >
-            <option value="">Choose a credential</option>
-            {CREDENTIALS.map((credential) => (
-              <option key={credential} value={credential}>
-                {credential}
-              </option>
-            ))}
-          </select>
-        </label>
+        <SelectField
+          label="Credential"
+          value={draft.credential}
+          onChange={(event) => {
+            const credential = event.target.value;
+            setDraft((current) => ({
+              ...current,
+              credential,
+            }));
+          }}
+        >
+          <option value="">Choose a credential</option>
+          {CREDENTIALS.map((credential) => (
+            <option key={credential} value={credential}>
+              {credential}
+            </option>
+          ))}
+        </SelectField>
 
-        <label className="block">
-          <span className={labelClass}>Years practicing</span>
-          <input
-            type="number"
-            min={0}
-            max={70}
-            step={1}
-            value={draft.yearsPracticing}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                yearsPracticing:
-                  event.target.value === "" ? "" : Number(event.target.value),
-              }))
-            }
-            className={`${fieldClass} mt-2`}
-          />
-        </label>
+        <TextField
+          label="Years practicing"
+          type="number"
+          min={0}
+          max={70}
+          step={1}
+          value={draft.yearsPracticing}
+          onChange={(event) =>
+            setDraft((current) => ({
+              ...current,
+              yearsPracticing:
+                event.target.value === "" ? "" : Number(event.target.value),
+            }))
+          }
+        />
       </div>
 
       <StringListField
@@ -94,7 +85,7 @@ export function JoinStep1({
       />
 
       <fieldset>
-        <legend className={labelClass}>State license(s)</legend>
+        <legend className={eyebrowClass}>State license(s)</legend>
         <div className="mt-4 space-y-3">
           {draft.licenses.map((license, index) => {
             const rowRequired =
@@ -170,18 +161,19 @@ export function JoinStep1({
             );
           })}
         </div>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          className="mt-3 w-full"
           onClick={() =>
             setDraft((current) => ({
               ...current,
               licenses: [...current.licenses, { number: "", state: "" }],
             }))
           }
-          className="mt-3 w-full rounded-full border border-dashed border-clay/50 px-5 py-2.5 text-sm font-medium text-clay hover:bg-cream"
         >
           + Add another state license
-        </button>
+        </Button>
       </fieldset>
     </div>
   );
@@ -204,7 +196,7 @@ function StringListField({
 
   return (
     <fieldset>
-      <legend className={labelClass}>{legend}</legend>
+      <legend className={eyebrowClass}>{legend}</legend>
       <div className="mt-4 space-y-3">
         {rows.map((value, index) => (
           <div key={index} className="flex items-center gap-2">
@@ -238,13 +230,14 @@ function StringListField({
           </div>
         ))}
       </div>
-      <button
+      <Button
         type="button"
+        variant="secondary"
+        className="mt-3 w-full"
         onClick={() => onChange([...rows, ""])}
-        className="mt-3 w-full rounded-full border border-dashed border-clay/50 px-5 py-2.5 text-sm font-medium text-clay hover:bg-cream"
       >
         {addLabel}
-      </button>
+      </Button>
     </fieldset>
   );
 }

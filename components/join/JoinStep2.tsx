@@ -14,6 +14,7 @@ import {
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { createClient } from "@/lib/supabase/client";
 import { storagePublicUrl } from "@/lib/therapists/display";
+import { Notice } from "@/components/ui/Notice";
 import { IntroRecorder } from "./IntroRecorder";
 import { MediaSlot } from "./MediaSlot";
 import { UploadHelp } from "./UploadHelp";
@@ -156,11 +157,7 @@ export function JoinStep2({
         onFile={(file) => void chooseFile("video", file)}
       />
 
-      {error ? (
-        <p role="alert" className="rounded-2xl bg-cream px-5 py-4 text-sm text-clay-dark">
-          {error}
-        </p>
-      ) : null}
+      {error ? <Notice role="alert">{error}</Notice> : null}
       <UploadHelp troubleToken={uploadTrouble} />
     </div>
   );
