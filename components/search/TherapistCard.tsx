@@ -6,6 +6,7 @@ import { buildTherapistHref } from "@/components/search/query";
 import { Card } from "@/components/ui/Card";
 import { tagClass } from "@/components/ui/styles";
 import { overlapCopy, searchCardLabels } from "@/lib/search/overlap";
+import { modalityDisplayLabel } from "@/lib/tags/modality-display";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import {
   initials,
@@ -97,7 +98,7 @@ export function TherapistCard({
             <ul className={`flex flex-wrap gap-2 ${hits ? "mt-2" : "mt-3"}`}>
               {tags.map((label) => (
                 <li key={label} className={tagClass(false)}>
-                  {label}
+                  {modalityDisplayLabel(label)}
                 </li>
               ))}
             </ul>

@@ -41,17 +41,42 @@ describe("join specialties picker", () => {
     const html = renderToStaticMarkup(
       createElement(JoinStep3, { draft: draft(), setDraft: () => {} }),
     );
-    const specialties = html.indexOf("Specialties");
-    const modalities = html.indexOf("Modalities / approach");
+    const specialties = html.indexOf("Areas of Interest");
+    const modalities = html.indexOf("Approach in Therapy");
     const insurance = html.indexOf("Insurance");
     expect(specialties).toBeGreaterThan(-1);
     expect(modalities).toBeGreaterThan(specialties);
+    expect(html).not.toContain("Modalities");
     const specialtyBlock = html.slice(specialties, modalities);
     expect(specialtyBlock).toContain("Anxiety");
     expect(specialtyBlock).toContain("Career");
     expect(specialtyBlock).not.toContain("Add your own");
     expect(specialtyBlock).not.toContain('placeholder="Add your own"');
-    expect(html.slice(modalities, insurance)).toContain("Add your own");
+    const approachBlock = html.slice(modalities, insurance);
+    expect(approachBlock).toContain("Add your own");
+    expect(approachBlock).toMatch(
+      /aria-pressed="true"[^>]*>\s*Cognitive Behavioral Therapy \(CBT\)</,
+    );
+    expect(approachBlock).toContain(">Psychodynamic<");
+    expect(approachBlock).toContain(
+      ">Eye Movement Desensitization and Reprocessing (EMDR)<",
+    );
+    expect(approachBlock).not.toContain(">CBT<");
     expect(html.slice(insurance)).toContain("Add your own");
+  });
+
+  it("shows a stored phrase as written and keeps the short code selected", () => {
+    const html = renderToStaticMarkup(
+      createElement(JoinStep3, {
+        draft: draft({
+          modalities: ["CBT", "Solution Focused Brief (SFBT)"],
+        }),
+        setDraft: () => {},
+      }),
+    );
+    expect(html).toContain("Solution Focused Brief (SFBT)");
+    expect(html).toMatch(
+      /aria-pressed="true"[^>]*>\s*Cognitive Behavioral Therapy \(CBT\)</,
+    );
   });
 });

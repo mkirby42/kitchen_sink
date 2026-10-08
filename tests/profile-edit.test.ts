@@ -276,14 +276,21 @@ describe("profile edit control", () => {
       }),
     );
     const education = html.indexOf("Education");
-    const modalities = html.indexOf("Modalities");
-    const specialties = html.indexOf("Specialties");
+    const modalities = html.indexOf("Approach in Therapy");
+    const specialties = html.indexOf("Areas of Interest");
     const heroDetails = html.indexOf("data-hero-details");
     expect(education).toBeGreaterThan(-1);
     expect(modalities).toBeGreaterThan(education);
     expect(specialties).toBeGreaterThan(modalities);
-    expect(html.indexOf("CBT")).toBeGreaterThan(modalities);
-    expect(html.indexOf("CBT")).toBeLessThan(specialties);
+    expect(html.indexOf("Cognitive Behavioral Therapy (CBT)")).toBeGreaterThan(
+      modalities,
+    );
+    expect(html.indexOf("Cognitive Behavioral Therapy (CBT)")).toBeLessThan(
+      specialties,
+    );
+    expect(html).toContain(
+      "Eye Movement Desensitization and Reprocessing (EMDR)",
+    );
     expect(html.indexOf("Anxiety")).toBeGreaterThan(specialties);
     expect(html.slice(heroDetails, education)).not.toContain("CBT");
     expect(html.slice(heroDetails, education)).not.toContain("EMDR");
@@ -305,8 +312,8 @@ describe("profile edit control", () => {
     );
     expect(html).not.toContain("Education");
     expect(html).not.toContain("Credentials");
-    const modalities = html.indexOf("Modalities");
-    const specialties = html.indexOf("Specialties");
+    const modalities = html.indexOf("Approach in Therapy");
+    const specialties = html.indexOf("Areas of Interest");
     expect(modalities).toBeGreaterThan(-1);
     expect(specialties).toBeGreaterThan(modalities);
   });
@@ -331,7 +338,7 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    const specialties = html.indexOf("Specialties");
+    const specialties = html.indexOf("Areas of Interest");
     expect(specialties).toBeGreaterThan(-1);
     expect(html).toContain("Anxiety");
     expect(html).toContain("Trauma &amp; PTSD");
@@ -340,8 +347,10 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Panic Attacks");
     expect(html).not.toContain("Therapy for Men");
     expect(html).not.toContain(">Stress<");
-    expect(html).toContain("IFS");
-    expect(html.indexOf("CBT")).toBeLessThan(specialties);
+    expect(html).toContain("Internal Family Systems (IFS)");
+    expect(html.indexOf("Cognitive Behavioral Therapy (CBT)")).toBeLessThan(
+      specialties,
+    );
   });
 
   it("omits the specialties section when none are on the Find list", () => {
@@ -356,9 +365,12 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(html).not.toContain("Specialties");
+    expect(html).not.toContain("Areas of Interest");
     expect(html).not.toContain("Career");
-    expect(html).toContain("Modalities");
-    expect(html).toContain("EMDR");
+    expect(html).toContain("Approach in Therapy");
+    expect(html).not.toContain("Modalities");
+    expect(html).toContain(
+      "Eye Movement Desensitization and Reprocessing (EMDR)",
+    );
   });
 });
