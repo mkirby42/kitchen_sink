@@ -15,6 +15,7 @@ import {
 } from "@/lib/therapists/load";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
+import { modalityDisplayLabels } from "@/lib/tags/modality-display";
 import { directorySpecialties } from "@/lib/tags/presets";
 import { AboutPanel } from "./ProfileAbout";
 import { ContactCtas } from "./ContactCtas";
@@ -146,7 +147,10 @@ export function TherapistProfile({
             </Card>
           ) : null}
 
-          <TagSection title="Modalities" labels={data.modalities} />
+          <TagSection
+            title="Approach in Therapy"
+            labels={modalityDisplayLabels(data.modalities)}
+          />
           <TagSection
             title="Areas of Interest"
             labels={directorySpecialties(data.specialties)}

@@ -179,7 +179,7 @@ describe("mobile hinge profile", () => {
 
   it("keeps logistics, modalities, and the pinned consult actions", () => {
     const html = render();
-    const modalities = html.indexOf("Modalities");
+    const modalities = html.indexOf("Approach in Therapy");
     const specialties = html.indexOf("Areas of Interest");
     const logistics = html.indexOf("Logistics");
     expect(modalities).toBeGreaterThan(-1);
@@ -201,10 +201,12 @@ describe("mobile hinge profile", () => {
     expect(html).toContain("max-md:block md:hidden");
     expect(html).toContain("No reviews yet.");
     expect(html).toContain("Doctor of Clinical Psychology");
-    expect(html).toContain("ACT");
+    expect(html).toContain("Acceptance and Commitment Therapy (ACT)");
+    expect(html).toContain("Cognitive Behavioral Therapy (CBT)");
+    expect(html).not.toContain("Modalities");
     const mobile = region(html, "mobile");
     expect(mobile.indexOf("a session with me feels like...")).toBeLessThan(
-      html.indexOf("Modalities"),
+      html.indexOf("Approach in Therapy"),
     );
   });
 });

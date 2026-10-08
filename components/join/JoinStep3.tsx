@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/Switch";
 import { TextField, SelectField } from "@/components/ui/Field";
 import { eyebrowClass, fieldClass } from "@/components/ui/styles";
 import { normalizeCustomLabel } from "@/lib/join/cards";
+import { modalityDisplayLabel } from "@/lib/tags/modality-display";
 import type { JoinDraft } from "@/lib/join/types";
 import {
   IDENTITY_PRESETS,
@@ -69,14 +70,14 @@ function TagGroup({
             selected={selected.includes(label)}
             onClick={() => toggle(label)}
           >
-            {label}
+            {field === "modalities" ? modalityDisplayLabel(label) : label}
           </Tag>
         ))}
         {selected
           .filter((label) => !labels.includes(label))
           .map((label) => (
             <Tag key={label} selected onClick={() => toggle(label)}>
-              {label} ×
+              {field === "modalities" ? modalityDisplayLabel(label) : label} ×
             </Tag>
           ))}
       </div>
@@ -223,7 +224,7 @@ export function JoinStep3({
         setDraft={setDraft}
       />
       <TagGroup
-        title="Modalities / approach"
+        title="Approach in Therapy"
         labels={MODALITY_PRESETS}
         field="modalities"
         selected={draft.modalities}
