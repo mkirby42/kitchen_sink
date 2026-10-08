@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { cardClass, cx } from "@/components/ui/styles";
+import { Card } from "@/components/ui/Card";
 import { routes } from "@/lib/routes";
 
 export function JoinShell({
@@ -21,9 +21,9 @@ export function JoinShell({
     "grid size-10 shrink-0 place-items-center rounded-full bg-cream text-xl text-ink hover:bg-line";
 
   return (
-    <main className="mx-auto w-full max-w-lg px-4 py-10 sm:px-6 sm:py-16">
-      <section className={cx(cardClass, "overflow-hidden")}>
-        <div className="flex items-center gap-4 px-5 pt-5 sm:px-8 sm:pt-7">
+    <main className="mx-auto w-full max-w-5xl px-5 py-12 sm:px-8 sm:py-16">
+      <Card className="mx-auto w-full max-w-3xl overflow-hidden">
+        <div className="flex items-center gap-4 px-5 pt-5 sm:px-10 sm:pt-7">
           {onBack ? (
             <button
               type="button"
@@ -58,13 +58,13 @@ export function JoinShell({
           </Link>
         </div>
 
-        <div className="px-6 py-8 sm:px-10 sm:py-10">{children}</div>
+        <div className="px-6 py-8 sm:px-12 sm:py-10">{children}</div>
         {footer ? (
-          <div className="sticky bottom-0 border-t border-line bg-paper/95 px-6 py-5 backdrop-blur sm:px-10">
+          <div className="sticky bottom-0 border-t border-line bg-paper px-6 py-5 sm:px-12">
             {footer}
           </div>
         ) : null}
-      </section>
+      </Card>
     </main>
   );
 }

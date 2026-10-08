@@ -3,9 +3,11 @@
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { TextArea, TextField } from "@/components/ui/Field";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Tag } from "@/components/ui/Tag";
-import { fieldClass, fieldLabelClass, textareaClass } from "@/components/ui/styles";
+import { eyebrowClass, fieldClass, fieldLabelClass, textareaClass } from "@/components/ui/styles";
 import {
   answeredConversationCardCount,
   CONVERSATION_PROMPTS,
@@ -24,8 +26,6 @@ const FILTERS = [
   ["about", "About me"],
   ["outcome", "Outcome"],
 ] as const;
-
-const labelClass = fieldLabelClass;
 
 export function JoinStep4({
   draft,
@@ -87,7 +87,7 @@ export function JoinStep4({
           {draft.cards.map((card, index) => (
             <div
               key={`${card.prompt}-${index}`}
-              className="flex gap-3 rounded-2xl border border-line px-4 py-4"
+              className="flex gap-3 rounded-box bg-cream px-4 py-4"
             >
               <span
                 className="grid size-8 shrink-0 place-items-center rounded-full bg-clay text-sm text-paper"
@@ -111,7 +111,7 @@ export function JoinStep4({
                     }))
                   }
                   placeholder="Write 1–2 sentences in your own voice…"
-                  className="mt-2 w-full resize-y bg-transparent text-sm leading-6 outline-none placeholder:text-mute/80"
+                  className={`${textareaClass} mt-2`}
                 />
               </div>
               <button
@@ -125,7 +125,7 @@ export function JoinStep4({
                     ),
                   }))
                 }
-                className="grid size-8 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-cream hover:text-clay"
+                className="grid size-8 shrink-0 place-items-center rounded-full text-xl text-mute hover:bg-paper hover:text-ink"
               >
                 ×
               </button>
@@ -134,13 +134,15 @@ export function JoinStep4({
         </div>
       ) : null}
 
-      <SegmentedControl
-        label="Prompt filters"
-        value={filter}
-        onChange={setFilter}
-        wrap
-        options={FILTERS.map(([value, label]) => ({ value, label }))}
-      />
+      <div className="flex justify-center">
+        <SegmentedControl
+          label="Prompt filters"
+          value={filter}
+          onChange={setFilter}
+          wrap
+          options={FILTERS.map(([value, label]) => ({ value, label }))}
+        />
+      </div>
 
       <div className="space-y-2">
         {filteredPrompts.map((item) => {
@@ -151,11 +153,11 @@ export function JoinStep4({
               type="button"
               disabled={added || atCardMax}
               onClick={() => addPrompt(item.prompt, item.tag)}
-              className="flex w-full items-center justify-between gap-4 rounded-2xl border border-line px-5 py-3 text-left disabled:opacity-50"
+              className="flex w-full items-center justify-between gap-4 rounded-box bg-cream px-5 py-3 text-left disabled:opacity-50"
             >
               <span className="font-display italic text-clay">{item.prompt}</span>
               <span
-                className="grid size-8 shrink-0 place-items-center rounded-full bg-cream text-lg text-clay"
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-paper text-lg text-clay"
                 aria-hidden
               >
                 +
@@ -165,25 +167,23 @@ export function JoinStep4({
         })}
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="secondary"
+        className="w-full"
         disabled={atCardMax}
         onClick={() => setShowCustom(true)}
-        className="w-full rounded-full border border-dashed border-clay/60 px-5 py-3 text-sm font-medium text-clay hover:bg-cream disabled:cursor-not-allowed disabled:opacity-40"
       >
         ✎ Write your own prompt
-      </button>
+      </Button>
       {showCustom ? (
-        <div className="space-y-4 rounded-2xl border border-line px-5 py-5">
-          <label className="block">
-            <span className={labelClass}>Your question</span>
-            <input
-              value={customPrompt}
-              onChange={(event) => setCustomPrompt(event.target.value)}
-              placeholder="e.g. what surprises new clients about me…"
-              className={`${fieldClass} mt-2`}
-            />
-          </label>
+        <div className="space-y-4 rounded-box bg-cream px-5 py-5">
+          <TextField
+            label="Your question"
+            value={customPrompt}
+            onChange={(event) => setCustomPrompt(event.target.value)}
+            placeholder="e.g. what surprises new clients about me…"
+          />
           <div className="flex gap-3">
             <Button type="button" disabled={atCardMax} onClick={addCustomCard}>
               Add card
@@ -196,7 +196,7 @@ export function JoinStep4({
       ) : null}
 
       <fieldset className="min-w-0 w-full">
-        <legend className={labelClass}>Rates</legend>
+        <legend className={eyebrowClass}>Rates</legend>
         <div className="mt-4 space-y-3">
           {draft.rates.map((rate, index) => {
             const canRemove = draft.rates.length > 1;
@@ -287,8 +287,10 @@ export function JoinStep4({
             );
           })}
         </div>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          className="mt-3 w-full"
           disabled={!availableService}
           onClick={() => {
             if (!availableService) return;
@@ -304,10 +306,9 @@ export function JoinStep4({
               ],
             }));
           }}
-          className="mt-3 w-full rounded-full border border-dashed border-clay/50 px-5 py-2.5 text-sm font-medium text-clay hover:bg-cream disabled:cursor-not-allowed disabled:opacity-40"
         >
           + Add another rate
-        </button>
+        </Button>
 
         <label className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-full border border-line bg-paper px-5 py-3">
           <input
@@ -319,28 +320,25 @@ export function JoinStep4({
                 slidingScale: event.target.checked,
               }))
             }
-            className="size-4 shrink-0 accent-clay"
+            className="size-4 shrink-0 accent-ink"
           />
           <span className="font-medium text-ink">Offer sliding scale</span>
         </label>
       </fieldset>
 
-      <label className="block">
-        <span className={labelClass}>About you</span>
-        <textarea
-          rows={5}
-          value={draft.about}
-          onChange={(event) =>
-            setDraft((current) => ({ ...current, about: event.target.value }))
-          }
-          className={`${textareaClass} mt-3`}
-          placeholder='Write this in the first person — e.g. "I work with adults navigating anxiety and big life transitions…" (shown at the top of your profile).'
-        />
-      </label>
+      <TextArea
+        label="About you"
+        rows={5}
+        value={draft.about}
+        onChange={(event) =>
+          setDraft((current) => ({ ...current, about: event.target.value }))
+        }
+        placeholder='Write this in the first person — e.g. "I work with adults navigating anxiety and big life transitions…" (shown at the top of your profile).'
+      />
 
       <section className="space-y-6">
         <fieldset>
-          <legend className={labelClass}>How should clients reach you?</legend>
+          <legend className={eyebrowClass}>How should clients reach you?</legend>
           <p className="mt-1 text-sm text-mute">
             Select all that apply — shown on your public profile so clients can
             contact you directly. Kitchen Sink doesn&apos;t handle introductions.
@@ -366,21 +364,18 @@ export function JoinStep4({
         </fieldset>
 
         {draft.outreach.includes("email") ? (
-          <label className="block">
-            <span className={labelClass}>Email</span>
-            <input
-              type="text"
-              autoComplete="email"
-              value={draft.email}
-              onChange={(event) =>
-                setDraft((current) => ({ ...current, email: event.target.value }))
-              }
-              className={`${fieldClass} mt-2`}
-            />
-          </label>
+          <TextField
+            label="Email"
+            type="text"
+            autoComplete="email"
+            value={draft.email}
+            onChange={(event) =>
+              setDraft((current) => ({ ...current, email: event.target.value }))
+            }
+          />
         ) : (
           <label className="block">
-            <span className={labelClass}>Your email</span>
+            <span className={fieldLabelClass}>Your email</span>
             <p className="mt-1 text-sm text-mute">
               For our records. Select Email above to list it on your profile.
             </p>
@@ -397,40 +392,34 @@ export function JoinStep4({
         )}
 
         {draft.outreach.includes("phone") ? (
-          <label className="block">
-            <span className={labelClass}>Phone number</span>
-            <input
-              type="text"
-              autoComplete="tel"
-              value={draft.phone}
-              onChange={(event) =>
-                setDraft((current) => ({ ...current, phone: event.target.value }))
-              }
-              className={`${fieldClass} mt-2`}
-            />
-          </label>
+          <TextField
+            label="Phone number"
+            type="text"
+            autoComplete="tel"
+            value={draft.phone}
+            onChange={(event) =>
+              setDraft((current) => ({ ...current, phone: event.target.value }))
+            }
+          />
         ) : null}
 
         {draft.outreach.includes("text") ? (
-          <label className="block">
-            <span className={labelClass}>Number for texts</span>
-            <input
-              type="text"
-              autoComplete="tel"
-              value={draft.phone}
-              onChange={(event) =>
-                setDraft((current) => ({ ...current, phone: event.target.value }))
-              }
-              className={`${fieldClass} mt-2`}
-            />
-          </label>
+          <TextField
+            label="Number for texts"
+            type="text"
+            autoComplete="tel"
+            value={draft.phone}
+            onChange={(event) =>
+              setDraft((current) => ({ ...current, phone: event.target.value }))
+            }
+          />
         ) : null}
       </section>
 
       {hideFeedback ? null : (
-        <label className="block">
-          <span className={labelClass}>Feedback for us</span>
-          <p className="mt-1 text-sm text-mute">
+        <div>
+          <Eyebrow>Feedback for us</Eyebrow>
+          <p className="mt-2 text-sm leading-relaxed text-mute">
             Optional — we&apos;re in testing, so anything you&apos;d flag is welcome.
             We email it to the team when you submit.
           </p>
@@ -446,7 +435,7 @@ export function JoinStep4({
             className={`${textareaClass} mt-3`}
             placeholder="Confusing steps, missing fields, bugs, ideas — anything at all."
           />
-        </label>
+        </div>
       )}
     </div>
   );

@@ -5,7 +5,8 @@ import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/Button";
 import { Tag } from "@/components/ui/Tag";
 import { Switch } from "@/components/ui/Switch";
-import { fieldClass, fieldLabelClass, selectClass } from "@/components/ui/styles";
+import { TextField, SelectField } from "@/components/ui/Field";
+import { eyebrowClass, fieldClass } from "@/components/ui/styles";
 import { normalizeCustomLabel } from "@/lib/join/cards";
 import type { JoinDraft } from "@/lib/join/types";
 import {
@@ -60,7 +61,7 @@ function TagGroup({
 
   return (
     <fieldset>
-      <legend className={fieldLabelClass}>{title}</legend>
+      <legend className={eyebrowClass}>{title}</legend>
       <div className="mt-3 flex flex-wrap gap-2">
         {labels.map((label) => (
           <Tag
@@ -111,7 +112,7 @@ export function JoinStep3({
 }) {
   return (
     <div className="space-y-9">
-      <div className="flex items-center justify-between gap-4 rounded-2xl bg-cream px-5 py-4">
+      <div className="flex items-center justify-between gap-4 rounded-box bg-cream px-5 py-4">
         <div>
           <p className="font-semibold">Currently accepting new clients</p>
           <p className="mt-1 text-sm text-mute">You can update this later.</p>
@@ -126,7 +127,7 @@ export function JoinStep3({
       </div>
 
       <fieldset>
-        <legend className={fieldLabelClass}>Session format</legend>
+        <legend className={eyebrowClass}>Session format</legend>
         <div className="mt-3 flex flex-wrap gap-2">
           <Tag
             selected={draft.virtual}
@@ -161,12 +162,12 @@ export function JoinStep3({
       </fieldset>
 
       {draft.inPerson && draft.location ? (
-        <div className="rounded-2xl bg-cream p-5">
-          <p className={fieldLabelClass}>Practice location</p>
+        <div className="rounded-box bg-cream p-5">
+          <p className={eyebrowClass}>Practice location</p>
           <div className="mt-4 grid gap-5 sm:grid-cols-2">
-            <label className="sm:col-span-2">
-              <span className={fieldLabelClass}>Street address</span>
-              <input
+            <div className="sm:col-span-2">
+              <TextField
+                label="Street address"
                 value={draft.location.address}
                 onChange={(event) =>
                   setDraft((current) => ({
@@ -176,47 +177,40 @@ export function JoinStep3({
                       : null,
                   }))
                 }
-                className={`${fieldClass} mt-2`}
               />
-            </label>
-            <label>
-              <span className={fieldLabelClass}>State</span>
-              <select
-                value={draft.location.state}
-                onChange={(event) =>
-                  setDraft((current) => ({
-                    ...current,
-                    location: current.location
-                      ? { ...current.location, state: event.target.value }
-                      : null,
-                  }))
-                }
-                className={`${selectClass} mt-2`}
-              >
-                <option value="">Choose state</option>
-                {LICENSE_STATES.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span className={fieldLabelClass}>ZIP</span>
-              <input
-                inputMode="numeric"
-                value={draft.location.zip}
-                onChange={(event) =>
-                  setDraft((current) => ({
-                    ...current,
-                    location: current.location
-                      ? { ...current.location, zip: event.target.value }
-                      : null,
-                  }))
-                }
-                className={`${fieldClass} mt-2`}
-              />
-            </label>
+            </div>
+            <SelectField
+              label="State"
+              value={draft.location.state}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  location: current.location
+                    ? { ...current.location, state: event.target.value }
+                    : null,
+                }))
+              }
+            >
+              <option value="">Choose state</option>
+              {LICENSE_STATES.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </SelectField>
+            <TextField
+              label="ZIP"
+              inputMode="numeric"
+              value={draft.location.zip}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  location: current.location
+                    ? { ...current.location, zip: event.target.value }
+                    : null,
+                }))
+              }
+            />
           </div>
         </div>
       ) : null}

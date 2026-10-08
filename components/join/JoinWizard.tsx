@@ -94,11 +94,11 @@ function Heading({ step }: { step: Step }) {
   }[step];
 
   return (
-    <div className="mb-9">
-      <Eyebrow>
+    <div className="mb-9 text-center">
+      <Eyebrow className="text-center sm:text-xl">
         Step {step} of 4 · {eyebrow}
       </Eyebrow>
-      <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
+      <h1 className="mx-auto mt-4 max-w-xl text-center font-display text-4xl leading-[1.08] font-medium tracking-tight text-ink sm:text-5xl">
         {step === 1 ? (
           <>
             Let&apos;s start with <em className="text-clay">you</em>.
@@ -117,7 +117,9 @@ function Heading({ step }: { step: Step }) {
           </>
         )}
       </h1>
-      <p className="mt-3 text-mute">{subcopy}</p>
+      <p className="mx-auto mt-4 max-w-md text-center text-base leading-relaxed text-mute">
+        {subcopy}
+      </p>
     </div>
   );
 }
@@ -211,8 +213,8 @@ export function JoinWizard({
       onBack={goBack}
       closeHref={editing ? routes.therapist(userId) : routes.home}
       footer={
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
+        <div className="flex flex-col items-center gap-3 text-center">
+          {submitError || hint || (blocked && errors[0]) ? (
             <p
               role={submitError ? "alert" : undefined}
               className={`text-sm ${
@@ -221,14 +223,13 @@ export function JoinWizard({
                   : "text-mute"
               }`}
             >
-              {submitError || hint || (blocked ? errors[0] : "")}
+              {submitError || hint || errors[0]}
             </p>
-          </div>
+          ) : null}
           <Button
             type="button"
             disabled={blocked || submitting || mediaBusy}
             onClick={() => void continueOrSubmit()}
-            className="shrink-0"
           >
             {submitting
               ? editing
@@ -244,7 +245,7 @@ export function JoinWizard({
       }
     >
       {notice ? (
-        <p className="mb-6 rounded-2xl bg-cream px-4 py-3 text-sm text-ink">
+        <p className="mb-6 rounded-box bg-cream px-4 py-3 text-left text-sm leading-relaxed text-ink">
           {notice}
         </p>
       ) : null}
