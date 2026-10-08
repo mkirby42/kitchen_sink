@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import type { ConsultBookAction, ContactAction } from "@/lib/therapists/load";
 
 export function ContactCtas({
@@ -49,7 +51,7 @@ export function ContactCtas({
         data-cta-placement="dock"
         className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(27,39,68,0.06)] md:hidden"
       >
-        <div className={`mx-auto grid max-w-[26.5rem] px-5 ${columns}`}>
+        <div className={`mx-auto grid w-full max-w-6xl px-5 sm:px-8 ${columns}`}>
           {actions.map((action) => (
             <CtaButton
               key={action.kind}
@@ -70,12 +72,10 @@ export function ContactCtas({
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="w-full max-w-sm rounded-[1.75rem] bg-paper px-5 py-6 shadow-[0_24px_70px_rgba(27,39,68,0.18)]"
+            className="w-full max-w-sm rounded-card bg-paper px-6 py-6 shadow-overlay"
             onClick={(event) => event.stopPropagation()}
           >
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-clay uppercase">
-              Contact
-            </p>
+            <Eyebrow>Contact</Eyebrow>
             <h2 id={titleId} className="mt-1 font-display text-2xl text-ink">
               Reach {name}
             </h2>
@@ -91,9 +91,7 @@ export function ContactCtas({
                     className="flex items-center justify-between gap-3 rounded-2xl bg-cream px-4 py-3 text-ink hover:bg-line"
                   >
                     <span>
-                      <span className="block text-[11px] font-semibold tracking-[0.14em] text-mute uppercase">
-                        {item.label}
-                      </span>
+                      <span className="block text-sm text-mute">{item.label}</span>
                       <span className="mt-0.5 block font-medium break-all">
                         {item.value}
                       </span>
@@ -105,13 +103,13 @@ export function ContactCtas({
                 </li>
               ))}
             </ul>
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              className="mt-5 w-full"
               onClick={() => setOpen(false)}
-              className="mt-5 w-full rounded-full border border-line px-4 py-3 text-sm font-semibold text-ink hover:bg-cream"
             >
               Close
-            </button>
+            </Button>
           </div>
         </div>
       ) : null}
@@ -129,20 +127,17 @@ function CtaButton({
   onOpen: () => void;
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant={action.kind === "book" ? "primary" : "secondary"}
+      size="sm"
+      className="w-full whitespace-nowrap"
       aria-haspopup="dialog"
       aria-expanded={open}
       onClick={onOpen}
-      className={
-        action.kind === "book"
-          ? "flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-clay px-3 py-[0.95rem] text-[15px] font-semibold text-paper hover:bg-clay-dark"
-          : "flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-pine bg-paper px-3 py-[0.95rem] text-[15px] font-semibold text-pine hover:bg-pine/5"
-      }
     >
       {action.kind === "consult" ? <ConsultIcon /> : <BookIcon />}
       {action.label}
-    </button>
+    </Button>
   );
 }
 

@@ -50,12 +50,11 @@ function PersonIcon() {
   );
 }
 
-/** Profiles and join steps keep their own chrome. Account pages do not. */
+/** Join steps hide the site header. Account pages and therapist profiles do not. */
 export function siteNavHidden(
   path: string,
   user: { role: string | null } | null,
 ) {
-  if (path.startsWith("/t/")) return true;
   return path === routes.join && user != null && user.role !== "patient";
 }
 
@@ -129,8 +128,9 @@ export function SiteHeader({
     <AudienceSwitcher audience={audience} />
   ) : null;
 
-  // Profiles and join steps use their own chrome.
+  // Join steps use their own chrome.
   // Admins still get the switcher there so Therapist/Client preview can return.
+  // Therapist profiles and account pages use this header.
   if (siteNavHidden(path, navUser)) {
     if (!switcher) return null;
     return (

@@ -166,6 +166,10 @@ describe("profile edit control", () => {
       }),
     );
     expect(html).not.toContain("Edit profile");
+    expect(html).not.toContain("♡");
+    expect(html).toContain("max-w-6xl");
+    expect(html).not.toContain("max-w-[26.5rem]");
+    expect(html).toContain("Back to search");
     expect(html).not.toContain("I'm interested");
     expect(html).not.toContain(routes.joinEdit);
     expect(html).not.toContain("Delete profile");

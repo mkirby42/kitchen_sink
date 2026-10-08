@@ -20,7 +20,13 @@ export const textareaClass =
 export const cardClass = "rounded-card bg-paper shadow-card";
 
 const buttonBase =
-  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-2.5 text-center text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full text-center font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+
+const buttonSizes = {
+  md: "px-6 py-2.5 text-sm",
+  /** Same height as md. Less side padding so two labels fit a phone dock. */
+  sm: "px-3 py-2.5 text-sm",
+} as const;
 
 const buttonVariants = {
   primary: "bg-clay text-paper hover:bg-clay-dark",
@@ -28,9 +34,14 @@ const buttonVariants = {
 } as const;
 
 export type ButtonVariant = keyof typeof buttonVariants;
+export type ButtonSize = keyof typeof buttonSizes;
 
-export function buttonClass(variant: ButtonVariant = "primary", className?: string) {
-  return cx(buttonBase, buttonVariants[variant], className);
+export function buttonClass(
+  variant: ButtonVariant = "primary",
+  className?: string,
+  size: ButtonSize = "md",
+) {
+  return cx(buttonBase, buttonSizes[size], buttonVariants[variant], className);
 }
 
 /** Clay text link. Same weight as the pill buttons. */
