@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { ConversationPeek } from "@/components/search/ConversationPeek";
+import { TherapistCardDesktop } from "@/components/search/TherapistCardDesktop";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { buildTherapistHref } from "@/components/search/query";
 import { Card } from "@/components/ui/Card";
@@ -9,11 +10,13 @@ import { overlapCopy, searchCardLabels } from "@/lib/search/overlap";
 import { modalityDisplayLabel } from "@/lib/tags/modality-display";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import {
+  credentialTitle,
   initials,
   storagePublicUrl,
   yearsPracticing,
 } from "@/lib/therapists/display";
 import { MAYA_ID } from "@/lib/therapists/ids";
+import { givenName } from "@/lib/therapists/load";
 
 function cardInitials(name: string) {
   return initials(name.replace(/^(dr\.?|prof\.?)\s+/i, ""));
@@ -72,6 +75,11 @@ export function TherapistCard({
   const hits = overlapCopy(row.match_count, filters.tags.length);
   const card = conversationPeek(row);
   const href = buildTherapistHref(row.profile_id, filters);
+  const given = givenName(row.name);
+  const mark = cardInitials(row.name);
+  const topicTags = tags.filter(
+    (label) => label !== "Virtual" && label !== "In-Person",
+  );
   const details = (
     <>
       <div className="flex items-start gap-4">
@@ -116,24 +124,43 @@ export function TherapistCard({
   );
 
   return (
-    <Card as="article" className="p-5 sm:p-6">
-      {videoUrl ? (
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-          <CardIntroVideo
-            name={row.name}
-            initials={cardInitials(row.name)}
-            photoUrl={photo}
-            videoUrl={videoUrl}
-          />
-          <Link href={href} className="block w-full min-w-0 sm:w-auto sm:flex-1">
+    <Card as="article" className="overflow-hidden p-5 sm:p-6 md:p-0">
+      <div data-find-card="phone" className="md:hidden">
+        {videoUrl ? (
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+            <CardIntroVideo
+              name={row.name}
+              initials={mark}
+              photoUrl={photo}
+              videoUrl={videoUrl}
+            />
+            <Link href={href} className="block w-full min-w-0 sm:w-auto sm:flex-1">
+              {details}
+            </Link>
+          </div>
+        ) : (
+          <Link href={href} className="block">
             {details}
           </Link>
-        </div>
-      ) : (
-        <Link href={href} className="block">
-          {details}
-        </Link>
-      )}
+        )}
+      </div>
+      <TherapistCardDesktop
+        name={row.name}
+        given={given}
+        initials={mark}
+        credential={credentialTitle(row.credential)}
+        photoUrl={photo}
+        videoUrl={videoUrl}
+        virtual={row.virtual_practice}
+        inPerson={row.in_person_practice}
+        tags={topicTags}
+        hits={hits}
+        prompt={card?.prompt ?? null}
+        answer={card?.answer ?? null}
+        href={href}
+        sample={sample}
+        hidden={row.listed === false}
+      />
     </Card>
   );
 }

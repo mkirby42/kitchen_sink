@@ -45,20 +45,22 @@ export default async function FindPage({ searchParams }: FindPageProps) {
     : found;
 
   return (
-    <main className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
-      <h1 className="text-center font-display text-[clamp(2.15rem,5vw,4.35rem)] leading-[1.05] font-medium tracking-tight text-ink">
-        Find your <em className="text-clay">therapist</em>
-      </h1>
-      <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-mute sm:text-lg">
-        Tap your must-haves below — we&apos;ll show therapists who match some
-        selected tag.
-      </p>
+    <main className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-3xl">
+        <h1 className="text-center font-display text-[clamp(2.15rem,5vw,4.35rem)] leading-[1.05] font-medium tracking-tight text-ink">
+          Find your <em className="text-clay">therapist</em>
+        </h1>
+        <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-mute sm:text-lg">
+          Tap your must-haves below — we&apos;ll show therapists who match some
+          selected tag.
+        </p>
 
-      <Card className="mt-10 px-5 py-8 sm:px-8 sm:py-10">
-        <Suspense fallback={null}>
-          <FindFilters />
-        </Suspense>
-      </Card>
+        <Card className="mt-10 px-5 py-8 sm:px-8 sm:py-10">
+          <Suspense fallback={null}>
+            <FindFilters />
+          </Suspense>
+        </Card>
+      </div>
 
       <div className="mt-10 space-y-6">
         {rows === null ? (
