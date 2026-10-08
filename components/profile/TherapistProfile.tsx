@@ -20,7 +20,6 @@ import { directorySpecialties } from "@/lib/tags/presets";
 import { AboutPanel } from "./ProfileAbout";
 import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
-import { MobileProfileStream } from "./MobileProfileStream";
 import { ProfileTabs } from "./ProfileTabs";
 import { ReviewsPanel } from "./ReviewsPanel";
 import { cardCorner, TagSection } from "./ProfileSections";
@@ -55,6 +54,22 @@ export function TherapistProfile({
   const ctas = consultBookActions(data.contact);
   const hasQualifications =
     data.education.length > 0 || data.credentials.length > 0;
+  const practicePanel = (flags?: {
+    showAbout?: boolean;
+    showLogistics?: boolean;
+  }) => (
+    <AboutPanel
+      about={data.about}
+      rates={data.rates}
+      inNetwork={data.inNetwork}
+      sliding={sliding}
+      superbill={superbill}
+      formats={formats}
+      officeLines={officeLines}
+      showAbout={flags?.showAbout}
+      showLogistics={flags?.showLogistics}
+    />
+  );
 
   return (
     <main
@@ -96,19 +111,9 @@ export function TherapistProfile({
       ) : null}
 
       <div className="mt-6 lg:grid lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:gap-14">
-        <MobileProfileStream
-          name={data.name}
-          initials={initials(data.name.replace(/^dr\.?\s+/i, ""))}
-          photoUrl={data.photoUrl}
-          videoUrl={data.videoUrl}
-          licenseCaptions={licenses}
-          years={data.years}
-          cards={data.cards}
-        />
-
         <div
-          data-profile-layout="desk"
-          className="mx-auto hidden w-full max-w-md md:block lg:mx-0 lg:max-w-none"
+          data-profile-layout="media"
+          className="mx-auto w-full max-w-md lg:mx-0 lg:max-w-none"
         >
           <HeroMedia
             name={data.name}
@@ -157,6 +162,10 @@ export function TherapistProfile({
             labels={directorySpecialties(data.specialties)}
           />
 
+          <div data-profile-show="phone" className="md:hidden">
+            {practicePanel({ showAbout: false })}
+          </div>
+
           <ContactCtas
             name={data.givenName}
             actions={ctas}
@@ -164,7 +173,7 @@ export function TherapistProfile({
           />
 
           {data.cards.length > 0 ? (
-            <section className="mt-10 hidden md:block">
+            <section className="mt-10">
               <h2 className="font-display text-3xl tracking-tight text-ink">
                 Get to know <em className="text-clay">{data.givenName}</em>
               </h2>
@@ -199,15 +208,16 @@ export function TherapistProfile({
           <ProfileTabs
             reviewCount={data.reviews.length}
             about={
-              <AboutPanel
-                about={data.about}
-                rates={data.rates}
-                inNetwork={data.inNetwork}
-                sliding={sliding}
-                superbill={superbill}
-                formats={formats}
-                officeLines={officeLines}
-              />
+              <>
+                {data.about ? (
+                  <div className="md:hidden">
+                    {practicePanel({ showLogistics: false })}
+                  </div>
+                ) : null}
+                <div data-profile-show="desk" className="hidden md:block">
+                  {practicePanel()}
+                </div>
+              </>
             }
             reviews={
               <ReviewsPanel
