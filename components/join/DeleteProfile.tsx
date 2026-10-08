@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { fieldClass, fieldLabelClass } from "@/components/ui/styles";
 import {
   deleteOwnTherapistProfile,
@@ -62,21 +63,20 @@ export function DeleteProfile({
 
   return (
     <section className="mt-12 border-t border-line pt-8">
-      <h2 className="font-display text-2xl tracking-tight text-ink">
-        Delete profile
-      </h2>
+      <Eyebrow>Delete profile</Eyebrow>
       <p className="mt-2 text-sm text-mute">
         Permanently remove your public therapist profile from Kitchen Sink.
         Your login stays, so you can join again later.
       </p>
-      <button
+      <Button
         type="button"
+        variant="secondary"
+        className="mt-4"
         disabled={disabled || busy}
         onClick={() => setOpen(true)}
-        className="mt-4 rounded-full border border-clay px-5 py-2.5 text-sm font-semibold text-clay hover:bg-clay/10 disabled:cursor-not-allowed disabled:opacity-45"
       >
         Delete profile
-      </button>
+      </Button>
       {open ? (
         <DeleteProfileDialog
           phrase={phrase}

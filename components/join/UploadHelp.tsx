@@ -23,7 +23,7 @@ export function UploadHelp({ troubleToken }: { troubleToken: number }) {
 
   return (
     <section className="space-y-3" aria-label="Upload help">
-      <p className="rounded-2xl border border-clay/30 bg-cream px-5 py-4 text-center text-sm leading-6 text-ink">
+      <p className="rounded-box bg-cream px-5 py-4 text-center text-sm leading-6 text-ink">
         Having trouble uploading? Email{" "}
         <a href={MAILTO} className="font-semibold text-clay-dark underline">
           {UPLOAD_HELP_EMAIL}

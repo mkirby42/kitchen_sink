@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { buttonClass, fieldLabelClass } from "@/components/ui/styles";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { buttonClass } from "@/components/ui/styles";
 
 export function MediaSlot({
   kind,
@@ -27,16 +28,14 @@ export function MediaSlot({
 
   return (
     <section className="space-y-3">
-      {kind === "video" ? (
-        <p className={fieldLabelClass}>Intro video</p>
-      ) : null}
+      {kind === "video" ? <Eyebrow>Intro video</Eyebrow> : null}
       <div className="flex items-center gap-4">
         <button
           type="button"
           aria-label={`Choose a ${noun}`}
           disabled={uploading}
           onClick={() => inputRef.current?.click()}
-          className="grid size-[4.5rem] shrink-0 place-items-center overflow-hidden rounded-full border border-dashed border-clay/45 bg-cream disabled:opacity-60"
+          className="grid size-[4.5rem] shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-cream disabled:opacity-60"
         >
           {preview ? (
             kind === "photo" ? (
@@ -84,7 +83,7 @@ export function MediaSlot({
       {helpers.map((text) => (
         <p
           key={text}
-          className="rounded-2xl bg-cream px-5 py-4 text-center text-sm leading-6 text-mute"
+          className="rounded-box bg-cream px-5 py-4 text-center text-sm leading-6 text-mute"
         >
           {text}
         </p>

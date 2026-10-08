@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import {
   filterTherapists,
   isTherapistMediaKey,
@@ -9,9 +8,12 @@ import {
 } from "@/lib/admin/media";
 import { DirectoryListing } from "@/components/admin/DirectoryListing";
 import { MediaField } from "@/components/admin/MediaField";
+import { TherapistPicker } from "@/components/admin/TherapistPicker";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { TextField } from "@/components/ui/Field";
+import { Notice } from "@/components/ui/Notice";
 import { mediaFileError } from "@/lib/join/media";
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { routes } from "@/lib/routes";
@@ -127,17 +129,17 @@ export function HelperUpload({
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
+    <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <Eyebrow>Ops</Eyebrow>
-      <h1 className="mt-3 font-display text-4xl tracking-tight">
+      <h1 className="mt-1 font-display text-2xl leading-snug tracking-tight text-clay">
         Upload therapist media
       </h1>
-      <p className="mt-4 max-w-xl text-mute">
+      <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
         Choose the therapist who emailed you a file. Photo and intro video go
         into the same storage folders their profile already uses.
       </p>
 
-      <div className="mt-8">
+      <div className="mt-6">
         <TextField
           label="Find therapist"
           value={query}
@@ -146,63 +148,34 @@ export function HelperUpload({
         />
       </div>
 
-      <ul className="mt-4 max-h-80 space-y-2 overflow-y-auto">
-        {visible.length === 0 ? (
-          <li className="rounded-2xl bg-paper px-4 py-3 text-sm text-mute">
-            No therapist matches that.
-          </li>
-        ) : (
-          visible.map((therapist) => {
-            const active = therapist.id === selectedId;
-            return (
-              <li key={therapist.id}>
-                <button
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => {
-                    setSelectedId(therapist.id);
-                    setError("");
-                    setNotice("");
-                  }}
-                  className={`w-full rounded-2xl border px-4 py-3 text-left ${
-                    active
-                      ? "border-clay bg-paper"
-                      : "border-line bg-paper hover:border-ink/20"
-                  }`}
-                >
-                  <span className="block font-medium">{therapist.name}</span>
-                  <span className="mt-1 block text-sm text-mute">
-                    {[therapist.credential, therapist.email]
-                      .filter(Boolean)
-                      .join(" · ") || "No email on file"}
-                    {therapist.videoKey ? " · Intro video" : " · No intro video"}
-                    {therapist.openToNewClients ? "" : " · Not open to new clients"}
-                    {therapist.listed ? "" : " · Hidden from Find"}
-                  </span>
-                </button>
-              </li>
-            );
-          })
-        )}
-      </ul>
+      <TherapistPicker
+        therapists={visible}
+        selectedId={selectedId}
+        onSelect={(id) => {
+          setSelectedId(id);
+          setError("");
+          setNotice("");
+        }}
+      />
 
       {selected ? (
-        <Card className="mt-8 space-y-6 p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="font-display text-3xl tracking-tight">
+        <Card className="mt-4 space-y-4 p-4 sm:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="font-display text-2xl tracking-tight text-ink">
                 {selected.name}
               </h2>
               <p className="mt-1 text-sm text-mute">
                 {selected.email ?? "No email on file"}
               </p>
             </div>
-            <Link
+            <Button
               href={routes.therapist(selected.id)}
-              className="text-sm font-medium text-clay hover:text-clay-dark"
+              variant="secondary"
+              size="sm"
             >
               View profile
-            </Link>
+            </Button>
           </div>
 
           <MediaField
@@ -229,18 +202,20 @@ export function HelperUpload({
           />
         </Card>
       ) : (
-        <p className="mt-8 text-sm text-mute">Pick a therapist to upload.</p>
+        <Card className="mt-4 px-4 py-3">
+          <p className="text-sm text-mute">Pick a therapist to upload.</p>
+        </Card>
       )}
 
       {notice ? (
-        <p role="status" className="mt-6 rounded-2xl bg-paper px-5 py-4 text-sm">
-          {notice}
-        </p>
+        <div className="mt-4">
+          <Notice>{notice}</Notice>
+        </div>
       ) : null}
       {error ? (
-        <p role="alert" className="mt-6 rounded-2xl bg-paper px-5 py-4 text-sm text-clay-dark">
-          {error}
-        </p>
+        <div className="mt-4">
+          <Notice role="alert">{error}</Notice>
+        </div>
       ) : null}
     </main>
   );
