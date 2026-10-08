@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { Notice } from "@/components/ui/Notice";
+import { tagClass, textLinkClass } from "@/components/ui/styles";
 import {
   approveReview,
   rejectReview,
@@ -44,43 +46,53 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
+    <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <Eyebrow>Ops</Eyebrow>
-      <h1 className="mt-3 font-display text-4xl tracking-tight">Review queue</h1>
-      <p className="mt-4 max-w-xl text-mute">
+      <h1 className="mt-1 font-display text-2xl leading-snug tracking-tight text-clay">
+        Review queue
+      </h1>
+      <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
         New client reviews stay here until you approve them. Approving posts
         the review on the therapist profile. Rejecting deletes it. Rejected
         reviews are not kept.
       </p>
 
       {rows.length === 0 ? (
-        <p className="mt-8 text-sm text-mute">No reviews waiting.</p>
+        <Card className="mt-6 px-4 py-3">
+          <p className="text-sm text-mute">No reviews waiting.</p>
+        </Card>
       ) : (
-        <ul className="mt-8 space-y-4">
+        <ul className="mt-6 space-y-3">
           {rows.map((review) => {
             const date = formatReviewDate(review.createdAt);
             const busy = busyId === review.id;
             return (
-              <Card as="li" key={review.id} className="px-5 py-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
+              <Card as="li" key={review.id} className="px-4 py-4">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
                     <p className="font-medium text-ink">{review.authorLabel}</p>
                     <p className="mt-1 text-sm text-mute">
                       For{" "}
                       <Link
                         href={routes.therapist(review.therapistId)}
-                        className="font-medium text-clay hover:text-clay-dark"
+                        className={textLinkClass}
                       >
                         {review.therapistName}
                       </Link>
                       {date ? ` · ${date}` : ""}
                     </p>
                   </div>
+                  <span className={tagClass(false)}>Pending</span>
                 </div>
-                <p className="mt-3 text-sm text-ink">
-                  Understood {review.understood ?? "—"} · Communication{" "}
-                  {review.communication ?? "—"} · Fit {review.fit ?? "—"}
-                </p>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  <li className={tagClass(false)}>
+                    Understood {review.understood ?? "—"}
+                  </li>
+                  <li className={tagClass(false)}>
+                    Communication {review.communication ?? "—"}
+                  </li>
+                  <li className={tagClass(false)}>Fit {review.fit ?? "—"}</li>
+                </ul>
                 {review.body ? (
                   <p className="mt-3 leading-relaxed whitespace-pre-wrap text-ink">
                     {review.body}
@@ -88,22 +100,24 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
                 ) : (
                   <p className="mt-3 text-sm text-mute">No written note.</p>
                 )}
-                <div className="mt-5 flex items-center gap-4">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Button
                     type="button"
+                    size="sm"
                     disabled={busyId !== null}
                     onClick={() => void run(review.id, "approve")}
                   >
                     {busy ? "Please wait…" : "Approve"}
                   </Button>
-                  <button
+                  <Button
                     type="button"
+                    variant="secondary"
+                    size="sm"
                     disabled={busyId !== null}
                     onClick={() => void run(review.id, "reject")}
-                    className="text-sm font-semibold text-mute hover:text-clay-dark disabled:opacity-50"
                   >
                     Reject and delete
-                  </button>
+                  </Button>
                 </div>
               </Card>
             );
@@ -112,9 +126,9 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
       )}
 
       {error ? (
-        <p role="alert" className="mt-6 rounded-2xl bg-paper px-5 py-4 text-sm text-clay-dark">
-          {error}
-        </p>
+        <div className="mt-4">
+          <Notice role="alert">{error}</Notice>
+        </div>
       ) : null}
     </main>
   );

@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/Button";
+import { tagClass } from "@/components/ui/styles";
+
 export function DirectoryListing({
   listed,
   busy,
@@ -10,16 +13,19 @@ export function DirectoryListing({
   onToggle: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-line px-4 py-3">
-      <p className="text-sm">{listed ? "Shown on Find" : "Hidden from Find"}</p>
-      <button
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <span className={tagClass(listed)}>
+        {listed ? "Shown on Find" : "Hidden from Find"}
+      </span>
+      <Button
         type="button"
+        variant="secondary"
+        size="sm"
         disabled={disabled}
         onClick={onToggle}
-        className="text-sm font-medium text-clay hover:text-clay-dark disabled:opacity-50"
       >
         {busy ? "Saving…" : listed ? "Hide from Find" : "Show on Find"}
-      </button>
+      </Button>
     </div>
   );
 }

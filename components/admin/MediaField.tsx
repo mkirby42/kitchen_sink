@@ -31,7 +31,7 @@ export function MediaField({
         )}
       </div>
       <div>
-        <label className={buttonClass("secondary", "cursor-pointer")}>
+        <label className={buttonClass("primary", "cursor-pointer", "sm")}>
           {busy ? `Uploading ${noun}…` : uploaded ? `Replace ${noun}…` : `Choose a ${noun}…`}
           <input
             type="file"
