@@ -23,6 +23,7 @@ import { MobileProfileStream } from "./MobileProfileStream";
 import { ProfileTabs } from "./ProfileTabs";
 import { ReviewsPanel } from "./ReviewsPanel";
 import { cardCorner, TagSection } from "./ProfileSections";
+import { promptAnswerClass, promptLabelClass } from "./prompt-type";
 
 export { ProfileNotFound } from "./ProfileSections";
 
@@ -182,12 +183,8 @@ export function TherapistProfile({
                       >
                         {corner.icon}
                       </span>
-                      <p className="pl-8 font-display text-[15px] text-clay italic">
-                        {card.prompt}
-                      </p>
-                      <p className="mt-2 text-[17px] leading-relaxed text-ink">
-                        {card.answer}
-                      </p>
+                      <p className={`pl-8 ${promptLabelClass}`}>{card.prompt}</p>
+                      <p className={promptAnswerClass}>{card.answer}</p>
                     </Card>
                   );
                 })}

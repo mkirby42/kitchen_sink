@@ -143,11 +143,21 @@ describe("mobile hinge profile", () => {
     expect(extraChunk).not.toContain(texas);
 
     expect(mobile).toContain('data-prompt-variant="hinge"');
-    expect(mobile).toContain("text-[1.7rem]");
+    expect(mobile).toContain("text-sm leading-snug text-ink");
+    expect(mobile).toContain(
+      "font-display text-[1.7rem] leading-tight font-semibold tracking-tight text-ink",
+    );
     expect(mobile).not.toContain("text-clay italic");
     expect(mobile).not.toContain("Get to know");
     expect(desk).toContain('data-prompt-variant="classic"');
-    expect(desk).toContain("text-clay italic");
+    const know = desk.slice(desk.indexOf("Get to know"), desk.indexOf("data-profile-switch"));
+    expect(know).toContain("text-sm leading-snug text-ink");
+    expect(know).toContain(
+      "font-display text-[1.7rem] leading-tight font-semibold tracking-tight text-ink",
+    );
+    expect(know).not.toContain("text-clay italic");
+    expect(know).not.toContain("text-[15px]");
+    expect(know).not.toContain("text-[17px]");
     expect(desk).toContain("Get to know");
 
     expect(html).not.toContain("♡");
