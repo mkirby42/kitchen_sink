@@ -219,9 +219,9 @@ Therapist profiles are public while that therapist is open to new clients and li
 
 ## Profile contents
 
-- Name, years practicing, education, and credentials. The licensed credential is not repeated under the profile photo
+- Name, years practicing, education, and credentials. Below a computer-width screen the licensed credential is not repeated on the photo. On a wider screen it leads the credential line under the name
 - State licenses (number and state)
-- Logistics: in-person and virtual as separate labels, plus the office address when the therapist sees people in person and saved a street address
+- How {FirstName} works: in-person and virtual as separate labels, plus the office address when the therapist sees people in person and saved a street address. On a computer-width screen that heading sits over areas of interest, approach, education, and credentials, and the address is an Office row on the name card
 - Photo (required) and an optional intro video
 - Specialties, modalities, insurance, and identity tags
 - Rates: service type, session length in minutes, and price. Sliding scale when the therapist offers it

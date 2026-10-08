@@ -235,7 +235,7 @@ export function reviewAverage(stars: number[]) {
   return Math.round(mean * 10) / 10;
 }
 
-/** Public profile Logistics pills. Both offerings stay two labels. */
+/** Public profile format pills. Both offerings stay two labels. */
 export function sessionFormatPills(virtual: boolean, inPerson: boolean) {
   const pills: string[] = [];
   if (inPerson) pills.push("In person");

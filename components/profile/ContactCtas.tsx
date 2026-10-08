@@ -9,10 +9,13 @@ export function ContactCtas({
   name,
   actions,
   contact,
+  placement = "responsive",
 }: {
   name: string;
   actions: ConsultBookAction[];
   contact: ContactAction[];
+  /** responsive: md+ grid and a phone dock. stack: full-width column, no dock. */
+  placement?: "responsive" | "stack";
 }) {
   const [open, setOpen] = useState(false);
   const titleId = useId();
@@ -30,38 +33,61 @@ export function ContactCtas({
 
   const columns =
     actions.length > 1 ? "grid-cols-2 gap-3" : "grid-cols-1";
+  const stacked =
+    placement === "stack"
+      ? [
+          ...actions.filter((action) => action.kind === "book"),
+          ...actions.filter((action) => action.kind !== "book"),
+        ]
+      : actions;
 
   return (
     <>
-      <div
-        data-cta-placement="inline"
-        className={`mt-4 hidden md:grid ${columns}`}
-      >
-        {actions.map((action) => (
-          <CtaButton
-            key={action.kind}
-            action={action}
-            open={open}
-            onOpen={() => setOpen(true)}
-          />
-        ))}
-      </div>
-
-      <div
-        data-cta-placement="dock"
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(27,39,68,0.06)] md:hidden"
-      >
-        <div className={`mx-auto grid w-full max-w-6xl px-5 sm:px-8 ${columns}`}>
-          {actions.map((action) => (
+      {placement === "stack" ? (
+        <div data-cta-placement="stack" className="mt-4 flex flex-col gap-2.5">
+          {stacked.map((action) => (
             <CtaButton
               key={action.kind}
               action={action}
               open={open}
               onOpen={() => setOpen(true)}
+              size="md"
             />
           ))}
         </div>
-      </div>
+      ) : (
+        <>
+          <div
+            data-cta-placement="inline"
+            className={`mt-4 hidden md:grid ${columns}`}
+          >
+            {actions.map((action) => (
+              <CtaButton
+                key={action.kind}
+                action={action}
+                open={open}
+                onOpen={() => setOpen(true)}
+              />
+            ))}
+          </div>
+
+          <div
+            data-cta-placement="dock"
+            className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(27,39,68,0.06)] md:hidden"
+          >
+            <div className={`mx-auto grid w-full max-w-6xl px-5 sm:px-8 ${columns}`}>
+              {actions.map((action) => (
+                <CtaButton
+                  key={action.kind}
+                  action={action}
+                  open={open}
+                  onOpen={() => setOpen(true)}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {open ? (
         <div
@@ -121,15 +147,17 @@ function CtaButton({
   action,
   open,
   onOpen,
+  size = "sm",
 }: {
   action: ConsultBookAction;
   open: boolean;
   onOpen: () => void;
+  size?: "sm" | "md";
 }) {
   return (
     <Button
       variant={action.kind === "book" ? "primary" : "secondary"}
-      size="sm"
+      size={size}
       className="w-full whitespace-nowrap"
       aria-haspopup="dialog"
       aria-expanded={open}

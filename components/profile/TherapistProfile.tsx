@@ -19,10 +19,13 @@ import { modalityDisplayLabels } from "@/lib/tags/modality-display";
 import { directorySpecialties } from "@/lib/tags/presets";
 import { AboutPanel } from "./ProfileAbout";
 import { ContactCtas } from "./ContactCtas";
+import { DesktopProfile } from "./DesktopProfile";
 import { HeroMedia } from "./HeroMedia";
+import { ProfileHeading } from "./ProfileHeading";
 import { ProfileTabs } from "./ProfileTabs";
 import { ReviewsPanel } from "./ReviewsPanel";
 import { cardCorner, TagSection } from "./ProfileSections";
+import { possessive } from "./copy";
 import { promptAnswerClass, promptLabelClass } from "./prompt-type";
 
 export { ProfileNotFound } from "./ProfileSections";
@@ -68,6 +71,7 @@ export function TherapistProfile({
       officeLines={officeLines}
       showAbout={flags?.showAbout}
       showLogistics={flags?.showLogistics}
+      givenName={data.givenName}
     />
   );
 
@@ -110,10 +114,11 @@ export function TherapistProfile({
         </div>
       ) : null}
 
-      <div className="mt-6 lg:grid lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:gap-14">
+      <div data-profile-layout="phone" className="md:hidden">
+      <div className="mt-6">
         <div
           data-profile-layout="media"
-          className="mx-auto w-full max-w-md lg:mx-0 lg:max-w-none"
+          className="mx-auto w-full max-w-md"
         >
           <HeroMedia
             name={data.name}
@@ -125,7 +130,7 @@ export function TherapistProfile({
           />
         </div>
 
-        <div className="mt-4 md:mt-8 lg:mt-0">
+        <div className="mt-4">
           {hasQualifications ? (
             <Card className="px-5 py-5 sm:px-6">
               <div className="space-y-4">
@@ -205,33 +210,32 @@ export function TherapistProfile({
             </section>
           ) : null}
 
-          <ProfileTabs
-            reviewCount={data.reviews.length}
-            about={
-              <>
-                {data.about ? (
-                  <div className="md:hidden">
-                    {practicePanel({ showLogistics: false })}
-                  </div>
-                ) : null}
-                <div data-profile-show="desk" className="hidden md:block">
-                  {practicePanel()}
-                </div>
-              </>
-            }
-            reviews={
-              <ReviewsPanel
-                therapistId={data.id}
-                therapistName={data.givenName}
-                reviews={data.reviews}
-                pendingReview={data.pendingReview}
-                average={avg}
-                viewer={viewer}
-              />
-            }
-          />
+          <div className="mt-10">
+            <ProfileHeading
+              lead={`In ${possessive(data.givenName)} own`}
+              accent="words"
+            />
+            <ProfileTabs
+              flush
+              reviewCount={data.reviews.length}
+              about={data.about ? practicePanel({ showLogistics: false }) : null}
+              reviews={
+                <ReviewsPanel
+                  therapistId={data.id}
+                  therapistName={data.givenName}
+                  reviews={data.reviews}
+                  pendingReview={data.pendingReview}
+                  average={avg}
+                  viewer={viewer}
+                />
+              }
+            />
+          </div>
         </div>
       </div>
+      </div>
+
+      <DesktopProfile data={data} viewer={viewer} />
     </main>
   );
 }
