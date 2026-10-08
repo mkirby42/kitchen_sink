@@ -3,13 +3,14 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { TextField } from "@/components/ui/Field";
+import { Notice } from "@/components/ui/Notice";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { textLinkClass } from "@/components/ui/styles";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
-import { JoinShell } from "./JoinShell";
 
 export function JoinAuth({
   initialMode = "signup",
@@ -56,71 +57,66 @@ export function JoinAuth({
   }
 
   return (
-    <JoinShell>
-      <div className="mx-auto max-w-xl">
-        <Eyebrow>Join as a therapist</Eyebrow>
-        <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
+    <AccountShell
+      eyebrow="Join as a therapist"
+      title={
+        <>
           Welcome to <em className="text-clay">Kitchen Sink</em>.
-        </h1>
-        <p className="mt-4 text-mute">
-          {mode === "signup"
-            ? "Create an account to build your therapist profile."
-            : "Sign in to continue your therapist profile."}
-        </p>
+        </>
+      }
+      lede={
+        mode === "signup"
+          ? "Create an account to build your therapist profile."
+          : "Sign in to continue your therapist profile."
+      }
+    >
+      <div className="flex justify-center">
+        <SegmentedControl
+          label="Create an account or sign in"
+          value={mode}
+          onChange={(option) => {
+            setMode(option);
+            setMessage("");
+          }}
+          options={[
+            { value: "signup", label: "Sign up" },
+            { value: "signin", label: "Sign in" },
+          ]}
+        />
+      </div>
 
-        <div className="mt-8">
-          <SegmentedControl
-            label="Create an account or sign in"
-            value={mode}
-            onChange={(option) => {
-              setMode(option);
-              setMessage("");
-            }}
-            options={[
-              { value: "signup", label: "Sign up" },
-              { value: "signin", label: "Sign in" },
-            ]}
-          />
-        </div>
+      <form onSubmit={submit} className="mt-8 space-y-5">
+        <TextField
+          label="Email"
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
 
-        <form onSubmit={submit} className="mt-8 space-y-7">
-          <TextField
-            label="Email"
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
+        <TextField
+          label="Password"
+          type="password"
+          required
+          minLength={6}
+          autoComplete={mode === "signup" ? "new-password" : "current-password"}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          hint="At least 6 characters."
+        />
 
-          <TextField
-            label="Password"
-            type="password"
-            required
-            minLength={6}
-            autoComplete={mode === "signup" ? "new-password" : "current-password"}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            hint="At least 6 characters."
-          />
+        {mode === "signin" ? (
+          <p className="text-center">
+            <Link href={forgotPasswordPath("join")} className={textLinkClass}>
+              Forgot password?
+            </Link>
+          </p>
+        ) : null}
 
-          {mode === "signin" ? (
-            <p className="-mt-4">
-              <Link
-                href={forgotPasswordPath("join")}
-                className="text-sm font-semibold text-clay hover:text-clay-dark"
-              >
-                Forgot password?
-              </Link>
-            </p>
-          ) : null}
+        {message ? <Notice>{message}</Notice> : null}
 
-          {message ? (
-            <p aria-live="polite" className="rounded-2xl bg-cream px-4 py-3 text-sm text-clay-dark">
-              {message}
-            </p>
-          ) : null}
-
+        <div className="flex justify-center pt-2">
           <Button type="submit" disabled={submitting}>
             {submitting
               ? "Please wait…"
@@ -128,8 +124,8 @@ export function JoinAuth({
                 ? "Create account →"
                 : "Sign in →"}
           </Button>
-        </form>
-      </div>
-    </JoinShell>
+        </div>
+      </form>
+    </AccountShell>
   );
 }

@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteHeader, siteNavHidden } from "@/components/SiteHeader";
 import { routes } from "@/lib/routes";
 
 vi.mock("next/navigation", () => ({
@@ -12,6 +12,21 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/supabase/env", () => ({
   supabasePublicConfig: () => null,
 }));
+
+describe("site header visibility", () => {
+  it("keeps the header on account pages and hides it on join steps and profiles", () => {
+    expect(siteNavHidden("/join", null)).toBe(false);
+    expect(siteNavHidden("/forgot-password", null)).toBe(false);
+    expect(siteNavHidden("/reset-password", { role: "admin" })).toBe(false);
+    expect(siteNavHidden("/profile-deleted", null)).toBe(false);
+    expect(siteNavHidden("/admin/media", null)).toBe(false);
+    expect(siteNavHidden("/join", { role: "patient" })).toBe(false);
+    expect(siteNavHidden("/join", { role: "therapist" })).toBe(true);
+    expect(siteNavHidden("/join", { role: "admin" })).toBe(true);
+    expect(siteNavHidden("/join", { role: null })).toBe(true);
+    expect(siteNavHidden("/t/abc", null)).toBe(true);
+  });
+});
 
 describe("site header", () => {
   it("omits Interest for a signed-in therapist", () => {

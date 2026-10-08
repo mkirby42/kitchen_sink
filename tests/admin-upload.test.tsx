@@ -49,6 +49,8 @@ describe("admin helper upload UI", () => {
     expect(html).toContain("Sign in →");
     expect(html).toContain("Forgot password?");
     expect(html).toContain('href="/forgot-password?from=admin"');
+    expect(html).toContain("rounded-card");
+    expect(html).not.toContain("uppercase");
     expect(html).not.toContain("Sign up");
     expect(html).not.toContain("Create account");
   });

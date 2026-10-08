@@ -2,10 +2,11 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { JoinShell } from "@/components/join/JoinShell";
+import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { TextField } from "@/components/ui/Field";
+import { Notice } from "@/components/ui/Notice";
+import { textLinkClass } from "@/components/ui/styles";
 import {
   passwordResetRedirect,
   rememberResetReturn,
@@ -60,24 +61,22 @@ export function ForgotPasswordForm({
   }
 
   return (
-    <JoinShell closeHref={signInPath}>
-      <div>
-        <Eyebrow>Account</Eyebrow>
-        <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
-          {sent ? "Check your email" : "Forgot your password?"}
-        </h1>
-        <p className="mt-4 text-mute">
-          {sent
-            ? RESET_SENT_MESSAGE
-            : "Enter the email on your account. We'll send a link to choose a new password."}
-        </p>
-
-        {sent ? (
-          <Button href={signInPath} className="mt-8">
-            Back to sign in
-          </Button>
-        ) : (
-          <form onSubmit={submit} className="mt-8 space-y-7">
+    <AccountShell
+      eyebrow="Account"
+      title={sent ? "Check your email" : "Forgot your password?"}
+      lede={
+        sent
+          ? RESET_SENT_MESSAGE
+          : "Enter the email on your account. We'll send a link to choose a new password."
+      }
+    >
+      {sent ? (
+        <div className="flex justify-center">
+          <Button href={signInPath}>Back to sign in</Button>
+        </div>
+      ) : (
+        <>
+          <form onSubmit={submit} className="space-y-5">
             <TextField
               label="Email"
               type="email"
@@ -87,29 +86,21 @@ export function ForgotPasswordForm({
               onChange={(event) => setEmail(event.target.value)}
             />
 
-            {message ? (
-              <p
-                role="alert"
-                className="rounded-2xl bg-cream px-4 py-3 text-sm text-clay-dark"
-              >
-                {message}
-              </p>
-            ) : null}
+            {message ? <Notice role="alert">{message}</Notice> : null}
 
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Please wait…" : "Send reset link"}
-            </Button>
+            <div className="flex justify-center pt-2">
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Please wait…" : "Send reset link"}
+              </Button>
+            </div>
           </form>
-        )}
-
-        {sent ? null : (
-          <p className="mt-6 text-sm text-mute">
-            <Link href={signInPath} className="font-semibold text-clay hover:text-clay-dark">
+          <p className="mt-6 text-center">
+            <Link href={signInPath} className={textLinkClass}>
               Back to sign in
             </Link>
           </p>
-        )}
-      </div>
-    </JoinShell>
+        </>
+      )}
+    </AccountShell>
   );
 }

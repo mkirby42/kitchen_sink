@@ -129,6 +129,8 @@ describe("password reset screens", () => {
     );
     expect(signIn).toContain('href="/forgot-password?from=join"');
     expect(signIn).toContain("Forgot password?");
+    expect(signIn).toContain("rounded-card");
+    expect(signIn).not.toContain('aria-label="Go home"');
 
     const signUp = renderToStaticMarkup(
       createElement(JoinAuth, { initialMode: "signup" }),
@@ -155,6 +157,8 @@ describe("password reset screens", () => {
     expect(html).toContain("Forgot your password?");
     expect(html).toContain("Send reset link");
     expect(html).toContain('href="/join?mode=signin"');
+    expect(html).toContain("rounded-card");
+    expect(html).not.toContain('aria-label="Close"');
     expect(html).not.toContain(RESET_SENT_MESSAGE);
   });
 
