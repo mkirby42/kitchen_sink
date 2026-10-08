@@ -207,6 +207,8 @@ A match is overlap. The person selects tags (for example a specialty or an insur
 
 The site does not book appointments or take payment. To reach a therapist, use the email, phone, or text number on their profile.
 
+The homepage links out to the Kitchen Sink newsletter: [Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd) and [subscribe](https://everythingbutkitchensink.beehiiv.com/).
+
 A signed-in therapist can delete their own profile from the edit screen. That removes the public page. The login stays, so they can join again. Email sign-in includes a forgot-password link. The reset email does not say whether that address has an account.
 
 ## Pages
