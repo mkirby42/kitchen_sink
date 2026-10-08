@@ -123,7 +123,7 @@ describe("profile edit control", () => {
     expect(ranged).not.toContain("sliding scale available");
     expect(ranged).not.toContain("+ out-of-network superbills");
     expect(ranged).not.toContain("Aetna, BCBS");
-    expect(ranged).toContain("Logistics");
+    expect(ranged).toContain("How Maya");
     expect(ranged).not.toContain("Rates &amp; insurance");
     expect(ranged).toContain("Individual session (50 min)");
     expect(ranged).toContain("$165");
@@ -199,12 +199,11 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(html).toContain("Logistics");
+    expect(html).toContain("How Maya");
     expect(html).not.toContain("Rates &amp; insurance");
-    expect(html).not.toContain(">Office<");
     expect(html).not.toContain("Virtual &amp; In-Person");
     expect(html).not.toContain("In-Person");
-    const logisticsAt = html.indexOf("Logistics");
+    const logisticsAt = html.indexOf("How Maya");
     const inPersonAt = html.indexOf(">In person</li>");
     const virtualAt = html.indexOf(">Virtual</li>");
     const addressAt = html.indexOf("1102 West 6th Street, Austin");
@@ -212,7 +211,9 @@ describe("profile edit control", () => {
     expect(virtualAt).toBeGreaterThan(inPersonAt);
     expect(addressAt).toBeGreaterThan(logisticsAt);
     const phoneSlot = html.indexOf('data-profile-show="phone"');
-    const deskSlot = html.indexOf('data-profile-show="desk"');
+    const deskSlot = html.indexOf('data-profile-layout="desk"');
+    expect(html.slice(phoneSlot, deskSlot)).not.toContain(">Office<");
+    expect(html.slice(deskSlot)).toContain(">Office<");
     expect(html.indexOf("1102 West 6th Street, Austin", phoneSlot)).toBeGreaterThan(
       phoneSlot,
     );
@@ -244,7 +245,7 @@ describe("profile edit control", () => {
     expect(html).toContain(">In person</li>");
     expect(html).toContain(">Virtual</li>");
     expect(html).toContain("Education");
-    expect(html).toContain("Logistics");
+    expect(html).toContain("How Maya");
   });
 
   it("hides a leftover address when the therapist is virtual only", () => {
@@ -269,7 +270,7 @@ describe("profile edit control", () => {
     expect(html).not.toContain("1102 West 6th Street");
     expect(html).toContain(">Virtual</li>");
     expect(html).not.toContain(">In person</li>");
-    expect(html).toContain("Logistics");
+    expect(html).toContain("How Maya");
   });
 
   it("titles modalities above specialties, both below education", () => {

@@ -9,6 +9,9 @@ type HeroMediaProps = {
   videoUrl: string | null;
   licenseCaptions: string[];
   years: number | null;
+  /** overlay: phone lead card. poster: desktop photo, name lives in the card below. */
+  variant?: "overlay" | "poster";
+  watchLabel?: string | null;
 };
 
 export function HeroMedia({
@@ -18,21 +21,35 @@ export function HeroMedia({
   videoUrl,
   licenseCaptions,
   years,
+  variant = "overlay",
+  watchLabel = null,
 }: HeroMediaProps) {
   const [playing, setPlaying] = useState(false);
   const showVideo = Boolean(videoUrl && playing);
+  const poster = variant === "poster";
 
   const yearsLabel =
     years == null ? null : `${years} yr${years === 1 ? "" : "s"} practicing`;
-  const showDetails = showVideo || Boolean(yearsLabel);
+  const showDetails = !poster && (showVideo || Boolean(yearsLabel));
 
   return (
     <div>
       <div
         data-hero-media
-        className="relative isolate overflow-hidden rounded-[2rem] bg-ink shadow-sm"
+        data-hero-variant={variant}
+        className={
+          poster
+            ? "relative isolate overflow-hidden rounded-[1.75rem] bg-ink shadow-card"
+            : "relative isolate overflow-hidden rounded-[2rem] bg-ink shadow-sm"
+        }
       >
-        <div className="relative aspect-[3/4] min-h-[28rem] w-full">
+        <div
+          className={
+            poster
+              ? "relative aspect-[4/5] w-full"
+              : "relative aspect-[3/4] min-h-[28rem] w-full"
+          }
+        >
           {showVideo && videoUrl ? (
             <video
               className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
@@ -65,7 +82,7 @@ export function HeroMedia({
             <button
               type="button"
               onClick={() => setPlaying(true)}
-              className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-paper/80 bg-transparent hover:bg-paper/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
+              className="absolute top-1/2 left-1/2 z-10 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-paper/80 bg-transparent hover:bg-paper/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
               aria-label={`Play intro video for ${name}`}
             >
               <svg
@@ -78,7 +95,18 @@ export function HeroMedia({
             </button>
           ) : null}
 
-          {showVideo ? null : (
+          {poster && watchLabel && videoUrl && !showVideo ? (
+            <button
+              type="button"
+              data-watch-intro
+              onClick={() => setPlaying(true)}
+              className="absolute bottom-3 left-3 z-10 rounded-full bg-ink/75 px-3 py-1.5 text-xs font-medium text-paper"
+            >
+              {watchLabel}
+            </button>
+          ) : null}
+
+          {poster || showVideo ? null : (
             <>
               <div
                 className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink/75 via-ink/40 via-[35%] to-transparent"

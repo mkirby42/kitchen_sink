@@ -105,7 +105,13 @@ function slot(html: string, show: "phone" | "desk") {
 describe("phone profile layout", () => {
   it("uses one lead card and stacks details under it, then conversation and the switch", () => {
     const html = render();
-    expect(html.match(/data-hero-media/g)).toHaveLength(1);
+    const phoneTree = html.slice(
+      html.indexOf('data-profile-layout="phone"'),
+      html.indexOf('data-profile-layout="desk"'),
+    );
+    const deskTree = html.slice(html.indexOf('data-profile-layout="desk"'));
+    expect(phoneTree.match(/data-hero-media/g)).toHaveLength(1);
+    expect(deskTree.match(/data-hero-media/g)).toHaveLength(1);
     expect(html).not.toContain("data-extra-media");
     expect(html).not.toContain("data-license-badge");
     expect(html).not.toContain('data-prompt-variant="hinge"');
@@ -117,7 +123,7 @@ describe("phone profile layout", () => {
     const phone = html.indexOf('data-profile-show="phone"');
     const know = html.indexOf("Get to know");
     const switchAt = html.indexOf("data-profile-switch");
-    const desk = html.indexOf('data-profile-show="desk"');
+    const desk = html.indexOf('data-profile-layout="desk"');
 
     expect(media).toBeGreaterThan(-1);
     expect(media).toBeLessThan(education);
@@ -146,31 +152,51 @@ describe("phone profile layout", () => {
 
     const phoneSlot = slot(html, "phone");
     expect(phoneSlot).toContain("md:hidden");
-    expect(phoneSlot).toContain("Logistics");
+    expect(phoneSlot).toContain("How Travis");
+    expect(phoneSlot).toContain(">works</em>");
+    expect(phoneSlot).not.toContain("Logistics");
     expect(phoneSlot).toContain("1102 West 6th Street, Austin");
     expect(phoneSlot).toContain(">In person</li>");
     expect(phoneSlot).toContain(">Virtual</li>");
     expect(phoneSlot).not.toContain("I help people find their way.");
+    expect(phoneSlot).not.toContain(">Office<");
 
-    const deskSlot = slot(html, "desk");
-    expect(deskSlot).toContain("hidden md:block");
-    expect(deskSlot).toContain("Logistics");
-    expect(deskSlot).toContain("1102 West 6th Street, Austin");
-    expect(deskSlot).toContain("I help people find their way.");
+    expect(deskTree).toContain("hidden md:grid");
+    expect(deskTree).toContain("How Travis");
+    expect(deskTree).toContain("1102 West 6th Street, Austin");
+    expect(deskTree).toContain("I help people find their way.");
+    expect(deskTree).toContain(">Office<");
+    const visible = deskTree.replace(/&#x27;/g, "'");
+    expect(visible).toContain("Watch Travis's intro");
+    expect(visible).toContain("In Travis's own");
+    expect(deskTree).toContain("PsyD · Licensed Psychologist");
+    expect(deskTree).not.toContain("How he");
+    expect(deskTree).not.toContain(">Approaches<");
+    expect(deskTree).not.toContain("Logistics");
+    expect(deskTree).toContain("Areas of Interest");
+    expect(deskTree).toContain("Approach in Therapy");
+    expect(deskTree.indexOf("Areas of Interest")).toBeLessThan(
+      deskTree.indexOf("Approach in Therapy"),
+    );
+    expect(deskTree).toContain("bg-ink px-3.5");
+    const stack = deskTree.indexOf('data-cta-placement="stack"');
+    expect(deskTree.indexOf("Book a Session", stack)).toBeLessThan(
+      deskTree.indexOf("Free Consult", stack),
+    );
 
     expect(html.slice(switchAt, switchAt + 80)).not.toContain("max-md:hidden");
     expect(html).not.toContain("max-md:block");
     expect(html).toContain('data-cta-placement="dock"');
     expect(html).toContain("Free Consult");
     expect(html).toContain("Book a Session");
-    expect(html).toContain("lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)]");
+    expect(html).toContain("lg:grid-cols-[minmax(0,26.5rem)_minmax(0,1fr)]");
     expect(html).not.toContain("♡");
     expect(html).not.toContain("Hinge");
   });
 
   it("keeps a photo-only and a video-only profile on that same lead card", () => {
     const photo = render({ ...base, videoUrl: null });
-    expect(photo.match(/data-hero-media/g)).toHaveLength(1);
+    expect(photo.match(/data-hero-media/g)).toHaveLength(2);
     expect(photo).not.toContain("Play intro video");
     expect(photo.indexOf("https://example.com/photo.jpg")).toBeLessThan(
       photo.indexOf("Education"),
@@ -180,6 +206,6 @@ describe("phone profile layout", () => {
     const media = video.indexOf('data-profile-layout="media"');
     const education = video.indexOf("Education");
     expect(video.slice(media, education)).toContain("Play intro video");
-    expect(video.match(/data-hero-media/g)).toHaveLength(1);
+    expect(video.match(/data-hero-media/g)).toHaveLength(2);
   });
 });

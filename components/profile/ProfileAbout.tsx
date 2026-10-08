@@ -13,6 +13,7 @@ export function AboutPanel({
   officeLines,
   showAbout = true,
   showLogistics = true,
+  givenName,
 }: {
   about: string | null;
   rates: TherapistProfileData["rates"];
@@ -24,6 +25,7 @@ export function AboutPanel({
   /** Phone puts logistics under the photo and leaves the about line on the Profile tab. */
   showAbout?: boolean;
   showLogistics?: boolean;
+  givenName: string;
 }) {
   const aboutCopy = showAbout === false ? null : about;
   const logistics = showLogistics !== false;
@@ -41,7 +43,9 @@ export function AboutPanel({
       <div
         className={`${showAbout === false ? "mt-4" : "mt-5"} rounded-card bg-clay/10 px-5 py-5 sm:px-6`}
       >
-        <Eyebrow>Logistics</Eyebrow>
+        <Eyebrow>
+          How {givenName} <em className="italic">works</em>
+        </Eyebrow>
         {formats.length > 0 ? (
           <ul className="mt-3 flex flex-wrap gap-2">
             {formats.map((label) => (
