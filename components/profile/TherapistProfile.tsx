@@ -19,6 +19,7 @@ import { directorySpecialties } from "@/lib/tags/presets";
 import { AboutPanel } from "./ProfileAbout";
 import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
+import { MobileProfileStream } from "./MobileProfileStream";
 import { ProfileTabs } from "./ProfileTabs";
 import { ReviewsPanel } from "./ReviewsPanel";
 import { cardCorner, TagSection } from "./ProfileSections";
@@ -93,7 +94,20 @@ export function TherapistProfile({
       ) : null}
 
       <div className="mt-6 lg:grid lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:gap-14">
-        <div className="mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
+        <MobileProfileStream
+          name={data.name}
+          initials={initials(data.name.replace(/^dr\.?\s+/i, ""))}
+          photoUrl={data.photoUrl}
+          videoUrl={data.videoUrl}
+          licenseCaptions={licenses}
+          years={data.years}
+          cards={data.cards}
+        />
+
+        <div
+          data-profile-layout="desk"
+          className="mx-auto hidden w-full max-w-md md:block lg:mx-0 lg:max-w-none"
+        >
           <HeroMedia
             name={data.name}
             initials={initials(data.name.replace(/^dr\.?\s+/i, ""))}
@@ -104,7 +118,7 @@ export function TherapistProfile({
           />
         </div>
 
-        <div className="mt-8 lg:mt-0">
+        <div className="mt-4 md:mt-8 lg:mt-0">
           {hasQualifications ? (
             <Card className="px-5 py-5 sm:px-6">
               <div className="space-y-4">
@@ -145,7 +159,7 @@ export function TherapistProfile({
           />
 
           {data.cards.length > 0 ? (
-            <section className="mt-10">
+            <section className="mt-10 hidden md:block">
               <h2 className="font-display text-3xl tracking-tight text-ink">
                 Get to know <em className="text-clay">{data.givenName}</em>
               </h2>
@@ -159,6 +173,7 @@ export function TherapistProfile({
                     <Card
                       as="li"
                       key={card.prompt}
+                      data-prompt-variant="classic"
                       className="relative overflow-hidden pt-3.5 pr-5 pb-5 pl-5"
                     >
                       <span
