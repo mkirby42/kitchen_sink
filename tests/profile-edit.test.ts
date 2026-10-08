@@ -277,7 +277,7 @@ describe("profile edit control", () => {
     );
     const education = html.indexOf("Education");
     const modalities = html.indexOf("Modalities");
-    const specialties = html.indexOf("Specialties");
+    const specialties = html.indexOf("Areas of Interest");
     const heroDetails = html.indexOf("data-hero-details");
     expect(education).toBeGreaterThan(-1);
     expect(modalities).toBeGreaterThan(education);
@@ -306,7 +306,7 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Education");
     expect(html).not.toContain("Credentials");
     const modalities = html.indexOf("Modalities");
-    const specialties = html.indexOf("Specialties");
+    const specialties = html.indexOf("Areas of Interest");
     expect(modalities).toBeGreaterThan(-1);
     expect(specialties).toBeGreaterThan(modalities);
   });
@@ -331,7 +331,7 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    const specialties = html.indexOf("Specialties");
+    const specialties = html.indexOf("Areas of Interest");
     expect(specialties).toBeGreaterThan(-1);
     expect(html).toContain("Anxiety");
     expect(html).toContain("Trauma &amp; PTSD");
@@ -356,7 +356,7 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(html).not.toContain("Specialties");
+    expect(html).not.toContain("Areas of Interest");
     expect(html).not.toContain("Career");
     expect(html).toContain("Modalities");
     expect(html).toContain("EMDR");

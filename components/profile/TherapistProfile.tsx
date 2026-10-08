@@ -148,7 +148,7 @@ export function TherapistProfile({
 
           <TagSection title="Modalities" labels={data.modalities} />
           <TagSection
-            title="Specialties"
+            title="Areas of Interest"
             labels={directorySpecialties(data.specialties)}
           />
 
