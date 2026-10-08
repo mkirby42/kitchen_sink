@@ -211,9 +211,18 @@ describe("profile edit control", () => {
     expect(inPersonAt).toBeGreaterThan(logisticsAt);
     expect(virtualAt).toBeGreaterThan(inPersonAt);
     expect(addressAt).toBeGreaterThan(logisticsAt);
-    expect(html.indexOf("1102 West 6th Street, Austin", addressAt + 1)).toBe(
-      -1,
+    const phoneSlot = html.indexOf('data-profile-show="phone"');
+    const deskSlot = html.indexOf('data-profile-show="desk"');
+    expect(html.indexOf("1102 West 6th Street, Austin", phoneSlot)).toBeGreaterThan(
+      phoneSlot,
     );
+    expect(html.indexOf("1102 West 6th Street, Austin", phoneSlot)).toBeLessThan(
+      deskSlot,
+    );
+    expect(html.indexOf("1102 West 6th Street, Austin", deskSlot)).toBeGreaterThan(
+      deskSlot,
+    );
+    expect(html.split("1102 West 6th Street, Austin").length - 1).toBe(2);
     expect(html).toContain("Suite 4");
     expect(html).toContain("TX 78703");
   });

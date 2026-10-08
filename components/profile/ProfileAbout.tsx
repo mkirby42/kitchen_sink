@@ -11,6 +11,8 @@ export function AboutPanel({
   superbill,
   formats,
   officeLines,
+  showAbout = true,
+  showLogistics = true,
 }: {
   about: string | null;
   rates: TherapistProfileData["rates"];
@@ -19,13 +21,26 @@ export function AboutPanel({
   superbill: boolean;
   formats: string[];
   officeLines: string[];
+  /** Phone puts logistics under the photo and leaves the about line on the Profile tab. */
+  showAbout?: boolean;
+  showLogistics?: boolean;
 }) {
+  const aboutCopy = showAbout === false ? null : about;
+  const logistics = showLogistics !== false;
+
+  if (!aboutCopy && !logistics) return null;
+  if (!logistics) {
+    return <p className="text-[17px] leading-relaxed text-ink">{aboutCopy}</p>;
+  }
+
   return (
     <div>
-      {about ? (
-        <p className="text-[17px] leading-relaxed text-ink">{about}</p>
+      {aboutCopy ? (
+        <p className="text-[17px] leading-relaxed text-ink">{aboutCopy}</p>
       ) : null}
-      <div className="mt-5 rounded-card bg-clay/10 px-5 py-5 sm:px-6">
+      <div
+        className={`${showAbout === false ? "mt-4" : "mt-5"} rounded-card bg-clay/10 px-5 py-5 sm:px-6`}
+      >
         <Eyebrow>Logistics</Eyebrow>
         {formats.length > 0 ? (
           <ul className="mt-3 flex flex-wrap gap-2">

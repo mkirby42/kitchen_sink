@@ -16,7 +16,7 @@ export function ProfileTabs({ reviewCount, about, reviews }: ProfileTabsProps) {
 
   return (
     <section className="mt-8 md:mt-10">
-      <div data-profile-switch className="max-md:hidden">
+      <div data-profile-switch>
         <SegmentedControl
           label="Profile sections"
           value={tab}
@@ -28,11 +28,11 @@ export function ProfileTabs({ reviewCount, about, reviews }: ProfileTabsProps) {
           ]}
         />
       </div>
-      <div className="mt-6 space-y-8 max-md:mt-0">
-        <div className={tab === "profile" ? undefined : "max-md:block md:hidden"}>
+      <div className="mt-6 space-y-8">
+        <div className={tab === "profile" ? undefined : "hidden"}>
           {about}
         </div>
-        <div className={tab === "reviews" ? undefined : "max-md:block md:hidden"}>
+        <div className={tab === "reviews" ? undefined : "hidden"}>
           {reviews}
         </div>
       </div>
