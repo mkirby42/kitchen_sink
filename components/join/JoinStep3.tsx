@@ -216,7 +216,7 @@ export function JoinStep3({
       ) : null}
 
       <TagGroup
-        title="Specialties"
+        title="Areas of Interest"
         labels={SPECIALTY_PRESETS}
         field="specialties"
         selected={draft.specialties}

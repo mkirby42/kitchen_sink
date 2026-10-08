@@ -41,7 +41,7 @@ describe("join specialties picker", () => {
     const html = renderToStaticMarkup(
       createElement(JoinStep3, { draft: draft(), setDraft: () => {} }),
     );
-    const specialties = html.indexOf("Specialties");
+    const specialties = html.indexOf("Areas of Interest");
     const modalities = html.indexOf("Modalities / approach");
     const insurance = html.indexOf("Insurance");
     expect(specialties).toBeGreaterThan(-1);

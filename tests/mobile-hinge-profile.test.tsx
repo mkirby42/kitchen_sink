@@ -180,7 +180,7 @@ describe("mobile hinge profile", () => {
   it("keeps logistics, modalities, and the pinned consult actions", () => {
     const html = render();
     const modalities = html.indexOf("Modalities");
-    const specialties = html.indexOf("Specialties");
+    const specialties = html.indexOf("Areas of Interest");
     const logistics = html.indexOf("Logistics");
     expect(modalities).toBeGreaterThan(-1);
     expect(specialties).toBeGreaterThan(modalities);
