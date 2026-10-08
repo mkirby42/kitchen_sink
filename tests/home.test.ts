@@ -74,4 +74,34 @@ describe("home hero", () => {
     expect(html).toMatch(/data-audience="client"[^>]*hidden/);
     expect(html).not.toMatch(/data-audience="therapist"[^>]*hidden/);
   });
+
+  it("adds the newsletter Why band without changing the find card", () => {
+    const html = renderToStaticMarkup(
+      createElement(HomeHero, homePanels()),
+    );
+
+    expect(html).toContain("Find a therapist who Gets You.");
+    expect(html).not.toContain("Find a therapist who actually fits.");
+    expect(html).not.toContain("Find someone who actually fits.");
+    expect(html).toContain("From the newsletter");
+    expect(html).toContain("uppercase");
+    expect(html).toContain("Why ");
+    expect(html).toContain("Kitchen Sink?");
+    expect(html).toContain("text-clay");
+    expect(html).toContain("italic");
+    expect(html).toContain("bg-ink");
+    expect(html).toContain("The story behind the name and our Why.");
+    expect(html).toContain("Read the story");
+    expect(html).toContain("Subscribe to the newsletter");
+    expect(html).toContain(
+      'href="https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd"',
+    );
+    expect(html).toContain(
+      'href="https://everythingbutkitchensink.beehiiv.com/"',
+    );
+    expect(html.match(/target="_blank"/g)).toHaveLength(2);
+    expect(html.match(/rel="noopener noreferrer"/g)).toHaveLength(2);
+    expect(html).toContain("bg-clay");
+    expect(html).toContain("underline");
+  });
 });

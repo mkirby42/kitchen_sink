@@ -44,6 +44,10 @@ describe("site header", () => {
       }),
     );
     expect(html).toContain("Find a Therapist");
+    expect(html).toContain("Why Kitchen Sink?");
+    expect(html).toContain(
+      'href="https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd"',
+    );
     expect(html).toContain("My profile");
     expect(html).toContain(
       `href="${routes.therapist("11111111-1111-4111-8111-111111111111")}"`,
@@ -178,6 +182,18 @@ describe("site header", () => {
     expect(html).toContain('href="/join"');
     expect(html).toContain("Therapist log in");
     expect(html).toContain('href="/join?mode=signin"');
+    expect(html).toContain("Why Kitchen Sink?");
+    expect(html).toContain(
+      'href="https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd"',
+    );
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html.indexOf("For Therapists")).toBeLessThan(
+      html.indexOf("Why Kitchen Sink?"),
+    );
+    expect(html.indexOf("Why Kitchen Sink?")).toBeLessThan(
+      html.indexOf("Therapist log in"),
+    );
     expect(html).not.toContain("Join as a Therapist");
     expect(html).not.toContain("Interest");
     expect(html).not.toContain("/matches");

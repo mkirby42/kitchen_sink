@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NewsletterWhy } from "@/components/home/NewsletterWhy";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -92,6 +93,7 @@ export function HomeHero({
         panel={panels.therapist}
         active={audience === "therapist"}
       />
+      <NewsletterWhy />
     </main>
   );
 }

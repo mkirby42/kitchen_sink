@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { headerChrome, type SiteAudience } from "@/lib/audience";
 import type { NavUser } from "@/lib/nav";
 import { parseProfileRole } from "@/lib/role";
+import { newsletter, newsletterLinkProps } from "@/lib/newsletter";
 import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
@@ -191,6 +192,13 @@ export function SiteHeader({
                 For Therapists
               </Link>
             ) : null}
+            <a
+              href={newsletter.story}
+              {...newsletterLinkProps}
+              className={navClass(false)}
+            >
+              Why Kitchen Sink?
+            </a>
             {chrome.myProfile && navUser ? (
               <Button href={routes.therapist(navUser.id)}>My profile</Button>
             ) : null}

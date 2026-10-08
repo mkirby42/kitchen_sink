@@ -67,6 +67,12 @@ describe("llms.txt", () => {
     expect(body).toContain("delete their own profile");
     expect(body).toContain("forgot-password");
     expect(body).toContain(`[Home](${ORIGIN})`);
+    expect(body).toContain(
+      "[Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd)",
+    );
+    expect(body).toContain(
+      "[subscribe](https://everythingbutkitchensink.beehiiv.com/)",
+    );
     expect(body).toContain(`[Find a therapist](${ORIGIN}/find)`);
     expect(body).toContain(`[Join as a therapist](${ORIGIN}/join)`);
     expect(body).toContain(`${ORIGIN}/sitemap.xml`);
