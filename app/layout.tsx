@@ -1,21 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Source_Sans_3 } from "next/font/google";
+import { Caprasimo, Nunito } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
 import { canonicalOrigin } from "@/lib/site";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const caprasimo = Caprasimo({
+  weight: "400",
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
+  variable: "--font-caprasimo",
   display: "swap",
 });
 
-const sourceSans = Source_Sans_3({
+const nunito = Nunito({
   subsets: ["latin"],
-  variable: "--font-source",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-nunito",
   display: "swap",
 });
 
@@ -48,7 +50,7 @@ export default async function RootLayout({
   ]);
 
   return (
-    <html lang="en" className={`${fraunces.variable} ${sourceSans.variable}`}>
+    <html lang="en" className={`${caprasimo.variable} ${nunito.variable}`}>
       <body className="min-h-screen antialiased">
         <SiteHeader initialNavUser={navUser} audience={audience} />
         {children}

@@ -13,9 +13,9 @@ function html(node: ReactElement) {
 }
 
 describe("shared ui", () => {
-  it("uses one clay primary pill and one bordered secondary pill", () => {
+  it("uses one eggplant primary pill and one bordered secondary pill", () => {
     const primary = html(createElement(Button, { type: "submit" }, "Save"));
-    expect(primary).toContain("bg-clay");
+    expect(primary).toContain("bg-ink");
     expect(primary).toContain("rounded-full");
     expect(primary).toContain("px-6");
     expect(primary).toContain("py-2.5");
@@ -24,7 +24,7 @@ describe("shared ui", () => {
     const secondary = html(
       createElement(Button, { variant: "secondary", href: "/find" }, "Log in"),
     );
-    expect(secondary).toContain("border-ink/15");
+    expect(secondary).toContain("border-ink");
     expect(secondary).toContain("bg-paper");
     expect(secondary).toContain('href="/find"');
     expect(secondary).not.toContain("bg-clay");
@@ -32,7 +32,9 @@ describe("shared ui", () => {
     expect(buttonClass("secondary")).toContain("py-2.5");
     expect(buttonClass("secondary", undefined, "sm")).toContain("px-3");
     expect(buttonClass("secondary", undefined, "sm")).toContain("py-2.5");
-    expect(buttonClass("primary", undefined, "sm")).toContain("bg-clay");
+    expect(buttonClass("primary", undefined, "sm")).toContain("bg-ink");
+    expect(buttonClass("gold")).toContain("bg-gold");
+    expect(buttonClass("gold")).toContain("text-ink");
 
     const labeled = html(
       createElement(
@@ -53,7 +55,7 @@ describe("shared ui", () => {
     expect(card).toContain("Meet clients");
   });
 
-  it("selects with the navy homepage switch", () => {
+  it("selects with the eggplant homepage switch", () => {
     const control = html(
       createElement(SegmentedControl, {
         label: "Account",
@@ -93,7 +95,7 @@ describe("shared ui", () => {
       createElement(Tag, { selected: true, onClick() {} }, "Anxiety"),
     );
     expect(tag).toContain("rounded-full");
-    expect(tag).toContain("bg-clay");
+    expect(tag).toContain("bg-ink");
     expect(tag).toContain('aria-pressed="true"');
 
     const field = html(

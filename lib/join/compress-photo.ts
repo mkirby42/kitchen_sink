@@ -17,7 +17,7 @@ export const PHOTO_ENCODE_PLAN = [
   { maxEdge: 800, quality: 0.72 },
 ] as const;
 
-const CANVAS_FILL = "#f6f0e6";
+const CANVAS_FILL = "#fbf6ea";
 
 export class PhotoPrepareError extends Error {
   constructor(message: string) {

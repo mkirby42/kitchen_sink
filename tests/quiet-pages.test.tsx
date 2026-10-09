@@ -15,7 +15,7 @@ describe("quiet pages", () => {
     expect(html).toContain("rounded-card");
     expect(html).toContain("bg-paper");
     expect(html).toContain("text-clay");
-    expect(html).toContain("bg-clay");
+    expect(html).toContain("bg-ink");
     expect(html).toContain("text-center");
   });
 
@@ -31,7 +31,7 @@ describe("quiet pages", () => {
     expect(html).toContain("Back to search");
     expect(html).toContain('href="/find?format=virtual"');
     expect(html).toContain("rounded-card");
-    expect(html).toContain("bg-clay");
+    expect(html).toContain("bg-ink");
     expect(html).toContain("text-center");
   });
 });

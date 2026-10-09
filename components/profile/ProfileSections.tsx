@@ -22,10 +22,10 @@ export function TagSection({ title, labels }: { title: string; labels: string[] 
 
 export function cardCorner(tag: string): { icon: ReactNode; tone: string } {
   if (tag === "approach") {
-    return { icon: "↑", tone: "bg-[#f3ddd3] text-clay" };
+    return { icon: "↑", tone: "bg-lavender text-ink" };
   }
   if (tag === "session_vibe") {
-    return { icon: "◷", tone: "bg-[#dceee6] text-[#3f6d5c]" };
+    return { icon: "◷", tone: "bg-gold/35 text-ink" };
   }
   if (tag === "specialty") {
     return {
@@ -41,7 +41,7 @@ export function cardCorner(tag: string): { icon: ReactNode; tone: string } {
           <path d="M14.5 4.5V8H18" />
         </svg>
       ),
-      tone: "bg-[#f6e4d8] text-clay",
+      tone: "bg-clay/15 text-ink",
     };
   }
   return { icon: "✦", tone: "bg-ink/10 text-ink" };

@@ -84,7 +84,7 @@ export function DesktopProfile({
         {data.cards.length > 0 ? (
           <section>
             <h2 className="font-display text-4xl leading-tight tracking-tight text-ink">
-              Get to know <em className="text-clay italic">{data.givenName}</em>
+              Get to know <em className="text-clay">{data.givenName}</em>
             </h2>
             <p className="mt-1 text-sm text-mute">
               Honest answers, before you ever say hello.
@@ -97,7 +97,7 @@ export function DesktopProfile({
                   data-prompt-variant="desk"
                   className="px-5 py-5"
                 >
-                  <p className="font-display text-[15px] leading-snug text-clay italic">
+                  <p className="font-display text-[15px] leading-snug text-clay">
                     {card.prompt}
                   </p>
                   <p className="mt-3 font-display text-2xl leading-snug text-ink">

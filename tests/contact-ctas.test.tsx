@@ -47,8 +47,8 @@ describe("ContactCtas", () => {
     expect(html).toContain("env(safe-area-inset-bottom)");
     expect(html.match(/Free Consult/g)).toHaveLength(2);
     expect(html.match(/Book a Session/g)).toHaveLength(2);
-    expect(html).toContain("border-ink/15");
-    expect(html).toContain("bg-clay");
+    expect(html).toContain("border-ink");
+    expect(html).toContain("bg-ink");
     expect(html).toContain("whitespace-nowrap");
     expect(html).toContain("px-3");
     expect(html).not.toContain("pine");

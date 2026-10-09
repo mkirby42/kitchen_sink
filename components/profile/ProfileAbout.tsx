@@ -41,10 +41,10 @@ export function AboutPanel({
         <p className="text-[17px] leading-relaxed text-ink">{aboutCopy}</p>
       ) : null}
       <div
-        className={`${showAbout === false ? "mt-4" : "mt-5"} rounded-card bg-clay/10 px-5 py-5 sm:px-6`}
+        className={`${showAbout === false ? "mt-4" : "mt-5"} rounded-card bg-lavender px-5 py-5 sm:px-6`}
       >
         <Eyebrow>
-          How {givenName} <em className="italic">works</em>
+          How {givenName} <em>works</em>
         </Eyebrow>
         {formats.length > 0 ? (
           <ul className="mt-3 flex flex-wrap gap-2">

@@ -63,7 +63,9 @@ describe("home hero", () => {
     expect(html).toContain('href="/join"');
     expect(html).toContain("Log in");
     expect(html).toContain('href="/join?mode=signin"');
-    expect(html).toContain("bg-clay");
+    expect(html).toContain("bg-ink");
+    expect(html).toContain("bg-lavender");
+    expect(html).toContain("bg-gold");
     expect(html).not.toContain("My profile");
     expect(html).not.toContain("Upload therapist media");
     expect(html).not.toContain("Review queue");
@@ -88,7 +90,7 @@ describe("home hero", () => {
     expect(html).toContain("Why ");
     expect(html).toContain("Kitchen Sink?");
     expect(html).toContain("text-clay");
-    expect(html).toContain("italic");
+    expect(html).toContain("text-gold");
     expect(html).toContain("bg-ink");
     expect(html).toContain("The story behind the name and our Why.");
     expect(html).toContain("Read the story");
@@ -101,7 +103,7 @@ describe("home hero", () => {
     );
     expect(html.match(/target="_blank"/g)).toHaveLength(2);
     expect(html.match(/rel="noopener noreferrer"/g)).toHaveLength(2);
-    expect(html).toContain("bg-clay");
+    expect(html).toContain("bg-gold");
     expect(html).toContain("underline");
   });
 });

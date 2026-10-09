@@ -44,7 +44,7 @@ describe("join step design", () => {
   it("uses the white secondary pill for delete on edit", () => {
     const html = wizard({ editing: true });
     const button = html.match(/<button[^>]*>Delete profile<\/button>/);
-    expect(button?.[0]).toContain("border-ink/15");
+    expect(button?.[0]).toContain("border-ink");
     expect(button?.[0]).toContain("bg-paper");
     expect(button?.[0]).not.toContain("border-clay");
     expect(button?.[0]).not.toContain("bg-clay");
@@ -63,7 +63,7 @@ describe("join step design", () => {
     expect(editing).toContain("Save changes →");
   });
 
-  it("keeps the sliding-scale checkbox and the navy prompt switch", () => {
+  it("keeps the sliding-scale checkbox and the eggplant prompt switch", () => {
     const draft: JoinDraft = {
       name: "",
       credential: "",
@@ -102,6 +102,6 @@ describe("join step design", () => {
     expect(html).toContain("accent-ink");
     expect(html).toContain("bg-ink");
     expect(html).not.toContain("border-dashed");
-    expect(html).toContain("border-ink/15");
+    expect(html).toContain("border-ink");
   });
 });
