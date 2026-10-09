@@ -25,7 +25,7 @@ export function cardCorner(tag: string): { icon: ReactNode; tone: string } {
     return { icon: "↑", tone: "bg-lavender text-ink" };
   }
   if (tag === "session_vibe") {
-    return { icon: "◷", tone: "bg-gold/35 text-ink" };
+    return { icon: "◷", tone: "bg-gold/40 text-black" };
   }
   if (tag === "specialty") {
     return {

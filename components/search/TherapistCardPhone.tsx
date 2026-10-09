@@ -53,7 +53,7 @@ export function TherapistCardPhone({
           videoUrl={videoUrl}
         />
       ) : photoUrl ? (
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink">
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-black">
           {/* Public Storage URLs; next/image is out of scope this weekend. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -69,17 +69,17 @@ export function TherapistCardPhone({
           {portrait ? null : (
             <span
               aria-hidden
-              className="flex size-14 shrink-0 items-center justify-center rounded-full bg-clay font-display text-lg text-paper"
+              className="flex size-14 shrink-0 items-center justify-center rounded-full bg-ink font-sans text-lg font-semibold text-paper"
             >
               {initials}
             </span>
           )}
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <h2 className="font-display text-[2rem] leading-none font-bold tracking-tight text-ink">
+            <h2 className="font-sans text-[1.75rem] leading-none font-bold tracking-tight text-black">
               {name}
             </h2>
             {sample ? (
-              <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
+              <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-black">
                 SAMPLE
               </span>
             ) : null}
@@ -105,16 +105,14 @@ export function TherapistCardPhone({
 
         {prompt && answer ? (
           <div className="mt-5">
-            <p className="font-display text-[1.15rem] leading-snug text-clay">
-              {prompt}
-            </p>
-            <p className="mt-2 text-[15px] leading-relaxed text-ink">{answer}</p>
+            <p className="text-sm font-medium leading-snug text-ink">{prompt}</p>
+            <p className="mt-2 text-[15px] leading-relaxed text-body">{answer}</p>
           </div>
         ) : null}
 
         <Link
           href={href}
-          className="mt-6 flex w-full items-center justify-center rounded-full bg-ink px-6 py-3.5 text-center text-[15px] font-medium text-paper transition-colors hover:bg-ink/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          className="mt-6 flex w-full items-center justify-center rounded-full bg-ink px-6 py-3.5 text-center text-[15px] font-semibold text-paper transition-colors hover:bg-ink/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         >
           {knowLabel}
         </Link>

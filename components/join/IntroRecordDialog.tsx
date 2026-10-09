@@ -45,9 +45,9 @@ export function IntroRecordDialog({
         event.preventDefault();
         onClose();
       }}
-      className="m-auto w-[min(calc(100%-2rem),28rem)] rounded-card border-0 bg-paper p-6 text-ink shadow-overlay backdrop:bg-ink/40"
+      className="m-auto w-[min(calc(100%-2rem),28rem)] rounded-card border-0 bg-paper p-6 text-body shadow-overlay backdrop:bg-black/40"
     >
-      <h2 id={titleId} className="font-display text-3xl tracking-tight">
+      <h2 id={titleId} className="font-display text-[1.75rem] font-normal tracking-tight text-ink">
         Record intro
       </h2>
       <p className="mt-2 text-sm leading-6 text-mute">
@@ -59,7 +59,7 @@ export function IntroRecordDialog({
           src={reviewUrl}
           controls
           playsInline
-          className="mt-4 aspect-video w-full rounded-2xl bg-ink object-cover"
+          className="mt-4 aspect-video w-full rounded-2xl bg-black object-cover"
         />
       ) : (
         <video
@@ -67,7 +67,7 @@ export function IntroRecordDialog({
           muted
           playsInline
           autoPlay
-          className="mt-4 aspect-video w-full rounded-2xl bg-ink object-cover"
+          className="mt-4 aspect-video w-full rounded-2xl bg-black object-cover"
         />
       )}
       <p className="mt-3 text-sm text-mute" aria-live="polite">

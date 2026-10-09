@@ -117,7 +117,7 @@ export function FormMessage({ children }: { children: ReactNode }) {
   return (
     <p
       aria-live="polite"
-      className="mt-3 rounded-2xl bg-cream px-4 py-3 text-sm text-clay-dark"
+      className="mt-3 rounded-2xl bg-cream px-4 py-3 text-sm text-body"
     >
       {children}
     </p>

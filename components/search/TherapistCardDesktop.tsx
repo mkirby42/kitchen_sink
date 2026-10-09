@@ -99,7 +99,7 @@ export function TherapistCardDesktop({
       }
     >
       {portrait ? (
-        <div className="relative min-h-72 bg-ink">
+        <div className="relative min-h-72 bg-black">
           {videoUrl ? (
             <CardIntroVideo
               variant="portrait"
@@ -126,18 +126,18 @@ export function TherapistCardDesktop({
             {portrait ? null : (
               <span
                 aria-hidden
-                className="flex size-16 shrink-0 items-center justify-center rounded-full bg-clay font-display text-lg text-paper"
+                className="flex size-16 shrink-0 items-center justify-center rounded-full bg-ink font-sans text-lg font-semibold text-paper"
               >
                 {initials}
               </span>
             )}
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="font-display text-[2rem] leading-none font-medium tracking-tight text-ink lg:text-[2.6rem]">
+                <h2 className="font-sans text-[1.75rem] leading-none font-bold tracking-tight text-black lg:text-[2rem]">
                   {name}
                 </h2>
                 {sample ? (
-                  <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
+                  <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-black">
                     SAMPLE
                   </span>
                 ) : null}
@@ -161,16 +161,16 @@ export function TherapistCardDesktop({
 
         {prompt && answer ? (
           <div className="mt-6">
-            <p className="font-display text-[15px] text-clay">
+            <p className="text-sm font-medium leading-snug text-ink">
               <span aria-hidden className="mr-1.5">
                 ✦
               </span>
               {prompt}
             </p>
-            <p className="mt-2 font-display text-[1.65rem] leading-snug font-medium tracking-tight text-pretty text-ink lg:text-[1.85rem]">
+            <p className="mt-2 font-display text-[1.75rem] leading-snug font-normal tracking-tight text-pretty text-black lg:text-[2rem]">
               <span
                 aria-hidden
-                className="mr-1 inline-block translate-y-1 font-display text-[2.8rem] leading-none font-normal text-clay/25"
+                className="mr-1 inline-block translate-y-1 font-display text-[2.8rem] leading-none font-normal text-mute/35"
               >
                 “
               </span>
@@ -180,7 +180,7 @@ export function TherapistCardDesktop({
         ) : null}
 
         {hits ? (
-          <p className="mt-5 text-sm font-medium text-clay">{hits}</p>
+          <p className="mt-5 text-xs font-medium text-mute">{hits}</p>
         ) : null}
 
         {tags.length > 0 ? (
@@ -191,7 +191,7 @@ export function TherapistCardDesktop({
             {tags.map((label) => (
               <li
                 key={label}
-                className="rounded-full border border-line bg-paper px-3 py-1 text-[13px] text-ink"
+                className="rounded-full border border-line bg-paper px-3 py-1 text-[13px] font-medium text-ink"
               >
                 {modalityDisplayLabel(label)}
               </li>
@@ -204,7 +204,7 @@ export function TherapistCardDesktop({
             <div className="flex justify-end">
               <Link
                 href={href}
-                className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition-colors hover:bg-ink/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+                className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-semibold text-paper transition-colors hover:bg-ink/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
               >
                 {knowLabel}
                 <span aria-hidden>→</span>

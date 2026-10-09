@@ -32,13 +32,13 @@ export function AboutPanel({
 
   if (!aboutCopy && !logistics) return null;
   if (!logistics) {
-    return <p className="text-[17px] leading-relaxed text-ink">{aboutCopy}</p>;
+    return <p className="text-[17px] leading-relaxed text-body">{aboutCopy}</p>;
   }
 
   return (
     <div>
       {aboutCopy ? (
-        <p className="text-[17px] leading-relaxed text-ink">{aboutCopy}</p>
+        <p className="text-[17px] leading-relaxed text-body">{aboutCopy}</p>
       ) : null}
       <div
         className={`${showAbout === false ? "mt-4" : "mt-5"} rounded-card bg-lavender px-5 py-5 sm:px-6`}
@@ -56,7 +56,7 @@ export function AboutPanel({
           </ul>
         ) : null}
         {officeLines.length > 0 ? (
-          <address className="mt-3 text-sm text-ink not-italic">
+          <address className="mt-3 text-sm text-body not-italic">
             {officeLines.map((line, index) => (
               <span key={`${index}-${line}`} className="block">
                 {line}
@@ -70,29 +70,29 @@ export function AboutPanel({
               key={`${rate.service_type}-${rate.duration_minutes}`}
               className="flex items-baseline justify-between gap-4 py-3"
             >
-              <dt className="text-ink">
+              <dt className="text-mute">
                 {rate.service_type} session ({rate.duration_minutes} min)
               </dt>
-              <dd className="font-medium text-ink">
+              <dd className="font-medium text-body">
                 {formatUsdFromCents(rate.price_cents)}
               </dd>
             </div>
           ))}
           {sliding ? (
             <div className="flex items-baseline justify-between gap-4 py-3">
-              <dt className="text-ink">Sliding scale</dt>
-              <dd className="font-medium text-ink">{sliding}</dd>
+              <dt className="text-mute">Sliding scale</dt>
+              <dd className="font-medium text-body">{sliding}</dd>
             </div>
           ) : null}
           <div className="flex items-baseline justify-between gap-4 py-3">
-            <dt className="text-ink">In-network</dt>
-            <dd className="text-right font-medium text-ink">
+            <dt className="text-mute">In-network</dt>
+            <dd className="text-right font-medium text-body">
               {inNetwork.length > 0 ? inNetwork.join(" · ") : "None listed"}
             </dd>
           </div>
           <div className="flex items-baseline justify-between gap-4 py-3">
-            <dt className="text-ink">Out-of-network</dt>
-            <dd className="font-medium text-ink">
+            <dt className="text-mute">Out-of-network</dt>
+            <dd className="font-medium text-body">
               {superbill ? "Superbill provided" : "Not listed"}
             </dd>
           </div>

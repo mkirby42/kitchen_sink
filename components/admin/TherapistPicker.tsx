@@ -38,7 +38,7 @@ export function TherapistPicker({
                 >
                   <span className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <span className="min-w-0">
-                      <span className="block font-medium text-ink">{therapist.name}</span>
+                      <span className="block font-semibold text-black">{therapist.name}</span>
                       <span className="mt-0.5 block text-sm text-mute">
                         {therapistMeta(therapist)}
                       </span>

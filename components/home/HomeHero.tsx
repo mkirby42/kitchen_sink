@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { pageTitleClass, sectionTitleClass } from "@/components/ui/styles";
 import type { HomeAudience, HomePanel } from "@/lib/home";
 
 const audiences: { value: HomeAudience; label: string }[] = [
@@ -29,11 +30,11 @@ function AudiencePanel({
       tone={audience === "therapist" ? "lavender" : "paper"}
       className="mx-auto mt-8 w-full max-w-2xl px-6 py-10 sm:px-12 sm:py-12"
     >
-      <h2 className="text-center font-display text-[1.7rem] leading-snug tracking-tight text-ink sm:text-3xl">
-        {panel.title}
-      </h2>
+      <h2 className={`text-center text-ink ${sectionTitleClass}`}>{panel.title}</h2>
       {panel.body ? (
-        <p className="mx-auto mt-3 max-w-md text-center text-mute">{panel.body}</p>
+        <p className="mx-auto mt-3 max-w-md text-center text-base text-body">
+          {panel.body}
+        </p>
       ) : null}
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
         {panel.actions.map((action) => (
@@ -66,14 +67,12 @@ export function HomeHero({
 
   return (
     <main className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-24">
-      <Eyebrow className="text-center sm:text-xl">Kitchen Sink</Eyebrow>
-      <h1 className="mx-auto mt-4 max-w-4xl text-center font-display text-[clamp(2.15rem,5vw,4.35rem)] leading-[1.05] font-medium tracking-tight text-ink">
-        <span className="sm:whitespace-nowrap">
-          Bring everything. <em className="text-clay">And the</em>
-        </span>
-        <em className="block text-clay">kitchen sink.</em>
+      <Eyebrow className="text-center">Kitchen Sink</Eyebrow>
+      <h1 className={`mx-auto mt-4 max-w-4xl text-center ${pageTitleClass}`}>
+        <span className="sm:whitespace-nowrap">Bring everything. And the</span>
+        <span className="block">kitchen sink.</span>
       </h1>
-      <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-mute sm:text-lg">
+      <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-body sm:text-lg">
         Connect with a therapist you can bring everything — and the kitchen sink
         — to session.
       </p>

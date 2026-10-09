@@ -1,23 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Caprasimo, Nunito } from "next/font/google";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
 import { canonicalOrigin } from "@/lib/site";
 import "./globals.css";
 
-const caprasimo = Caprasimo({
+const dmSerif = DM_Serif_Display({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-caprasimo",
+  variable: "--font-dm-serif",
   display: "swap",
 });
 
-const nunito = Nunito({
+const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  variable: "--font-nunito",
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
@@ -50,7 +50,7 @@ export default async function RootLayout({
   ]);
 
   return (
-    <html lang="en" className={`${caprasimo.variable} ${nunito.variable}`}>
+    <html lang="en" className={`${dmSerif.variable} ${dmSans.variable}`}>
       <body className="min-h-screen antialiased">
         <SiteHeader initialNavUser={navUser} audience={audience} />
         {children}

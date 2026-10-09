@@ -37,7 +37,7 @@ describe("join step design", () => {
     expect(html).toContain("text-clay");
     expect(html).not.toContain("uppercase");
     expect(html).not.toContain("border-dashed");
-    expect(html).toContain("bg-clay");
+    expect(html).toContain("bg-ink");
     expect(html).toContain("Continue →");
   });
 

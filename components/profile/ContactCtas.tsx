@@ -102,7 +102,7 @@ export function ContactCtas({
             onClick={(event) => event.stopPropagation()}
           >
             <Eyebrow>Contact</Eyebrow>
-            <h2 id={titleId} className="mt-1 font-display text-2xl text-ink">
+            <h2 id={titleId} className="mt-1 font-display text-[1.75rem] font-normal tracking-tight text-ink">
               Reach {name}
             </h2>
             <p className="mt-1 text-sm text-mute">
@@ -114,7 +114,7 @@ export function ContactCtas({
                 <li key={item.kind}>
                   <a
                     href={item.href}
-                    className="flex items-center justify-between gap-3 rounded-2xl bg-cream px-4 py-3 text-ink hover:bg-line"
+                    className="flex items-center justify-between gap-3 rounded-2xl bg-cream px-4 py-3 text-body hover:bg-line"
                   >
                     <span>
                       <span className="block text-sm text-mute">{item.label}</span>

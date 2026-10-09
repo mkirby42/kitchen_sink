@@ -1,4 +1,4 @@
-import { buttonClass } from "@/components/ui/styles";
+import { buttonClass, sectionTitleClass } from "@/components/ui/styles";
 import { newsletter, newsletterLinkProps } from "@/lib/newsletter";
 
 function EnvelopeIcon() {
@@ -31,7 +31,7 @@ export function NewsletterWhy() {
       </p>
       <h2
         id="why-kitchen-sink-title"
-        className="mx-auto mt-4 max-w-3xl text-balance font-display text-[clamp(2.15rem,4.6vw,3.35rem)] leading-[1.12] font-medium tracking-tight text-paper"
+        className={`mx-auto mt-4 max-w-3xl text-balance text-paper ${sectionTitleClass}`}
       >
         Why <span className="text-gold">Kitchen Sink?</span>
       </h2>

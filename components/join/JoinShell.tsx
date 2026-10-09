@@ -47,7 +47,7 @@ export function JoinShell({
               <span
                 key={segment}
                 className={`h-1 w-8 rounded-full ${
-                  step && segment <= step ? "bg-clay" : "bg-line"
+                  step && segment <= step ? "bg-ink" : "bg-line"
                 }`}
               />
             ))}

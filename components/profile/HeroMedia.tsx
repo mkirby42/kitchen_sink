@@ -39,8 +39,8 @@ export function HeroMedia({
         data-hero-variant={variant}
         className={
           poster
-            ? "relative isolate overflow-hidden rounded-[1.75rem] bg-ink shadow-card"
-            : "relative isolate overflow-hidden rounded-[2rem] bg-ink shadow-sm"
+            ? "relative isolate overflow-hidden rounded-[1.75rem] bg-black shadow-card"
+            : "relative isolate overflow-hidden rounded-[2rem] bg-black shadow-sm"
         }
       >
         <div
@@ -69,10 +69,10 @@ export function HeroMedia({
             />
           ) : (
             <div
-              className="absolute inset-0 flex items-center justify-center bg-ink"
+              className="absolute inset-0 flex items-center justify-center bg-black"
               aria-hidden
             >
-              <span className="font-display text-7xl tracking-wide text-paper/80">
+              <span className="font-sans text-7xl font-semibold tracking-wide text-paper/80">
                 {initials}
               </span>
             </div>
@@ -109,11 +109,11 @@ export function HeroMedia({
           {poster || showVideo ? null : (
             <>
               <div
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink/75 via-ink/40 via-[35%] to-transparent"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/75 via-black/40 via-[35%] to-transparent"
                 aria-hidden
               />
               <div className="absolute inset-x-0 bottom-0 p-5">
-                <h1 className="font-display text-4xl leading-tight tracking-tight text-paper drop-shadow-[0_1px_8px_rgba(60,32,102,0.65)]">
+                <h1 className="font-sans text-[1.75rem] leading-tight font-bold tracking-tight text-paper drop-shadow-[0_1px_8px_rgba(23,23,23,0.65)] sm:text-[2rem]">
                   {name}
                 </h1>
                 {licenseCaptions.length > 0 ? (
@@ -121,7 +121,7 @@ export function HeroMedia({
                     {licenseCaptions.map((line) => (
                       <p
                         key={line}
-                        className="text-sm leading-snug text-paper/95 drop-shadow-[0_1px_6px_rgba(60,32,102,0.7)]"
+                        className="text-sm leading-snug text-paper/95 drop-shadow-[0_1px_6px_rgba(23,23,23,0.7)]"
                       >
                         {line}
                       </p>
@@ -138,7 +138,7 @@ export function HeroMedia({
         <div data-hero-details className="mt-4">
           {showVideo ? (
             <>
-              <h1 className="font-display text-4xl leading-tight tracking-tight text-ink">
+              <h1 className="font-sans text-[1.75rem] leading-none font-bold tracking-tight text-black sm:text-[2rem]">
                 {name}
               </h1>
               {licenseCaptions.length > 0 ? (

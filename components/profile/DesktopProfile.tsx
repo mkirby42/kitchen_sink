@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/Card";
+import { sectionTitleClass } from "@/components/ui/styles";
 import { initials, officeAddressLines } from "@/lib/therapists/display";
 import {
   consultBookActions,
@@ -20,6 +21,7 @@ import { ProfileHeading } from "./ProfileHeading";
 import { ProfileTabs } from "./ProfileTabs";
 import { ReviewsPanel } from "./ReviewsPanel";
 import { possessive } from "./copy";
+import { promptAnswerClass, promptLabelClass } from "./prompt-type";
 
 export function DesktopProfile({
   data,
@@ -83,7 +85,7 @@ export function DesktopProfile({
       <div className="min-w-0">
         {data.cards.length > 0 ? (
           <section>
-            <h2 className="font-display text-4xl leading-tight tracking-tight text-ink">
+            <h2 className={`text-ink ${sectionTitleClass}`}>
               Get to know <em className="text-clay">{data.givenName}</em>
             </h2>
             <p className="mt-1 text-sm text-mute">
@@ -97,12 +99,8 @@ export function DesktopProfile({
                   data-prompt-variant="desk"
                   className="px-5 py-5"
                 >
-                  <p className="font-display text-[15px] leading-snug text-clay">
-                    {card.prompt}
-                  </p>
-                  <p className="mt-3 font-display text-2xl leading-snug text-ink">
-                    {card.answer}
-                  </p>
+                  <p className={promptLabelClass}>{card.prompt}</p>
+                  <p className={promptAnswerClass}>{card.answer}</p>
                 </Card>
               ))}
             </ul>

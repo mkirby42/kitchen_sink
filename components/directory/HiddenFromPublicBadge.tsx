@@ -8,7 +8,7 @@ export function HiddenFromPublicBadge({
   if (variant === "banner") {
     return (
       <p
-        className="relative z-10 mb-4 rounded-2xl border border-clay/40 bg-paper px-4 py-3 text-sm font-medium text-ink"
+        className="relative z-10 mb-4 rounded-2xl border border-ink/30 bg-paper px-4 py-3 text-sm font-medium text-ink"
         role="status"
       >
         {ADMIN_ONLY_HIDDEN_LABEL}
@@ -18,7 +18,7 @@ export function HiddenFromPublicBadge({
 
   return (
     <p
-      className="mt-2 inline-flex rounded-full border border-clay/50 bg-cream px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink"
+      className="mt-2 inline-flex rounded-full border border-ink/30 bg-cream px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink"
       role="status"
     >
       {ADMIN_ONLY_HIDDEN_LABEL}

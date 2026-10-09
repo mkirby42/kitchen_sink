@@ -40,7 +40,7 @@ export function ReviewComposer({
 export function SessionHeading({ name }: { name: string }) {
   return (
     <div>
-      <h2 className="font-display text-[1.7rem] leading-tight tracking-tight text-ink">
+      <h2 className="font-display text-[1.75rem] leading-tight font-normal tracking-tight text-ink sm:text-[2.125rem]">
         How was your session with <em className="text-clay">{name}</em>?
       </h2>
       <p className="mt-2 text-sm text-mute">
@@ -143,13 +143,13 @@ function ReviewForm({
           value={body}
           placeholder="Optional — share as much or as little as you'd like."
           onChange={(event) => setBody(event.target.value)}
-          className="mt-3 w-full resize-y rounded-2xl border border-line bg-paper px-4 py-3 text-sm leading-relaxed text-ink outline-none placeholder:text-mute/70 focus:border-clay"
+          className="mt-3 w-full resize-y rounded-2xl border border-line bg-paper px-4 py-3 text-sm leading-relaxed text-body outline-none placeholder:text-mute/70 focus:border-ink"
         />
       </label>
 
       <div className="mt-4 border-t border-line pt-4">
         <label className="block">
-          <span className="text-sm text-ink">Display name</span>
+          <span className="text-sm font-medium text-ink">Display name</span>
           <input
             type="text"
             value={authorName}
@@ -160,7 +160,7 @@ function ReviewForm({
             className="mt-1 w-full border-0 border-b border-line bg-transparent px-0 py-2 text-base outline-none focus:border-clay disabled:opacity-40"
           />
         </label>
-        <label className="mt-3 flex items-center gap-2 text-sm text-ink">
+        <label className="mt-3 flex items-center gap-2 text-sm text-body">
           <input
             type="checkbox"
             checked={anonymous}

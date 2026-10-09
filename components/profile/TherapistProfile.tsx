@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { eyebrowClass } from "@/components/ui/styles";
+import { eyebrowClass, sectionTitleClass } from "@/components/ui/styles";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { initials, officeAddressLines } from "@/lib/therapists/display";
 import {
@@ -86,7 +86,7 @@ export function TherapistProfile({
       <div className="flex items-center justify-between gap-3">
         <Link
           href={backHref}
-          className="inline-flex items-center gap-1.5 text-sm text-ink/80 hover:text-ink"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-clay hover:text-clay-dark"
           aria-label="Back to search"
         >
           <svg
@@ -137,7 +137,7 @@ export function TherapistProfile({
                 {data.education.length > 0 ? (
                   <div>
                     <h2 className={eyebrowClass}>Education</h2>
-                    <ul className="mt-2 space-y-1 text-sm text-ink">
+                    <ul className="mt-2 space-y-1 text-sm text-body">
                       {data.education.map((item) => (
                         <li key={item}>{item}</li>
                       ))}
@@ -147,7 +147,7 @@ export function TherapistProfile({
                 {data.credentials.length > 0 ? (
                   <div>
                     <h2 className={eyebrowClass}>Credentials</h2>
-                    <ul className="mt-2 space-y-1 text-sm text-ink">
+                    <ul className="mt-2 space-y-1 text-sm text-body">
                       {data.credentials.map((item) => (
                         <li key={item}>{item}</li>
                       ))}
@@ -179,7 +179,7 @@ export function TherapistProfile({
 
           {data.cards.length > 0 ? (
             <section className="mt-10">
-              <h2 className="font-display text-3xl tracking-tight text-ink">
+              <h2 className={`text-ink ${sectionTitleClass}`}>
                 Get to know <em className="text-clay">{data.givenName}</em>
               </h2>
               <p className="mt-1 text-sm text-mute">

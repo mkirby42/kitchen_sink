@@ -14,7 +14,7 @@ import { createClient } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 
 function navClass(active: boolean) {
-  return active ? "font-medium text-ink" : "text-ink/80 hover:text-ink";
+  return active ? "font-medium text-ink" : "font-normal text-ink/75 hover:text-ink";
 }
 
 function Sparkle() {
@@ -149,7 +149,7 @@ export function SiteHeader({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href={routes.home}
-            className="shrink-0 font-display text-2xl tracking-tight text-ink"
+            className="shrink-0 font-sans text-2xl font-bold tracking-tight text-ink"
           >
             Kitchen Sink
             <Sparkle />
@@ -219,7 +219,7 @@ export function SiteHeader({
                 />
                 <Link
                   href={routes.joinSignIn}
-                  className="inline-flex items-center gap-1.5 text-ink/80 hover:text-ink"
+                  className="inline-flex items-center gap-1.5 font-normal text-ink/75 hover:text-ink"
                 >
                   <PersonIcon />
                   Therapist log in
