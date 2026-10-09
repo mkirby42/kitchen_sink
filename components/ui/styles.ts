@@ -68,7 +68,7 @@ export const textLinkClass = "text-sm font-medium text-clay hover:text-clay-dark
 
 export function tagClass(selected: boolean, className?: string) {
   return cx(
-    "rounded-full px-4 py-2 text-[15px] leading-snug whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50 sm:text-[17px]",
+    "max-w-full min-w-0 rounded-full px-4 py-2 text-[15px] leading-snug break-words whitespace-normal disabled:cursor-not-allowed disabled:opacity-50 sm:text-[17px]",
     selected
       ? "bg-ink font-medium text-paper hover:bg-ink-dark"
       : "border border-line bg-paper font-normal text-ink hover:border-ink/30",
