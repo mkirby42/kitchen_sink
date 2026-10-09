@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { TextArea, TextField } from "@/components/ui/Field";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Tag } from "@/components/ui/Tag";
-import { buttonClass, eyebrowClass, fieldLabelClass } from "@/components/ui/styles";
+import { buttonClass, eyebrowClass, fieldLabelClass, tagClass } from "@/components/ui/styles";
 
 function html(node: ReactElement) {
   return renderToStaticMarkup(node);
@@ -97,6 +97,12 @@ describe("shared ui", () => {
     );
     expect(tag).toContain("rounded-full");
     expect(tag).toContain("bg-ink");
+    expect(tag).toContain("max-w-full");
+    expect(tag).toContain("whitespace-normal");
+    expect(tag).not.toContain("whitespace-nowrap");
+    expect(tagClass(false)).toContain("max-w-full");
+    expect(tagClass(false)).toContain("min-w-0");
+    expect(tagClass(false)).not.toContain("whitespace-nowrap");
     expect(tag).toContain('aria-pressed="true"');
 
     const field = html(

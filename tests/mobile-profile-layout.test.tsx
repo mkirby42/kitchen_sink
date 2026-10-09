@@ -194,6 +194,23 @@ describe("phone profile layout", () => {
     expect(html).not.toContain("Hinge");
   });
 
+  it("wraps a long approach pill inside the phone column", () => {
+    const html = render();
+    const phoneTree = html.slice(
+      html.indexOf('data-profile-layout="phone"'),
+      html.indexOf('data-profile-layout="desk"'),
+    );
+    const label = "Acceptance and Commitment Therapy (ACT)";
+    const at = phoneTree.indexOf(label);
+    expect(at).toBeGreaterThan(-1);
+    const open = phoneTree.lastIndexOf("<li", at);
+    const li = phoneTree.slice(open, phoneTree.indexOf(">", open));
+    expect(li).toContain("max-w-full");
+    expect(li).toContain("min-w-0");
+    expect(li).toContain("whitespace-normal");
+    expect(li).not.toContain("whitespace-nowrap");
+  });
+
   it("keeps a photo-only and a video-only profile on that same lead card", () => {
     const photo = render({ ...base, videoUrl: null });
     expect(photo.match(/data-hero-media/g)).toHaveLength(2);
