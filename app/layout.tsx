@@ -1,10 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, DM_Serif_Display } from "next/font/google";
+import { Caprasimo, DM_Sans, DM_Serif_Display } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
 import { canonicalOrigin } from "@/lib/site";
 import "./globals.css";
+
+const caprasimo = Caprasimo({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-caprasimo",
+  display: "swap",
+});
 
 const dmSerif = DM_Serif_Display({
   weight: "400",
@@ -50,7 +57,10 @@ export default async function RootLayout({
   ]);
 
   return (
-    <html lang="en" className={`${dmSerif.variable} ${dmSans.variable}`}>
+    <html
+      lang="en"
+      className={`${caprasimo.variable} ${dmSerif.variable} ${dmSans.variable}`}
+    >
       <body className="min-h-screen antialiased">
         <SiteHeader initialNavUser={navUser} audience={audience} />
         {children}

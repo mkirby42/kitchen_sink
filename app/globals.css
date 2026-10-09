@@ -3,6 +3,8 @@
 @theme {
   --font-display: var(--font-dm-serif), Georgia, "Iowan Old Style", serif;
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Brand wordmark only. Headlines stay DM Serif Display. */
+  --font-logo: var(--font-caprasimo), Georgia, "Iowan Old Style", serif;
   /* Warm cream page. */
   --color-cream: #fff9e8;
   /* White cards, filter panels, profile surfaces. */
@@ -46,6 +48,13 @@ body {
 .font-display,
 .font-display em {
   font-style: normal;
+  font-synthesis: none;
+}
+
+/* Caprasimo is the wordmark only. The face is roman, weight 400. */
+.font-logo {
+  font-style: normal;
+  font-weight: 400;
   font-synthesis: none;
 }
 

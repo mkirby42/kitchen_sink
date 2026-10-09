@@ -173,6 +173,18 @@ describe("site header", () => {
     expect(therapist).not.toContain("Admin only");
   });
 
+  it("renders the Kitchen Sink wordmark in the brand face", () => {
+    const html = renderToStaticMarkup(
+      createElement(SiteHeader, { initialNavUser: null }),
+    );
+    expect(html).toContain(
+      'class="shrink-0 font-logo text-2xl tracking-tight text-ink"',
+    );
+    expect(html).toContain(">Kitchen Sink<");
+    expect(html).not.toContain("font-sans text-2xl");
+    expect(html).not.toContain("font-bold");
+  });
+
   it("omits Interest for a signed-out visitor", () => {
     const html = renderToStaticMarkup(
       createElement(SiteHeader, { initialNavUser: null }),
