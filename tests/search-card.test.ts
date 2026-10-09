@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 import { TherapistCard } from "@/components/search/TherapistCard";
 import { credentialTitle } from "@/lib/therapists/display";
 import { ADMIN_ONLY_HIDDEN_LABEL } from "@/lib/therapists/listing";
@@ -206,17 +207,20 @@ describe("Find therapist card", () => {
     expect(withCard).toContain("who I work best with...");
     expect(withCard).toContain("College students and early-career professionals.");
     const narrow = phone(withCard);
-    expect(narrow).toContain("text-sm font-medium leading-snug text-ink");
-    expect(narrow).toContain("text-[15px] leading-relaxed text-body");
+    expect(narrow).toContain(promptLabelClass);
+    expect(narrow).toContain(promptAnswerClass);
+    expect(narrow).not.toContain("text-[15px] leading-relaxed text-body");
     const promptAt = narrow.indexOf("who I work best with...");
     const answerAt = narrow.indexOf("College students and early-career professionals.");
     const ctaAt = narrow.indexOf("Get to know Maya");
     expect(promptAt).toBeGreaterThan(-1);
     expect(answerAt).toBeGreaterThan(promptAt);
     expect(ctaAt).toBeGreaterThan(answerAt);
-    expect(desk(withCard)).toContain("text-sm font-medium leading-snug text-ink");
-    expect(desk(withCard)).toContain("font-display text-[1.75rem]");
-    expect(desk(withCard)).toContain("text-black");
+    const widePeek = desk(withCard);
+    expect(widePeek).toContain(promptLabelClass);
+    expect(widePeek).toContain(promptAnswerClass);
+    expect(widePeek).not.toContain("✦");
+    expect(widePeek).not.toContain("“");
 
     const blank = render({
       card_prompt: "   ",
@@ -254,8 +258,10 @@ describe("Find therapist card", () => {
     expect(wide).toContain("→");
     expect(wide).toContain("who I work best with...");
     expect(wide).toContain("I help college students find their way.");
-    expect(wide).toContain("✦");
-    expect(wide).toContain("“");
+    expect(wide).toContain(promptLabelClass);
+    expect(wide).toContain(promptAnswerClass);
+    expect(wide).not.toContain("✦");
+    expect(wide).not.toContain("“");
     expect(wide).toContain("object-cover");
     expect(wide).toContain("1 of 1 tag");
     expect(wide).not.toContain("intro.mp4");

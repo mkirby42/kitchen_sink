@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
+import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 import { modalityDisplayLabel } from "@/lib/tags/modality-display";
 
 function CameraIcon() {
@@ -161,21 +162,8 @@ export function TherapistCardDesktop({
 
         {prompt && answer ? (
           <div className="mt-6">
-            <p className="text-sm font-medium leading-snug text-ink">
-              <span aria-hidden className="mr-1.5">
-                ✦
-              </span>
-              {prompt}
-            </p>
-            <p className="mt-2 font-display text-[1.75rem] leading-snug font-normal tracking-tight text-pretty text-black lg:text-[2rem]">
-              <span
-                aria-hidden
-                className="mr-1 inline-block translate-y-1 font-display text-[2.8rem] leading-none font-normal text-mute/35"
-              >
-                “
-              </span>
-              {answer}
-            </p>
+            <p className={promptLabelClass}>{prompt}</p>
+            <p className={promptAnswerClass}>{answer}</p>
           </div>
         ) : null}
 

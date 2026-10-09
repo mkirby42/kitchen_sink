@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
+import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 
 const formatPillClass =
   "inline-flex items-center rounded-full border border-line bg-cream px-3 py-1 text-[13px] leading-none text-mute";
@@ -105,8 +106,8 @@ export function TherapistCardPhone({
 
         {prompt && answer ? (
           <div className="mt-5">
-            <p className="text-sm font-medium leading-snug text-ink">{prompt}</p>
-            <p className="mt-2 text-[15px] leading-relaxed text-body">{answer}</p>
+            <p className={promptLabelClass}>{prompt}</p>
+            <p className={promptAnswerClass}>{answer}</p>
           </div>
         ) : null}
 
