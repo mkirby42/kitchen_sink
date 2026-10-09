@@ -7,7 +7,7 @@ export function ProfileHeading({
 }) {
   return (
     <h2 className="font-display text-3xl leading-tight tracking-tight text-ink md:text-4xl">
-      {lead} <em className="text-clay italic">{accent}</em>
+      {lead} <em className="text-clay">{accent}</em>
     </h2>
   );
 }

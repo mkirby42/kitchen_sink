@@ -137,7 +137,7 @@ export function TherapistCardDesktop({
                   {name}
                 </h2>
                 {sample ? (
-                  <span className="shrink-0 rounded-full bg-[#f3dc6b] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
+                  <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
                     SAMPLE
                   </span>
                 ) : null}
@@ -161,7 +161,7 @@ export function TherapistCardDesktop({
 
         {prompt && answer ? (
           <div className="mt-6">
-            <p className="font-display text-[15px] text-clay italic">
+            <p className="font-display text-[15px] text-clay">
               <span aria-hidden className="mr-1.5">
                 ✦
               </span>
@@ -170,7 +170,7 @@ export function TherapistCardDesktop({
             <p className="mt-2 font-display text-[1.65rem] leading-snug font-medium tracking-tight text-pretty text-ink lg:text-[1.85rem]">
               <span
                 aria-hidden
-                className="mr-1 inline-block translate-y-1 font-display text-[2.8rem] leading-none font-normal text-[#c5cedc]"
+                className="mr-1 inline-block translate-y-1 font-display text-[2.8rem] leading-none font-normal text-clay/25"
               >
                 “
               </span>

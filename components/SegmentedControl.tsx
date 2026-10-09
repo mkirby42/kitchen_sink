@@ -2,7 +2,7 @@
 
 import { SegmentedControl as UiSegmentedControl } from "@/components/ui/SegmentedControl";
 
-/** Header-sized navy switch. Same component as the homepage control. */
+/** Header-sized eggplant switch. Same component as the homepage control. */
 export function SegmentedControl<T extends string>(props: {
   label: string;
   value: T;

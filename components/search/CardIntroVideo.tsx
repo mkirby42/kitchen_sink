@@ -173,7 +173,7 @@ function PortraitIntro({
           void videoRef.current?.play();
         }}
         aria-label={watchLabel}
-        className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2.5 rounded-full bg-paper py-1.5 pr-4 pl-1.5 text-sm font-medium text-ink shadow-[0_10px_28px_rgb(27_39_68/0.2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
+        className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2.5 rounded-full bg-paper py-1.5 pr-4 pl-1.5 text-sm font-medium text-ink shadow-[0_10px_28px_rgb(60_32_102/0.2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
       >
         <span
           className="flex size-8 items-center justify-center rounded-full bg-clay"

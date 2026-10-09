@@ -165,7 +165,7 @@ function ReviewForm({
             type="checkbox"
             checked={anonymous}
             onChange={(event) => setAnonymous(event.target.checked)}
-            className="accent-clay"
+            className="accent-ink"
           />
           Post anonymously
         </label>
@@ -175,7 +175,7 @@ function ReviewForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-clay px-6 py-3 text-sm font-semibold text-paper hover:bg-clay-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper hover:bg-ink-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? "Please wait…" : "Submit for review"}
         </button>

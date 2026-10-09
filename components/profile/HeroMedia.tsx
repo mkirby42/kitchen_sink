@@ -113,7 +113,7 @@ export function HeroMedia({
                 aria-hidden
               />
               <div className="absolute inset-x-0 bottom-0 p-5">
-                <h1 className="font-display text-4xl leading-tight tracking-tight text-paper drop-shadow-[0_1px_8px_rgba(27,39,68,0.65)]">
+                <h1 className="font-display text-4xl leading-tight tracking-tight text-paper drop-shadow-[0_1px_8px_rgba(60,32,102,0.65)]">
                   {name}
                 </h1>
                 {licenseCaptions.length > 0 ? (
@@ -121,7 +121,7 @@ export function HeroMedia({
                     {licenseCaptions.map((line) => (
                       <p
                         key={line}
-                        className="text-sm leading-snug text-paper/95 drop-shadow-[0_1px_6px_rgba(27,39,68,0.7)]"
+                        className="text-sm leading-snug text-paper/95 drop-shadow-[0_1px_6px_rgba(60,32,102,0.7)]"
                       >
                         {line}
                       </p>

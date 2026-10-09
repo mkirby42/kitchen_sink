@@ -169,7 +169,7 @@ function StateLicensePicker({
                   onClick={() => choose(item.code)}
                   className={`flex w-full items-baseline justify-between gap-3 px-4 py-2 text-left text-sm ${
                     index === active
-                      ? "bg-clay/10 text-ink"
+                      ? "bg-lavender text-ink"
                       : "text-ink hover:bg-cream"
                   }`}
                 >

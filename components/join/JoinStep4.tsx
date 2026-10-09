@@ -96,7 +96,7 @@ export function JoinStep4({
                 ✦
               </span>
               <div className="min-w-0 flex-1">
-                <p className="font-display italic text-clay">{card.prompt}</p>
+                <p className="font-display text-clay">{card.prompt}</p>
                 <textarea
                   rows={2}
                   value={card.answer}
@@ -155,7 +155,7 @@ export function JoinStep4({
               onClick={() => addPrompt(item.prompt, item.tag)}
               className="flex w-full items-center justify-between gap-4 rounded-box bg-cream px-5 py-3 text-left disabled:opacity-50"
             >
-              <span className="font-display italic text-clay">{item.prompt}</span>
+              <span className="font-display text-clay">{item.prompt}</span>
               <span
                 className="grid size-8 shrink-0 place-items-center rounded-full bg-paper text-lg text-clay"
                 aria-hidden

@@ -206,7 +206,7 @@ describe("Find therapist card", () => {
     expect(withCard).toContain("who I work best with...");
     expect(withCard).toContain("College students and early-career professionals.");
     const narrow = phone(withCard);
-    expect(narrow).toContain("font-display text-[1.15rem] leading-snug text-clay italic");
+    expect(narrow).toContain("font-display text-[1.15rem] leading-snug text-clay");
     expect(narrow).toContain("text-[15px] leading-relaxed text-ink");
     const promptAt = narrow.indexOf("who I work best with...");
     const answerAt = narrow.indexOf("College students and early-career professionals.");
@@ -214,7 +214,7 @@ describe("Find therapist card", () => {
     expect(promptAt).toBeGreaterThan(-1);
     expect(answerAt).toBeGreaterThan(promptAt);
     expect(ctaAt).toBeGreaterThan(answerAt);
-    expect(desk(withCard)).toContain("font-display text-[15px] text-clay italic");
+    expect(desk(withCard)).toContain("font-display text-[15px] text-clay");
 
     const blank = render({
       card_prompt: "   ",

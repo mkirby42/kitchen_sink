@@ -21,7 +21,7 @@ function Sparkle() {
   return (
     <svg
       viewBox="0 0 16 16"
-      className="ml-1 inline-block h-[0.55em] w-[0.55em] -translate-y-[0.28em] text-clay"
+      className="ml-1 inline-block h-[0.55em] w-[0.55em] -translate-y-[0.28em] text-gold"
       aria-hidden
     >
       <path

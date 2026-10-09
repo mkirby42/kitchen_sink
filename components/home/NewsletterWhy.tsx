@@ -17,7 +17,7 @@ function EnvelopeIcon() {
   );
 }
 
-/** Navy newsletter band under the homepage audience card. */
+/** Eggplant newsletter band under the homepage audience card. */
 export function NewsletterWhy() {
   return (
     <section
@@ -25,15 +25,15 @@ export function NewsletterWhy() {
       aria-labelledby="why-kitchen-sink-title"
       className="mt-16 rounded-card bg-ink px-6 py-14 text-center sm:mt-20 sm:px-12 sm:py-16"
     >
-      <p className="inline-flex items-center justify-center gap-2 text-[0.68rem] font-semibold tracking-[0.22em] text-clay uppercase">
+      <p className="inline-flex items-center justify-center gap-2 text-[0.68rem] font-semibold tracking-[0.22em] text-gold uppercase">
         <EnvelopeIcon />
         From the newsletter
       </p>
       <h2
         id="why-kitchen-sink-title"
-        className="mx-auto mt-4 max-w-3xl text-balance font-display text-[clamp(2.15rem,4.6vw,3.35rem)] leading-[1.12] font-medium tracking-tight text-paper italic"
+        className="mx-auto mt-4 max-w-3xl text-balance font-display text-[clamp(2.15rem,4.6vw,3.35rem)] leading-[1.12] font-medium tracking-tight text-paper"
       >
-        Why <span className="text-clay">Kitchen Sink?</span>
+        Why <span className="text-gold">Kitchen Sink?</span>
       </h2>
       <p className="mx-auto mt-3 max-w-md text-base text-paper/75 sm:text-lg">
         The story behind the name and our Why.
@@ -42,7 +42,7 @@ export function NewsletterWhy() {
         <a
           href={newsletter.story}
           {...newsletterLinkProps}
-          className={buttonClass("primary")}
+          className={buttonClass("gold")}
         >
           Read the story
           <span aria-hidden="true">→</span>

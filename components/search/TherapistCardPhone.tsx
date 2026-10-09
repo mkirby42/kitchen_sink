@@ -3,7 +3,7 @@ import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 
 const formatPillClass =
-  "inline-flex items-center rounded-full border border-[#e3dcd2] bg-[#f3efe8] px-3 py-1 text-[13px] leading-none text-[#6f695f]";
+  "inline-flex items-center rounded-full border border-line bg-cream px-3 py-1 text-[13px] leading-none text-mute";
 
 function FormatPill({ label }: { label: string }) {
   return <span className={formatPillClass}>{label}</span>;
@@ -79,7 +79,7 @@ export function TherapistCardPhone({
               {name}
             </h2>
             {sample ? (
-              <span className="shrink-0 rounded-full bg-[#f3dc6b] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
+              <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
                 SAMPLE
               </span>
             ) : null}
@@ -105,7 +105,7 @@ export function TherapistCardPhone({
 
         {prompt && answer ? (
           <div className="mt-5">
-            <p className="font-display text-[1.15rem] leading-snug text-clay italic">
+            <p className="font-display text-[1.15rem] leading-snug text-clay">
               {prompt}
             </p>
             <p className="mt-2 text-[15px] leading-relaxed text-ink">{answer}</p>

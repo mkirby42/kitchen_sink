@@ -55,7 +55,7 @@ export function MediaSlot({
               />
             )
           ) : (
-            <span className="text-2xl text-clay/70" aria-hidden>
+            <span className="text-2xl text-clay" aria-hidden>
               {kind === "photo" ? "+" : "▶"}
             </span>
           )}

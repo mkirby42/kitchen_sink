@@ -48,7 +48,7 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <Eyebrow>Ops</Eyebrow>
-      <h1 className="mt-1 font-display text-2xl leading-snug tracking-tight text-clay">
+      <h1 className="mt-1 font-display text-2xl leading-snug tracking-tight text-ink">
         Review queue
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">

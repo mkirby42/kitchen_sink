@@ -26,6 +26,7 @@ function AudiencePanel({
     <Card
       data-audience={audience}
       hidden={!active}
+      tone={audience === "therapist" ? "lavender" : "paper"}
       className="mx-auto mt-8 w-full max-w-2xl px-6 py-10 sm:px-12 sm:py-12"
     >
       <h2 className="text-center font-display text-[1.7rem] leading-snug tracking-tight text-ink sm:text-3xl">
@@ -39,7 +40,11 @@ function AudiencePanel({
           <Button
             key={action.label}
             href={action.href}
-            variant={action.variant}
+            variant={
+              audience === "therapist" && action.variant === "primary"
+                ? "gold"
+                : action.variant
+            }
           >
             {action.label}
           </Button>

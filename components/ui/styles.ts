@@ -2,7 +2,7 @@ export function cx(...parts: Array<string | false | null | undefined>) {
   return parts.filter(Boolean).join(" ");
 }
 
-/** Serif clay line. Sentence case. Replaces tiny all-caps kickers. */
+/** Caprasimo violet line. Sentence case. Replaces tiny all-caps kickers. */
 export const eyebrowClass = "font-display text-lg leading-snug text-clay";
 
 /** Sentence-case field label. Not tracking-wide capitals. */
@@ -29,8 +29,12 @@ const buttonSizes = {
 } as const;
 
 const buttonVariants = {
-  primary: "bg-clay text-paper hover:bg-clay-dark",
-  secondary: "border border-ink/15 bg-paper text-ink hover:border-ink/30",
+  /** Eggplant fill. Light surfaces, including the find CTA. */
+  primary: "bg-ink text-paper hover:bg-ink-dark",
+  /** Mustard fill, eggplant label. Newsletter band and the lavender therapist card. */
+  gold: "bg-gold text-ink hover:bg-gold-dark",
+  /** Eggplant outline on white. */
+  secondary: "border border-ink bg-paper text-ink hover:bg-lavender",
 } as const;
 
 export type ButtonVariant = keyof typeof buttonVariants;
@@ -44,15 +48,15 @@ export function buttonClass(
   return cx(buttonBase, buttonSizes[size], buttonVariants[variant], className);
 }
 
-/** Clay text link. Same weight as the pill buttons. */
+/** Violet text link. Same weight as the pill buttons. */
 export const textLinkClass = "text-sm font-medium text-clay hover:text-clay-dark";
 
 export function tagClass(selected: boolean, className?: string) {
   return cx(
     "rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50",
     selected
-      ? "bg-clay text-paper hover:bg-clay-dark"
-      : "border border-line bg-paper text-ink hover:border-ink/20",
+      ? "bg-ink text-paper hover:bg-ink-dark"
+      : "border border-line bg-paper text-ink hover:border-ink/30",
     className,
   );
 }
@@ -83,5 +87,5 @@ export function segmentOptionClass(selected: boolean, size: "md" | "sm" = "md") 
   const pad = size === "sm" ? "px-3 py-1 text-xs" : "px-5 py-2.5 text-sm";
   return selected
     ? `rounded-full bg-ink text-center font-medium text-paper ${pad}`
-    : `rounded-full text-center font-medium text-ink/65 hover:text-ink ${pad}`;
+    : `rounded-full text-center font-medium text-ink/80 hover:text-ink ${pad}`;
 }

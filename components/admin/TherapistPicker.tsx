@@ -33,7 +33,7 @@ export function TherapistPicker({
                   aria-pressed={active}
                   onClick={() => onSelect(therapist.id)}
                   className={`w-full px-4 py-3 text-left focus-visible:ring-2 focus-visible:ring-clay focus-visible:outline-none focus-visible:ring-inset ${
-                    active ? "bg-clay/10" : "hover:bg-cream"
+                    active ? "bg-lavender" : "hover:bg-cream"
                   }`}
                 >
                   <span className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

@@ -24,7 +24,7 @@ export function DesktopPractice({
       <Card className="mt-4 px-5 py-5 sm:px-6">
         {specialties.length > 0 ? (
           <div>
-            <h3 className="font-display text-lg italic text-clay">
+            <h3 className="font-display text-lg text-clay">
               Areas of Interest
             </h3>
             <ul className="mt-3 flex flex-wrap gap-2">
@@ -41,7 +41,7 @@ export function DesktopPractice({
         ) : null}
         {modalities.length > 0 ? (
           <div className={specialties.length > 0 ? "mt-5" : undefined}>
-            <h3 className="font-display text-lg italic text-clay">
+            <h3 className="font-display text-lg text-clay">
               Approach in Therapy
             </h3>
             <ul className="mt-3 flex flex-wrap gap-2">
@@ -61,7 +61,7 @@ export function DesktopPractice({
         ) : null}
         {education.length > 0 ? (
           <div>
-            <h3 className="font-display text-lg italic text-clay">Education</h3>
+            <h3 className="font-display text-lg text-clay">Education</h3>
             <ul className="mt-1 space-y-1 text-[15px] text-ink">
               {education.map((item) => (
                 <li key={item}>{item}</li>
@@ -71,7 +71,7 @@ export function DesktopPractice({
         ) : null}
         {credentials.length > 0 ? (
           <div className={education.length > 0 ? "mt-4" : undefined}>
-            <h3 className="font-display text-lg italic text-clay">
+            <h3 className="font-display text-lg text-clay">
               Credentials
             </h3>
             <ul className="mt-1 space-y-1 text-[15px] text-ink">
