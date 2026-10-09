@@ -149,7 +149,7 @@ export function SiteHeader({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href={routes.home}
-            className="shrink-0 font-sans text-2xl font-bold tracking-tight text-ink"
+            className="shrink-0 font-logo text-2xl tracking-tight text-ink"
           >
             Kitchen Sink
             <Sparkle />
