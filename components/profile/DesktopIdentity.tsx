@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/Card";
+import { therapistNameClass } from "@/components/ui/styles";
 import { formatUsdFromCents } from "@/lib/therapists/display";
 import type {
   ConsultBookAction,
@@ -29,10 +30,8 @@ export function DesktopIdentity({
 
   return (
     <Card className="mt-4 px-5 py-5 sm:px-6">
-      <h1 className="font-display text-4xl leading-none tracking-tight text-ink lg:text-[2.65rem]">
-        {data.name}
-      </h1>
-      {summary ? <p className="mt-2 text-[15px] text-ink">{summary}</p> : null}
+      <h1 className={therapistNameClass}>{data.name}</h1>
+      {summary ? <p className="mt-2 text-[15px] text-mute">{summary}</p> : null}
       {licenses.length > 0 ? (
         <div className="mt-1 space-y-0.5">
           {licenses.map((line) => (
@@ -71,7 +70,7 @@ export function DesktopIdentity({
             <dt className="text-mute">
               {rate.service_type} session ({rate.duration_minutes} min)
             </dt>
-            <dd className="font-medium text-ink">
+            <dd className="font-medium text-body">
               {formatUsdFromCents(rate.price_cents)}
             </dd>
           </div>
@@ -79,12 +78,12 @@ export function DesktopIdentity({
         {sliding ? (
           <div className="flex items-baseline justify-between gap-4 py-3">
             <dt className="text-mute">Sliding scale</dt>
-            <dd className="font-medium text-ink">{sliding}</dd>
+            <dd className="font-medium text-body">{sliding}</dd>
           </div>
         ) : null}
         <div className="flex items-start justify-between gap-4 py-3">
           <dt className="text-mute">In-network</dt>
-          <dd className="max-w-[62%] text-right font-medium text-ink">
+          <dd className="max-w-[62%] text-right font-medium text-body">
             {data.inNetwork.length > 0
               ? data.inNetwork.join(" · ")
               : "None listed"}
@@ -92,14 +91,14 @@ export function DesktopIdentity({
         </div>
         <div className="flex items-baseline justify-between gap-4 py-3">
           <dt className="text-mute">Out-of-network</dt>
-          <dd className="font-medium text-ink">
+          <dd className="font-medium text-body">
             {superbill ? "Superbill provided" : "Not listed"}
           </dd>
         </div>
         {officeLines.length > 0 ? (
           <div className="flex items-start justify-between gap-4 py-3">
             <dt className="text-mute">Office</dt>
-            <dd className="text-right text-sm font-medium text-ink not-italic">
+            <dd className="text-right text-sm font-medium text-body not-italic">
               {officeLines.map((line, index) => (
                 <span key={`${index}-${line}`} className="block">
                   {line}

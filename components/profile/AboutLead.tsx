@@ -7,14 +7,12 @@ export function AboutLead({ about }: { about: string | null }) {
   return (
     <div data-about-lead>
       {lead ? (
-        <p className="font-display text-[1.65rem] leading-snug font-semibold tracking-tight text-ink">
-          {lead}
-        </p>
+        <p className="text-lg leading-snug text-body">{lead}</p>
       ) : null}
       {paragraphs.map((paragraph, index) => (
         <p
           key={`${index}-${paragraph.slice(0, 24)}`}
-          className={`${lead || index > 0 ? "mt-4" : ""} text-[17px] leading-relaxed text-ink`}
+          className={`${lead || index > 0 ? "mt-4" : ""} text-[17px] leading-relaxed text-body`}
         >
           {paragraph}
         </p>

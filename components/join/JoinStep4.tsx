@@ -90,13 +90,13 @@ export function JoinStep4({
               className="flex gap-3 rounded-box bg-cream px-4 py-4"
             >
               <span
-                className="grid size-8 shrink-0 place-items-center rounded-full bg-clay text-sm text-paper"
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-ink text-sm text-paper"
                 aria-hidden
               >
                 ✦
               </span>
               <div className="min-w-0 flex-1">
-                <p className="font-display text-clay">{card.prompt}</p>
+                <p className="text-sm font-medium leading-snug text-ink">{card.prompt}</p>
                 <textarea
                   rows={2}
                   value={card.answer}
@@ -155,9 +155,9 @@ export function JoinStep4({
               onClick={() => addPrompt(item.prompt, item.tag)}
               className="flex w-full items-center justify-between gap-4 rounded-box bg-cream px-5 py-3 text-left disabled:opacity-50"
             >
-              <span className="font-display text-clay">{item.prompt}</span>
+              <span className="text-sm font-medium leading-snug text-ink">{item.prompt}</span>
               <span
-                className="grid size-8 shrink-0 place-items-center rounded-full bg-paper text-lg text-clay"
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-paper text-lg text-ink"
                 aria-hidden
               >
                 +
@@ -322,7 +322,7 @@ export function JoinStep4({
             }
             className="size-4 shrink-0 accent-ink"
           />
-          <span className="font-medium text-ink">Offer sliding scale</span>
+          <span className="font-medium text-body">Offer sliding scale</span>
         </label>
       </fieldset>
 

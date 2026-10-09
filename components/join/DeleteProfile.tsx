@@ -119,7 +119,7 @@ export function DeleteProfileDialog({
       >
         <h2
           id="delete-profile-title"
-          className="font-display text-3xl tracking-tight text-ink"
+          className="font-display text-[1.75rem] font-normal tracking-tight text-ink"
         >
           Delete your therapist profile?
         </h2>

@@ -1,42 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: var(--font-caprasimo), Georgia, "Iowan Old Style", serif;
-  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
-  /* Pale cream page. */
-  --color-cream: #fbf6ea;
-  /* White cards. */
+  --font-display: var(--font-dm-serif), Georgia, "Iowan Old Style", serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Warm cream page. */
+  --color-cream: #fff9e8;
+  /* White cards, filter panels, profile surfaces. */
   --color-paper: #ffffff;
-  /* Deep eggplant: headlines, body, filled primary buttons, newsletter band. */
-  --color-ink: #3c2066;
-  --color-ink-dark: #2c174c;
-  /* Brighter purple: accent type on light surfaces. Passes AA as small text. */
-  --color-clay: #6b46d0;
-  --color-clay-dark: #5532a8;
-  /* Mustard: on-dark accents and buttons that sit on eggplant or lavender. */
-  --color-gold: #f2c446;
-  --color-gold-dark: #e0b033;
-  /* Soft lavender: For Therapists card and tinted sections. */
+  /* Soft black: main headlines, therapist names, profile prompt answers. */
+  --color-black: #171717;
+  /* Near-black body copy. */
+  --color-body: #262626;
+  /* Muted charcoal: supporting text and metadata. */
+  --color-mute: #625d68;
+  /* Deep purple: buttons, nav, selected states, section headlines and labels. */
+  --color-ink: #39205f;
+  --color-ink-dark: #2a1746;
+  /* Accent purple: links and small accents only. */
+  --color-clay: #7050d8;
+  --color-clay-dark: #5a3ec0;
+  /* Kitchen Sink yellow: highlights and occasional button fills. */
+  --color-gold: #f7d65c;
+  --color-gold-dark: #e8c43a;
+  /* Soft lavender wash for the homepage therapist card. */
   --color-lavender: #e8dcf7;
-  --color-mute: #5e5274;
-  --color-line: #e6dcc8;
+  /* Cream-family stroke so filter tags read on white. */
+  --color-line: #e6dcc4;
   --radius-card: 1.75rem;
   --radius-box: 1.25rem;
-  --shadow-card: 0 18px 50px rgb(60 32 102 / 0.07);
-  --shadow-overlay: 0 24px 70px rgb(60 32 102 / 0.18);
+  --shadow-card: 0 18px 50px rgb(23 23 23 / 0.07);
+  --shadow-overlay: 0 24px 70px rgb(23 23 23 / 0.18);
 }
 
 html,
 body {
   background: var(--color-cream);
-  color: var(--color-ink);
+  color: var(--color-body);
 }
 
 body {
   font-family: var(--font-sans);
 }
 
-/* Caprasimo is roman only. Display accents stay upright, including <em>. */
+/* Display accents stay upright. <em> carries color, not italic. */
 .font-display,
 .font-display em {
   font-style: normal;
@@ -46,7 +52,7 @@ body {
 /* Pill selects. The chevron stays inside the rounded end. */
 select.ks-select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%233C2066' stroke-width='1.5' stroke-linecap='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%2339205F' stroke-width='1.5' stroke-linecap='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.95rem center;
   background-size: 0.7rem;

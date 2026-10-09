@@ -1,3 +1,5 @@
+import { sectionTitleClass } from "@/components/ui/styles";
+
 export function ProfileHeading({
   lead,
   accent,
@@ -6,7 +8,7 @@ export function ProfileHeading({
   accent: string;
 }) {
   return (
-    <h2 className="font-display text-3xl leading-tight tracking-tight text-ink md:text-4xl">
+    <h2 className={`text-ink ${sectionTitleClass}`}>
       {lead} <em className="text-clay">{accent}</em>
     </h2>
   );

@@ -48,7 +48,7 @@ describe("HeroMedia", () => {
       "bg-paper shadow-[0_8px_28px_rgba(27,39,68,0.28)]",
     );
     expect(media).not.toContain("from-ink/90");
-    expect(media).toContain("from-ink/75");
+    expect(media).toContain("from-black/75");
     expect(media).toContain(">Travis White<");
     expect(media).toContain(texasLicense);
     expect(media).not.toContain("PsyD");

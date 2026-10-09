@@ -145,8 +145,8 @@ describe("phone profile layout", () => {
     expect(lead).not.toContain("PsyD");
 
     expect(html.slice(know, switchAt)).toContain('data-prompt-variant="classic"');
-    expect(html.slice(know, switchAt)).toContain("text-sm leading-snug text-ink");
-    expect(html.slice(know, switchAt)).toContain("text-[1.7rem]");
+    expect(html.slice(know, switchAt)).toContain("text-sm font-medium leading-snug text-ink");
+    expect(html.slice(know, switchAt)).toContain("text-[1.75rem]");
     expect(html.slice(know, switchAt)).toContain("a session with me feels like...");
     expect(html.slice(know, switchAt)).toContain("outside of session, I...");
 

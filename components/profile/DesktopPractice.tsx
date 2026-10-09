@@ -24,9 +24,7 @@ export function DesktopPractice({
       <Card className="mt-4 px-5 py-5 sm:px-6">
         {specialties.length > 0 ? (
           <div>
-            <h3 className="font-display text-lg text-clay">
-              Areas of Interest
-            </h3>
+            <h3 className="text-base font-medium text-ink">Areas of Interest</h3>
             <ul className="mt-3 flex flex-wrap gap-2">
               {specialties.map((label) => (
                 <li
@@ -41,9 +39,7 @@ export function DesktopPractice({
         ) : null}
         {modalities.length > 0 ? (
           <div className={specialties.length > 0 ? "mt-5" : undefined}>
-            <h3 className="font-display text-lg text-clay">
-              Approach in Therapy
-            </h3>
+            <h3 className="text-base font-medium text-ink">Approach in Therapy</h3>
             <ul className="mt-3 flex flex-wrap gap-2">
               {modalities.map((label) => (
                 <li
@@ -61,8 +57,8 @@ export function DesktopPractice({
         ) : null}
         {education.length > 0 ? (
           <div>
-            <h3 className="font-display text-lg text-clay">Education</h3>
-            <ul className="mt-1 space-y-1 text-[15px] text-ink">
+            <h3 className="text-base font-medium text-ink">Education</h3>
+            <ul className="mt-1 space-y-1 text-[15px] text-body">
               {education.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -71,10 +67,8 @@ export function DesktopPractice({
         ) : null}
         {credentials.length > 0 ? (
           <div className={education.length > 0 ? "mt-4" : undefined}>
-            <h3 className="font-display text-lg text-clay">
-              Credentials
-            </h3>
-            <ul className="mt-1 space-y-1 text-[15px] text-ink">
+            <h3 className="text-base font-medium text-ink">Credentials</h3>
+            <ul className="mt-1 space-y-1 text-[15px] text-body">
               {credentials.map((item) => (
                 <li key={item}>{item}</li>
               ))}

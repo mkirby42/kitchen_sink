@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { FindFilters } from "@/components/search/FindFilters";
 import { TherapistCard } from "@/components/search/TherapistCard";
 import { Card } from "@/components/ui/Card";
+import { pageTitleClass } from "@/components/ui/styles";
 import {
   buildFindHref,
   requestFindHref,
@@ -47,10 +48,10 @@ export default async function FindPage({ searchParams }: FindPageProps) {
   return (
     <main className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-24">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-center font-display text-[clamp(2.15rem,5vw,4.35rem)] leading-[1.05] font-medium tracking-tight text-ink">
-          Find your <em className="text-clay">therapist</em>
+        <h1 className={`text-center ${pageTitleClass}`}>
+          Find your therapist
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-mute sm:text-lg">
+        <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-body sm:text-lg">
           Tap your must-haves below — we&apos;ll show therapists who match some
           selected tag.
         </p>

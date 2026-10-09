@@ -131,7 +131,7 @@ export function HelperUpload({
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <Eyebrow>Ops</Eyebrow>
-      <h1 className="mt-1 font-display text-2xl leading-snug tracking-tight text-ink">
+      <h1 className="mt-1 font-display text-[1.75rem] font-normal leading-snug tracking-tight text-ink sm:text-[2.125rem]">
         Upload therapist media
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
@@ -162,7 +162,7 @@ export function HelperUpload({
         <Card className="mt-4 space-y-4 p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
-              <h2 className="font-display text-2xl tracking-tight text-ink">
+              <h2 className="font-sans text-[1.75rem] font-bold tracking-tight text-black">
                 {selected.name}
               </h2>
               <p className="mt-1 text-sm text-mute">

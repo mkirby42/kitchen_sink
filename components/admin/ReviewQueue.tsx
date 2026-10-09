@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Notice } from "@/components/ui/Notice";
-import { tagClass, textLinkClass } from "@/components/ui/styles";
+import { sectionTitleClass, tagClass, textLinkClass } from "@/components/ui/styles";
 import {
   approveReview,
   rejectReview,
@@ -48,7 +48,7 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <Eyebrow>Ops</Eyebrow>
-      <h1 className="mt-1 font-display text-2xl leading-snug tracking-tight text-ink">
+      <h1 className={`mt-1 text-ink ${sectionTitleClass}`}>
         Review queue
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
@@ -70,7 +70,7 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
               <Card as="li" key={review.id} className="px-4 py-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="font-medium text-ink">{review.authorLabel}</p>
+                    <p className="font-medium text-black">{review.authorLabel}</p>
                     <p className="mt-1 text-sm text-mute">
                       For{" "}
                       <Link
@@ -94,7 +94,7 @@ export function ReviewQueue({ reviews }: { reviews: PendingReview[] }) {
                   <li className={tagClass(false)}>Fit {review.fit ?? "—"}</li>
                 </ul>
                 {review.body ? (
-                  <p className="mt-3 leading-relaxed whitespace-pre-wrap text-ink">
+                  <p className="mt-3 leading-relaxed whitespace-pre-wrap text-body">
                     {review.body}
                   </p>
                 ) : (

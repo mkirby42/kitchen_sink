@@ -14,7 +14,7 @@ describe("quiet pages", () => {
     expect(html).toContain(`href="${routes.home}"`);
     expect(html).toContain("rounded-card");
     expect(html).toContain("bg-paper");
-    expect(html).toContain("text-clay");
+    expect(html).toContain("text-black");
     expect(html).toContain("bg-ink");
     expect(html).toContain("text-center");
   });

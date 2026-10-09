@@ -56,13 +56,13 @@ function FrameIntro({
 }) {
   const [playing, setPlaying] = useState(false);
   // Full-bleed phone portrait. Poster crops to the frame; playback stays whole.
-  const frame = "relative aspect-[4/5] w-full overflow-hidden bg-ink";
+  const frame = "relative aspect-[4/5] w-full overflow-hidden bg-black";
 
   if (playing) {
     return (
       <div className={frame}>
         <video
-          className="absolute inset-0 h-full w-full bg-ink object-contain"
+          className="absolute inset-0 h-full w-full bg-black object-contain"
           src={videoUrl}
           poster={photoUrl ?? undefined}
           preload="none"
@@ -96,7 +96,7 @@ function FrameIntro({
       ) : (
         <span
           aria-hidden
-          className="absolute inset-0 flex items-center justify-center font-display text-7xl text-paper/80"
+          className="absolute inset-0 flex items-center justify-center font-sans text-7xl font-semibold text-paper/80"
         >
           {initials}
         </span>
@@ -135,7 +135,7 @@ function PortraitIntro({
     return (
       <video
         ref={videoRef}
-        className="absolute inset-0 h-full w-full bg-ink object-contain"
+        className="absolute inset-0 h-full w-full bg-black object-contain"
         src={videoUrl}
         poster={photoUrl ?? undefined}
         preload="none"
@@ -159,7 +159,7 @@ function PortraitIntro({
       ) : (
         <span
           aria-hidden
-          className="absolute inset-0 flex items-center justify-center font-display text-6xl text-paper/80"
+          className="absolute inset-0 flex items-center justify-center font-sans text-6xl font-semibold text-paper/80"
         >
           {initials}
         </span>
@@ -173,10 +173,10 @@ function PortraitIntro({
           void videoRef.current?.play();
         }}
         aria-label={watchLabel}
-        className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2.5 rounded-full bg-paper py-1.5 pr-4 pl-1.5 text-sm font-medium text-ink shadow-[0_10px_28px_rgb(60_32_102/0.2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
+        className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2.5 rounded-full bg-paper py-1.5 pr-4 pl-1.5 text-sm font-semibold text-ink shadow-[0_10px_28px_rgb(23_23_23/0.18)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
       >
         <span
-          className="flex size-8 items-center justify-center rounded-full bg-clay"
+          className="flex size-8 items-center justify-center rounded-full bg-ink"
           aria-hidden
         >
           <svg viewBox="0 0 24 24" className="ml-0.5 h-3.5 w-3.5 fill-paper">

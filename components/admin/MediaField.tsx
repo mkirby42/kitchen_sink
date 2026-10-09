@@ -19,7 +19,7 @@ export function MediaField({
   const noun = kind === "photo" ? "photo" : "video";
   return (
     <div className="flex items-center gap-4">
-      <div className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-cream text-clay">
+      <div className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-cream text-ink">
         {preview && kind === "photo" ? (
           // Storage URLs are not configured for next/image.
           // eslint-disable-next-line @next/next/no-img-element

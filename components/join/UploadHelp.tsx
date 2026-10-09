@@ -23,9 +23,9 @@ export function UploadHelp({ troubleToken }: { troubleToken: number }) {
 
   return (
     <section className="space-y-3" aria-label="Upload help">
-      <p className="rounded-box bg-cream px-5 py-4 text-center text-sm leading-6 text-ink">
+      <p className="rounded-box bg-cream px-5 py-4 text-center text-sm leading-6 text-body">
         Having trouble uploading? Email{" "}
-        <a href={MAILTO} className="font-semibold text-clay-dark underline">
+        <a href={MAILTO} className="font-medium text-clay underline">
           {UPLOAD_HELP_EMAIL}
         </a>{" "}
         and the team will help.
@@ -49,14 +49,14 @@ export function UploadHelp({ troubleToken }: { troubleToken: number }) {
         onClick={(event) => {
           if (event.target === event.currentTarget) dialogRef.current?.close();
         }}
-        className="m-auto w-[min(calc(100%-2rem),24rem)] rounded-card border-0 bg-paper p-6 text-ink shadow-overlay backdrop:bg-ink/40"
+        className="m-auto w-[min(calc(100%-2rem),24rem)] rounded-card border-0 bg-paper p-6 text-body shadow-overlay backdrop:bg-black/40"
       >
-        <h2 id={titleId} className="font-display text-3xl tracking-tight">
+        <h2 id={titleId} className="font-display text-[1.75rem] font-normal tracking-tight text-ink">
           Need help uploading?
         </h2>
         <p className="mt-3 text-sm leading-6 text-mute">
           If your photo or intro video won&apos;t upload, email{" "}
-          <a href={MAILTO} className="font-semibold text-ink underline">
+          <a href={MAILTO} className="font-medium text-clay underline">
             {UPLOAD_HELP_EMAIL}
           </a>{" "}
           and the team will help.

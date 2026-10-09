@@ -19,6 +19,7 @@ import { joinPath, routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { pageTitleClass } from "@/components/ui/styles";
 import { DeleteProfile } from "./DeleteProfile";
 import { JoinShell } from "./JoinShell";
 import { JoinStep1 } from "./JoinStep1";
@@ -95,10 +96,10 @@ function Heading({ step }: { step: Step }) {
 
   return (
     <div className="mb-9 text-center">
-      <Eyebrow className="text-center sm:text-xl">
+      <Eyebrow className="text-center">
         Step {step} of 4 · {eyebrow}
       </Eyebrow>
-      <h1 className="mx-auto mt-4 max-w-xl text-center font-display text-4xl leading-[1.08] font-medium tracking-tight text-ink sm:text-5xl">
+      <h1 className={`mx-auto mt-4 max-w-xl text-center ${pageTitleClass}`}>
         {step === 1 ? (
           <>
             Let&apos;s start with <em className="text-clay">you</em>.
@@ -117,7 +118,7 @@ function Heading({ step }: { step: Step }) {
           </>
         )}
       </h1>
-      <p className="mx-auto mt-4 max-w-md text-center text-base leading-relaxed text-mute">
+      <p className="mx-auto mt-4 max-w-md text-center text-base leading-relaxed text-body">
         {subcopy}
       </p>
     </div>
@@ -245,7 +246,7 @@ export function JoinWizard({
       }
     >
       {notice ? (
-        <p className="mb-6 rounded-box bg-cream px-4 py-3 text-left text-sm leading-relaxed text-ink">
+        <p className="mb-6 rounded-box bg-cream px-4 py-3 text-left text-sm leading-relaxed text-body">
           {notice}
         </p>
       ) : null}

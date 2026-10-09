@@ -89,7 +89,7 @@ describe("home hero", () => {
     expect(html).toContain("uppercase");
     expect(html).toContain("Why ");
     expect(html).toContain("Kitchen Sink?");
-    expect(html).toContain("text-clay");
+    expect(html).toContain("text-black");
     expect(html).toContain("text-gold");
     expect(html).toContain("bg-ink");
     expect(html).toContain("The story behind the name and our Why.");

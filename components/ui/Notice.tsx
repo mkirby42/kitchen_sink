@@ -12,7 +12,7 @@ export function Notice({
     <p
       role={role}
       aria-live={role === "alert" ? "assertive" : "polite"}
-      className="rounded-box bg-cream px-4 py-3 text-left text-sm leading-relaxed text-clay-dark"
+      className="rounded-box bg-cream px-4 py-3 text-left text-sm leading-relaxed text-body"
     >
       {children}
     </p>

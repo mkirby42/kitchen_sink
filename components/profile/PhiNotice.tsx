@@ -4,9 +4,9 @@ export function PhiNotice() {
   return (
     <aside
       role="note"
-      className="rounded-2xl border border-clay/40 bg-cream px-4 py-3 text-sm leading-relaxed text-ink"
+      className="rounded-2xl border border-line bg-cream px-4 py-3 text-sm leading-relaxed text-body"
     >
-      <p className="font-semibold text-clay-dark">{PHI_REVIEW_HEADING}</p>
+      <p className="font-semibold text-black">{PHI_REVIEW_HEADING}</p>
       <p className="mt-1">{PHI_REVIEW_WARNING}</p>
     </aside>
   );
@@ -14,7 +14,7 @@ export function PhiNotice() {
 
 export function ReviewPendingNote() {
   return (
-    <p className="rounded-2xl bg-cream px-4 py-3 text-sm text-ink">
+    <p className="rounded-2xl bg-cream px-4 py-3 text-sm text-body">
       Waiting for approval. This review is not on the profile yet. If it is
       rejected, it is deleted and not kept.
     </p>
