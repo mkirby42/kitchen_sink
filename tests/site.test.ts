@@ -68,7 +68,7 @@ describe("llms.txt", () => {
     expect(body).toContain("forgot-password");
     expect(body).toContain(`[Home](${ORIGIN})`);
     expect(body).toContain(
-      "[Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd)",
+      "[Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/let-s-connect)",
     );
     expect(body).toContain(
       "[subscribe](https://everythingbutkitchensink.beehiiv.com/)",
