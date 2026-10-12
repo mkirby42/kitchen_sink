@@ -163,6 +163,41 @@ describe("profile edit control", () => {
     expect(off).toContain("None listed");
   });
 
+  it("shows every custom rate label the same way as a preset", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          rates: [
+            {
+              service_type: "Individual",
+              duration_minutes: 50,
+              price_cents: 16500,
+            },
+            {
+              service_type: "Ketamine-assisted",
+              duration_minutes: 90,
+              price_cents: 25000,
+            },
+            {
+              service_type: "Supervision",
+              duration_minutes: 60,
+              price_cents: 12000,
+            },
+          ],
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(html).toContain("Individual session (50 min)");
+    expect(html).toContain("min-w-0 break-words");
+    expect(html).toContain("Ketamine-assisted session (90 min)");
+    expect(html).toContain("Supervision session (60 min)");
+    expect(html).toContain("$250");
+    expect(html).toContain("$120");
+  });
+
   it("hides Edit from visitors", () => {
     const html = renderToStaticMarkup(
       createElement(TherapistProfile, {

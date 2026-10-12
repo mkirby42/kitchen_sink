@@ -62,6 +62,12 @@ function ownPromptButton(html: string) {
   return html.slice(start, index);
 }
 
+function addAnotherButton(html: string) {
+  const index = html.indexOf("Add another rate");
+  const start = html.lastIndexOf("<button", index);
+  return html.slice(start, index);
+}
+
 function removeButton(html: string, prompt: string) {
   const marker = `aria-label="Remove ${prompt}"`;
   const index = html.indexOf(marker);
@@ -176,6 +182,37 @@ describe("JoinStep4 contact and rates", () => {
     expect(html).toContain("Feedback for us");
     expect(html).toContain("We email it to the team when you publish.");
     expect(html).toContain("The license step was unclear.");
+  });
+
+  it("offers Add your own on each rate and keeps adding after the presets are used", () => {
+    const one = render();
+    expect(one).toContain(">Add your own</option>");
+    expect(one).not.toContain('placeholder="Add your own"');
+    expect(isDisabled(addAnotherButton(one))).toBe(false);
+
+    const custom = render({
+      rates: [
+        { service_type: "Individual", duration_minutes: 50, price_cents: 16500 },
+        { service_type: "Ketamine-assisted", duration_minutes: 90, price_cents: 25000 },
+        { service_type: "Supervision", duration_minutes: 60, price_cents: 12000 },
+      ],
+    });
+    expect(custom).toContain('aria-label="Rate 2 name"');
+    expect(custom).toContain('placeholder="Add your own"');
+    expect(custom).toContain('value="Ketamine-assisted"');
+    expect(custom).toContain('value="Supervision"');
+    expect(custom).toContain('aria-label="Rate 3 name"');
+    expect(isDisabled(addAnotherButton(custom))).toBe(false);
+
+    const full = render({
+      rates: ["Individual", "Couples", "Family", "Group"].map((service_type) => ({
+        service_type,
+        duration_minutes: 50,
+        price_cents: 10000,
+      })),
+    });
+    expect(isDisabled(addAnotherButton(full))).toBe(false);
+    expect(full.match(/aria-label="Remove rate/g)?.length).toBe(4);
   });
 
   it("hides product feedback when editing an existing profile", () => {

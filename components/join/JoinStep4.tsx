@@ -13,6 +13,14 @@ import {
   CONVERSATION_PROMPTS,
   MAX_CONVERSATION_CARDS,
 } from "@/lib/join/cards";
+import {
+  commitRateServiceType,
+  CUSTOM_RATE_SERVICE,
+  isPresetRateService,
+  nextRate,
+  normalizeRateServiceType,
+  RATE_SERVICE_LABEL_MAX,
+} from "@/lib/join/rates";
 import type { JoinDraft } from "@/lib/join/types";
 import { OUTREACH_OPTIONS, RATE_SERVICE_TYPES } from "@/lib/tags/presets";
 import { RateDurationInput } from "./RateDurationInput";
@@ -40,10 +48,6 @@ export function JoinStep4({
   const [showCustom, setShowCustom] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
 
-  const usedServices = new Set(draft.rates.map((rate) => rate.service_type));
-  const availableService = RATE_SERVICE_TYPES.find(
-    (service) => !usedServices.has(service),
-  );
   const filteredPrompts = CONVERSATION_PROMPTS.filter(
     (item) => filter === "all" || item.tag === filter,
   );
@@ -200,8 +204,19 @@ export function JoinStep4({
         <div className="mt-4 space-y-3">
           {draft.rates.map((rate, index) => {
             const canRemove = draft.rates.length > 1;
+            const custom = !isPresetRateService(rate.service_type);
+            const usedPresets = new Set(
+              draft.rates.flatMap((item, itemIndex) => {
+                if (itemIndex === index) return [];
+                const normalized = normalizeRateServiceType(item.service_type);
+                return normalized && isPresetRateService(normalized)
+                  ? [normalized]
+                  : [];
+              }),
+            );
             return (
-            <div key={index} className="relative w-full min-w-0">
+            <div key={index} className="w-full min-w-0 space-y-2">
+              <div className="relative w-full min-w-0">
               <div
                 className={`grid w-full min-w-0 grid-cols-[minmax(5.75rem,1.4fr)_minmax(3.5rem,5.25rem)_minmax(3.25rem,4.5rem)] items-center gap-x-2 rounded-full border border-line bg-paper py-1.5 pl-4 ${
                   canRemove ? "pr-10" : "pr-4"
@@ -211,17 +226,22 @@ export function JoinStep4({
                   <span className="sr-only">Service type</span>
                   <select
                     aria-label={`Rate ${index + 1} service type`}
-                    value={rate.service_type}
-                    onChange={(event) =>
+                    value={custom ? CUSTOM_RATE_SERVICE : rate.service_type}
+                    onChange={(event) => {
+                      const value = event.target.value;
                       setDraft((current) => ({
                         ...current,
                         rates: current.rates.map((item, itemIndex) =>
                           itemIndex === index
-                            ? { ...item, service_type: event.target.value }
+                            ? {
+                                ...item,
+                                service_type:
+                                  value === CUSTOM_RATE_SERVICE ? "" : value,
+                              }
                             : item,
                         ),
-                      }))
-                    }
+                      }));
+                    }}
                     className="w-full min-w-0 bg-transparent py-1.5 outline-none"
                   >
                     {RATE_SERVICE_TYPES.map((service) => (
@@ -230,12 +250,13 @@ export function JoinStep4({
                         value={service}
                         disabled={
                           service !== rate.service_type &&
-                          usedServices.has(service)
+                          usedPresets.has(service)
                         }
                       >
                         {service}
                       </option>
                     ))}
+                    <option value={CUSTOM_RATE_SERVICE}>Add your own</option>
                   </select>
                 </label>
                 <RateDurationInput
@@ -283,6 +304,49 @@ export function JoinStep4({
               >
                 ×
               </button>
+              </div>
+              {custom ? (
+                <input
+                  aria-label={`Rate ${index + 1} name`}
+                  value={rate.service_type}
+                  maxLength={RATE_SERVICE_LABEL_MAX}
+                  autoFocus={rate.service_type === ""}
+                  placeholder="Add your own"
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setDraft((current) => ({
+                      ...current,
+                      rates: current.rates.map((item, itemIndex) =>
+                        itemIndex === index
+                          ? { ...item, service_type: value }
+                          : item,
+                      ),
+                    }));
+                  }}
+                  onBlur={() =>
+                    setDraft((current) => ({
+                      ...current,
+                      rates: current.rates.map((item, itemIndex) =>
+                        itemIndex === index
+                          ? {
+                              ...item,
+                              service_type: commitRateServiceType(
+                                item.service_type,
+                                current.rates
+                                  .filter((_, otherIndex) => otherIndex !== index)
+                                  .map((other) => other.service_type),
+                              ),
+                            }
+                          : item,
+                      ),
+                    }))
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") event.preventDefault();
+                  }}
+                  className={fieldClass}
+                />
+              ) : null}
             </div>
             );
           })}
@@ -291,21 +355,12 @@ export function JoinStep4({
           type="button"
           variant="secondary"
           className="mt-3 w-full"
-          disabled={!availableService}
-          onClick={() => {
-            if (!availableService) return;
+          onClick={() =>
             setDraft((current) => ({
               ...current,
-              rates: [
-                ...current.rates,
-                {
-                  service_type: availableService,
-                  duration_minutes: 50,
-                  price_cents: 0,
-                },
-              ],
-            }));
-          }}
+              rates: [...current.rates, nextRate(current.rates)],
+            }))
+          }
         >
           + Add another rate
         </Button>
