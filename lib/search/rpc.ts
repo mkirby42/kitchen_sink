@@ -24,6 +24,8 @@ export type SearchRow = {
   sliding_scale: boolean;
   /** False when an admin search included an unlisted profile. Absent means listed. */
   listed?: boolean;
+  /** False when an admin search included a draft. Absent means published. */
+  published?: boolean;
   video_key: string | null;
   card_prompt: string | null;
   card_answer: string | null;

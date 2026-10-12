@@ -52,7 +52,7 @@ export function ProfileNotFound({ backHref }: { backHref: string }) {
     <AccountShell
       eyebrow="Therapist profile"
       title="We couldn't find that therapist."
-      lede="They may have closed their practice to new clients, be hidden from Find, or the link is out of date."
+      lede="They may have closed their practice to new clients, be hidden from Find, still be a draft, or the link is out of date."
     >
       <div className="flex justify-center">
         <Button href={backHref}>Back to search</Button>

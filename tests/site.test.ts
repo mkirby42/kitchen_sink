@@ -3,6 +3,7 @@ import {
   AI_USER_AGENTS,
   PRIVATE_PATH_PREFIX,
   canonicalOrigin,
+  isMissingPublishedColumn,
   llmsTxt,
   originFromRequest,
   robotsPolicy,
@@ -51,6 +52,21 @@ describe("sitemap entries", () => {
     expect(therapistProfilePath("maya")).toBeNull();
     expect(therapistProfilePath("11111111-1111-4111-8111-111111111111")).toBe(
       "/t/11111111-1111-4111-8111-111111111111",
+    );
+  });
+});
+
+describe("published column fallback", () => {
+  it("only treats a missing published column as the pre-migration error", () => {
+    expect(isMissingPublishedColumn(null)).toBe(false);
+    expect(isMissingPublishedColumn({ code: "42703" })).toBe(true);
+    expect(
+      isMissingPublishedColumn({
+        message: "column therapists.published does not exist",
+      }),
+    ).toBe(true);
+    expect(isMissingPublishedColumn({ message: "permission denied" })).toBe(
+      false,
     );
   });
 });

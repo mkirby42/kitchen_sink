@@ -4,7 +4,10 @@ import { describe, expect, it } from "vitest";
 import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 import { TherapistCard } from "@/components/search/TherapistCard";
 import { credentialTitle } from "@/lib/therapists/display";
-import { ADMIN_ONLY_HIDDEN_LABEL } from "@/lib/therapists/listing";
+import {
+  ADMIN_ONLY_HIDDEN_LABEL,
+  DRAFT_PROFILE_LABEL,
+} from "@/lib/therapists/listing";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 
 const filters: SearchFilters = {
@@ -144,6 +147,8 @@ describe("Find therapist card", () => {
     expect(render({ listed: false })).toContain(ADMIN_ONLY_HIDDEN_LABEL);
     expect(render()).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
     expect(render({ listed: true })).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
+    expect(render({ published: false })).toContain(DRAFT_PROFILE_LABEL);
+    expect(render({ published: true })).not.toContain(DRAFT_PROFILE_LABEL);
   });
 
   it("keeps a full-bleed photo and no play control when there is no intro video", () => {

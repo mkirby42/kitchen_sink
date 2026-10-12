@@ -26,7 +26,7 @@ describe("quiet pages", () => {
     expect(html).toContain("Therapist profile");
     expect(html).toContain("find that therapist.");
     expect(html).toContain(
-      "They may have closed their practice to new clients, be hidden from Find, or the link is out of date.",
+      "They may have closed their practice to new clients, be hidden from Find, still be a draft, or the link is out of date.",
     );
     expect(html).toContain("Back to search");
     expect(html).toContain('href="/find?format=virtual"');

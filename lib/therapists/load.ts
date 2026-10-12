@@ -8,6 +8,7 @@ import {
 } from "@/lib/tags/presets";
 import {
   canViewDirectoryProfile,
+  isProfilePublished,
   isDirectoryListed,
 } from "@/lib/therapists/listing";
 import { supabasePublicConfig } from "@/lib/supabase/env";
@@ -99,6 +100,8 @@ export type TherapistProfileData = {
   contact: ContactAction[];
   /** Unlisted practice shown only because the viewer is an admin. */
   hiddenFromPublic?: boolean;
+  /** Draft. Public Find and /t/[id] omit it. Owner and admin can still open it. */
+  unpublished?: boolean;
 };
 
 const SUPERBILL_LABEL = "out-of-network superbill";
@@ -435,6 +438,7 @@ export async function fetchTherapistProfile(
     !canViewDirectoryProfile({
       openToNewClients: therapist.open_to_new_clients === true,
       listed: therapist.listed,
+      published: therapist.published,
       ...previewDirectoryAccess({
         roleIsAdmin: viewer.isAdmin,
         viewerIsOwner: viewer.userId === id,
@@ -447,6 +451,7 @@ export async function fetchTherapistProfile(
 
   const viewerId = viewer.userId;
   const hiddenFromPublic = !isDirectoryListed(therapist.listed);
+  const unpublished = !isProfilePublished(therapist.published);
 
   const tags = (tagsRes.data ?? []) as ProfileTag[];
   const outreach = labelsOf(tags, "outreach");
@@ -512,6 +517,7 @@ export async function fetchTherapistProfile(
       outreach,
     }),
     hiddenFromPublic,
+    unpublished,
   };
 }
 

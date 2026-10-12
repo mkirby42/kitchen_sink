@@ -1,3 +1,4 @@
+import { isProfileId } from "@/lib/join/publish";
 import { routes } from "@/lib/routes";
 import type { ProfileRole } from "@/lib/role";
 
@@ -7,7 +8,13 @@ export const ADMIN_JOIN_NOTICE =
 export type JoinAccess =
   | { kind: "patient" }
   | { kind: "redirect"; href: string }
-  | { kind: "wizard"; editing: boolean; adminTest: boolean };
+  | {
+      kind: "wizard";
+      editing: boolean;
+      adminTest: boolean;
+      /** Set when an admin is editing a therapist other than themselves. */
+      profileId?: string;
+    };
 
 /** Signed-in join gate. Admins can create or replace one test therapist profile. */
 export function joinAccess(input: {
@@ -15,7 +22,31 @@ export function joinAccess(input: {
   role: ProfileRole | null;
   hasTherapist: boolean;
   editing: boolean;
+  /** `/join?edit=1&profile=` — another therapist, admin only. */
+  targetProfileId?: string | null;
 }): JoinAccess {
+  const target = input.targetProfileId?.trim() ?? "";
+  if (target && target !== input.userId) {
+    if (input.role === "admin" && isProfileId(target)) {
+      return {
+        kind: "wizard",
+        editing: true,
+        adminTest: true,
+        profileId: target,
+      };
+    }
+    if (
+      input.role === "therapist" ||
+      (input.role === "admin" && input.hasTherapist)
+    ) {
+      return { kind: "redirect", href: routes.therapist(input.userId) };
+    }
+    return {
+      kind: "redirect",
+      href: input.role === "admin" ? routes.adminMedia : routes.join,
+    };
+  }
+
   if (input.role === "patient") return { kind: "patient" };
 
   if (input.role === "admin") {

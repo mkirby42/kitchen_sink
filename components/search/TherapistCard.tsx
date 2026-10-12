@@ -60,6 +60,7 @@ export function TherapistCard({
         href={href}
         sample={sample}
         hidden={row.listed === false}
+        draft={row.published === false}
       />
       <TherapistCardDesktop
         name={row.name}
@@ -77,6 +78,7 @@ export function TherapistCard({
         href={href}
         sample={sample}
         hidden={row.listed === false}
+        draft={row.published === false}
       />
     </Card>
   );

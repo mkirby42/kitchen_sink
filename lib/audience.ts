@@ -72,7 +72,7 @@ export function previewDirectoryAccess(input: {
 }
 
 /**
- * Drop unlisted search rows unless this is a real admin in Admin view.
+ * Drop unlisted and draft search rows unless this is a real admin in Admin view.
  * The result is always a subset of `rows`.
  */
 export function narrowSearchRows(
@@ -80,7 +80,9 @@ export function narrowSearchRows(
   input: { roleIsAdmin: boolean; audience: SiteAudience },
 ) {
   if (directoryViewerIsAdmin(input)) return rows;
-  return rows.filter((row) => row.listed !== false);
+  return rows.filter(
+    (row) => row.listed !== false && row.published !== false,
+  );
 }
 
 export type HeaderChrome = {

@@ -51,6 +51,36 @@ describe("joinAccess", () => {
     ).toEqual({ kind: "redirect", href: `/t/${adminId}` });
   });
 
+  it("lets an admin edit someone else's profile", () => {
+    const therapistId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2";
+    expect(
+      joinAccess({
+        userId: adminId,
+        role: "admin",
+        hasTherapist: false,
+        editing: true,
+        targetProfileId: therapistId,
+      }),
+    ).toEqual({
+      kind: "wizard",
+      editing: true,
+      adminTest: true,
+      profileId: therapistId,
+    });
+  });
+
+  it("refuses a non-admin edit of someone else's profile", () => {
+    expect(
+      joinAccess({
+        userId: adminId,
+        role: "therapist",
+        hasTherapist: true,
+        editing: true,
+        targetProfileId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+      }),
+    ).toEqual({ kind: "redirect", href: `/t/${adminId}` });
+  });
+
   it("blocks a patient account", () => {
     expect(
       joinAccess({

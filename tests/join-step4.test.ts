@@ -174,7 +174,7 @@ describe("JoinStep4 contact and rates", () => {
       }),
     );
     expect(html).toContain("Feedback for us");
-    expect(html).toContain("We email it to the team when you submit.");
+    expect(html).toContain("We email it to the team when you publish.");
     expect(html).toContain("The license step was unclear.");
   });
 

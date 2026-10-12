@@ -153,6 +153,18 @@ export function sitemapEntries(
   return pages;
 }
 
+/** True when this database has not applied the published column yet. */
+export function isMissingPublishedColumn(
+  error: { message?: string; code?: string } | null,
+) {
+  if (!error) return false;
+  const message = error.message ?? "";
+  return (
+    error.code === "42703" ||
+    (message.includes("published") && message.includes("does not exist"))
+  );
+}
+
 export async function indexableTherapistIds(): Promise<string[]> {
   const config = supabasePublicConfig();
   if (!config) return [];
@@ -160,15 +172,25 @@ export async function indexableTherapistIds(): Promise<string[]> {
     const supabase = createClient(config.url, config.key, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data, error } = await supabase
+    const published = await supabase
       .from("therapists")
       .select("profile_id")
       .eq("open_to_new_clients", true)
       .eq("listed", true)
+      .eq("published", true)
       .order("profile_id", { ascending: true })
       .limit(1000);
-    if (error || !data) return [];
-    return data.map((row) => String(row.profile_id));
+    const result = isMissingPublishedColumn(published.error)
+      ? await supabase
+          .from("therapists")
+          .select("profile_id")
+          .eq("open_to_new_clients", true)
+          .eq("listed", true)
+          .order("profile_id", { ascending: true })
+          .limit(1000)
+      : published;
+    if (result.error || !result.data) return [];
+    return result.data.map((row) => String(row.profile_id));
   } catch {
     return [];
   }
@@ -203,7 +225,7 @@ export function llmsTxt(origin: string): string {
 
 > Kitchen Sink (Talk Shoppe) is a therapist-matching site. People look up therapists by the tags they need. Therapists publish a profile with a photo, an optional intro video, specialties, insurance, licenses, rates, and contact details.
 
-A match is overlap. The person selects tags (for example a specialty or an insurance plan). The directory lists therapists who have at least one of those tags, ranked by how many tags overlap. Session format (virtual, in-person, or both) and license state apply when those filters are set. With no filters, the list is therapists who are open to new clients and listed in the directory. Search filters are not stored. A client account is only for leaving a review.
+A match is overlap. The person selects tags (for example a specialty or an insurance plan). The directory lists therapists who have at least one of those tags, ranked by how many tags overlap. Session format (virtual, in-person, or both) and license state apply when those filters are set. With no filters, the list is therapists who are open to new clients, published, and listed in the directory. Search filters are not stored. A client account is only for leaving a review.
 
 The site does not book appointments or take payment. To reach a therapist, use the email, phone, or text number on their profile.
 
@@ -215,7 +237,7 @@ A signed-in therapist can delete their own profile from the edit screen. That re
 
 ${pages}
 
-Therapist profiles are public while that therapist is open to new clients and listed in the directory. A hidden listing is left off Find and its public page. Each listed profile lives at \`${origin}/t/{id}\` and is in the sitemap (${origin}/sitemap.xml).
+Therapist profiles are public while that therapist is open to new clients, published, and listed in the directory. A draft or a hidden listing is left off Find and its public page. Each listed profile lives at \`${origin}/t/{id}\` and is in the sitemap (${origin}/sitemap.xml).
 
 ## Profile contents
 

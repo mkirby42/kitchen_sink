@@ -22,7 +22,7 @@ One round trip. Filter in SQL, not JS. Page size 24.
 Typical predicates:
 
 - `open_to_new_clients = true`
-- `listed = true` for public Find, sitemap, and `/t/[id]`. A signed-in admin also sees `listed = false` there, badged admin-only. Sitemap stays listed-only.
+- `listed = true` and `published = true` for public Find, sitemap, and `/t/[id]`. A signed-in admin also sees `listed = false` or `published = false` there (admin-only badge, or “Draft — not published”). Sitemap stays listed and published. A save cannot set `published` back to false.
 - virtual / in-person flags
 - selected tag labels overlap therapist tags (specialty or insurance)
 - `licenses.state` if a state is selected
@@ -34,6 +34,7 @@ Typical predicates:
 - `licenses (therapist_id)`, `licenses (state)`
 - partial `therapists (profile_id) where open_to_new_clients`
 - partial `therapists (profile_id) where open_to_new_clients and listed`
+- partial `therapists (profile_id) where open_to_new_clients and listed and published`
 - `profile_items (therapist_id, position)` for the first conversation card on Find
 
 If explain shows a slow join, add `therapists.specialty_labels text[]` + GIN and keep tags in sync.
