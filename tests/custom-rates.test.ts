@@ -292,7 +292,7 @@ describe("custom rate label migration", () => {
           published boolean not null default true
         );
         create table public.rates (
-          id uuid primary key,
+          id uuid primary key default gen_random_uuid(),
           therapist_id uuid not null references public.therapists (profile_id),
           service_type text not null check (
             service_type in ('Individual', 'Couples', 'Family', 'Group')
