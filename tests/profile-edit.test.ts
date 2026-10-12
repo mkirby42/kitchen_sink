@@ -92,7 +92,8 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Practicing under supervision");
     expect(html).not.toContain("I'm interested");
     expect(html).toContain(routes.joinEdit);
-    expect(html).not.toContain("Delete profile");
+    expect(html).toContain("Delete profile");
+    expect(html).toContain("data-profile-manage");
   });
 
   it("keeps rates and insurance in the lower box and drops the top summary cards", () => {

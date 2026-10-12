@@ -16,10 +16,12 @@ export function joinPath(opts?: {
   step?: number;
   edit?: boolean;
   mode?: "signin";
+  profile?: string;
 }) {
   const query = new URLSearchParams();
   if (opts?.mode) query.set("mode", opts.mode);
   if (opts?.edit) query.set("edit", "1");
+  if (opts?.profile) query.set("profile", opts.profile);
   if (opts?.step) query.set("step", String(opts.step));
   const suffix = query.toString();
   return suffix ? `${routes.join}?${suffix}` : routes.join;

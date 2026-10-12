@@ -43,3 +43,21 @@ export function joinAccess(input: {
     adminTest: false,
   };
 }
+
+const PROFILE_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * `/join?edit=1` edits the signed-in profile.
+ * `/join?edit=1&profile=` edits someone else, and only an admin may do that.
+ */
+export function editSubject(input: {
+  userId: string;
+  role: ProfileRole | null;
+  profile: string | undefined;
+}): { kind: "self" } | { kind: "other"; id: string } | { kind: "deny" } {
+  const raw = input.profile?.trim() ?? "";
+  if (!raw || raw === input.userId) return { kind: "self" };
+  if (!PROFILE_ID.test(raw) || input.role !== "admin") return { kind: "deny" };
+  return { kind: "other", id: raw };
+}

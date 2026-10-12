@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { JoinAuth } from "@/components/join/JoinAuth";
 import { JoinWizard } from "@/components/join/JoinWizard";
 import { readAudienceCookie } from "@/lib/audience-cookie";
-import { ADMIN_JOIN_NOTICE, joinAccess } from "@/lib/join/access";
+import { ADMIN_JOIN_NOTICE, editSubject, joinAccess } from "@/lib/join/access";
 import { fetchJoinDraft } from "@/lib/join/load-draft";
 import { parseProfileRole } from "@/lib/role";
 import { routes } from "@/lib/routes";
@@ -22,7 +22,12 @@ export const metadata: Metadata = {
 export default async function JoinPage({
   searchParams,
 }: {
-  searchParams: Promise<{ step?: string; mode?: string; edit?: string }>;
+  searchParams: Promise<{
+    step?: string;
+    mode?: string;
+    edit?: string;
+    profile?: string;
+  }>;
 }) {
   if (!supabasePublicConfig()) {
     return (
@@ -58,9 +63,40 @@ export default async function JoinPage({
     .eq("id", user.id)
     .maybeSingle();
 
+  const role = parseProfileRole(profile?.role);
+  const subject = editSubject({
+    userId: user.id,
+    role,
+    profile: params.profile,
+  });
+
+  if (subject.kind === "deny") redirect(routes.find);
+
+  const rawStep = Number(params.step);
+  const initialStep =
+    Number.isInteger(rawStep) && rawStep >= 1 && rawStep <= 4
+      ? (rawStep as 1 | 2 | 3 | 4)
+      : 1;
+
+  if (subject.kind === "other") {
+    const otherDraft = await fetchJoinDraft(supabase, subject.id, "");
+    if (!otherDraft) redirect(routes.therapist(subject.id));
+    return (
+      <JoinWizard
+        userId={user.id}
+        profileId={subject.id}
+        email={user.email ?? ""}
+        initialStep={initialStep}
+        initialDraft={otherDraft}
+        editing
+        adminTest
+      />
+    );
+  }
+
   const access = joinAccess({
     userId: user.id,
-    role: parseProfileRole(profile?.role),
+    role,
     hasTherapist: Boolean(therapist),
     editing,
   });
@@ -80,12 +116,6 @@ export default async function JoinPage({
       </AccountShell>
     );
   }
-
-  const rawStep = Number(params.step);
-  const initialStep =
-    Number.isInteger(rawStep) && rawStep >= 1 && rawStep <= 4
-      ? (rawStep as 1 | 2 | 3 | 4)
-      : 1;
 
   const loadedDraft = access.editing
     ? await fetchJoinDraft(supabase, user.id, user.email ?? "")
