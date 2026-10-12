@@ -69,7 +69,9 @@ describe("site header", () => {
       }),
     );
     expect(html).toContain("For Therapists");
-    expect(html).toContain('href="/join"');
+    expect(html).toContain('href="/for-therapists"');
+    expect(html).toContain("Drafts");
+    expect(html).toContain('href="/admin/starts"');
     expect(html).toContain("Uploads");
     expect(html).toContain("Reviews");
     expect(html).toContain('href="/admin/reviews"');
@@ -168,6 +170,7 @@ describe("site header", () => {
     expect(therapist).toContain("My profile");
     expect(therapist).toContain('aria-label="Site view"');
     expect(therapist).not.toContain("Uploads");
+    expect(therapist).not.toContain("Drafts");
     expect(therapist).not.toContain('href="/admin/media"');
     expect(therapist).not.toContain("For Therapists");
     expect(therapist).not.toContain("Admin only");
@@ -191,7 +194,7 @@ describe("site header", () => {
     );
     expect(html).toContain("Find a Therapist");
     expect(html).toContain("For Therapists");
-    expect(html).toContain('href="/join"');
+    expect(html).toContain('href="/for-therapists"');
     expect(html).toContain("Therapist log in");
     expect(html).toContain('href="/join?mode=signin"');
     expect(html).toContain("Why Kitchen Sink?");

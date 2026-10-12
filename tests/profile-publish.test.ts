@@ -47,6 +47,17 @@ describe("editor save actions", () => {
       publish: true,
       saveChanges: false,
     });
+    expect(
+      editorSaveActions({
+        published: false,
+        editing: true,
+        publishHeld: true,
+      }),
+    ).toEqual({
+      draft: true,
+      publish: false,
+      saveChanges: false,
+    });
   });
 
   it("hides publish and save changes until a photo and intro video are both attached", () => {
@@ -234,6 +245,7 @@ describe("draft and publish buttons", () => {
     step?: 1 | 2 | 3 | 4;
     withMedia?: boolean;
     draft?: JoinDraft;
+    publishHeld?: boolean;
   }) {
     return renderToStaticMarkup(
       createElement(JoinWizard, {
@@ -242,6 +254,7 @@ describe("draft and publish buttons", () => {
         initialStep: props.step ?? 4,
         editing: props.editing,
         published: props.published,
+        publishHeld: props.publishHeld,
         initialDraft:
           props.draft ?? (props.withMedia === false ? undefined : mediaDraft()),
       }),
@@ -270,6 +283,17 @@ describe("draft and publish buttons", () => {
     expect(saveButton?.[0]).toContain("bg-ink");
     expect(saveButton?.[0]).toContain("text-paper");
     expect(live).not.toContain(PUBLISH_MEDIA_NOTE);
+  });
+
+  it("holds publish while an admin fills a started draft", () => {
+    const held = wizard({
+      editing: true,
+      published: false,
+      publishHeld: true,
+    });
+    expect(held).toContain("Save as draft");
+    expect(held).not.toContain("Publish profile");
+    expect(held).not.toContain("Save changes →");
   });
 
   it("continues the media step without a photo or video and says both are required to publish", () => {

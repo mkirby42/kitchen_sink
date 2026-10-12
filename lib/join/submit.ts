@@ -1,5 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { joinMediaPath } from "@/lib/join/media";
+import {
+  profileSaveRpc,
+  withPublishArg,
+  type EditorSaveAction,
+} from "@/lib/join/publish";
 import type { buildJoinPayload } from "@/lib/join/validate";
 
 type JoinPayload = ReturnType<typeof buildJoinPayload>;
@@ -29,6 +34,29 @@ export function toRpcArgs(payload: JoinPayload) {
     p_qualifications: payload.qualifications,
     p_feedback: payload.feedback,
   };
+}
+
+export async function saveJoinProfile(
+  supabase: SupabaseClient,
+  payload: JoinPayload,
+  options: {
+    editing: boolean;
+    profileId?: string;
+    intent: EditorSaveAction;
+  },
+) {
+  const args = withPublishArg(toRpcArgs(payload), options.intent);
+  const rpc = profileSaveRpc({
+    editing: options.editing,
+    ownProfile: !options.profileId,
+  });
+  const { error } = await supabase.rpc(
+    rpc,
+    rpc === "admin_save_therapist_profile"
+      ? { p_therapist_id: options.profileId, ...args }
+      : args,
+  );
+  return error?.message ?? null;
 }
 
 export async function uploadJoinMedia(

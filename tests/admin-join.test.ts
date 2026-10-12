@@ -81,6 +81,47 @@ describe("joinAccess", () => {
     ).toEqual({ kind: "redirect", href: `/t/${adminId}` });
   });
 
+  it("lets an admin fill a started draft", () => {
+    expect(
+      joinAccess({
+        userId: adminId,
+        role: "admin",
+        hasTherapist: false,
+        editing: false,
+        forId: "11111111-1111-4111-8111-111111111111",
+      }),
+    ).toEqual({
+      kind: "wizard",
+      editing: true,
+      adminTest: false,
+      onBehalfId: "11111111-1111-4111-8111-111111111111",
+    });
+  });
+
+  it("keeps an admin's own edit on their test profile", () => {
+    expect(
+      joinAccess({
+        userId: adminId,
+        role: "admin",
+        hasTherapist: true,
+        editing: true,
+        forId: adminId,
+      }),
+    ).toEqual({ kind: "wizard", editing: true, adminTest: true });
+  });
+
+  it("does not let a therapist open someone else's started draft", () => {
+    expect(
+      joinAccess({
+        userId: adminId,
+        role: "therapist",
+        hasTherapist: true,
+        editing: false,
+        forId: "11111111-1111-4111-8111-111111111111",
+      }),
+    ).toEqual({ kind: "redirect", href: `/t/${adminId}` });
+  });
+
   it("blocks a patient account", () => {
     expect(
       joinAccess({

@@ -89,6 +89,27 @@ async function settleResetLink(params: ResetLinkParams | null): Promise<ResetPha
   }
 }
 
+async function continueAfterReset(supabase: ReturnType<typeof createClient>) {
+  const stored = readResetReturn("");
+  if (stored) return stored;
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return routes.home;
+    const { data, error } = await supabase
+      .from("profile_starts")
+      .select("id")
+      .eq("profile_id", user.id)
+      .in("status", ["drafting", "ready"])
+      .limit(1);
+    if (!error && data && data.length > 0) return routes.joinEdit;
+  } catch {
+    // Profile starts may not be migrated yet.
+  }
+  return routes.home;
+}
+
 export function ResetPasswordForm() {
   const [phase, setPhase] = useState<ResetPhase>("checking");
   const [password, setPassword] = useState("");
@@ -124,7 +145,7 @@ export function ResetPasswordForm() {
         setMessage(passwordUpdateMessage(error));
         return;
       }
-      setContinueHref(readResetReturn(routes.home));
+      setContinueHref(await continueAfterReset(supabase));
       setPhase("done");
     } catch {
       setMessage("We couldn't update that password. Try again.");

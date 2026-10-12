@@ -14,9 +14,11 @@ export type JoinAccess =
       adminTest: boolean;
       /** Set when an admin is editing a therapist other than themselves. */
       profileId?: string;
+      /** Started draft an admin is filling. Returns to Drafts. */
+      onBehalfId?: string;
     };
 
-/** Signed-in join gate. Admins can create or replace one test therapist profile. */
+/** Signed-in join gate. Admins can create or replace one test therapist profile, or edit someone else's. */
 export function joinAccess(input: {
   userId: string;
   role: ProfileRole | null;
@@ -24,6 +26,8 @@ export function joinAccess(input: {
   editing: boolean;
   /** `/join?edit=1&profile=` — another therapist, admin only. */
   targetProfileId?: string | null;
+  /** `/join?edit=1&for=` — a profile_starts draft an admin is filling. */
+  forId?: string | null;
 }): JoinAccess {
   const target = input.targetProfileId?.trim() ?? "";
   if (target && target !== input.userId) {
@@ -48,6 +52,21 @@ export function joinAccess(input: {
   }
 
   if (input.role === "patient") return { kind: "patient" };
+
+  const forId = input.forId?.trim() ?? "";
+  if (
+    input.role === "admin" &&
+    forId &&
+    forId !== input.userId &&
+    isProfileId(forId)
+  ) {
+    return {
+      kind: "wizard",
+      editing: true,
+      adminTest: false,
+      onBehalfId: forId,
+    };
+  }
 
   if (input.role === "admin") {
     if (input.editing && !input.hasTherapist) {

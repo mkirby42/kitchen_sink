@@ -16,7 +16,7 @@ import { TextField } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
 import { mediaFileError } from "@/lib/join/media";
 import { uploadJoinMedia } from "@/lib/join/submit";
-import { routes } from "@/lib/routes";
+import { joinPath, routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { storagePublicUrl } from "@/lib/therapists/display";
 
@@ -169,13 +169,22 @@ export function HelperUpload({
                 {selected.email ?? "No email on file"}
               </p>
             </div>
-            <Button
-              href={routes.therapist(selected.id)}
-              variant="secondary"
-              size="sm"
-            >
-              View profile
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                href={joinPath({ edit: true, profile: selected.id })}
+                variant="secondary"
+                size="sm"
+              >
+                Edit profile
+              </Button>
+              <Button
+                href={routes.therapist(selected.id)}
+                variant="secondary"
+                size="sm"
+              >
+                View profile
+              </Button>
+            </div>
           </div>
 
           <MediaField

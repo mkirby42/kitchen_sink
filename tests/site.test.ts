@@ -42,6 +42,7 @@ describe("sitemap entries", () => {
       ORIGIN,
       `${ORIGIN}/find`,
       `${ORIGIN}/join`,
+      `${ORIGIN}/for-therapists`,
       `${ORIGIN}/t/${id}`,
     ]);
     expect(urls.some((url) => url.includes("/admin"))).toBe(false);
