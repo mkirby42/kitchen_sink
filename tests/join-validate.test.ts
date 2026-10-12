@@ -346,6 +346,19 @@ describe("buildJoinPayload", () => {
     );
   });
 
+  it("stores a custom identity and still allows none", () => {
+    expect(step3Errors(validStep3({ identity: [] }))).toEqual([]);
+    const payload = buildJoinPayload(
+      validStep4({ identity: ["BIPOC", "Neurodivergent"] }),
+    );
+    expect(payload.tags).toEqual(
+      expect.arrayContaining([
+        { kind: "identity", label: "BIPOC" },
+        { kind: "identity", label: "Neurodivergent" },
+      ]),
+    );
+  });
+
   it("keeps a stored specialty that is outside the Find list", () => {
     const payload = buildJoinPayload(
       validStep4({

@@ -36,6 +36,8 @@ describe("draftFromRows", () => {
       tags: [
         { kind: "specialty", label: "Anxiety" },
         { kind: "modality", label: "CBT" },
+        { kind: "identity", label: "BIPOC" },
+        { kind: "identity", label: "Neurodivergent" },
         { kind: "outreach", label: "email" },
       ],
       items: [
@@ -56,6 +58,7 @@ describe("draftFromRows", () => {
     expect(draft.yearsPracticing).toBe(yearsPracticing("2017-01-01"));
     expect(draft.photoKey).toBe("uid/photo.jpg");
     expect(draft.specialties).toEqual(["Anxiety"]);
+    expect(draft.identity).toEqual(["BIPOC", "Neurodivergent"]);
     expect(draft.outreach).toEqual(["email"]);
     expect(draft.cards).toHaveLength(1);
     expect(draft.feedback).toBe("");
