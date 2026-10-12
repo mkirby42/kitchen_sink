@@ -133,6 +133,7 @@ export function JoinWizard({
   editing = false,
   notice,
   adminTest = false,
+  profileId = userId,
 }: {
   userId: string;
   email: string;
@@ -141,6 +142,8 @@ export function JoinWizard({
   editing?: boolean;
   notice?: string;
   adminTest?: boolean;
+  /** Profile being edited. Defaults to the signed-in user. */
+  profileId?: string;
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initialStep);
@@ -154,15 +157,20 @@ export function JoinWizard({
   function moveTo(nextStep: Step) {
     setStep(nextStep);
     setSubmitError("");
-    router.replace(joinPath({ step: nextStep, edit: editing }), {
-      scroll: false,
-    });
+    router.replace(
+      joinPath({
+        step: nextStep,
+        edit: editing,
+        profile: profileId !== userId ? profileId : undefined,
+      }),
+      { scroll: false },
+    );
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function goBack() {
     if (step === 1) {
-      router.push(editing ? routes.therapist(userId) : routes.home);
+      router.push(editing ? routes.therapist(profileId) : routes.home);
       return;
     }
     moveTo((step - 1) as Step);
@@ -182,9 +190,15 @@ export function JoinWizard({
       const result = await finishJoin({
         feedback: payload.feedback,
         save: async () => {
+          const args = toRpcArgs(payload);
+          const editingOther = profileId !== userId;
           const { error } = await createClient().rpc(
-            editing ? "update_therapist_profile" : "complete_therapist_join",
-            toRpcArgs(payload),
+            editingOther
+              ? "admin_update_therapist_profile"
+              : editing
+                ? "update_therapist_profile"
+                : "complete_therapist_join",
+            editingOther ? { p_therapist_id: profileId, ...args } : args,
           );
           return error?.message ?? null;
         },
@@ -194,7 +208,7 @@ export function JoinWizard({
         setSubmitError(result.error);
         return;
       }
-      router.push(routes.therapist(userId));
+      router.push(routes.therapist(profileId));
     } catch (error) {
       setSubmitError(
         error instanceof Error ? error.message : "Unable to submit your profile.",
@@ -212,7 +226,7 @@ export function JoinWizard({
     <JoinShell
       step={step}
       onBack={goBack}
-      closeHref={editing ? routes.therapist(userId) : routes.home}
+      closeHref={editing ? routes.therapist(profileId) : routes.home}
       footer={
         <div className="flex flex-col items-center gap-3 text-center">
           {submitError || hint || (blocked && errors[0]) ? (
@@ -255,7 +269,7 @@ export function JoinWizard({
         <JoinStep1 draft={draft} setDraft={setDraft} />
       ) : step === 2 ? (
         <JoinStep2
-          userId={userId}
+          userId={profileId}
           draft={draft}
           setDraft={setDraft}
           onBusyChange={setMediaBusy}

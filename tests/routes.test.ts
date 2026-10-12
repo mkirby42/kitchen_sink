@@ -19,5 +19,8 @@ describe("judge path routes", () => {
 
   it("keeps edit + step on the same join path", () => {
     expect(joinPath({ edit: true, step: 2 })).toBe("/join?edit=1&step=2");
+    expect(joinPath({ edit: true, profile: "abc", step: 2 })).toBe(
+      "/join?edit=1&profile=abc&step=2",
+    );
   });
 });

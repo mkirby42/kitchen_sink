@@ -11,6 +11,7 @@ import {
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
 import { presentProfileData, presentReviewViewer } from "@/lib/audience";
+import { profileManageForViewer } from "@/lib/profile/manage";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadReviewViewer, type ReviewViewer } from "@/lib/reviews/viewer";
 import { parseFindSearchParams } from "@/lib/search/rpc";
@@ -104,6 +105,11 @@ export default async function TherapistProfilePage({
       data={presentProfileData(data, viewer.role, audience)}
       backHref={backHref}
       viewer={presentReviewViewer(viewer, audience)}
+      manage={profileManageForViewer({
+        viewer,
+        audience,
+        profileId: data.id,
+      })}
     />
   );
 }

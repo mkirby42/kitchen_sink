@@ -1,7 +1,12 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh() {}, push() {}, replace() {} }),
+}));
+
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
 import { loadReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";

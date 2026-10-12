@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { eyebrowClass, sectionTitleClass } from "@/components/ui/styles";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
@@ -14,7 +13,11 @@ import {
   type TherapistProfileData,
 } from "@/lib/therapists/load";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
-import { routes } from "@/lib/routes";
+import {
+  profileManageState,
+  type ProfileManageState,
+} from "@/lib/profile/manage";
+import { ProfileManageActions } from "./ProfileManageActions";
 import { modalityDisplayLabels } from "@/lib/tags/modality-display";
 import { directorySpecialties } from "@/lib/tags/presets";
 import { AboutPanel } from "./ProfileAbout";
@@ -34,12 +37,22 @@ export function TherapistProfile({
   data,
   backHref,
   viewer,
+  manage,
 }: {
   data: TherapistProfileData;
   backHref: string;
   viewer: ReviewViewer;
+  /** Omit to derive from `viewer`. Pass null to hide the controls. */
+  manage?: ProfileManageState | null;
 }) {
-  const isOwner = viewer.isOwner;
+  const actions =
+    manage === undefined
+      ? profileManageState({
+          presented: viewer,
+          accountRole: viewer.role,
+          profileId: data.id,
+        })
+      : manage;
   const formats = sessionFormatPills(data.virtual, data.inPerson);
   const officeLines = data.inPerson ? officeAddressLines(data.office) : [];
   const licenses = licenseCaptions(data.licenses);
@@ -83,7 +96,7 @@ export function TherapistProfile({
           : "pb-16"
       }`}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <Link
           href={backHref}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-clay hover:text-clay-dark"
@@ -101,10 +114,14 @@ export function TherapistProfile({
           </svg>
           Back to search
         </Link>
-        {isOwner ? (
-          <Button href={routes.joinEdit} variant="secondary" aria-label="Edit profile">
-            Edit
-          </Button>
+        {actions ? (
+          <ProfileManageActions
+            profileId={data.id}
+            name={data.givenName}
+            editHref={actions.editHref}
+            deleteMode={actions.deleteMode}
+            isOwn={actions.isOwn}
+          />
         ) : null}
       </div>
 

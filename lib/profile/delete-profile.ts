@@ -133,3 +133,37 @@ export async function deleteOwnTherapistProfile(
 
   return { ok: true };
 }
+
+/** Admin, or the owner when their account is not a plain therapist role. */
+export async function deleteManagedTherapistProfile(
+  supabase: SupabaseClient,
+  input: {
+    therapistId: string;
+    photoKey: string | null;
+    videoKey: string | null;
+  },
+): Promise<DeleteProfileResult> {
+  const { error } = await supabase.rpc("delete_therapist_profile", {
+    p_therapist_id: input.therapistId,
+    p_confirm: DELETE_PROFILE_PHRASE,
+  });
+  if (error) return { ok: false, message: error.message };
+
+  try {
+    await removeOwnTherapistMedia(supabase, {
+      userId: input.therapistId,
+      photoKey: input.photoKey,
+      videoKey: input.videoKey,
+    });
+  } catch (error) {
+    return {
+      ok: true,
+      mediaError:
+        error instanceof Error
+          ? error.message
+          : "Could not remove uploaded media.",
+    };
+  }
+
+  return { ok: true };
+}
