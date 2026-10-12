@@ -5,7 +5,7 @@ import {
 } from "@/lib/tags/presets";
 
 describe("directory specialties", () => {
-  it("keeps only labels from the Find specialty list, in stored order", () => {
+  it("keeps preset and custom labels, in stored order", () => {
     expect(
       directorySpecialties([
         "Career",
@@ -18,7 +18,17 @@ describe("directory specialties", () => {
         "Couples & Relationships",
         "Life Transitions",
       ]),
-    ).toEqual(["Anxiety", "Depression", "Couples & Relationships", "Life Transitions"]);
+    ).toEqual([
+      "Career",
+      "Anxiety",
+      "College Students",
+      "Panic Attacks",
+      "Depression",
+      "Stress",
+      "Therapy for Men",
+      "Couples & Relationships",
+      "Life Transitions",
+    ]);
   });
 
   it("shows a stored Teens specialty as Self Discovery", () => {
@@ -27,10 +37,12 @@ describe("directory specialties", () => {
     );
   });
 
-  it("uses the same list Find filters by", () => {
+  it("keeps the Find preset list and a custom label", () => {
     expect(directorySpecialties([...SPECIALTY_PRESETS])).toEqual([
       ...SPECIALTY_PRESETS,
     ]);
-    expect(directorySpecialties(["Not a specialty"])).toEqual([]);
+    expect(directorySpecialties(["Not a specialty"])).toEqual([
+      "Not a specialty",
+    ]);
   });
 });
