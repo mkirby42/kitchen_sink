@@ -222,6 +222,7 @@ export function JoinStep3({
         field="specialties"
         selected={draft.specialties}
         setDraft={setDraft}
+        custom
       />
       <TagGroup
         title="Approach in Therapy"

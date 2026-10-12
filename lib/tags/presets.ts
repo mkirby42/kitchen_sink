@@ -31,13 +31,9 @@ export function canonicalSpecialtyLabels(labels: readonly string[]) {
   return out;
 }
 
-const SPECIALTY_PRESET_SET = new Set<string>(SPECIALTY_PRESETS);
-
-/** Specialties the public profile may show: Find-list labels, with Teens shown as Self Discovery. */
+/** Profile Areas of Interest. Teens shows as Self Discovery. Custom labels stay. */
 export function directorySpecialties(labels: readonly string[]): string[] {
-  return canonicalSpecialtyLabels(labels).filter((label) =>
-    SPECIALTY_PRESET_SET.has(label),
-  );
+  return canonicalSpecialtyLabels(labels);
 }
 
 export const INSURANCE_PRESETS = [

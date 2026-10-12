@@ -125,7 +125,7 @@ describe("therapist meta description", () => {
     );
   });
 
-  it("skips specialties that are not on the Find list", () => {
+  it("includes custom specialties ahead of later presets", () => {
     expect(
       therapistMetaDescription({
         name: "Travis White",
@@ -139,7 +139,7 @@ describe("therapist meta description", () => {
         ],
       }),
     ).toBe(
-      "Travis White, PsyD. Specialties include Anxiety, Depression. Profile on Kitchen Sink.",
+      "Travis White, PsyD. Specialties include Career, Anxiety, College Students. Profile on Kitchen Sink.",
     );
   });
 });

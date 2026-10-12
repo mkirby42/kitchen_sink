@@ -53,8 +53,9 @@ describe("join specialties picker", () => {
     const specialtyBlock = html.slice(specialties, modalities);
     expect(specialtyBlock).toContain("Anxiety");
     expect(specialtyBlock).toContain("Career");
-    expect(specialtyBlock).not.toContain("Add your own");
-    expect(specialtyBlock).not.toContain('placeholder="Add your own"');
+    expect(specialtyBlock).toContain("Add your own");
+    expect(specialtyBlock).toContain('placeholder="Add your own"');
+    expect(specialtyBlock).toContain(">Add<");
     const approachBlock = html.slice(modalities, insurance);
     expect(approachBlock).toContain("Add your own");
     expect(approachBlock).toMatch(
