@@ -140,14 +140,33 @@ export function step1Errors(draft: JoinDraft): string[] {
   return errors;
 }
 
-export function step2Errors(draft: JoinDraft): string[] {
+/** Shown on the media step and when publish is withheld. */
+export const PUBLISH_MEDIA_NOTE =
+  "You need a short video and a picture to publish your profile.";
+
+export const PUBLISH_MEDIA_CONTINUE_NOTE = `${PUBLISH_MEDIA_NOTE} You can continue without them.`;
+
+export function hasPublishMedia(
+  draft: Pick<JoinDraft, "photoKey" | "videoKey">,
+): boolean {
+  return Boolean(draft.photoKey?.trim() && draft.videoKey?.trim());
+}
+
+export function publishMediaErrors(draft: JoinDraft): string[] {
   const errors: string[] = [];
-
   if (!draft.photoKey?.trim()) {
-    errors.push("Photo is required");
+    errors.push("A picture is required to publish");
   }
-
+  if (!draft.videoKey?.trim()) {
+    errors.push("A short intro video is required to publish");
+  }
   return errors;
+}
+
+/** Media never blocks the wizard. Publish checks `publishMediaErrors` instead. */
+export function step2Errors(draft: JoinDraft): string[] {
+  void draft;
+  return [];
 }
 
 export function step3Errors(draft: JoinDraft): string[] {
@@ -308,12 +327,8 @@ export function continueHint(step: 1 | 2 | 3 | 4, draft: JoinDraft): string {
       }
       return "";
     }
-    case 2: {
-      if (!draft.photoKey?.trim()) {
-        return "Add a photo to continue";
-      }
+    case 2:
       return "";
-    }
     case 3: {
       const count =
         draft.specialties.length +
@@ -329,12 +344,17 @@ export function continueHint(step: 1 | 2 | 3 | 4, draft: JoinDraft): string {
   }
 }
 
-export function buildJoinPayload(draft: JoinDraft) {
+export function buildJoinPayload(
+  draft: JoinDraft,
+  options: { publish?: boolean } = {},
+) {
+  const publish = options.publish !== false;
   const allErrors = [
     ...step1Errors(draft),
     ...step2Errors(draft),
     ...step3Errors(draft),
     ...step4Errors(draft),
+    ...(publish ? publishMediaErrors(draft) : []),
   ];
   if (allErrors.length > 0) {
     throw new Error("Join draft is incomplete");
@@ -345,7 +365,7 @@ export function buildJoinPayload(draft: JoinDraft) {
     email: draft.email.trim(),
     phone: draft.phone.trim(),
     about: draft.about.trim(),
-    photo_key: draft.photoKey!.trim(),
+    photo_key: draft.photoKey?.trim() || null,
     video_key: draft.videoKey?.trim() || null,
     credential: draft.credential,
     start_date: startDateFromYears(Number(draft.yearsPracticing)),

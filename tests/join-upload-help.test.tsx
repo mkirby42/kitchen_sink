@@ -3,7 +3,11 @@ import { describe, expect, it } from "vitest";
 import { JoinStep2 } from "@/components/join/JoinStep2";
 import { UPLOAD_HELP_EMAIL } from "@/components/join/UploadHelp";
 import type { JoinDraft } from "@/lib/join/types";
-import { continueHint, step2Errors } from "@/lib/join/validate";
+import {
+  continueHint,
+  PUBLISH_MEDIA_CONTINUE_NOTE,
+  step2Errors,
+} from "@/lib/join/validate";
 
 function emptyDraft(): JoinDraft {
   return {
@@ -52,13 +56,16 @@ describe("step 2 upload help", () => {
       "JPEG, PNG, WebP, or GIF · up to 5MB. This is the photo clients see first on your profile.",
     );
     expect(html).toContain("Large photos are resized in your browser so they can upload.");
-    expect(html).toContain("Optional. One short intro clip.");
+    expect(html).toContain("One short intro clip.");
+    expect(html).toContain("no editing.");
+    expect(html).not.toContain("Optional.");
+    expect(html).toContain(PUBLISH_MEDIA_CONTINUE_NOTE);
     expect(html).toContain("MP4, WebM, or MOV · up to 50MB.");
   });
 
-  it("still requires a photo before continue", () => {
+  it("does not require a photo or video before continue", () => {
     const draft = emptyDraft();
-    expect(step2Errors(draft)).toContain("Photo is required");
-    expect(continueHint(2, draft)).toBe("Add a photo to continue");
+    expect(step2Errors(draft)).toEqual([]);
+    expect(continueHint(2, draft)).toBe("");
   });
 });

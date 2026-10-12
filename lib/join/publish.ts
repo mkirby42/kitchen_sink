@@ -21,14 +21,21 @@ export function isProfileId(value: string) {
 export function editorSaveActions(input: {
   published: boolean;
   editing: boolean;
+  /**
+   * When false, hide Publish and Save changes.
+   * Omitted means the caller is not applying the media rule.
+   * A live profile still cannot be saved as a draft.
+   */
+  mediaReady?: boolean;
 }) {
+  const canGoLive = input.mediaReady !== false;
   if (input.published && input.editing) {
-    return { draft: false, publish: false, saveChanges: true };
+    return { draft: false, publish: false, saveChanges: canGoLive };
   }
   if (input.published) {
-    return { draft: false, publish: true, saveChanges: false };
+    return { draft: false, publish: canGoLive, saveChanges: false };
   }
-  return { draft: true, publish: true, saveChanges: false };
+  return { draft: true, publish: canGoLive, saveChanges: false };
 }
 
 export function profileSaveRpc(input: {

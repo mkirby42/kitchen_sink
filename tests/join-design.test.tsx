@@ -5,19 +5,57 @@ import { JoinStep4 } from "@/components/join/JoinStep4";
 import { JoinWizard } from "@/components/join/JoinWizard";
 import type { JoinDraft } from "@/lib/join/types";
 
+function draftWithMedia(email: string): JoinDraft {
+  return {
+    name: "Maya Chen",
+    credential: "LMFT",
+    yearsPracticing: 4,
+    education: [],
+    credentials: [],
+    licenses: [{ number: "1", state: "CA" }],
+    photoKey: "uid/photo.jpg",
+    videoKey: "uid/intro.mp4",
+    openToNewClients: true,
+    virtual: true,
+    inPerson: false,
+    specialties: [],
+    modalities: [],
+    insurance: [],
+    identity: [],
+    location: null,
+    rates: [
+      { service_type: "Individual", duration_minutes: 50, price_cents: 10000 },
+    ],
+    slidingScale: false,
+    slidingScaleMinCents: null,
+    slidingScaleMaxCents: null,
+    cards: [],
+    about: "",
+    email,
+    phone: "",
+    outreach: ["email"],
+    feedback: "",
+  };
+}
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push() {}, replace() {} }),
 }));
 
 const userId = "11111111-1111-4111-8111-111111111111";
 
-function wizard(props: { step?: 1 | 2 | 3 | 4; editing?: boolean } = {}) {
+function wizard(
+  props: { step?: 1 | 2 | 3 | 4; editing?: boolean; withMedia?: boolean } = {},
+) {
   return renderToStaticMarkup(
     createElement(JoinWizard, {
       userId,
       email: "maya@example.com",
       initialStep: props.step ?? 1,
       editing: props.editing,
+      initialDraft: props.withMedia
+        ? draftWithMedia("maya@example.com")
+        : undefined,
     }),
   );
 }
@@ -52,7 +90,7 @@ describe("join step design", () => {
   });
 
   it("keeps feedback on the last join step as the rounded box", () => {
-    const html = wizard({ step: 4 });
+    const html = wizard({ step: 4, withMedia: true });
     expect(html).toContain("Feedback for us");
     expect(html).toContain("We email it to the team when you publish.");
     expect(html).toContain("rounded-box");
@@ -61,7 +99,7 @@ describe("join step design", () => {
     expect(html).not.toContain("Save changes →");
     expect(html).not.toContain("Submit application →");
 
-    const editing = wizard({ step: 4, editing: true });
+    const editing = wizard({ step: 4, editing: true, withMedia: true });
     expect(editing).not.toContain("Feedback for us");
     expect(editing).toContain("Save changes →");
     expect(editing).not.toContain("Save as draft");

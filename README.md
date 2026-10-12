@@ -55,7 +55,7 @@ flowchart LR
 
 - `/find` calls one RPC, `search_therapists` — OR overlap on selected tags, ranked by match count, page size 24.
 - `/t/[id]` loads one therapist (photo + native `<video>` intro). The owner sees **Edit** (header, top right).
-- `/join` is a 4-step therapist wizard; photo required, intro video optional (50MB). Returning therapists sign in from home and land on their profile; **Save changes** calls `update_therapist_profile`.
+- `/join` is a 4-step therapist wizard. Continue does not require a photo or intro video. Publishing requires both (video up to 50MB). Returning therapists sign in from home and land on their profile; **Save changes** calls `update_therapist_profile`.
 - `proxy.ts` refreshes the Supabase session. Schema lives in `supabase/migrations/`.
 
 ## Run it

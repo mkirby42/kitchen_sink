@@ -12,6 +12,7 @@ import {
   uploadFailureMessage,
 } from "@/lib/join/media";
 import { uploadJoinMedia } from "@/lib/join/submit";
+import { PUBLISH_MEDIA_CONTINUE_NOTE } from "@/lib/join/validate";
 import { createClient } from "@/lib/supabase/client";
 import { storagePublicUrl } from "@/lib/therapists/display";
 import { Notice } from "@/components/ui/Notice";
@@ -124,6 +125,9 @@ export function JoinStep2({
 
   return (
     <div className="space-y-10">
+      <p className="rounded-box bg-cream px-5 py-4 text-center text-sm leading-6 text-body">
+        {PUBLISH_MEDIA_CONTINUE_NOTE}
+      </p>
       <MediaSlot
         kind="photo"
         preview={photoPreview}
@@ -146,7 +150,7 @@ export function JoinStep2({
         uploading={uploading.video}
         accept={VIDEO_ACCEPT}
         helpers={[
-          "Optional. One short intro clip. We'll play it as uploaded on your public profile — no editing.",
+          "One short intro clip. We'll play it as uploaded on your public profile — no editing.",
           "MP4, WebM, or MOV · up to 50MB.",
         ]}
         onFile={(file) => void chooseFile("video", file)}

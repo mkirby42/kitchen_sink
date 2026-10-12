@@ -12,6 +12,7 @@ export function JoinSaveBar({
   submitError,
   hint,
   error,
+  mediaNote,
   onContinue,
   onSave,
 }: {
@@ -25,6 +26,7 @@ export function JoinSaveBar({
   submitError: string;
   hint: string;
   error?: string;
+  mediaNote?: string | null;
   onContinue: () => void;
   onSave: (intent: EditorSaveAction) => void;
 }) {
@@ -32,6 +34,11 @@ export function JoinSaveBar({
 
   return (
     <div className="flex flex-col items-center gap-3 text-center">
+      {mediaNote ? (
+        <p className="max-w-md rounded-box bg-cream px-5 py-4 text-center text-sm leading-6 text-body">
+          {mediaNote}
+        </p>
+      ) : null}
       {submitError || hint || (blocked && error) ? (
         <p
           role={submitError ? "alert" : undefined}
