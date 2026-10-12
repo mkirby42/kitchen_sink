@@ -4,6 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendJoinFeedback } from "@/lib/feedback/actions";
 import { finishJoin } from "@/lib/join/finish";
+import {
+  editorSaveActions,
+  profileSaveRpc,
+  withPublishArg,
+  type EditorSaveAction,
+} from "@/lib/join/publish";
 import type { JoinDraft } from "@/lib/join/types";
 import { toRpcArgs } from "@/lib/join/submit";
 import {
@@ -17,10 +23,10 @@ import {
 } from "@/lib/join/validate";
 import { joinPath, routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { pageTitleClass } from "@/components/ui/styles";
 import { DeleteProfile } from "./DeleteProfile";
+import { JoinSaveBar } from "./JoinSaveBar";
 import { JoinShell } from "./JoinShell";
 import { JoinStep1 } from "./JoinStep1";
 import { JoinStep2 } from "./JoinStep2";
@@ -127,23 +133,26 @@ function Heading({ step }: { step: Step }) {
 
 export function JoinWizard({
   userId,
+  profileId = userId,
   email,
   initialStep,
   initialDraft,
   editing = false,
+  published,
   notice,
   adminTest = false,
-  profileId = userId,
 }: {
   userId: string;
+  /** Profile being edited. Differs from userId when an admin edits someone else. */
+  profileId?: string;
   email: string;
   initialStep: Step;
   initialDraft?: JoinDraft;
   editing?: boolean;
+  /** Omitted: an in-progress edit is treated as already published. */
+  published?: boolean;
   notice?: string;
   adminTest?: boolean;
-  /** Profile being edited. Defaults to the signed-in user. */
-  profileId?: string;
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initialStep);
@@ -151,8 +160,12 @@ export function JoinWizard({
     () => initialDraft ?? emptyDraft(email),
   );
   const [submitting, setSubmitting] = useState(false);
+  const [saveIntent, setSaveIntent] = useState<EditorSaveAction | null>(null);
   const [submitError, setSubmitError] = useState("");
   const [mediaBusy, setMediaBusy] = useState(false);
+  const live = published ?? editing;
+  const actions = editorSaveActions({ published: live, editing });
+  const ownProfile = profileId === userId;
 
   function moveTo(nextStep: Step) {
     setStep(nextStep);
@@ -161,7 +174,7 @@ export function JoinWizard({
       joinPath({
         step: nextStep,
         edit: editing,
-        profile: profileId !== userId ? profileId : undefined,
+        profile: ownProfile ? undefined : profileId,
       }),
       { scroll: false },
     );
@@ -176,29 +189,29 @@ export function JoinWizard({
     moveTo((step - 1) as Step);
   }
 
-  async function continueOrSubmit() {
-    if (!canContinue(step, draft)) return;
-    if (step < 4) {
-      moveTo((step + 1) as Step);
-      return;
-    }
+  function continueForward() {
+    if (!canContinue(step, draft) || step >= 4) return;
+    moveTo((step + 1) as Step);
+  }
+
+  async function saveProfile(intent: EditorSaveAction) {
+    if (step !== 4 || !canContinue(4, draft)) return;
 
     setSubmitError("");
+    setSaveIntent(intent);
     setSubmitting(true);
     try {
       const payload = buildJoinPayload(draft);
+      const args = withPublishArg(toRpcArgs(payload), intent);
+      const rpc = profileSaveRpc({ editing, ownProfile });
       const result = await finishJoin({
-        feedback: payload.feedback,
+        feedback: !ownProfile || intent === "draft" ? null : payload.feedback,
         save: async () => {
-          const args = toRpcArgs(payload);
-          const editingOther = profileId !== userId;
           const { error } = await createClient().rpc(
-            editingOther
-              ? "admin_update_therapist_profile"
-              : editing
-                ? "update_therapist_profile"
-                : "complete_therapist_join",
-            editingOther ? { p_therapist_id: profileId, ...args } : args,
+            rpc,
+            rpc === "admin_save_therapist_profile"
+              ? { p_therapist_id: profileId, ...args }
+              : args,
           );
           return error?.message ?? null;
         },
@@ -215,6 +228,7 @@ export function JoinWizard({
       );
     } finally {
       setSubmitting(false);
+      setSaveIntent(null);
     }
   }
 
@@ -228,35 +242,20 @@ export function JoinWizard({
       onBack={goBack}
       closeHref={editing ? routes.therapist(profileId) : routes.home}
       footer={
-        <div className="flex flex-col items-center gap-3 text-center">
-          {submitError || hint || (blocked && errors[0]) ? (
-            <p
-              role={submitError ? "alert" : undefined}
-              className={`text-sm ${
-                submitError || (!hint && blocked)
-                  ? "font-medium text-clay-dark"
-                  : "text-mute"
-              }`}
-            >
-              {submitError || hint || errors[0]}
-            </p>
-          ) : null}
-          <Button
-            type="button"
-            disabled={blocked || submitting || mediaBusy}
-            onClick={() => void continueOrSubmit()}
-          >
-            {submitting
-              ? editing
-                ? "Saving…"
-                : "Submitting…"
-              : step === 4
-                ? editing
-                  ? "Save changes →"
-                  : "Submit application →"
-                : "Continue →"}
-          </Button>
-        </div>
+        <JoinSaveBar
+          step={step}
+          live={live}
+          actions={actions}
+          blocked={blocked}
+          submitting={submitting}
+          mediaBusy={mediaBusy}
+          saveIntent={saveIntent}
+          submitError={submitError}
+          hint={hint}
+          error={errors[0]}
+          onContinue={continueForward}
+          onSave={(intent) => void saveProfile(intent)}
+        />
       }
     >
       {notice ? (
@@ -280,7 +279,7 @@ export function JoinWizard({
         <JoinStep4
           draft={draft}
           setDraft={setDraft}
-          hideFeedback={editing}
+          hideFeedback={live || !ownProfile}
         />
       )}
       {editing && !adminTest ? (

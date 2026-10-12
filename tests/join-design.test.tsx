@@ -54,13 +54,18 @@ describe("join step design", () => {
   it("keeps feedback on the last join step as the rounded box", () => {
     const html = wizard({ step: 4 });
     expect(html).toContain("Feedback for us");
-    expect(html).toContain("We email it to the team when you submit.");
+    expect(html).toContain("We email it to the team when you publish.");
     expect(html).toContain("rounded-box");
-    expect(html).toContain("Submit application →");
+    expect(html).toContain("Save as draft");
+    expect(html).toContain("Publish profile →");
+    expect(html).not.toContain("Save changes →");
+    expect(html).not.toContain("Submit application →");
 
     const editing = wizard({ step: 4, editing: true });
     expect(editing).not.toContain("Feedback for us");
     expect(editing).toContain("Save changes →");
+    expect(editing).not.toContain("Save as draft");
+    expect(editing).not.toContain("Publish profile →");
   });
 
   it("keeps the sliding-scale checkbox and the eggplant prompt switch", () => {

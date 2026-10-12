@@ -19,7 +19,8 @@ describe("join feedback", () => {
         initialStep: 4,
       }),
     );
-    expect(html).toContain("Submit application →");
+    expect(html).toContain("Publish profile →");
+    expect(html).toContain("Save as draft");
     expect(html).not.toContain("Retry feedback email");
     expect(html).not.toContain("Sending feedback");
     expect(html).not.toContain("Your profile is saved");

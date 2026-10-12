@@ -2,8 +2,10 @@ import { ADMIN_ONLY_HIDDEN_LABEL } from "@/lib/therapists/listing";
 
 export function HiddenFromPublicBadge({
   variant,
+  label = ADMIN_ONLY_HIDDEN_LABEL,
 }: {
   variant: "card" | "banner";
+  label?: string;
 }) {
   if (variant === "banner") {
     return (
@@ -11,7 +13,7 @@ export function HiddenFromPublicBadge({
         className="relative z-10 mb-4 rounded-2xl border border-ink/30 bg-paper px-4 py-3 text-sm font-medium text-ink"
         role="status"
       >
-        {ADMIN_ONLY_HIDDEN_LABEL}
+        {label}
       </p>
     );
   }
@@ -21,7 +23,7 @@ export function HiddenFromPublicBadge({
       className="mt-2 inline-flex rounded-full border border-ink/30 bg-cream px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink"
       role="status"
     >
-      {ADMIN_ONLY_HIDDEN_LABEL}
+      {label}
     </p>
   );
 }

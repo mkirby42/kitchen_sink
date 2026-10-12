@@ -6,7 +6,8 @@ import { JoinAuth } from "@/components/join/JoinAuth";
 import { JoinWizard } from "@/components/join/JoinWizard";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { ADMIN_JOIN_NOTICE, editSubject, joinAccess } from "@/lib/join/access";
-import { fetchJoinDraft } from "@/lib/join/load-draft";
+import { fetchJoinEditor } from "@/lib/join/load-draft";
+import { isProfilePublished } from "@/lib/therapists/listing";
 import { parseProfileRole } from "@/lib/role";
 import { routes } from "@/lib/routes";
 import { supabasePublicConfig } from "@/lib/supabase/env";
@@ -41,6 +42,7 @@ export default async function JoinPage({
 
   const params = await searchParams;
   const editing = params.edit === "1";
+  const targetProfileId = editing ? (params.profile?.trim() ?? "") : "";
   const initialMode =
     params.mode === "signin" || editing ? "signin" : "signup";
 
@@ -53,7 +55,7 @@ export default async function JoinPage({
 
   const { data: therapist } = await supabase
     .from("therapists")
-    .select("profile_id")
+    .select("*")
     .eq("profile_id", user.id)
     .maybeSingle();
 
@@ -79,16 +81,17 @@ export default async function JoinPage({
       : 1;
 
   if (subject.kind === "other") {
-    const otherDraft = await fetchJoinDraft(supabase, subject.id, "");
-    if (!otherDraft) redirect(routes.therapist(subject.id));
+    const loaded = await fetchJoinEditor(supabase, subject.id, "");
+    if (!loaded) redirect(routes.therapist(subject.id));
     return (
       <JoinWizard
         userId={user.id}
         profileId={subject.id}
-        email={user.email ?? ""}
+        email={loaded.draft.email || user.email || ""}
         initialStep={initialStep}
-        initialDraft={otherDraft}
+        initialDraft={loaded.draft}
         editing
+        published={loaded.published}
         adminTest
       />
     );
@@ -99,6 +102,7 @@ export default async function JoinPage({
     role,
     hasTherapist: Boolean(therapist),
     editing,
+    targetProfileId,
   });
 
   if (access.kind === "redirect") redirect(access.href);
@@ -117,19 +121,31 @@ export default async function JoinPage({
     );
   }
 
-  const loadedDraft = access.editing
-    ? await fetchJoinDraft(supabase, user.id, user.email ?? "")
-    : undefined;
+  const profileId = access.profileId ?? user.id;
+  const loaded = access.editing
+    ? await fetchJoinEditor(supabase, profileId, user.email ?? "")
+    : null;
 
-  if (access.editing && !loadedDraft) redirect(routes.join);
+  if (access.editing && !loaded) {
+    redirect(access.profileId ? routes.adminMedia : routes.join);
+  }
+
+  const practice = therapist as { published?: boolean | null } | null;
+  const published = access.editing
+    ? (loaded?.published ?? true)
+    : practice
+      ? isProfilePublished(practice.published)
+      : false;
 
   return (
     <JoinWizard
       userId={user.id}
-      email={user.email ?? ""}
+      profileId={profileId}
+      email={loaded?.draft.email || user.email || ""}
       initialStep={initialStep}
-      initialDraft={loadedDraft ?? undefined}
+      initialDraft={loaded?.draft}
       editing={access.editing}
+      published={published}
       adminTest={access.adminTest}
       notice={
         access.adminTest &&

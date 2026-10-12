@@ -269,7 +269,11 @@ describe("admin view switcher", () => {
         roleIsAdmin: false,
         audience,
       });
-      expect(narrowed.every((item) => item.listed !== false)).toBe(true);
+      expect(
+        narrowed.every(
+          (item) => item.listed !== false && item.published !== false,
+        ),
+      ).toBe(true);
       expect(narrowed.length).toBeLessThanOrEqual(rows.length);
       expect(narrowed.every((item) => rows.includes(item))).toBe(true);
     }

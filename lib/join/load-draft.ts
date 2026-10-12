@@ -98,11 +98,25 @@ export function draftFromRows(rows: JoinDraftRows): JoinDraft {
   };
 }
 
+export type JoinEditorState = {
+  draft: JoinDraft;
+  published: boolean;
+};
+
 export async function fetchJoinDraft(
   supabase: SupabaseClient,
   userId: string,
   email: string,
 ): Promise<JoinDraft | null> {
+  const loaded = await fetchJoinEditor(supabase, userId, email);
+  return loaded?.draft ?? null;
+}
+
+export async function fetchJoinEditor(
+  supabase: SupabaseClient,
+  userId: string,
+  email: string,
+): Promise<JoinEditorState | null> {
   const [
     profileRes,
     therapistRes,
@@ -141,15 +155,20 @@ export async function fetchJoinDraft(
   if (profileRes.error || therapistRes.error) return null;
   if (!profileRes.data || !therapistRes.data) return null;
 
-  return draftFromRows({
-    email,
-    profile: profileRes.data,
-    therapist: therapistRes.data,
-    licenses: licensesRes.data ?? [],
-    qualifications: qualificationsRes.data ?? [],
-    rates: ratesRes.data ?? [],
-    tags: tagsRes.data ?? [],
-    items: itemsRes.data ?? [],
-    location: locationRes.data,
-  });
+  const therapist = therapistRes.data as { published?: boolean | null };
+
+  return {
+    draft: draftFromRows({
+      email,
+      profile: profileRes.data,
+      therapist: therapistRes.data,
+      licenses: licensesRes.data ?? [],
+      qualifications: qualificationsRes.data ?? [],
+      rates: ratesRes.data ?? [],
+      tags: tagsRes.data ?? [],
+      items: itemsRes.data ?? [],
+      location: locationRes.data,
+    }),
+    published: therapist.published !== false,
+  };
 }

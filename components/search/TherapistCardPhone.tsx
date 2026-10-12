@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
+import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
 import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 
 const formatPillClass =
@@ -24,6 +25,7 @@ export function TherapistCardPhone({
   href,
   sample,
   hidden,
+  draft = false,
 }: {
   name: string;
   given: string;
@@ -38,6 +40,7 @@ export function TherapistCardPhone({
   href: string;
   sample: boolean;
   hidden: boolean;
+  draft?: boolean;
 }) {
   const portrait = Boolean(photoUrl || videoUrl);
   const knowLabel = `Get to know ${given}`;
@@ -102,6 +105,9 @@ export function TherapistCardPhone({
           </div>
         ) : null}
 
+        {draft ? (
+          <HiddenFromPublicBadge variant="card" label={DRAFT_PROFILE_LABEL} />
+        ) : null}
         {hidden ? <HiddenFromPublicBadge variant="card" /> : null}
 
         {prompt && answer ? (

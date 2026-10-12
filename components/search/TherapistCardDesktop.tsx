@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
+import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
 import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 import { modalityDisplayLabel } from "@/lib/tags/modality-display";
 
@@ -70,6 +71,7 @@ export function TherapistCardDesktop({
   href,
   sample,
   hidden,
+  draft = false,
 }: {
   name: string;
   given: string;
@@ -86,6 +88,7 @@ export function TherapistCardDesktop({
   href: string;
   sample: boolean;
   hidden: boolean;
+  draft?: boolean;
 }) {
   const portrait = Boolean(photoUrl || videoUrl);
   const knowLabel = `Get to know ${given}`;
@@ -145,6 +148,9 @@ export function TherapistCardDesktop({
               </div>
               {credential ? (
                 <p className="mt-2 text-sm text-mute">{credential}</p>
+              ) : null}
+              {draft ? (
+                <HiddenFromPublicBadge variant="card" label={DRAFT_PROFILE_LABEL} />
               ) : null}
               {hidden ? <HiddenFromPublicBadge variant="card" /> : null}
             </div>

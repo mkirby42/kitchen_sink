@@ -17,6 +17,7 @@ import {
   profileManageState,
   type ProfileManageState,
 } from "@/lib/profile/manage";
+import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
 import { ProfileManageActions } from "./ProfileManageActions";
 import { modalityDisplayLabels } from "@/lib/tags/modality-display";
 import { directorySpecialties } from "@/lib/tags/presets";
@@ -125,6 +126,11 @@ export function TherapistProfile({
         ) : null}
       </div>
 
+      {data.unpublished ? (
+        <div className="mt-6">
+          <HiddenFromPublicBadge variant="banner" label={DRAFT_PROFILE_LABEL} />
+        </div>
+      ) : null}
       {data.hiddenFromPublic ? (
         <div className="mt-6">
           <HiddenFromPublicBadge variant="banner" />

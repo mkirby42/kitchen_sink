@@ -57,7 +57,7 @@ export async function generateMetadata({
       alternates: { canonical: `/t/${id}` },
     };
   }
-  if (data.hiddenFromPublic) {
+  if (data.hiddenFromPublic || data.unpublished) {
     return {
       title: data.name,
       description: therapistMetaDescription({

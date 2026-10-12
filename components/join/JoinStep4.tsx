@@ -421,7 +421,7 @@ export function JoinStep4({
           <Eyebrow>Feedback for us</Eyebrow>
           <p className="mt-2 text-sm leading-relaxed text-mute">
             Optional — we&apos;re in testing, so anything you&apos;d flag is welcome.
-            We email it to the team when you submit.
+            We email it to the team when you publish.
           </p>
           <textarea
             rows={3}
