@@ -8,13 +8,17 @@ import {
   QUALIFICATION_MAX_LENGTH,
   qualificationRows,
 } from "@/lib/join/qualifications";
+import {
+  normalizeRateServiceType,
+  RATE_SERVICE_LABEL_MAX,
+  rateServiceLabelIssue,
+} from "@/lib/join/rates";
 import type { JoinDraft } from "@/lib/join/types";
 import {
   canonicalSpecialtyLabels,
   CREDENTIALS,
   LICENSE_STATES,
   OUTREACH_OPTIONS,
-  RATE_SERVICE_TYPES,
 } from "@/lib/tags/presets";
 
 const MIN_SESSION_MINUTES = 1;
@@ -31,7 +35,6 @@ const CARD_TAGS = new Set([
 
 const LICENSE_STATE_SET = new Set<string>(LICENSE_STATES);
 const CREDENTIAL_SET = new Set<string>(CREDENTIALS);
-const RATE_SERVICE_TYPE_SET = new Set<string>(RATE_SERVICE_TYPES);
 const OUTREACH_OPTION_SET = new Set<string>(OUTREACH_OPTIONS);
 
 function hasDuplicateValues(values: string[]): boolean {
@@ -183,9 +186,27 @@ export function step4Errors(draft: JoinDraft): string[] {
     errors.push("At least one rate is required");
   }
 
+  let missingRateName = false;
+  let longRateName = false;
+  let duplicateRate = false;
+  const rateKeys = new Set<string>();
+
   for (const rate of draft.rates) {
-    if (!RATE_SERVICE_TYPE_SET.has(rate.service_type)) {
-      errors.push(`Invalid service type: ${rate.service_type}`);
+    const issue = rateServiceLabelIssue(rate.service_type);
+    if (issue === "empty") {
+      missingRateName = true;
+    } else if (issue === "long") {
+      longRateName = true;
+    } else {
+      const label = normalizeRateServiceType(rate.service_type);
+      const key = label?.toLowerCase();
+      if (!key) {
+        missingRateName = true;
+      } else if (rateKeys.has(key)) {
+        duplicateRate = true;
+      } else {
+        rateKeys.add(key);
+      }
     }
     if (
       !Number.isInteger(rate.duration_minutes) ||
@@ -201,10 +222,13 @@ export function step4Errors(draft: JoinDraft): string[] {
     }
   }
 
-  const serviceTypes = draft.rates.map((rate) => rate.service_type);
-  if (hasDuplicateValues(serviceTypes)) {
-    errors.push("Rate service types must be unique");
+  if (missingRateName) errors.push("Add a name for each rate");
+  if (longRateName) {
+    errors.push(
+      `Rate names must be ${RATE_SERVICE_LABEL_MAX} characters or fewer`,
+    );
   }
+  if (duplicateRate) errors.push("Rate service types must be unique");
 
   const answeredCards = answeredConversationCardCount(draft.cards);
   if (answeredCards < MIN_CONVERSATION_CARDS) {
@@ -335,11 +359,15 @@ export function buildJoinPayload(draft: JoinDraft) {
         number: license.number.trim(),
         state: license.state.trim(),
       })),
-    rates: draft.rates.map((rate) => ({
-      service_type: rate.service_type,
-      duration_minutes: rate.duration_minutes,
-      price_cents: rate.price_cents,
-    })),
+    rates: draft.rates.map((rate) => {
+      const serviceType = normalizeRateServiceType(rate.service_type);
+      if (!serviceType) throw new Error("Join draft is incomplete");
+      return {
+        service_type: serviceType,
+        duration_minutes: rate.duration_minutes,
+        price_cents: rate.price_cents,
+      };
+    }),
     sliding_scale: draft.slidingScale,
     sliding_scale_min_cents: null,
     sliding_scale_max_cents: null,

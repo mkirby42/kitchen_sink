@@ -67,10 +67,10 @@ export function DesktopIdentity({
             key={`${rate.service_type}-${rate.duration_minutes}`}
             className="flex items-baseline justify-between gap-4 py-3"
           >
-            <dt className="text-mute">
+            <dt className="min-w-0 break-words text-mute">
               {rate.service_type} session ({rate.duration_minutes} min)
             </dt>
-            <dd className="font-medium text-body">
+            <dd className="shrink-0 font-medium text-body">
               {formatUsdFromCents(rate.price_cents)}
             </dd>
           </div>
