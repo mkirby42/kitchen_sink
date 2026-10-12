@@ -27,7 +27,12 @@ export function editorSaveActions(input: {
    * A live profile still cannot be saved as a draft.
    */
   mediaReady?: boolean;
+  /** Started draft an admin is filling. Only the therapist can publish it. */
+  publishHeld?: boolean;
 }) {
+  if (input.publishHeld && !(input.published && input.editing)) {
+    return { draft: true, publish: false, saveChanges: false };
+  }
   const canGoLive = input.mediaReady !== false;
   if (input.published && input.editing) {
     return { draft: false, publish: false, saveChanges: canGoLive };

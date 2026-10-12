@@ -6,12 +6,10 @@ import { sendJoinFeedback } from "@/lib/feedback/actions";
 import { finishJoin } from "@/lib/join/finish";
 import {
   editorSaveActions,
-  profileSaveRpc,
-  withPublishArg,
   type EditorSaveAction,
 } from "@/lib/join/publish";
 import type { JoinDraft } from "@/lib/join/types";
-import { toRpcArgs } from "@/lib/join/submit";
+import { saveJoinProfile } from "@/lib/join/submit";
 import {
   buildJoinPayload,
   canContinue,
@@ -144,6 +142,9 @@ export function JoinWizard({
   published,
   notice,
   adminTest = false,
+  onBehalfId,
+  canPublish = false,
+  publishHeld = false,
 }: {
   userId: string;
   /** Profile being edited. Differs from userId when an admin edits someone else. */
@@ -156,6 +157,12 @@ export function JoinWizard({
   published?: boolean;
   notice?: string;
   adminTest?: boolean;
+  /** Started draft an admin is filling. Returns to Drafts. */
+  onBehalfId?: string;
+  /** Owner of a profile_starts draft. Publish also lists it. */
+  canPublish?: boolean;
+  /** Admin fill-in. Save as draft only; the therapist publishes. */
+  publishHeld?: boolean;
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initialStep);
@@ -172,6 +179,7 @@ export function JoinWizard({
     published: live,
     editing,
     mediaReady,
+    publishHeld,
   });
   const ownProfile = profileId === userId;
   const mediaNote =
@@ -190,7 +198,8 @@ export function JoinWizard({
       joinPath({
         step: nextStep,
         edit: editing,
-        profile: ownProfile ? undefined : profileId,
+        profile: onBehalfId || ownProfile ? undefined : profileId,
+        forId: onBehalfId,
       }),
       { scroll: false },
     );
@@ -199,7 +208,13 @@ export function JoinWizard({
 
   function goBack() {
     if (step === 1) {
-      router.push(editing ? routes.therapist(profileId) : routes.home);
+      router.push(
+        onBehalfId
+          ? routes.adminStarts
+          : editing
+            ? routes.therapist(profileId)
+            : routes.home,
+      );
       return;
     }
     moveTo((step - 1) as Step);
@@ -224,17 +239,17 @@ export function JoinWizard({
       const payload = buildJoinPayload(draft, {
         publish: intent !== "draft",
       });
-      const args = withPublishArg(toRpcArgs(payload), intent);
-      const rpc = profileSaveRpc({ editing, ownProfile });
+      const claim = intent === "publish" && canPublish;
       const result = await finishJoin({
         feedback: !ownProfile || intent === "draft" ? null : payload.feedback,
         save: async () => {
-          const { error } = await createClient().rpc(
-            rpc,
-            rpc === "admin_save_therapist_profile"
-              ? { p_therapist_id: profileId, ...args }
-              : args,
-          );
+          const saved = await saveJoinProfile(createClient(), payload, {
+            editing,
+            profileId: ownProfile ? undefined : profileId,
+            intent: claim ? "draft" : intent,
+          });
+          if (saved || !claim) return saved;
+          const { error } = await createClient().rpc("publish_started_profile");
           return error?.message ?? null;
         },
         notify: (body) => sendJoinFeedback(body),
@@ -243,7 +258,9 @@ export function JoinWizard({
         setSubmitError(result.error);
         return;
       }
-      router.push(routes.therapist(profileId));
+      router.push(
+        onBehalfId ? routes.adminStarts : routes.therapist(profileId),
+      );
     } catch (error) {
       setSubmitError(
         error instanceof Error ? error.message : "Unable to submit your profile.",
@@ -262,7 +279,13 @@ export function JoinWizard({
     <JoinShell
       step={step}
       onBack={goBack}
-      closeHref={editing ? routes.therapist(profileId) : routes.home}
+      closeHref={
+        onBehalfId
+          ? routes.adminStarts
+          : editing
+            ? routes.therapist(profileId)
+            : routes.home
+      }
       footer={
         <JoinSaveBar
           step={step}
@@ -305,7 +328,7 @@ export function JoinWizard({
           hideFeedback={live || !ownProfile}
         />
       )}
-      {editing && !adminTest ? (
+      {editing && !adminTest && !onBehalfId ? (
         <DeleteProfile
           userId={userId}
           photoKey={draft.photoKey}

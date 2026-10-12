@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 export default function HomePage() {
   const panels = homePanels();
 
-  return <HomeHero client={panels.client} therapist={panels.therapist} />;
+  return <HomeHero client={panels.client} />;
 }

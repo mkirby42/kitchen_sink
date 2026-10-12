@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AccountShell } from "@/components/auth/AccountShell";
+import { AdminViewHold } from "@/components/admin/AdminViewHold";
 import { Button } from "@/components/ui/Button";
 import { JoinAuth } from "@/components/join/JoinAuth";
 import { JoinWizard } from "@/components/join/JoinWizard";
 import { readAudienceCookie } from "@/lib/audience-cookie";
+import { adminToolsVisible } from "@/lib/audience";
 import { ADMIN_JOIN_NOTICE, editSubject, joinAccess } from "@/lib/join/access";
 import { fetchJoinEditor } from "@/lib/join/load-draft";
+import { isProfileId } from "@/lib/join/publish";
 import { isProfilePublished } from "@/lib/therapists/listing";
 import { parseProfileRole } from "@/lib/role";
 import { routes } from "@/lib/routes";
@@ -20,6 +23,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/join" },
 };
 
+const STARTED_DRAFT_NOTICE =
+  "You're filling this draft in for them. It stays off Find and the public profile until they publish it.";
+
 export default async function JoinPage({
   searchParams,
 }: {
@@ -28,6 +34,7 @@ export default async function JoinPage({
     mode?: string;
     edit?: string;
     profile?: string;
+    for?: string;
   }>;
 }) {
   if (!supabasePublicConfig()) {
@@ -43,6 +50,7 @@ export default async function JoinPage({
   const params = await searchParams;
   const editing = params.edit === "1";
   const targetProfileId = editing ? (params.profile?.trim() ?? "") : "";
+  const forId = params.for && isProfileId(params.for) ? params.for : null;
   const initialMode =
     params.mode === "signin" || editing ? "signin" : "signup";
 
@@ -83,6 +91,7 @@ export default async function JoinPage({
   if (subject.kind === "other") {
     const loaded = await fetchJoinEditor(supabase, subject.id, "");
     if (!loaded) redirect(routes.therapist(subject.id));
+    const started = await hasUnpublishedStart(supabase, subject.id);
     return (
       <JoinWizard
         userId={user.id}
@@ -93,6 +102,8 @@ export default async function JoinPage({
         editing
         published={loaded.published}
         adminTest
+        publishHeld={started}
+        notice={started ? STARTED_DRAFT_NOTICE : undefined}
       />
     );
   }
@@ -103,7 +114,27 @@ export default async function JoinPage({
     hasTherapist: Boolean(therapist),
     editing,
     targetProfileId,
+    forId,
   });
+
+  if (access.kind === "wizard" && access.onBehalfId) {
+    if (
+      !adminToolsVisible({
+        role,
+        audience: await readAudienceCookie(),
+      })
+    ) {
+      return <AdminViewHold />;
+    }
+  }
+
+  if (
+    access.kind === "redirect" &&
+    role === "therapist" &&
+    (await hasUnpublishedStart(supabase, user.id))
+  ) {
+    redirect(routes.joinEdit);
+  }
 
   if (access.kind === "redirect") redirect(access.href);
 
@@ -121,12 +152,25 @@ export default async function JoinPage({
     );
   }
 
-  const profileId = access.profileId ?? user.id;
+  const profileId = access.onBehalfId ?? access.profileId ?? user.id;
   const loaded = access.editing
-    ? await fetchJoinEditor(supabase, profileId, user.email ?? "")
+    ? await fetchJoinEditor(
+        supabase,
+        profileId,
+        access.onBehalfId ? "" : (user.email ?? ""),
+      )
     : null;
 
   if (access.editing && !loaded) {
+    if (access.onBehalfId) {
+      return (
+        <AccountShell
+          eyebrow="Ops"
+          title="No profile to edit"
+          lede="That account does not have a therapist profile yet."
+        />
+      );
+    }
     redirect(access.profileId ? routes.adminMedia : routes.join);
   }
 
@@ -136,6 +180,11 @@ export default async function JoinPage({
     : practice
       ? isProfilePublished(practice.published)
       : false;
+  const started = access.editing
+    ? await hasUnpublishedStart(supabase, profileId)
+    : false;
+  const canPublish = started && !access.onBehalfId;
+  const audience = await readAudienceCookie();
 
   return (
     <JoinWizard
@@ -147,13 +196,32 @@ export default async function JoinPage({
       editing={access.editing}
       published={published}
       adminTest={access.adminTest}
+      onBehalfId={access.onBehalfId}
+      canPublish={canPublish}
+      publishHeld={Boolean(access.onBehalfId) && started}
       notice={
-        access.adminTest &&
-        !access.editing &&
-        (await readAudienceCookie()) === "admin"
-          ? ADMIN_JOIN_NOTICE
-          : undefined
+        access.onBehalfId
+          ? STARTED_DRAFT_NOTICE
+          : canPublish
+            ? "This draft is only visible to you and Kitchen Sink. Nothing goes live until you publish it."
+            : access.adminTest && !access.editing && audience === "admin"
+              ? ADMIN_JOIN_NOTICE
+              : undefined
       }
     />
   );
+}
+
+async function hasUnpublishedStart(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+) {
+  const { data, error } = await supabase
+    .from("profile_starts")
+    .select("id")
+    .eq("profile_id", userId)
+    .in("status", ["drafting", "ready"])
+    .limit(1);
+  if (error || !data) return false;
+  return data.length > 0;
 }

@@ -6,7 +6,7 @@ import { homePanels } from "@/lib/home";
 import { routes } from "@/lib/routes";
 
 describe("homePanels", () => {
-  it("matches the public homepage mock", () => {
+  it("keeps the client find card", () => {
     expect(homePanels()).toEqual({
       client: {
         title: "Find a therapist who Gets You.",
@@ -15,36 +15,12 @@ describe("homePanels", () => {
           { href: routes.find, label: "Find a therapist", variant: "primary" },
         ],
       },
-      therapist: {
-        title: "Meet clients who are ready to bring it all.",
-        actions: [
-          { href: routes.join, label: "Create a profile", variant: "primary" },
-          {
-            href: routes.joinSignIn,
-            label: "Log in",
-            variant: "secondary",
-          },
-        ],
-      },
     });
-  });
-
-  it("keeps the therapist card to Create a profile and Log in", () => {
-    const panels = homePanels();
-    expect(panels.therapist.actions.map((action) => action.label)).toEqual([
-      "Create a profile",
-      "Log in",
-    ]);
-    expect(panels.therapist.actions.map((action) => action.variant)).toEqual([
-      "primary",
-      "secondary",
-    ]);
-    expect(panels.client.actions[0]?.href).toBe(routes.find);
   });
 });
 
 describe("home hero", () => {
-  it("renders the mock copy with the therapist path selected", () => {
+  it("renders the therapist start and the client card", () => {
     const html = renderToStaticMarkup(
       createElement(HomeHero, homePanels()),
     );
@@ -55,14 +31,28 @@ describe("home hero", () => {
     expect(html).toContain(
       "Connect with a therapist you can bring everything — and the kitchen sink — to session.",
     );
-    expect(html).toContain("Connect with a Therapist");
-    expect(html).toContain("Therapist who is ready to connect");
-    expect(html).toContain('aria-pressed="true"');
-    expect(html).toContain("Meet clients who are ready to bring it all.");
-    expect(html).toContain("Create a profile");
+    expect(html).toContain("FOR THERAPISTS · FREE");
+    expect(html).toContain("You bring the expertise. We&#x27;ll help with the profile.");
+    expect(html).toContain("Less setup. Your profile, your voice.");
+    expect(html).toContain("Get my profile started →");
+    expect(html).toContain("Takes about a minute. We do the rest.");
+    expect(html).toContain("Build it myself from scratch");
     expect(html).toContain('href="/join"');
+    expect(html).toContain("How it works");
+    expect(html).toContain("01 — We get it started");
+    expect(html).toContain(
+      "We gather the professional info you&#x27;ve already shared publicly and prepare your draft.",
+    );
+    expect(html).toContain("02 — You make it yours");
+    expect(html).toContain("03 — You approve it");
+    expect(html).toContain("You&#x27;re in control of how you&#x27;re represented.");
+    expect(html).toContain("Start my profile →");
+    expect(html).toContain("Nothing goes live until you approve it.");
+    expect(html).toContain("Build from scratch");
     expect(html).toContain("Log in");
     expect(html).toContain('href="/join?mode=signin"');
+    expect(html).toContain("Looking for a therapist instead?");
+    expect(html).toContain("Find a therapist →");
     expect(html).toContain("bg-ink");
     expect(html).toContain("bg-lavender");
     expect(html).toContain("bg-gold");
@@ -71,10 +61,7 @@ describe("home hero", () => {
     expect(html).not.toContain("Review queue");
     expect(html).toContain("Find a therapist who Gets You.");
     expect(html).toContain('href="/find"');
-    expect(html).toContain('data-audience="client"');
-    expect(html).toContain('data-audience="therapist"');
-    expect(html).toMatch(/data-audience="client"[^>]*hidden/);
-    expect(html).not.toMatch(/data-audience="therapist"[^>]*hidden/);
+    expect(html).not.toContain("Meet clients who are ready to bring it all.");
   });
 
   it("adds the newsletter Why band without changing the find card", () => {

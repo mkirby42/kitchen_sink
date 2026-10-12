@@ -45,6 +45,14 @@ export const PUBLIC_PAGES = [
     title: "Join as a therapist",
     detail: "Create an account and publish a profile",
   },
+  {
+    path: "/for-therapists",
+    changeFrequency: "monthly",
+    priority: 0.6,
+    title: "For therapists",
+    detail:
+      "Ask Kitchen Sink to start a draft from a profile you already have online, or build one from scratch",
+  },
 ] as const satisfies ReadonlyArray<{
   path: string;
   changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];

@@ -171,6 +171,15 @@ export function SiteHeader({
             </Link>
             {chrome.uploads ? (
               <Link
+                href={routes.adminStarts}
+                className={navClass(path === routes.adminStarts)}
+                aria-current={path === routes.adminStarts ? "page" : undefined}
+              >
+                Drafts
+              </Link>
+            ) : null}
+            {chrome.uploads ? (
+              <Link
                 href={routes.adminMedia}
                 className={navClass(path === routes.adminMedia)}
                 aria-current={path === routes.adminMedia ? "page" : undefined}
@@ -188,7 +197,11 @@ export function SiteHeader({
               </Link>
             ) : null}
             {chrome.forTherapists ? (
-              <Link href={routes.join} className={navClass(false)}>
+              <Link
+                href={routes.forTherapists}
+                className={navClass(path === routes.forTherapists)}
+                aria-current={path === routes.forTherapists ? "page" : undefined}
+              >
                 For Therapists
               </Link>
             ) : null}

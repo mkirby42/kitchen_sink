@@ -99,7 +99,7 @@ npm run apply:travis-white
 
 `DATABASE_URL` can replace `SUPABASE_ACCESS_TOKEN` when `psql` is installed. The script creates a therapist auth user for `thetalkshoppeatx@gmail.com` with an unknown password. Claim it from `/forgot-password`, sign in at `/join?mode=signin`, then Edit. Re-runs update that profile and media in place and do not reset the password. On the hosted project the auth user is `3b354f1e-50a1-4a17-b536-cc7fce1296fe`; the script refuses to insert a second user for that email or to retarget a different account that already has that id.
 
-`SUPABASE_SERVICE_ROLE_KEY` is **not** required for the app, tests, or `seed:media`. Never put the service role in the browser, Vercel public env, or git. `npm run apply:travis-white` is the exception: it writes one real profile and uploads that therapist's photo and intro video. It needs the service role plus either `SUPABASE_ACCESS_TOKEN` (database write) or `DATABASE_URL`.
+`SUPABASE_SERVICE_ROLE_KEY` is server-only. Tests and `seed:media` do not need it. Starting a therapist draft (`/admin/starts`) does: it creates that therapist's login and the "draft is ready" link. Never put the service role in the browser, Vercel public env, or git. `npm run apply:travis-white` also needs it, plus either `SUPABASE_ACCESS_TOKEN` (database write) or `DATABASE_URL`.
 
 ## Data and provenance
 
