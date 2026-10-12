@@ -7,6 +7,8 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { JoinWizard } from "@/components/join/JoinWizard";
+import type { JoinDraft } from "@/lib/join/types";
+import { PUBLISH_MEDIA_NOTE } from "@/lib/join/validate";
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
 import {
   editorSaveActions,
@@ -42,6 +44,42 @@ describe("editor save actions", () => {
     });
     expect(editorSaveActions({ published: true, editing: false })).toEqual({
       draft: false,
+      publish: true,
+      saveChanges: false,
+    });
+  });
+
+  it("hides publish and save changes until a photo and intro video are both attached", () => {
+    expect(
+      editorSaveActions({
+        published: false,
+        editing: false,
+        mediaReady: false,
+      }),
+    ).toEqual({
+      draft: true,
+      publish: false,
+      saveChanges: false,
+    });
+    expect(
+      editorSaveActions({
+        published: true,
+        editing: true,
+        mediaReady: false,
+      }),
+    ).toEqual({
+      draft: false,
+      publish: false,
+      saveChanges: false,
+    });
+    expect(
+      editorSaveActions({
+        published: false,
+        editing: true,
+        mediaReady: true,
+      }),
+    ).toEqual({
+      draft: true,
       publish: true,
       saveChanges: false,
     });
@@ -157,13 +195,55 @@ describe("draft visibility", () => {
 describe("draft and publish buttons", () => {
   const userId = "11111111-1111-4111-8111-111111111111";
 
-  function wizard(props: { editing?: boolean; published?: boolean }) {
+  function mediaDraft(): JoinDraft {
+    return {
+      name: "Maya Chen",
+      credential: "LMFT",
+      yearsPracticing: 4,
+      education: [],
+      credentials: [],
+      licenses: [{ number: "1", state: "CA" }],
+      photoKey: `${userId}/photo.jpg`,
+      videoKey: `${userId}/intro.mp4`,
+      openToNewClients: true,
+      virtual: true,
+      inPerson: false,
+      specialties: [],
+      modalities: [],
+      insurance: [],
+      identity: [],
+      location: null,
+      rates: [
+        { service_type: "Individual", duration_minutes: 50, price_cents: 10000 },
+      ],
+      slidingScale: false,
+      slidingScaleMinCents: null,
+      slidingScaleMaxCents: null,
+      cards: [],
+      about: "",
+      email: "maya@example.com",
+      phone: "",
+      outreach: ["email"],
+      feedback: "",
+    };
+  }
+
+  function wizard(props: {
+    editing?: boolean;
+    published?: boolean;
+    step?: 1 | 2 | 3 | 4;
+    withMedia?: boolean;
+    draft?: JoinDraft;
+  }) {
     return renderToStaticMarkup(
       createElement(JoinWizard, {
         userId,
         email: "maya@example.com",
-        initialStep: 4,
-        ...props,
+        initialStep: props.step ?? 4,
+        editing: props.editing,
+        published: props.published,
+        initialDraft:
+          props.draft ?? (props.withMedia === false ? undefined : mediaDraft()),
       }),
     );
   }
@@ -189,6 +269,51 @@ describe("draft and publish buttons", () => {
     const saveButton = live.match(/<button[^>]*>Save changes →<\/button>/);
     expect(saveButton?.[0]).toContain("bg-ink");
     expect(saveButton?.[0]).toContain("text-paper");
+    expect(live).not.toContain(PUBLISH_MEDIA_NOTE);
+  });
+
+  it("continues the media step without a photo or video and says both are required to publish", () => {
+    const html = wizard({ step: 2, withMedia: false });
+    expect(html).toContain(PUBLISH_MEDIA_NOTE);
+    expect(html).toContain("You can continue without them.");
+    expect(html).not.toContain("Add a photo to continue");
+    const button = html.match(/<button[^>]*>Continue →<\/button>/);
+    expect(button?.[0]).not.toMatch(/\sdisabled(?=[\s>=])/);
+  });
+
+  it("offers only save as draft on the last step when a photo or video is missing", () => {
+    const missing = wizard({
+      editing: true,
+      published: false,
+      withMedia: false,
+    });
+    expect(missing).toContain("Save as draft");
+    expect(missing).toContain(PUBLISH_MEDIA_NOTE);
+    expect(missing).not.toContain("Publish profile →");
+    expect(missing).not.toContain("Save changes →");
+
+    const photoOnly = wizard({
+      editing: true,
+      published: false,
+      draft: { ...mediaDraft(), videoKey: null },
+    });
+    expect(photoOnly).toContain("Save as draft");
+    expect(photoOnly).toContain(PUBLISH_MEDIA_NOTE);
+    expect(photoOnly).not.toContain("Publish profile →");
+
+    const videoOnly = wizard({
+      editing: true,
+      published: false,
+      draft: { ...mediaDraft(), photoKey: null },
+    });
+    expect(videoOnly).not.toContain("Publish profile →");
+
+    const live = wizard({ editing: true, published: true, withMedia: false });
+    expect(live).toContain(PUBLISH_MEDIA_NOTE);
+    expect(live).toContain("Add both before saving.");
+    expect(live).not.toContain("Save as draft");
+    expect(live).not.toContain("Save changes →");
+    expect(live).not.toContain("Publish profile →");
   });
 });
 

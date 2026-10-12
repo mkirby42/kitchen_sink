@@ -30,7 +30,7 @@ function draft(rates: JoinDraft["rates"]): JoinDraft {
     credentials: [],
     licenses: [{ number: "MFC 112938", state: "CA" }],
     photoKey: "uid/photo.jpg",
-    videoKey: null,
+    videoKey: "uid/intro.mp4",
     openToNewClients: true,
     virtual: true,
     inPerson: false,

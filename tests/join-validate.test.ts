@@ -6,6 +6,8 @@ import {
   buildJoinPayload,
   canContinue,
   continueHint,
+  hasPublishMedia,
+  publishMediaErrors,
   step1Errors,
   step2Errors,
   step3Errors,
@@ -176,20 +178,39 @@ describe("join validation", () => {
     );
   });
 
-  it("fails step 2 without photo", () => {
-    const withoutPhoto = validStep1({ videoKey: "uid/intro.mp4" });
+  it("lets step 2 continue without a photo or intro video", () => {
+    const withoutMedia = validStep1({ photoKey: null, videoKey: null });
 
-    expect(canContinue(2, withoutPhoto)).toBe(false);
-    expect(continueHint(2, withoutPhoto)).toBe("Add a photo to continue");
-    expect(step2Errors(withoutPhoto).length).toBeGreaterThan(0);
+    expect(canContinue(2, withoutMedia)).toBe(true);
+    expect(continueHint(2, withoutMedia)).toBe("");
+    expect(step2Errors(withoutMedia)).toEqual([]);
+    expect(hasPublishMedia(withoutMedia)).toBe(false);
+    expect(publishMediaErrors(withoutMedia)).toEqual([
+      "A picture is required to publish",
+      "A short intro video is required to publish",
+    ]);
   });
 
-  it("allows step 2 with photo and no intro video", () => {
-    const withoutVideo = validStep1({ photoKey: "uid/photo.jpg" });
+  it("requires both a photo and a short intro video to publish", () => {
+    const photoOnly = validStep1({ photoKey: "uid/photo.jpg", videoKey: null });
+    const videoOnly = validStep1({ photoKey: null, videoKey: "uid/intro.mp4" });
+    const both = validStep1({
+      photoKey: "uid/photo.jpg",
+      videoKey: "uid/intro.mp4",
+    });
 
-    expect(canContinue(2, withoutVideo)).toBe(true);
-    expect(continueHint(2, withoutVideo)).toBe("");
-    expect(step2Errors(withoutVideo)).toEqual([]);
+    expect(canContinue(2, photoOnly)).toBe(true);
+    expect(canContinue(2, videoOnly)).toBe(true);
+    expect(hasPublishMedia(photoOnly)).toBe(false);
+    expect(hasPublishMedia(videoOnly)).toBe(false);
+    expect(publishMediaErrors(photoOnly)).toEqual([
+      "A short intro video is required to publish",
+    ]);
+    expect(publishMediaErrors(videoOnly)).toEqual([
+      "A picture is required to publish",
+    ]);
+    expect(hasPublishMedia(both)).toBe(true);
+    expect(publishMediaErrors(both)).toEqual([]);
   });
 
   it("fails in-person without location on step 3", () => {
@@ -475,8 +496,21 @@ describe("buildJoinPayload", () => {
     expect(payload.licenses).toEqual([{ number: "MFC 112938", state: "CA" }]);
   });
 
-  it("allows a null intro video key", () => {
-    const payload = buildJoinPayload(validStep4({ videoKey: null }));
+  it("allows a draft save without a photo or intro video", () => {
+    const payload = buildJoinPayload(
+      validStep4({ photoKey: null, videoKey: null }),
+      { publish: false },
+    );
+    expect(payload.photo_key).toBeNull();
     expect(payload.video_key).toBeNull();
+  });
+
+  it("refuses to build a publish payload without both media", () => {
+    expect(() =>
+      buildJoinPayload(validStep4({ photoKey: null, videoKey: "uid/intro.mp4" })),
+    ).toThrow(/incomplete/);
+    expect(() =>
+      buildJoinPayload(validStep4({ photoKey: "uid/photo.jpg", videoKey: null })),
+    ).toThrow(/incomplete/);
   });
 });

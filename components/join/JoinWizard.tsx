@@ -16,6 +16,9 @@ import {
   buildJoinPayload,
   canContinue,
   continueHint,
+  hasPublishMedia,
+  PUBLISH_MEDIA_CONTINUE_NOTE,
+  PUBLISH_MEDIA_NOTE,
   step1Errors,
   step2Errors,
   step3Errors,
@@ -164,8 +167,21 @@ export function JoinWizard({
   const [submitError, setSubmitError] = useState("");
   const [mediaBusy, setMediaBusy] = useState(false);
   const live = published ?? editing;
-  const actions = editorSaveActions({ published: live, editing });
+  const mediaReady = hasPublishMedia(draft);
+  const actions = editorSaveActions({
+    published: live,
+    editing,
+    mediaReady,
+  });
   const ownProfile = profileId === userId;
+  const mediaNote =
+    step === 2
+      ? PUBLISH_MEDIA_CONTINUE_NOTE
+      : step === 4 && !mediaReady
+        ? live
+          ? `${PUBLISH_MEDIA_NOTE} Add both before saving.`
+          : PUBLISH_MEDIA_NOTE
+        : null;
 
   function moveTo(nextStep: Step) {
     setStep(nextStep);
@@ -196,12 +212,18 @@ export function JoinWizard({
 
   async function saveProfile(intent: EditorSaveAction) {
     if (step !== 4 || !canContinue(4, draft)) return;
+    if (intent !== "draft" && !hasPublishMedia(draft)) {
+      setSubmitError(PUBLISH_MEDIA_NOTE);
+      return;
+    }
 
     setSubmitError("");
     setSaveIntent(intent);
     setSubmitting(true);
     try {
-      const payload = buildJoinPayload(draft);
+      const payload = buildJoinPayload(draft, {
+        publish: intent !== "draft",
+      });
       const args = withPublishArg(toRpcArgs(payload), intent);
       const rpc = profileSaveRpc({ editing, ownProfile });
       const result = await finishJoin({
@@ -253,6 +275,7 @@ export function JoinWizard({
           submitError={submitError}
           hint={hint}
           error={errors[0]}
+          mediaNote={mediaNote}
           onContinue={continueForward}
           onSave={(intent) => void saveProfile(intent)}
         />

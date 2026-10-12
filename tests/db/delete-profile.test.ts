@@ -60,13 +60,14 @@ describe.skipIf(!dbConfigured())("delete_own_therapist_profile", () => {
 
     const userId = signUp.data.user.id;
     const photoKey = `${userId}/delete-me.jpg`;
+    const videoKey = `${userId}/delete-me.mp4`;
     const joined = await owner.rpc("complete_therapist_join", {
       p_name: "Delete Test Therapist",
       p_email: email,
       p_phone: "206-555-0199",
       p_about: "Profile created to test delete.",
       p_photo_key: photoKey,
-      p_video_key: null,
+      p_video_key: videoKey,
       p_credential: "LCSW",
       p_start_date: "2018-06-01",
       p_open_to_new_clients: true,
@@ -173,7 +174,7 @@ describe.skipIf(!dbConfigured())("delete_own_therapist_profile", () => {
     const deleted = await deleteOwnTherapistProfile(owner, {
       userId,
       photoKey,
-      videoKey: null,
+      videoKey,
       confirm: "DELETE",
     });
     expect(deleted).toEqual({ ok: true });
