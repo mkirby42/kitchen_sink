@@ -46,7 +46,7 @@ describe("site header", () => {
     expect(html).toContain("Find a Therapist");
     expect(html).toContain("Why Kitchen Sink?");
     expect(html).toContain(
-      'href="https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd"',
+      'href="https://everythingbutkitchensink.beehiiv.com/p/let-s-connect"',
     );
     expect(html).toContain("My profile");
     expect(html).toContain(
@@ -196,7 +196,7 @@ describe("site header", () => {
     expect(html).toContain('href="/join?mode=signin"');
     expect(html).toContain("Why Kitchen Sink?");
     expect(html).toContain(
-      'href="https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd"',
+      'href="https://everythingbutkitchensink.beehiiv.com/p/let-s-connect"',
     );
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');

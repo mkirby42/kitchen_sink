@@ -96,7 +96,7 @@ describe("home hero", () => {
     expect(html).toContain("Read the story");
     expect(html).toContain("Subscribe to the newsletter");
     expect(html).toContain(
-      'href="https://everythingbutkitchensink.beehiiv.com/p/two-feet-in-the-kitchen-sink-5219f599263b7fcd"',
+      'href="https://everythingbutkitchensink.beehiiv.com/p/let-s-connect"',
     );
     expect(html).toContain(
       'href="https://everythingbutkitchensink.beehiiv.com/"',
