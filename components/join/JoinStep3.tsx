@@ -245,6 +245,7 @@ export function JoinStep3({
         field="identity"
         selected={draft.identity}
         setDraft={setDraft}
+        custom
       />
     </div>
   );

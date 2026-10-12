@@ -44,8 +44,11 @@ describe("join specialties picker", () => {
     const specialties = html.indexOf("Areas of Interest");
     const modalities = html.indexOf("Approach in Therapy");
     const insurance = html.indexOf("Insurance");
+    const identity = html.indexOf("Identity (optional)");
     expect(specialties).toBeGreaterThan(-1);
     expect(modalities).toBeGreaterThan(specialties);
+    expect(insurance).toBeGreaterThan(modalities);
+    expect(identity).toBeGreaterThan(insurance);
     expect(html).not.toContain("Modalities");
     const specialtyBlock = html.slice(specialties, modalities);
     expect(specialtyBlock).toContain("Anxiety");
@@ -62,7 +65,32 @@ describe("join specialties picker", () => {
       ">Eye Movement Desensitization and Reprocessing (EMDR)<",
     );
     expect(approachBlock).not.toContain(">CBT<");
-    expect(html.slice(insurance)).toContain("Add your own");
+    const insuranceBlock = html.slice(insurance, identity);
+    expect(insuranceBlock).toContain("Add your own");
+    expect(insuranceBlock).toContain('placeholder="Add your own"');
+    const identityBlock = html.slice(identity);
+    expect(identityBlock).toContain("BIPOC");
+    expect(identityBlock).toContain("Disabled");
+    expect(identityBlock).toContain("Add your own");
+    expect(identityBlock).toContain('placeholder="Add your own"');
+    expect(identityBlock).toContain(">Add<");
+  });
+
+  it("shows a stored custom identity as a selected chip", () => {
+    const html = renderToStaticMarkup(
+      createElement(JoinStep3, {
+        draft: draft({ identity: ["BIPOC", "Neurodivergent"] }),
+        setDraft: () => {},
+      }),
+    );
+    const identity = html.indexOf("Identity (optional)");
+    const identityBlock = html.slice(identity);
+    expect(identityBlock).toMatch(
+      /aria-pressed="true"[^>]*>\s*BIPOC</,
+    );
+    expect(identityBlock).toMatch(
+      /aria-pressed="true"[^>]*>\s*Neurodivergent ×</,
+    );
   });
 
   it("shows a stored phrase as written and keeps the short code selected", () => {
