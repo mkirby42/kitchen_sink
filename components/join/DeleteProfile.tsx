@@ -16,11 +16,13 @@ export function DeleteProfile({
   userId,
   photoKey,
   videoKey,
+  voiceKey = null,
   disabled = false,
 }: {
   userId: string;
   photoKey: string | null;
   videoKey: string | null;
+  voiceKey?: string | null;
   disabled?: boolean;
 }) {
   const router = useRouter();
@@ -44,6 +46,7 @@ export function DeleteProfile({
         userId,
         photoKey,
         videoKey,
+        voiceKey,
         confirm: phrase,
       });
       if (!result.ok) {
@@ -124,9 +127,9 @@ export function DeleteProfileDialog({
           Delete your therapist profile?
         </h2>
         <p id="delete-profile-copy" className="mt-3 text-sm text-mute">
-          This permanently removes your public page, photo, intro video,
-          specialties, rates, conversation cards, and reviews about you. Your
-          login stays.
+          This permanently removes your public page, photo, intro video, voice
+          prompt, specialties, rates, conversation cards, and reviews about you.
+          Your login stays.
         </p>
         <label
           htmlFor="delete-profile-confirm"

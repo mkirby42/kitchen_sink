@@ -20,6 +20,8 @@ const rows: AdminTherapist[] = [
     listed: true,
     photoKey: `${MAYA}/photo.jpg`,
     videoKey: null,
+    voiceKey: null,
+    voicePrompt: null,
   },
   {
     id: "55555555-5555-4555-8555-555555555001",
@@ -30,6 +32,8 @@ const rows: AdminTherapist[] = [
     listed: true,
     photoKey: null,
     videoKey: null,
+    voiceKey: null,
+    voicePrompt: null,
   },
 ];
 

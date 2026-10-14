@@ -75,6 +75,8 @@ export type TherapistProfileData = {
   about: string | null;
   photoUrl: string | null;
   videoUrl: string | null;
+  voiceUrl: string | null;
+  voicePrompt: string | null;
   credential: string | null;
   years: number | null;
   virtual: boolean;
@@ -480,6 +482,8 @@ export async function fetchTherapistProfile(
     about: profile.about_me,
     photoUrl: storagePublicUrl("photos", profile.photo_key),
     videoUrl: storagePublicUrl("videos", profile.video_key),
+    voiceUrl: storagePublicUrl("voice", profile.voice_key),
+    voicePrompt: profile.voice_prompt?.trim() || null,
     credential: therapist.credential,
     years: yearsPracticing(therapist.start_date_of_practice),
     virtual: therapist.virtual_practice,

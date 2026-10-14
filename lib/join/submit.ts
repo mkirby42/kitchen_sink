@@ -17,6 +17,8 @@ export function toRpcArgs(payload: JoinPayload) {
     p_about: payload.about,
     p_photo_key: payload.photo_key,
     p_video_key: payload.video_key,
+    p_voice_key: payload.voice_key,
+    p_voice_prompt: payload.voice_prompt,
     p_credential: payload.credential,
     p_start_date: payload.start_date,
     p_open_to_new_clients: payload.open_to_new_clients,
@@ -62,10 +64,11 @@ export async function saveJoinProfile(
 export async function uploadJoinMedia(
   supabase: SupabaseClient,
   userId: string,
-  kind: "photo" | "video",
+  kind: "photo" | "video" | "voice",
   file: File,
 ) {
-  const bucket = kind === "photo" ? "photos" : "videos";
+  const bucket =
+    kind === "photo" ? "photos" : kind === "video" ? "videos" : "voice";
   const path = joinMediaPath(userId, kind, file.name);
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     upsert: true,

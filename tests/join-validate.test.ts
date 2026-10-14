@@ -24,6 +24,8 @@ function emptyDraft(overrides: Partial<JoinDraft> = {}): JoinDraft {
     licenses: [],
     photoKey: null,
     videoKey: null,
+    voiceKey: null,
+    voicePrompt: null,
     openToNewClients: true,
     virtual: false,
     inPerson: false,
@@ -60,6 +62,8 @@ function validStep2(overrides: Partial<JoinDraft> = {}): JoinDraft {
   return validStep1({
     photoKey: "uid/photo.jpg",
     videoKey: "uid/intro.mp4",
+    voiceKey: null,
+    voicePrompt: null,
     ...overrides,
   });
 }
@@ -187,16 +191,30 @@ describe("join validation", () => {
     expect(hasPublishMedia(withoutMedia)).toBe(false);
     expect(publishMediaErrors(withoutMedia)).toEqual([
       "A picture is required to publish",
-      "A short intro video is required to publish",
+      "A short intro video or a voice prompt is required to publish",
     ]);
   });
 
-  it("requires both a photo and a short intro video to publish", () => {
+  it("publishes with a picture plus either a video or a voice prompt", () => {
     const photoOnly = validStep1({ photoKey: "uid/photo.jpg", videoKey: null });
     const videoOnly = validStep1({ photoKey: null, videoKey: "uid/intro.mp4" });
     const both = validStep1({
       photoKey: "uid/photo.jpg",
       videoKey: "uid/intro.mp4",
+      voiceKey: null,
+      voicePrompt: null,
+    });
+    const voiceOnly = validStep1({
+      photoKey: "uid/photo.jpg",
+      videoKey: null,
+      voiceKey: "uid/voice.m4a",
+      voicePrompt: "Say hello and I'll take it from there",
+    });
+    const untitled = validStep1({
+      photoKey: "uid/photo.jpg",
+      videoKey: null,
+      voiceKey: "uid/voice.m4a",
+      voicePrompt: "   ",
     });
 
     expect(canContinue(2, photoOnly)).toBe(true);
@@ -204,13 +222,29 @@ describe("join validation", () => {
     expect(hasPublishMedia(photoOnly)).toBe(false);
     expect(hasPublishMedia(videoOnly)).toBe(false);
     expect(publishMediaErrors(photoOnly)).toEqual([
-      "A short intro video is required to publish",
+      "A short intro video or a voice prompt is required to publish",
     ]);
     expect(publishMediaErrors(videoOnly)).toEqual([
       "A picture is required to publish",
     ]);
     expect(hasPublishMedia(both)).toBe(true);
     expect(publishMediaErrors(both)).toEqual([]);
+    expect(hasPublishMedia(voiceOnly)).toBe(true);
+    expect(publishMediaErrors(voiceOnly)).toEqual([]);
+    expect(hasPublishMedia(untitled)).toBe(false);
+    expect(publishMediaErrors(untitled)).toEqual([
+      "Add a short title for your voice prompt",
+    ]);
+    const payload = buildJoinPayload(
+      validStep4({
+        videoKey: null,
+        voiceKey: "uid/voice.m4a",
+        voicePrompt: "Say hello and I'll take it from there",
+      }),
+    );
+    expect(payload.voice_key).toBe("uid/voice.m4a");
+    expect(payload.voice_prompt).toBe("Say hello and I'll take it from there");
+    expect(payload.video_key).toBeNull();
   });
 
   it("fails in-person without location on step 3", () => {

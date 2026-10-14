@@ -12,6 +12,8 @@ export type JoinDraftRows = {
     about_me: string | null;
     photo_key: string | null;
     video_key: string | null;
+    voice_key?: string | null;
+    voice_prompt?: string | null;
   };
   therapist: {
     credential: string | null;
@@ -58,6 +60,8 @@ export function draftFromRows(rows: JoinDraftRows): JoinDraft {
       rows.licenses.length > 0 ? rows.licenses : [{ number: "", state: "" }],
     photoKey: rows.profile.photo_key,
     videoKey: rows.profile.video_key,
+    voiceKey: rows.profile.voice_key ?? null,
+    voicePrompt: rows.profile.voice_prompt ?? null,
     openToNewClients: rows.therapist.open_to_new_clients,
     virtual: rows.therapist.virtual_practice,
     inPerson: rows.therapist.in_person_practice,

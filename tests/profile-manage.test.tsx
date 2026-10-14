@@ -27,6 +27,8 @@ const data: TherapistProfileData = {
   about: null,
   photoUrl: null,
   videoUrl: null,
+  voiceUrl: null,
+  voicePrompt: null,
   credential: "PsyD",
   years: 8,
   virtual: true,

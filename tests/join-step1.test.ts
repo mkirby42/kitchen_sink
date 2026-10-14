@@ -14,6 +14,8 @@ function draft(overrides: Partial<JoinDraft> = {}): JoinDraft {
     licenses: [{ number: "MFC 112938", state: "CA" }],
     photoKey: "photo.jpg",
     videoKey: null,
+    voiceKey: null,
+    voicePrompt: null,
     openToNewClients: true,
     virtual: true,
     inPerson: false,

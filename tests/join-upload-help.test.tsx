@@ -19,6 +19,8 @@ function emptyDraft(): JoinDraft {
     licenses: [],
     photoKey: null,
     videoKey: null,
+    voiceKey: null,
+    voicePrompt: null,
     openToNewClients: true,
     virtual: false,
     inPerson: false,

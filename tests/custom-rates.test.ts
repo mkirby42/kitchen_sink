@@ -31,6 +31,8 @@ function draft(rates: JoinDraft["rates"]): JoinDraft {
     licenses: [{ number: "MFC 112938", state: "CA" }],
     photoKey: "uid/photo.jpg",
     videoKey: "uid/intro.mp4",
+    voiceKey: null,
+    voicePrompt: null,
     openToNewClients: true,
     virtual: true,
     inPerson: false,

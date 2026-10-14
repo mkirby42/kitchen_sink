@@ -44,6 +44,8 @@ function joinDraftFromTravis(): JoinDraft {
     })),
     photoKey: `${TRAVIS_PROFILE_ID}/photo.jpg`,
     videoKey: `${TRAVIS_PROFILE_ID}/intro.mp4`,
+    voiceKey: null,
+    voicePrompt: null,
     openToNewClients: travisWhite.openToNewClients,
     virtual: travisWhite.virtual,
     inPerson: travisWhite.inPerson,

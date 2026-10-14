@@ -21,6 +21,8 @@ function draftWithMedia(): JoinDraft {
     licenses: [{ number: "1", state: "CA" }],
     photoKey: "uid/photo.jpg",
     videoKey: "uid/intro.mp4",
+    voiceKey: null,
+    voicePrompt: null,
     openToNewClients: true,
     virtual: true,
     inPerson: false,

@@ -23,7 +23,7 @@ export function formatUsdFromCents(cents: number | null | undefined) {
 }
 
 export function storagePublicUrl(
-  bucket: "photos" | "videos",
+  bucket: "photos" | "videos" | "voice",
   key: string | null | undefined,
 ) {
   if (!key) return null;
