@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export function AdminAuth({
   title = "Sign in to upload media",
-  lede = "This page is for Kitchen Sink ops. Pick a therapist and upload the photo or intro video they emailed you.",
+  lede = "This page is for Kitchen Sink ops. Pick a therapist and upload the photo, intro video, or voice prompt they emailed you.",
 }: {
   title?: string;
   lede?: string;

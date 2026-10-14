@@ -14,7 +14,15 @@ import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { TextField } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
+import { VoicePromptEditor } from "@/components/join/VoicePromptEditor";
 import { mediaFileError } from "@/lib/join/media";
+import {
+  prepareVoiceFile,
+  readVoiceDuration,
+  voiceFileError,
+  voiceLengthError,
+  voiceUploadFailureMessage,
+} from "@/lib/join/voice";
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { joinPath, routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
@@ -43,7 +51,7 @@ export function HelperUpload({
   const [therapists, setTherapists] = useState(initialTherapists);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId);
-  const [uploading, setUploading] = useState<"photo" | "video" | null>(null);
+  const [uploading, setUploading] = useState<"photo" | "video" | "voice" | null>(null);
   const [savingListing, setSavingListing] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -128,6 +136,83 @@ export function HelperUpload({
     }
   }
 
+  async function saveVoice(input: { file: File | null; prompt: string }) {
+    if (!selected) return;
+    setError("");
+    setNotice("");
+    let path = selected.voiceKey;
+    if (input.file) {
+      const prepared = prepareVoiceFile(input.file);
+      if (!prepared) throw new Error(voiceFileError(input.file) ?? "Choose an audio file.");
+      const typeError = voiceFileError(prepared);
+      if (typeError) throw new Error(typeError);
+      const seconds = await readVoiceDuration(prepared);
+      const lengthError = voiceLengthError(seconds, prepared.size);
+      if (lengthError) throw new Error(lengthError);
+      setUploading("voice");
+      try {
+        const supabase = createClient();
+        path = await uploadJoinMedia(supabase, selected.id, "voice", prepared);
+        if (!isTherapistMediaKey(selected.id, path)) {
+          throw new Error("Upload path was not under this therapist.");
+        }
+        await writeVoice(selected.id, path, input.prompt);
+      } catch (uploadError) {
+        setError(voiceUploadFailureMessage(uploadError));
+        throw uploadError;
+      } finally {
+        setUploading(null);
+      }
+      return;
+    }
+    if (!path) throw new Error("Record a voice prompt, or upload an audio file.");
+    setUploading("voice");
+    try {
+      await writeVoice(selected.id, path, input.prompt);
+    } catch (titleError) {
+      const message = errorMessage(titleError, "Unable to save the voice prompt.");
+      setError(message);
+      throw new Error(message);
+    } finally {
+      setUploading(null);
+    }
+  }
+
+  async function writeVoice(therapistId: string, key: string | null, prompt: string) {
+    const supabase = createClient();
+    const saved = await supabase.rpc("admin_set_therapist_voice", {
+      p_therapist_id: therapistId,
+      p_key: key,
+      p_prompt: prompt,
+    });
+    if (saved.error) throw saved.error;
+    setTherapists((current) =>
+      current.map((row) =>
+        row.id === therapistId
+          ? { ...row, voiceKey: key, voicePrompt: key ? prompt : null }
+          : row,
+      ),
+    );
+    const name = therapists.find((row) => row.id === therapistId)?.name ?? "this therapist";
+    setNotice(
+      key ? `Voice prompt saved for ${name}.` : `Voice prompt removed for ${name}.`,
+    );
+  }
+
+  async function clearVoice() {
+    if (!selected || busy) return;
+    setError("");
+    setNotice("");
+    setUploading("voice");
+    try {
+      await writeVoice(selected.id, null, "");
+    } catch (clearError) {
+      setError(errorMessage(clearError, "Unable to remove the voice prompt."));
+    } finally {
+      setUploading(null);
+    }
+  }
+
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
       <Eyebrow>Ops</Eyebrow>
@@ -135,8 +220,8 @@ export function HelperUpload({
         Upload therapist media
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
-        Choose the therapist who emailed you a file. Photo and intro video go
-        into the same storage folders their profile already uses.
+        Choose the therapist who emailed you a file. Photo, intro video, and
+        voice prompt go into that profile&apos;s storage folders.
       </p>
 
       <div className="mt-6">
@@ -208,6 +293,15 @@ export function HelperUpload({
             busy={uploading === "video"}
             disabled={busy}
             onFile={(file) => void chooseFile("video", file)}
+          />
+          <VoicePromptEditor
+            name={selected.name}
+            prompt={selected.voicePrompt ?? ""}
+            audioUrl={storagePublicUrl("voice", selected.voiceKey)}
+            busy={uploading === "voice"}
+            disabled={busy}
+            onRemove={() => void clearVoice()}
+            onSave={(input) => saveVoice(input)}
           />
         </Card>
       ) : (

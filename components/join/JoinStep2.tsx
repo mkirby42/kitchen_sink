@@ -19,6 +19,8 @@ import { Notice } from "@/components/ui/Notice";
 import { IntroRecorder } from "./IntroRecorder";
 import { MediaSlot } from "./MediaSlot";
 import { UploadHelp } from "./UploadHelp";
+import { useJoinVoiceUpload } from "./useJoinVoiceUpload";
+import { VoicePromptEditor } from "./VoicePromptEditor";
 
 export function JoinStep2({
   userId,
@@ -43,6 +45,19 @@ export function JoinStep2({
   const [error, setError] = useState("");
   const [uploadTrouble, setUploadTrouble] = useState(0);
 
+  function fail(message: string) {
+    setError(message);
+    setUploadTrouble((count) => count + 1);
+  }
+
+  const voice = useJoinVoiceUpload({
+    userId,
+    draft,
+    setDraft,
+    onFail: fail,
+    onBegin: () => setError(""),
+  });
+
   useEffect(
     () => () => {
       if (photoPreview) URL.revokeObjectURL(photoPreview);
@@ -58,14 +73,9 @@ export function JoinStep2({
   );
 
   useEffect(() => {
-    onBusyChange?.(uploading.photo || uploading.video || preparingPhoto);
+    onBusyChange?.(uploading.photo || uploading.video || voice.uploading || preparingPhoto);
     return () => onBusyChange?.(false);
-  }, [onBusyChange, preparingPhoto, uploading.photo, uploading.video]);
-
-  function fail(message: string) {
-    setError(message);
-    setUploadTrouble((count) => count + 1);
-  }
+  }, [onBusyChange, preparingPhoto, uploading.photo, uploading.video, voice.uploading]);
 
   async function chooseFile(kind: "photo" | "video", file?: File) {
     if (!file) return;
@@ -159,6 +169,16 @@ export function JoinStep2({
       <IntroRecorder
         disabled={uploading.video}
         onFile={(file) => void chooseFile("video", file)}
+      />
+
+      <VoicePromptEditor
+        name={draft.name.trim() || "you"}
+        prompt={draft.voicePrompt ?? ""}
+        audioUrl={voice.preview}
+        busy={voice.uploading}
+        disabled={voice.uploading}
+        onRemove={voice.remove}
+        onSave={voice.save}
       />
 
       {error ? <Notice role="alert">{error}</Notice> : null}

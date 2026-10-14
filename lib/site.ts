@@ -231,7 +231,7 @@ export function llmsTxt(origin: string): string {
 
   return `# Kitchen Sink
 
-> Kitchen Sink (Talk Shoppe) is a therapist-matching site. People look up therapists by the tags they need. Therapists publish a profile with a photo, a short intro video, specialties, insurance, licenses, rates, and contact details.
+> Kitchen Sink (Talk Shoppe) is a therapist-matching site. People look up therapists by the tags they need. Therapists publish a profile with a photo, a short intro video or a voice prompt, specialties, insurance, licenses, rates, and contact details.
 
 A match is overlap. The person selects tags (for example a specialty or an insurance plan). The directory lists therapists who have at least one of those tags, ranked by how many tags overlap. Session format (virtual, in-person, or both) and license state apply when those filters are set. With no filters, the list is therapists who are open to new clients, published, and listed in the directory. Search filters are not stored. A client account is only for leaving a review.
 
@@ -252,7 +252,7 @@ Therapist profiles are public while that therapist is open to new clients, publi
 - Name, years practicing, education, and credentials. Below a computer-width screen the licensed credential is not repeated on the photo. On a wider screen it leads the credential line under the name
 - State licenses (number and state)
 - How {FirstName} works: in-person and virtual as separate labels, plus the office address when the therapist sees people in person and saved a street address. On a computer-width screen that heading sits over areas of interest, approach, education, and credentials, and the address is an Office row on the name card
-- A photo and a short intro video, both required to publish
+- A profile photo, plus either a short intro video or a voice prompt (all three are allowed), required to publish
 - Specialties, modalities, insurance, and identity tags
 - Rates: service type, session length in minutes, and price. Sliding scale when the therapist offers it
 - A short about section, conversation cards, and published reviews. A review is published only after an admin approves it. Clients are told not to include personal health information. Rejected reviews are deleted and not kept.

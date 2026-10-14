@@ -14,7 +14,7 @@ const steps = [
   {
     n: "02",
     title: "You make it yours",
-    body: "Fill in the missing details, make edits, and add a short video to connect with your people.",
+    body: "Fill in the missing details, make edits, and add a short video or voice prompt to connect with your people.",
     icon: PencilIcon,
   },
   {

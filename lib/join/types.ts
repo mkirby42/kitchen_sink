@@ -21,6 +21,8 @@ export type JoinDraft = {
   licenses: JoinLicense[];
   photoKey: string | null;
   videoKey: string | null;
+  voiceKey: string | null;
+  voicePrompt: string | null;
   openToNewClients: boolean;
   virtual: boolean;
   inPerson: boolean;

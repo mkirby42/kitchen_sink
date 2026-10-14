@@ -16,6 +16,7 @@ import {
   continueHint,
   hasPublishMedia,
   PUBLISH_MEDIA_CONTINUE_NOTE,
+  PUBLISH_MEDIA_LIVE_NOTE,
   PUBLISH_MEDIA_NOTE,
   step1Errors,
   step2Errors,
@@ -46,6 +47,8 @@ function emptyDraft(email: string): JoinDraft {
     licenses: [{ number: "", state: "" }],
     photoKey: null,
     videoKey: null,
+    voiceKey: null,
+    voicePrompt: null,
     openToNewClients: true,
     virtual: false,
     inPerson: false,
@@ -187,7 +190,7 @@ export function JoinWizard({
       ? PUBLISH_MEDIA_CONTINUE_NOTE
       : step === 4 && !mediaReady
         ? live
-          ? `${PUBLISH_MEDIA_NOTE} Add both before saving.`
+          ? PUBLISH_MEDIA_LIVE_NOTE
           : PUBLISH_MEDIA_NOTE
         : null;
 
@@ -333,6 +336,7 @@ export function JoinWizard({
           userId={userId}
           photoKey={draft.photoKey}
           videoKey={draft.videoKey}
+          voiceKey={draft.voiceKey}
           disabled={submitting || mediaBusy}
         />
       ) : null}

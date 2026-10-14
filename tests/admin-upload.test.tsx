@@ -19,6 +19,8 @@ const therapist: AdminTherapist = {
   listed: true,
   photoKey: "11111111-1111-4111-8111-111111111111/photo.jpg",
   videoKey: null,
+  voiceKey: null,
+  voicePrompt: null,
 };
 
 describe("admin helper upload UI", () => {

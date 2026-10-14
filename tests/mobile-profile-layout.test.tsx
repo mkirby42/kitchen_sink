@@ -28,6 +28,8 @@ const base: TherapistProfileData = {
   about: "I help people find their way.",
   photoUrl: "https://example.com/photo.jpg",
   videoUrl: "https://example.com/intro.mp4",
+  voiceUrl: null,
+  voicePrompt: null,
   credential: "PsyD",
   years: 8,
   virtual: true,

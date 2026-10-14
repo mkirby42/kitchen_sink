@@ -14,6 +14,7 @@ import {
   rateServiceLabelIssue,
 } from "@/lib/join/rates";
 import type { JoinDraft } from "@/lib/join/types";
+import { VOICE_PROMPT_MAX } from "@/lib/join/voice";
 import {
   canonicalSpecialtyLabels,
   CREDENTIALS,
@@ -142,14 +143,25 @@ export function step1Errors(draft: JoinDraft): string[] {
 
 /** Shown on the media step and when publish is withheld. */
 export const PUBLISH_MEDIA_NOTE =
-  "You need a short video and a picture to publish your profile.";
+  "You need a picture, plus a short video or a voice prompt, to publish your profile.";
 
 export const PUBLISH_MEDIA_CONTINUE_NOTE = `${PUBLISH_MEDIA_NOTE} You can continue without them.`;
 
-export function hasPublishMedia(
-  draft: Pick<JoinDraft, "photoKey" | "videoKey">,
+export const PUBLISH_MEDIA_LIVE_NOTE = `${PUBLISH_MEDIA_NOTE} Add a picture and either a short video or a voice prompt before saving.`;
+
+export function voicePromptReady(
+  draft: Pick<JoinDraft, "voiceKey" | "voicePrompt">,
 ): boolean {
-  return Boolean(draft.photoKey?.trim() && draft.videoKey?.trim());
+  const title = draft.voicePrompt?.trim() ?? "";
+  return Boolean(draft.voiceKey?.trim() && title && title.length <= VOICE_PROMPT_MAX);
+}
+
+export function hasPublishMedia(
+  draft: Pick<JoinDraft, "photoKey" | "videoKey" | "voiceKey" | "voicePrompt">,
+): boolean {
+  return Boolean(
+    draft.photoKey?.trim() && (draft.videoKey?.trim() || voicePromptReady(draft)),
+  );
 }
 
 export function publishMediaErrors(draft: JoinDraft): string[] {
@@ -157,8 +169,16 @@ export function publishMediaErrors(draft: JoinDraft): string[] {
   if (!draft.photoKey?.trim()) {
     errors.push("A picture is required to publish");
   }
-  if (!draft.videoKey?.trim()) {
-    errors.push("A short intro video is required to publish");
+  const video = Boolean(draft.videoKey?.trim());
+  const voice = voicePromptReady(draft);
+  if (!video && !voice) {
+    if (draft.voiceKey?.trim() && !draft.voicePrompt?.trim()) {
+      errors.push("Add a short title for your voice prompt");
+    } else if ((draft.voicePrompt?.trim().length ?? 0) > VOICE_PROMPT_MAX) {
+      errors.push(`Voice prompt titles can be ${VOICE_PROMPT_MAX} characters or fewer`);
+    } else {
+      errors.push("A short intro video or a voice prompt is required to publish");
+    }
   }
   return errors;
 }
@@ -359,6 +379,13 @@ export function buildJoinPayload(
   if (allErrors.length > 0) {
     throw new Error("Join draft is incomplete");
   }
+  if (draft.voiceKey?.trim() && !voicePromptReady(draft)) {
+    throw new Error(
+      draft.voicePrompt?.trim()
+        ? `Voice prompt titles can be ${VOICE_PROMPT_MAX} characters or fewer`
+        : "Add a short title for your voice prompt",
+    );
+  }
 
   return {
     name: draft.name.trim(),
@@ -367,6 +394,8 @@ export function buildJoinPayload(
     about: draft.about.trim(),
     photo_key: draft.photoKey?.trim() || null,
     video_key: draft.videoKey?.trim() || null,
+    voice_key: voicePromptReady(draft) ? draft.voiceKey!.trim() : null,
+    voice_prompt: voicePromptReady(draft) ? draft.voicePrompt!.trim() : null,
     credential: draft.credential,
     start_date: startDateFromYears(Number(draft.yearsPracticing)),
     open_to_new_clients: draft.openToNewClients,

@@ -15,7 +15,7 @@ export const VIDEO_STILL_TOO_LARGE =
 
 export function joinMediaPath(
   userId: string,
-  kind: "photo" | "video",
+  kind: "photo" | "video" | "voice",
   fileName: string,
   now = Date.now(),
 ) {

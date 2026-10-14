@@ -12,6 +12,8 @@ const draft: JoinDraft = {
     licenses: [{ number: "MFC 112938", state: "CA" }],
   photoKey: "user-id/photo.jpg",
   videoKey: "user-id/intro.mp4",
+  voiceKey: null,
+  voicePrompt: null,
   openToNewClients: true,
   virtual: true,
   inPerson: false,
@@ -65,6 +67,8 @@ describe("toRpcArgs", () => {
       p_about: payload.about,
       p_photo_key: payload.photo_key,
       p_video_key: payload.video_key,
+      p_voice_key: payload.voice_key,
+      p_voice_prompt: payload.voice_prompt,
       p_credential: payload.credential,
       p_start_date: payload.start_date,
       p_open_to_new_clients: payload.open_to_new_clients,
@@ -101,5 +105,7 @@ describe("toRpcArgs", () => {
 
     expect(args.p_photo_key).toBeNull();
     expect(args.p_video_key).toBeNull();
+    expect(args.p_voice_key).toBeNull();
+    expect(args.p_voice_prompt).toBeNull();
   });
 });

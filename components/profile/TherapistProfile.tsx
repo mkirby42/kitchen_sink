@@ -25,6 +25,7 @@ import { AboutPanel } from "./ProfileAbout";
 import { ContactCtas } from "./ContactCtas";
 import { DesktopProfile } from "./DesktopProfile";
 import { HeroMedia } from "./HeroMedia";
+import { VoicePromptCard } from "./VoicePromptCard";
 import { ProfileHeading } from "./ProfileHeading";
 import { ProfileTabs } from "./ProfileTabs";
 import { ReviewsPanel } from "./ReviewsPanel";
@@ -151,6 +152,15 @@ export function TherapistProfile({
             licenseCaptions={licenses}
             years={data.years}
           />
+          {data.voiceUrl && data.voicePrompt ? (
+            <div className="mt-4">
+              <VoicePromptCard
+                name={data.name}
+                prompt={data.voicePrompt}
+                src={data.voiceUrl}
+              />
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-4">

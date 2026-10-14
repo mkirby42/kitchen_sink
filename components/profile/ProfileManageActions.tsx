@@ -154,8 +154,8 @@ export function ProfileDeleteDialog({
   const who = name.trim() || "this therapist";
   const title = isOwn ? "Delete your profile?" : `Delete ${who}'s profile?`;
   const copy = isOwn
-    ? "This permanently removes your therapist page from Kitchen Sink, including your photo, intro video, and reviews. Your login stays, so you can join again. This can't be undone."
-    : `This permanently removes ${who}'s therapist page from Kitchen Sink, including their photo, intro video, and reviews. Their login stays. This can't be undone.`;
+    ? "This permanently removes your therapist page from Kitchen Sink, including your photo, intro video, voice prompt, and reviews. Your login stays, so you can join again. This can't be undone."
+    : `This permanently removes ${who}'s therapist page from Kitchen Sink, including their photo, intro video, voice prompt, and reviews. Their login stays. This can't be undone.`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 px-4 py-6 sm:items-center">

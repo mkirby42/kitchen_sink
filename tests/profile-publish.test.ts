@@ -216,6 +216,8 @@ describe("draft and publish buttons", () => {
       licenses: [{ number: "1", state: "CA" }],
       photoKey: `${userId}/photo.jpg`,
       videoKey: `${userId}/intro.mp4`,
+      voiceKey: null,
+      voicePrompt: null,
       openToNewClients: true,
       virtual: true,
       inPerson: false,
@@ -296,7 +298,7 @@ describe("draft and publish buttons", () => {
     expect(held).not.toContain("Save changes →");
   });
 
-  it("continues the media step without a photo or video and says both are required to publish", () => {
+  it("continues the media step without a photo, video, or voice prompt", () => {
     const html = wizard({ step: 2, withMedia: false });
     expect(html).toContain(PUBLISH_MEDIA_NOTE);
     expect(html).toContain("You can continue without them.");
@@ -305,7 +307,7 @@ describe("draft and publish buttons", () => {
     expect(button?.[0]).not.toMatch(/\sdisabled(?=[\s>=])/);
   });
 
-  it("offers only save as draft on the last step when a photo or video is missing", () => {
+  it("offers only save as draft when the picture plus video-or-voice rule is not met", () => {
     const missing = wizard({
       editing: true,
       published: false,
@@ -332,9 +334,24 @@ describe("draft and publish buttons", () => {
     });
     expect(videoOnly).not.toContain("Publish profile →");
 
+    const voiceInstead = wizard({
+      editing: true,
+      published: false,
+      draft: {
+        ...mediaDraft(),
+        videoKey: null,
+        voiceKey: `${userId}/voice.m4a`,
+        voicePrompt: "A short hello",
+      },
+    });
+    expect(voiceInstead).toContain("Publish profile →");
+    expect(voiceInstead).not.toContain(PUBLISH_MEDIA_NOTE);
+
     const live = wizard({ editing: true, published: true, withMedia: false });
     expect(live).toContain(PUBLISH_MEDIA_NOTE);
-    expect(live).toContain("Add both before saving.");
+    expect(live).toContain(
+      "Add a picture and either a short video or a voice prompt before saving.",
+    );
     expect(live).not.toContain("Save as draft");
     expect(live).not.toContain("Save changes →");
     expect(live).not.toContain("Publish profile →");
@@ -351,6 +368,8 @@ describe("draft profile banner", () => {
     about: null,
     photoUrl: null,
     videoUrl: null,
+    voiceUrl: null,
+    voicePrompt: null,
     credential: "LMFT",
     years: 1,
     virtual: true,

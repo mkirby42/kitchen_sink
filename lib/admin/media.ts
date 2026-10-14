@@ -10,6 +10,8 @@ export type AdminTherapist = {
   listed: boolean;
   photoKey: string | null;
   videoKey: string | null;
+  voiceKey: string | null;
+  voicePrompt: string | null;
 };
 
 type PracticeRow = {
@@ -24,6 +26,8 @@ export type TherapistMediaRow = {
   email: string | null;
   photo_key: string | null;
   video_key: string | null;
+  voice_key?: string | null;
+  voice_prompt?: string | null;
   therapists: PracticeRow | PracticeRow[] | null;
 };
 
@@ -66,6 +70,8 @@ export function normalizeAdminTherapists(rows: TherapistMediaRow[]) {
       listed: isDirectoryListed(practice.listed),
       photoKey: row.photo_key,
       videoKey: row.video_key,
+      voiceKey: row.voice_key ?? null,
+      voicePrompt: row.voice_prompt ?? null,
     });
   }
   return therapists.sort((a, b) => a.name.localeCompare(b.name));
@@ -75,7 +81,7 @@ export async function listAdminTherapists(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, name, email, photo_key, video_key, therapists!inner(credential, open_to_new_clients, listed)",
+      "id, name, email, photo_key, video_key, voice_key, voice_prompt, therapists!inner(credential, open_to_new_clients, listed)",
     )
     .in("role", ["therapist", "admin"])
     .order("name");

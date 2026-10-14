@@ -17,6 +17,7 @@ import { AboutLead } from "./AboutLead";
 import { DesktopIdentity } from "./DesktopIdentity";
 import { DesktopPractice } from "./DesktopPractice";
 import { HeroMedia } from "./HeroMedia";
+import { VoicePromptCard } from "./VoicePromptCard";
 import { ProfileHeading } from "./ProfileHeading";
 import { ProfileTabs } from "./ProfileTabs";
 import { ReviewsPanel } from "./ReviewsPanel";
@@ -65,6 +66,15 @@ export function DesktopProfile({
           years={data.years}
           watchLabel={watchLabel}
         />
+        {data.voiceUrl && data.voicePrompt ? (
+          <div className="mt-4">
+            <VoicePromptCard
+              name={data.name}
+              prompt={data.voicePrompt}
+              src={data.voiceUrl}
+            />
+          </div>
+        ) : null}
         <DesktopIdentity
           data={data}
           formats={formats}

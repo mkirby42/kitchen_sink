@@ -2,13 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const DELETE_PROFILE_PHRASE = "DELETE";
 
-const MEDIA_BUCKETS = ["photos", "videos"] as const;
+const MEDIA_BUCKETS = ["photos", "videos", "voice"] as const;
 const LIST_PAGE = 100;
 
 export type DeleteProfileInput = {
   userId: string;
   photoKey: string | null;
   videoKey: string | null;
+  voiceKey?: string | null;
   confirm: string;
 };
 
@@ -43,7 +44,7 @@ function isSinglePathSegment(name: string) {
   );
 }
 
-/** Object paths under photos/{userId}/ or videos/{userId}/ only. */
+/** Object paths under photos/{userId}/, videos/{userId}/, or voice/{userId}/ only. */
 export function ownMediaPaths(
   userId: string,
   listedNames: readonly string[],
@@ -80,13 +81,18 @@ async function listedNames(
 
 export async function removeOwnTherapistMedia(
   supabase: SupabaseClient,
-  input: Pick<DeleteProfileInput, "userId" | "photoKey" | "videoKey">,
+  input: Pick<DeleteProfileInput, "userId" | "photoKey" | "videoKey" | "voiceKey">,
 ) {
   const errors: string[] = [];
 
   for (const bucketId of MEDIA_BUCKETS) {
     const bucket = supabase.storage.from(bucketId);
-    const extraKey = bucketId === "photos" ? input.photoKey : input.videoKey;
+    const extraKey =
+      bucketId === "photos"
+        ? input.photoKey
+        : bucketId === "videos"
+          ? input.videoKey
+          : (input.voiceKey ?? null);
     let names: string[] = [];
     try {
       names = await listedNames(bucket, input.userId);
@@ -141,6 +147,7 @@ export async function deleteManagedTherapistProfile(
     therapistId: string;
     photoKey: string | null;
     videoKey: string | null;
+    voiceKey?: string | null;
   },
 ): Promise<DeleteProfileResult> {
   const { error } = await supabase.rpc("delete_therapist_profile", {
@@ -154,6 +161,7 @@ export async function deleteManagedTherapistProfile(
       userId: input.therapistId,
       photoKey: input.photoKey,
       videoKey: input.videoKey,
+      voiceKey: input.voiceKey,
     });
   } catch (error) {
     return {

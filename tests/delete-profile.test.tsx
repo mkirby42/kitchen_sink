@@ -55,6 +55,7 @@ describe("delete confirmation", () => {
         userId,
         photoKey: `${userId}/photo.jpg`,
         videoKey: null,
+        voiceKey: null,
       }),
     );
     expect(closed).toContain("Delete profile");
@@ -158,7 +159,9 @@ describe("deleteOwnTherapistProfile", () => {
               ? null
               : bucket === "photos"
                 ? (options?.listed ?? [])
-                : [{ name: "old.mp4", id: "obj-2" }],
+                : bucket === "videos"
+                  ? [{ name: "old.mp4", id: "obj-2" }]
+                  : [],
             error: options?.listError ? { message: options.listError } : null,
           }),
           remove: async (paths: string[]) => {

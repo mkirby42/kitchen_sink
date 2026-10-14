@@ -7,7 +7,7 @@ import { buttonClass } from "@/components/ui/styles";
 export const UPLOAD_HELP_EMAIL = "chrislo5240@gmail.com";
 
 const MAILTO = `mailto:${UPLOAD_HELP_EMAIL}?subject=${encodeURIComponent(
-  "Trouble uploading my profile photo or video",
+  "Trouble uploading my profile photo, video, or voice prompt",
 )}`;
 
 export function UploadHelp({ troubleToken }: { troubleToken: number }) {
@@ -55,7 +55,7 @@ export function UploadHelp({ troubleToken }: { troubleToken: number }) {
           Need help uploading?
         </h2>
         <p className="mt-3 text-sm leading-6 text-mute">
-          If your photo or intro video won&apos;t upload, email{" "}
+          If your photo, intro video, or voice prompt won&apos;t upload, email{" "}
           <a href={MAILTO} className="font-medium text-clay underline">
             {UPLOAD_HELP_EMAIL}
           </a>{" "}
