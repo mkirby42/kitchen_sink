@@ -93,7 +93,7 @@ describe("analytics events in postgres", () => {
       insert into public.analytics_events (visitor_id, session_id, event, path)
       values ('${VISITOR}', '${SESSION}', 'page_view', '/');
     `);
-    const anonRead = await db.exec(
+    const anonRead = await db.query(
       "select * from public.analytics_events",
     ).then(
       (result) => result.rows.length,
