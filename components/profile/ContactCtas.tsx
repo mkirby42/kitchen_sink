@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { pageSubtitleClass, profileSectionHeadingClass } from "@/components/ui/styles";
 import type { ConsultBookAction, ContactAction } from "@/lib/therapists/load";
 
 export function ContactCtas({
@@ -102,10 +103,10 @@ export function ContactCtas({
             onClick={(event) => event.stopPropagation()}
           >
             <Eyebrow>Contact</Eyebrow>
-            <h2 id={titleId} className="mt-1 font-display text-[1.75rem] font-normal tracking-tight text-ink">
+            <h2 id={titleId} className={`mt-1 ${profileSectionHeadingClass}`}>
               Reach {name}
             </h2>
-            <p className="mt-1 text-sm text-mute">
+            <p className={`mt-1 ${pageSubtitleClass}`}>
               Kitchen Sink doesn&apos;t book sessions — use the details they
               listed.
             </p>
@@ -156,8 +157,8 @@ function CtaButton({
 }) {
   return (
     <Button
-      variant={action.kind === "book" ? "primary" : "secondary"}
-      size={size}
+      variant={action.kind === "book" ? "solid" : "secondary"}
+      size={size === "sm" ? "dock" : "label"}
       className="w-full whitespace-nowrap"
       aria-haspopup="dialog"
       aria-expanded={open}

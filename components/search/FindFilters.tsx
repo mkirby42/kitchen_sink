@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tag } from "@/components/ui/Tag";
+import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import { eyebrowClass, fieldClass } from "@/components/ui/styles";
 import {
   INSURANCE_PRESETS,
@@ -213,7 +214,7 @@ export function FindFilters() {
             selected={filters.inPerson}
             onClick={() => apply({ ...filters, inPerson: !filters.inPerson })}
           >
-            In-Person
+            In person
           </Tag>
         </div>
       </fieldset>
@@ -227,7 +228,7 @@ export function FindFilters() {
               apply({ ...filters, tags: toggleTag(filters.tags, label) })
             }
           >
-            {label}
+            {sentenceCasePhrase(label)}
           </Tag>
         ))}
       </FilterGroup>
@@ -241,7 +242,7 @@ export function FindFilters() {
               apply({ ...filters, tags: toggleTag(filters.tags, label) })
             }
           >
-            {label}
+            {sentenceCasePhrase(label)}
           </Tag>
         ))}
       </FilterGroup>

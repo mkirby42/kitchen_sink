@@ -69,8 +69,8 @@ describe("ReviewsPanel", () => {
   it("keeps the empty state and asks a visitor to sign in", () => {
     const html = render({});
     expect(html).toContain("No reviews yet.");
-    expect(html).toContain("How was your session with ");
-    expect(html).toContain(">Maya</em>?");
+    expect(html).toContain("How was your session with Maya?");
+    expect(html).not.toContain(">Maya</em>");
     expect(html).toContain("Your feedback helps other clients find the right fit.");
     expect(html).toContain("Sign in as a client to leave a review.");
     expect(html).not.toContain("jr@kitchensink.demo");

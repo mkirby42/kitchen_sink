@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { REVIEW_QUESTIONS, type ReviewRatingKey, type ReviewRatings } from "@/lib/reviews/questions";
 import { deleteOwnReview, submitReview } from "@/lib/reviews/submit";
 import { validateReview } from "@/lib/reviews/validate";
+import { pageSubtitleClass, profileSectionHeadingClass } from "@/components/ui/styles";
 import { PhiNotice, ReviewEditNote, ReviewPendingNote } from "./PhiNotice";
 import { FormMessage, ReviewAuth } from "./ReviewAuth";
 
@@ -40,10 +41,10 @@ export function ReviewComposer({
 export function SessionHeading({ name }: { name: string }) {
   return (
     <div>
-      <h2 className="font-display text-[1.75rem] leading-tight font-normal tracking-tight text-ink sm:text-[2.125rem]">
-        How was your session with <em className="text-clay">{name}</em>?
+      <h2 className={profileSectionHeadingClass}>
+        How was your session with {name}?
       </h2>
-      <p className="mt-2 text-sm text-mute">
+      <p className={`mt-2 ${pageSubtitleClass}`}>
         Your feedback helps other clients find the right fit.
       </p>
     </div>
@@ -175,7 +176,7 @@ function ReviewForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper hover:bg-ink-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-heading px-6 py-3 font-sans text-[16px] font-medium text-white hover:bg-heading/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? "Please wait…" : "Submit for review"}
         </button>
@@ -184,7 +185,7 @@ function ReviewForm({
             type="button"
             disabled={submitting}
             onClick={() => void onRemove()}
-            className="text-sm font-semibold text-mute hover:text-clay-dark disabled:opacity-50"
+            className="font-sans text-[15px] font-medium text-meta hover:text-heading disabled:opacity-50"
           >
             Remove
           </button>

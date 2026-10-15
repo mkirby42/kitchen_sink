@@ -1,11 +1,13 @@
 import { Card } from "@/components/ui/Card";
-import { therapistNameClass } from "@/components/ui/styles";
+import { metaLineClass, therapistNameClass } from "@/components/ui/styles";
+import { sentenceCaseSegments } from "@/lib/copy/sentence-case";
 import { formatUsdFromCents } from "@/lib/therapists/display";
 import type {
   ConsultBookAction,
   TherapistProfileData,
 } from "@/lib/therapists/load";
 import { ContactCtas } from "./ContactCtas";
+import { SessionFormatLine } from "./SessionFormatLine";
 import { credentialLine, yearsPracticingLabel } from "./copy";
 
 export function DesktopIdentity({
@@ -31,29 +33,23 @@ export function DesktopIdentity({
   return (
     <Card className="mt-4 px-5 py-5 sm:px-6">
       <h1 className={therapistNameClass}>{data.name}</h1>
-      {summary ? <p className="mt-2 text-[15px] text-mute">{summary}</p> : null}
+      {summary ? (
+        <p className={`mt-2 ${metaLineClass}`}>{sentenceCaseSegments(summary)}</p>
+      ) : null}
       {licenses.length > 0 ? (
         <div className="mt-1 space-y-0.5">
           {licenses.map((line) => (
-            <p key={line} className="text-sm text-mute">
+            <p key={line} className={metaLineClass}>
               {line}
             </p>
           ))}
         </div>
       ) : null}
-      {years ? <p className="mt-1 text-sm text-mute">{years}</p> : null}
+      {years ? <p className={`mt-1 ${metaLineClass}`}>{years}</p> : null}
       {formats.length > 0 ? (
-        <ul className="mt-4 flex flex-wrap gap-2">
-          {formats.map((label) => (
-            <li
-              key={label}
-              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1 text-xs font-medium text-ink"
-            >
-              {label === "In person" ? <PinIcon /> : <VideoIcon />}
-              {label}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-3">
+          <SessionFormatLine formats={formats} />
+        </div>
       ) : null}
       <ContactCtas
         name={data.givenName}
@@ -98,7 +94,7 @@ export function DesktopIdentity({
         {officeLines.length > 0 ? (
           <div className="flex items-start justify-between gap-4 py-3">
             <dt className="text-mute">Office</dt>
-            <dd className="text-right text-sm font-medium text-body not-italic">
+            <dd className={`text-right not-italic ${metaLineClass}`}>
               {officeLines.map((line, index) => (
                 <span key={`${index}-${line}`} className="block">
                   {line}
@@ -112,37 +108,3 @@ export function DesktopIdentity({
   );
 }
 
-function PinIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-3.5 w-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      aria-hidden
-    >
-      <path
-        d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="11" r="1.6" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function VideoIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-3.5 w-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      aria-hidden
-    >
-      <rect x="3.5" y="6.5" width="12" height="11" rx="2" />
-      <path d="M15.5 11.5 20.5 8.5v7l-5-3Z" strokeLinejoin="round" />
-    </svg>
-  );
-}

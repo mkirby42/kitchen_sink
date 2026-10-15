@@ -242,8 +242,8 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Virtual &amp; In-Person");
     expect(html).not.toContain("In-Person");
     const logisticsAt = html.indexOf("How Maya");
-    const inPersonAt = html.indexOf(">In person</li>");
-    const virtualAt = html.indexOf(">Virtual</li>");
+    const inPersonAt = html.indexOf(">In person<");
+    const virtualAt = html.indexOf(">Virtual<");
     const addressAt = html.indexOf("1102 West 6th Street, Austin");
     expect(inPersonAt).toBeGreaterThan(logisticsAt);
     expect(virtualAt).toBeGreaterThan(inPersonAt);
@@ -280,8 +280,8 @@ describe("profile edit control", () => {
     );
     expect(html).not.toContain(">Office<");
     expect(html).not.toContain("1102 West 6th Street");
-    expect(html).toContain(">In person</li>");
-    expect(html).toContain(">Virtual</li>");
+    expect(html).toContain(">In person<");
+    expect(html).toContain(">Virtual<");
     expect(html).toContain("Education");
     expect(html).toContain("How Maya");
   });
@@ -306,8 +306,8 @@ describe("profile edit control", () => {
     );
     expect(html).not.toContain(">Office<");
     expect(html).not.toContain("1102 West 6th Street");
-    expect(html).toContain(">Virtual</li>");
-    expect(html).not.toContain(">In person</li>");
+    expect(html).toContain(">Virtual<");
+    expect(html).not.toContain(">In person<");
     expect(html).toContain("How Maya");
   });
 
@@ -324,20 +324,20 @@ describe("profile edit control", () => {
       }),
     );
     const education = html.indexOf("Education");
-    const modalities = html.indexOf("Approach in Therapy");
-    const specialties = html.indexOf("Areas of Interest");
+    const modalities = html.indexOf("Approach in therapy");
+    const specialties = html.indexOf("Areas of interest");
     const heroDetails = html.indexOf("data-hero-details");
     expect(education).toBeGreaterThan(-1);
     expect(modalities).toBeGreaterThan(education);
     expect(specialties).toBeGreaterThan(modalities);
-    expect(html.indexOf("Cognitive Behavioral Therapy (CBT)")).toBeGreaterThan(
+    expect(html.indexOf("Cognitive behavioral therapy (CBT)")).toBeGreaterThan(
       modalities,
     );
-    expect(html.indexOf("Cognitive Behavioral Therapy (CBT)")).toBeLessThan(
+    expect(html.indexOf("Cognitive behavioral therapy (CBT)")).toBeLessThan(
       specialties,
     );
     expect(html).toContain(
-      "Eye Movement Desensitization and Reprocessing (EMDR)",
+      "Eye movement desensitization and reprocessing (EMDR)",
     );
     expect(html.indexOf("Anxiety")).toBeGreaterThan(specialties);
     expect(html.slice(heroDetails, education)).not.toContain("CBT");
@@ -360,8 +360,8 @@ describe("profile edit control", () => {
     );
     expect(html).not.toContain("Education");
     expect(html).not.toContain("Credentials");
-    const modalities = html.indexOf("Approach in Therapy");
-    const specialties = html.indexOf("Areas of Interest");
+    const modalities = html.indexOf("Approach in therapy");
+    const specialties = html.indexOf("Areas of interest");
     expect(modalities).toBeGreaterThan(-1);
     expect(specialties).toBeGreaterThan(modalities);
   });
@@ -386,22 +386,23 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    const specialties = html.indexOf("Areas of Interest");
+    const specialties = html.indexOf("Areas of interest");
     expect(specialties).toBeGreaterThan(-1);
     expect(html).toContain("Anxiety");
     expect(html).toContain("Trauma &amp; PTSD");
     expect(html).toContain("Career");
-    expect(html).toContain("College Students");
-    expect(html).toContain("Panic Attacks");
-    expect(html).toContain("Therapy for Men");
+    expect(html).toContain("College students");
+    expect(html).toContain("Panic attacks");
+    expect(html).toContain("+1 more");
+    expect(html).not.toContain("Therapy for men");
     expect(html).toContain(">Stress<");
-    expect(html).toContain("Internal Family Systems (IFS)");
-    expect(html.indexOf("Cognitive Behavioral Therapy (CBT)")).toBeLessThan(
+    expect(html).toContain("Internal family systems (IFS)");
+    expect(html.indexOf("Cognitive behavioral therapy (CBT)")).toBeLessThan(
       specialties,
     );
   });
 
-  it("shows Areas of Interest when the only specialties are custom", () => {
+  it("shows Areas of interest when the only specialties are custom", () => {
     const html = renderToStaticMarkup(
       createElement(TherapistProfile, {
         data: {
@@ -413,14 +414,14 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    const specialties = html.indexOf("Areas of Interest");
+    const specialties = html.indexOf("Areas of interest");
     expect(specialties).toBeGreaterThan(-1);
     expect(html.indexOf("Career")).toBeGreaterThan(specialties);
-    expect(html).toContain("College Students");
-    expect(html).toContain("Approach in Therapy");
+    expect(html).toContain("College students");
+    expect(html).toContain("Approach in therapy");
     expect(html).not.toContain("Modalities");
     expect(html).toContain(
-      "Eye Movement Desensitization and Reprocessing (EMDR)",
+      "Eye movement desensitization and reprocessing (EMDR)",
     );
   });
 });

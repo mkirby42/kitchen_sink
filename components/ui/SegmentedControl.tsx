@@ -2,6 +2,8 @@
 
 import { cx, segmentOptionClass, segmentTrackClass } from "./styles";
 
+type SegmentTone = "solid" | "quiet";
+
 export function SegmentedControl<T extends string>({
   label,
   value,
@@ -13,6 +15,7 @@ export function SegmentedControl<T extends string>({
   size = "md",
   fill = false,
   disabled = false,
+  tone = "solid",
 }: {
   label: string;
   value: T;
@@ -27,13 +30,15 @@ export function SegmentedControl<T extends string>({
   /** Stretch the track and split the options evenly. */
   fill?: boolean;
   disabled?: boolean;
+  /** quiet is the profile Profile/Reviews toggle: 15px heading purple. */
+  tone?: SegmentTone;
 }) {
   return (
     <div
       role="group"
       aria-label={label}
       className={cx(
-        segmentTrackClass({ stack, wrap, size }),
+        segmentTrackClass({ stack, wrap, size, tone }),
         fill && "flex w-full",
         className,
       )}
@@ -48,7 +53,7 @@ export function SegmentedControl<T extends string>({
             disabled={disabled}
             onClick={() => onChange(option.value)}
             className={cx(
-              segmentOptionClass(selected, size),
+              segmentOptionClass(selected, size, tone),
               stack &&
                 size === "md" &&
                 "flex w-full items-center justify-center sm:inline-flex sm:w-auto",

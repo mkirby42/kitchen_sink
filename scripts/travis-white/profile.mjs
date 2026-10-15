@@ -26,7 +26,7 @@ export const travisWhite = {
   superbill: true,
   about: [
     "It’s tough to find your path and easy to lose it. I help college students, grad students, and early to mid-career professionals find their way.",
-    "I am a Doctor of Clinical Psychology and a Licensed Psychologist in Texas. I’m married with three young kids. Being a husband and dad has taught me more about myself, people, and the world in general than I could have possibly imagined. I like run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time, like to stay busy around the house, and love my job as a therapist.",
+    "I am a Doctor of Clinical Psychology and a Licensed Psychologist in Texas. I’m married with three young kids. Being a husband and dad has taught me more about myself, people, and the world in general than I could have possibly imagined. I like to run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time, like to stay busy around the house, and love my job as a therapist.",
     "College, grad school, early marriage, and young parenthood have been some of the most challenging and rewarding periods of my life. Nearly as exciting as they’ve been terrifying. I’ve done it all…made mistakes, put it back together, made the same mistakes again, found new mistakes to make, pulled off miraculous triumphs, and spent plenty of time grinding away. Through it all, I’ve tried to stay true to myself and always remain a student to my experiences. I wouldn’t change a bit of it.",
   ].join("\n\n"),
   licenses: [{ number: "38047", state: "TX" }],
@@ -113,7 +113,7 @@ export const travisWhite = {
       prompt: "outside of session, I...",
       tag: "session_vibe",
       answer:
-        "I like run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
+        "I like to run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
     },
   ],
 };

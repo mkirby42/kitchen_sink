@@ -2,20 +2,15 @@ import type { ReactNode } from "react";
 import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { eyebrowClass, tagClass } from "@/components/ui/styles";
+import { smallLabelClass } from "@/components/ui/styles";
+import { TagPills } from "./TagPills";
 
 export function TagSection({ title, labels }: { title: string; labels: string[] }) {
   if (labels.length === 0) return null;
   return (
     <Card className="mt-4 px-5 py-5 sm:px-6">
-      <h2 className={eyebrowClass}>{title}</h2>
-      <ul className="mt-3 flex flex-wrap gap-2">
-        {labels.map((label) => (
-          <li key={label} className={tagClass(false)}>
-            {label}
-          </li>
-        ))}
-      </ul>
+      <h2 className={smallLabelClass}>{title}</h2>
+      <TagPills labels={labels} />
     </Card>
   );
 }

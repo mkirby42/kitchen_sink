@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
-import { eyebrowClass, sectionTitleClass } from "@/components/ui/styles";
+import {
+  metaLineClass,
+  pageSubtitleClass,
+  profilePageHeadingClass,
+  smallLabelClass,
+  textActionClass,
+} from "@/components/ui/styles";
+import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { initials, officeAddressLines } from "@/lib/therapists/display";
 import {
@@ -101,7 +108,7 @@ export function TherapistProfile({
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <Link
           href={backHref}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-clay hover:text-clay-dark"
+          className={`inline-flex items-center gap-1.5 hover:opacity-80 ${textActionClass}`}
           aria-label="Back to search"
         >
           <svg
@@ -169,8 +176,8 @@ export function TherapistProfile({
               <div className="space-y-4">
                 {data.education.length > 0 ? (
                   <div>
-                    <h2 className={eyebrowClass}>Education</h2>
-                    <ul className="mt-2 space-y-1 text-sm text-body">
+                    <h2 className={smallLabelClass}>Education</h2>
+                    <ul className={`mt-2 space-y-1 ${metaLineClass}`}>
                       {data.education.map((item) => (
                         <li key={item}>{item}</li>
                       ))}
@@ -179,10 +186,10 @@ export function TherapistProfile({
                 ) : null}
                 {data.credentials.length > 0 ? (
                   <div>
-                    <h2 className={eyebrowClass}>Credentials</h2>
-                    <ul className="mt-2 space-y-1 text-sm text-body">
+                    <h2 className={smallLabelClass}>Credentials</h2>
+                    <ul className={`mt-2 space-y-1 ${metaLineClass}`}>
                       {data.credentials.map((item) => (
-                        <li key={item}>{item}</li>
+                        <li key={item}>{sentenceCasePhrase(item)}</li>
                       ))}
                     </ul>
                   </div>
@@ -192,11 +199,11 @@ export function TherapistProfile({
           ) : null}
 
           <TagSection
-            title="Approach in Therapy"
+            title="Approach in therapy"
             labels={modalityDisplayLabels(data.modalities)}
           />
           <TagSection
-            title="Areas of Interest"
+            title="Areas of interest"
             labels={directorySpecialties(data.specialties)}
           />
 
@@ -212,10 +219,10 @@ export function TherapistProfile({
 
           {data.cards.length > 0 ? (
             <section className="mt-10">
-              <h2 className={`text-ink ${sectionTitleClass}`}>
-                Get to know <em className="text-clay">{data.givenName}</em>
+              <h2 className={profilePageHeadingClass}>
+                Get to know {data.givenName}
               </h2>
-              <p className="mt-1 text-sm text-mute">
+              <p className={`mt-1 ${pageSubtitleClass}`}>
                 Honest answers, before you ever say hello.
               </p>
               <ul className="mt-5 space-y-3">
@@ -244,10 +251,7 @@ export function TherapistProfile({
           ) : null}
 
           <div className="mt-10">
-            <ProfileHeading
-              lead={`In ${possessive(data.givenName)} own`}
-              accent="words"
-            />
+            <ProfileHeading>{`In ${possessive(data.givenName)} own words`}</ProfileHeading>
             <ProfileTabs
               flush
               reviewCount={data.reviews.length}

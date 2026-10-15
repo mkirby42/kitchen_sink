@@ -2,14 +2,10 @@ import Link from "next/link";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
+import { SessionFormatLine } from "@/components/profile/SessionFormatLine";
 import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
-
-const formatPillClass =
-  "inline-flex items-center rounded-full border border-line bg-cream px-3 py-1 text-[13px] leading-none text-mute";
-
-function FormatPill({ label }: { label: string }) {
-  return <span className={formatPillClass}>{label}</span>;
-}
+import { metaLineClass, primaryPillClass, therapistNameClass } from "@/components/ui/styles";
+import { sessionFormatPills } from "@/lib/therapists/load";
 
 export function TherapistCardPhone({
   name,
@@ -45,7 +41,7 @@ export function TherapistCardPhone({
   const portrait = Boolean(photoUrl || videoUrl);
   const knowLabel = `Get to know ${given}`;
   const code = credential?.trim() || null;
-  const formats = virtual || inPerson;
+  const formats = sessionFormatPills(virtual, inPerson);
 
   return (
     <div data-find-card="phone" className="md:hidden">
@@ -73,33 +69,27 @@ export function TherapistCardPhone({
           {portrait ? null : (
             <span
               aria-hidden
-              className="flex size-14 shrink-0 items-center justify-center rounded-full bg-ink font-sans text-lg font-semibold text-paper"
+              className="flex size-14 shrink-0 items-center justify-center rounded-full bg-heading font-sans text-lg font-medium text-white"
             >
               {initials}
             </span>
           )}
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <h2 className="font-sans text-[1.75rem] leading-none font-bold tracking-tight text-black">
-              {name}
-            </h2>
+            <h2 className={therapistNameClass}>{name}</h2>
             {sample ? (
-              <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-black">
+              <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-black">
                 SAMPLE
               </span>
             ) : null}
           </div>
         </div>
 
-        {code || formats ? (
+        {code || formats.length > 0 ? (
           <div className="mt-2.5 flex items-center gap-3">
-            {code ? <p className="text-sm text-mute">{code}</p> : null}
-            {formats ? (
-              <div
-                data-find-formats
-                className="ml-auto flex shrink-0 flex-wrap justify-end gap-1.5"
-              >
-                {virtual ? <FormatPill label="Virtual" /> : null}
-                {inPerson ? <FormatPill label="In-Person" /> : null}
+            {code ? <p className={metaLineClass}>{code}</p> : null}
+            {formats.length > 0 ? (
+              <div data-find-formats className="ml-auto flex shrink-0 justify-end">
+                <SessionFormatLine formats={formats} />
               </div>
             ) : null}
           </div>
@@ -119,7 +109,7 @@ export function TherapistCardPhone({
 
         <Link
           href={href}
-          className="mt-6 flex w-full items-center justify-center rounded-full bg-ink px-6 py-3.5 text-center text-[15px] font-semibold text-paper transition-colors hover:bg-ink/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          className={`${primaryPillClass} mt-6 w-full px-6 py-3.5 text-center`}
         >
           {knowLabel}
         </Link>

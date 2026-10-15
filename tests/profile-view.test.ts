@@ -79,12 +79,12 @@ describe("profile view helpers", () => {
     expect(ctas).toEqual([
       {
         kind: "consult",
-        label: "Free Consult",
+        label: "Free consult",
         href: "mailto:maya@kitchensink.demo",
       },
       {
         kind: "book",
-        label: "Book a Session",
+        label: "Book a session",
         href: "tel:+14155550199",
       },
     ]);

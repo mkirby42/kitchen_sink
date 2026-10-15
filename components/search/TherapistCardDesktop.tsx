@@ -2,58 +2,17 @@ import Link from "next/link";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
+import { SessionFormatLine } from "@/components/profile/SessionFormatLine";
 import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
+import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
+import { sessionFormatPills } from "@/lib/therapists/load";
 import { modalityDisplayLabel } from "@/lib/tags/modality-display";
-
-function CameraIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-3.5 w-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      aria-hidden
-    >
-      <rect x="3" y="7" width="12" height="10" rx="1.5" />
-      <path d="M15 11.2 20.5 8.2v7.6L15 12.8" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-3.5 w-3.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      aria-hidden
-    >
-      <path
-        d="M12 21s6-5.1 6-10a6 6 0 1 0-12 0c0 4.9 6 10 6 10z"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="11" r="1.7" />
-    </svg>
-  );
-}
-
-function FormatPill({
-  icon,
-  label,
-}: {
-  icon: "camera" | "pin";
-  label: string;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-2.5 py-1 text-xs text-mute">
-      {icon === "camera" ? <CameraIcon /> : <PinIcon />}
-      {label}
-    </span>
-  );
-}
+import {
+  metaLineClass,
+  primaryPillClass,
+  softTagClass,
+  therapistNameClass,
+} from "@/components/ui/styles";
 
 export function TherapistCardDesktop({
   name,
@@ -92,6 +51,7 @@ export function TherapistCardDesktop({
 }) {
   const portrait = Boolean(photoUrl || videoUrl);
   const knowLabel = `Get to know ${given}`;
+  const formats = sessionFormatPills(virtual, inPerson);
 
   return (
     <div
@@ -130,24 +90,22 @@ export function TherapistCardDesktop({
             {portrait ? null : (
               <span
                 aria-hidden
-                className="flex size-16 shrink-0 items-center justify-center rounded-full bg-ink font-sans text-lg font-semibold text-paper"
+                className="flex size-16 shrink-0 items-center justify-center rounded-full bg-heading font-sans text-lg font-medium text-white"
               >
                 {initials}
               </span>
             )}
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="font-sans text-[1.75rem] leading-none font-bold tracking-tight text-black lg:text-[2rem]">
-                  {name}
-                </h2>
+                <h2 className={therapistNameClass}>{name}</h2>
                 {sample ? (
-                  <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-black">
+                  <span className="shrink-0 rounded-full bg-gold px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-black">
                     SAMPLE
                   </span>
                 ) : null}
               </div>
               {credential ? (
-                <p className="mt-2 text-sm text-mute">{credential}</p>
+                <p className={`mt-2 ${metaLineClass}`}>{credential}</p>
               ) : null}
               {draft ? (
                 <HiddenFromPublicBadge variant="card" label={DRAFT_PROFILE_LABEL} />
@@ -160,8 +118,7 @@ export function TherapistCardDesktop({
               data-find-formats
               className="flex shrink-0 flex-wrap justify-end gap-2"
             >
-              {virtual ? <FormatPill icon="camera" label="Virtual" /> : null}
-              {inPerson ? <FormatPill icon="pin" label="In-Person" /> : null}
+              <SessionFormatLine formats={formats} />
             </div>
           ) : null}
         </div>
@@ -185,9 +142,9 @@ export function TherapistCardDesktop({
             {tags.map((label) => (
               <li
                 key={label}
-                className="rounded-full border border-line bg-paper px-3 py-1 text-[13px] font-medium text-ink"
+                className={softTagClass}
               >
-                {modalityDisplayLabel(label)}
+                {sentenceCasePhrase(modalityDisplayLabel(label))}
               </li>
             ))}
           </ul>
@@ -198,7 +155,7 @@ export function TherapistCardDesktop({
             <div className="flex justify-end">
               <Link
                 href={href}
-                className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-semibold text-paper transition-colors hover:bg-ink/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+                className={`${primaryPillClass} px-6 py-3`}
               >
                 {knowLabel}
                 <span aria-hidden>→</span>

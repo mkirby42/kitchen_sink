@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/Card";
-import { sectionTitleClass } from "@/components/ui/styles";
+import { pageSubtitleClass, profilePageHeadingClass } from "@/components/ui/styles";
 import { initials, officeAddressLines } from "@/lib/therapists/display";
 import {
   consultBookActions,
@@ -95,10 +95,10 @@ export function DesktopProfile({
       <div className="min-w-0">
         {data.cards.length > 0 ? (
           <section>
-            <h2 className={`text-ink ${sectionTitleClass}`}>
-              Get to know <em className="text-clay">{data.givenName}</em>
+            <h2 className={profilePageHeadingClass}>
+              Get to know {data.givenName}
             </h2>
-            <p className="mt-1 text-sm text-mute">
+            <p className={`mt-1 ${pageSubtitleClass}`}>
               Honest answers, before you ever say hello.
             </p>
             <ul className="mt-5 space-y-3">
@@ -117,10 +117,7 @@ export function DesktopProfile({
           </section>
         ) : null}
         <section className={data.cards.length > 0 ? "mt-10" : undefined}>
-          <ProfileHeading
-            lead={`In ${possessive(data.givenName)} own`}
-            accent="words"
-          />
+          <ProfileHeading>{`In ${possessive(data.givenName)} own words`}</ProfileHeading>
           <ProfileTabs
             flush
             fill={false}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { metaLineClass, therapistNameClass, therapistNameOnPhotoClass } from "@/components/ui/styles";
 
 type HeroMediaProps = {
   name: string;
@@ -72,7 +73,7 @@ export function HeroMedia({
               className="absolute inset-0 flex items-center justify-center bg-black"
               aria-hidden
             >
-              <span className="font-sans text-7xl font-semibold tracking-wide text-paper/80">
+              <span className="font-sans text-7xl font-medium tracking-wide text-paper/80">
                 {initials}
               </span>
             </div>
@@ -113,7 +114,7 @@ export function HeroMedia({
                 aria-hidden
               />
               <div className="absolute inset-x-0 bottom-0 p-5">
-                <h1 className="font-sans text-[1.75rem] leading-tight font-bold tracking-tight text-paper drop-shadow-[0_1px_8px_rgba(23,23,23,0.65)] sm:text-[2rem]">
+                <h1 className={therapistNameOnPhotoClass}>
                   {name}
                 </h1>
                 {licenseCaptions.length > 0 ? (
@@ -121,7 +122,7 @@ export function HeroMedia({
                     {licenseCaptions.map((line) => (
                       <p
                         key={line}
-                        className="text-sm leading-snug text-paper/95 drop-shadow-[0_1px_6px_rgba(23,23,23,0.7)]"
+                        className="font-sans text-[15px] leading-[22px] font-normal text-paper/95 drop-shadow-[0_1px_6px_rgba(23,23,23,0.7)]"
                       >
                         {line}
                       </p>
@@ -138,13 +139,13 @@ export function HeroMedia({
         <div data-hero-details className="mt-4">
           {showVideo ? (
             <>
-              <h1 className="font-sans text-[1.75rem] leading-none font-bold tracking-tight text-black sm:text-[2rem]">
+              <h1 className={therapistNameClass}>
                 {name}
               </h1>
               {licenseCaptions.length > 0 ? (
                 <div className="mt-1 space-y-0.5">
                   {licenseCaptions.map((line) => (
-                    <p key={line} className="text-sm text-mute">
+                    <p key={line} className={metaLineClass}>
                       {line}
                     </p>
                   ))}
@@ -153,7 +154,7 @@ export function HeroMedia({
             </>
           ) : null}
           {yearsLabel ? (
-            <p className={showVideo ? "mt-1 text-sm text-mute" : "text-sm text-mute"}>
+            <p className={showVideo ? `mt-1 ${metaLineClass}` : metaLineClass}>
               {yearsLabel}
             </p>
           ) : null}

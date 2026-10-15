@@ -43,7 +43,7 @@ export function ReviewsPanel({
         <div className={canReview ? "mt-10" : undefined}>
           <div className="flex items-end gap-3">
             {average != null ? (
-              <p className="font-sans text-5xl leading-none font-bold text-black">
+              <p className="font-sans text-5xl leading-none font-medium text-copy">
                 {formatRating(average)}
               </p>
             ) : null}

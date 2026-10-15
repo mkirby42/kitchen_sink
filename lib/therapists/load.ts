@@ -206,14 +206,14 @@ export function consultBookActions(
   if (email) {
     actions.push({
       kind: "consult",
-      label: "Free Consult",
+      label: "Free consult",
       href: email.href,
     });
   }
   if (phone) {
     actions.push({
       kind: "book",
-      label: "Book a Session",
+      label: "Book a session",
       href: phone.href,
     });
   }

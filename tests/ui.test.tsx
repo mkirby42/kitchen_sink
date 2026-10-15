@@ -35,7 +35,11 @@ describe("shared ui", () => {
     expect(buttonClass("primary", undefined, "sm")).toContain("bg-ink");
     expect(buttonClass("gold")).toContain("bg-gold");
     expect(buttonClass("gold")).toContain("text-black");
-    expect(buttonClass("primary")).toContain("font-semibold");
+    expect(buttonClass("primary")).toContain("font-medium");
+    expect(buttonClass("primary")).not.toContain("font-semibold");
+    expect(buttonClass("solid")).toContain("bg-heading");
+    expect(buttonClass("solid", undefined, "label")).toContain("text-[16px]");
+    expect(buttonClass("solid", undefined, "dock")).toContain("text-[16px]");
 
     const labeled = html(
       createElement(

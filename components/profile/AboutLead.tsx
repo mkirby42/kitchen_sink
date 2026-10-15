@@ -1,3 +1,4 @@
+import { bodyCopyClass } from "@/components/ui/styles";
 import { splitAboutLead } from "./copy";
 
 export function AboutLead({ about }: { about: string | null }) {
@@ -7,12 +8,12 @@ export function AboutLead({ about }: { about: string | null }) {
   return (
     <div data-about-lead>
       {lead ? (
-        <p className="text-lg leading-snug text-body">{lead}</p>
+        <p className={bodyCopyClass}>{lead}</p>
       ) : null}
       {paragraphs.map((paragraph, index) => (
         <p
           key={`${index}-${paragraph.slice(0, 24)}`}
-          className={`${lead || index > 0 ? "mt-4" : ""} text-[17px] leading-relaxed text-body`}
+          className={`${lead || index > 0 ? "mt-4" : ""} ${bodyCopyClass}`}
         >
           {paragraph}
         </p>

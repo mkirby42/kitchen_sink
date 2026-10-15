@@ -1,5 +1,5 @@
-import { Eyebrow } from "@/components/ui/Eyebrow";
-import { tagClass } from "@/components/ui/styles";
+import { bodyCopyClass, metaLineClass, profileSectionHeadingClass } from "@/components/ui/styles";
+import { SessionFormatLine } from "./SessionFormatLine";
 import { formatUsdFromCents } from "@/lib/therapists/display";
 import type { TherapistProfileData } from "@/lib/therapists/load";
 
@@ -32,31 +32,25 @@ export function AboutPanel({
 
   if (!aboutCopy && !logistics) return null;
   if (!logistics) {
-    return <p className="text-[17px] leading-relaxed text-body">{aboutCopy}</p>;
+    return <p className={bodyCopyClass}>{aboutCopy}</p>;
   }
 
   return (
     <div>
       {aboutCopy ? (
-        <p className="text-[17px] leading-relaxed text-body">{aboutCopy}</p>
+        <p className={bodyCopyClass}>{aboutCopy}</p>
       ) : null}
       <div
         className={`${showAbout === false ? "mt-4" : "mt-5"} rounded-card bg-lavender px-5 py-5 sm:px-6`}
       >
-        <Eyebrow>
-          How {givenName} <em>works</em>
-        </Eyebrow>
+        <h2 className={profileSectionHeadingClass}>How {givenName} works</h2>
         {formats.length > 0 ? (
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {formats.map((label) => (
-              <li key={label} className={tagClass(false)}>
-                {label}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-3">
+            <SessionFormatLine formats={formats} />
+          </div>
         ) : null}
         {officeLines.length > 0 ? (
-          <address className="mt-3 text-sm text-body not-italic">
+          <address className={`mt-3 not-italic ${metaLineClass}`}>
             {officeLines.map((line, index) => (
               <span key={`${index}-${line}`} className="block">
                 {line}
