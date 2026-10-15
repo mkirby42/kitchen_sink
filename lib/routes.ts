@@ -11,6 +11,7 @@ export const routes = {
   adminMedia: "/admin/media",
   adminReviews: "/admin/reviews",
   adminStarts: "/admin/starts",
+  adminAnalytics: "/admin/analytics",
   therapist: (id: string) => `/t/${id}`,
 } as const;
 

@@ -75,6 +75,8 @@ describe("site header", () => {
     expect(html).toContain("Uploads");
     expect(html).toContain("Reviews");
     expect(html).toContain('href="/admin/reviews"');
+    expect(html).toContain("Analytics");
+    expect(html).toContain('href="/admin/analytics"');
     expect(html).not.toContain("Therapist log in");
     expect(html).not.toContain("My profile");
   });
@@ -113,6 +115,7 @@ describe("site header", () => {
     expect(admin).toContain("Client view");
     expect(admin).toContain("Uploads");
     expect(admin).toContain("Reviews");
+    expect(admin).toContain('href="/admin/analytics"');
 
     const therapist = renderToStaticMarkup(
       createElement(SiteHeader, {
@@ -135,6 +138,7 @@ describe("site header", () => {
     );
     expect(visitor).not.toContain('aria-label="Site view"');
     expect(visitor).not.toContain("Uploads");
+    expect(visitor).not.toContain("Analytics");
     expect(visitor).toContain("Therapist log in");
   });
 
@@ -154,6 +158,8 @@ describe("site header", () => {
     expect(client).toContain("Sign out");
     expect(client).not.toContain("Uploads");
     expect(client).not.toContain('href="/admin/reviews"');
+    expect(client).not.toContain('href="/admin/analytics"');
+    expect(client).not.toContain("Analytics");
     expect(client).not.toContain("My profile");
     expect(client).not.toContain("Admin only");
 
@@ -172,6 +178,7 @@ describe("site header", () => {
     expect(therapist).not.toContain("Uploads");
     expect(therapist).not.toContain("Drafts");
     expect(therapist).not.toContain('href="/admin/media"');
+    expect(therapist).not.toContain('href="/admin/analytics"');
     expect(therapist).not.toContain("For Therapists");
     expect(therapist).not.toContain("Admin only");
   });

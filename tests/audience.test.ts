@@ -75,6 +75,7 @@ describe("admin view switcher", () => {
         expect(chrome.switcher).toBe(false);
         expect(chrome.uploads).toBe(false);
         expect(chrome.reviews).toBe(false);
+        expect(chrome.analytics).toBe(false);
       }
     }
 
@@ -106,6 +107,7 @@ describe("admin view switcher", () => {
     ).toMatchObject({
       uploads: true,
       reviews: true,
+      analytics: true,
       forTherapists: true,
       myProfile: true,
       switcher: true,
@@ -126,6 +128,7 @@ describe("admin view switcher", () => {
     ).toMatchObject({
       uploads: false,
       reviews: false,
+      analytics: false,
       forTherapists: false,
       myProfile: true,
       signOut: true,
@@ -147,6 +150,7 @@ describe("admin view switcher", () => {
     ).toMatchObject({
       uploads: false,
       reviews: false,
+      analytics: false,
       forTherapists: true,
       myProfile: false,
       signOut: true,

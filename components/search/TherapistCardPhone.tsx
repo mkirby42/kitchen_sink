@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { FindCardLink } from "@/components/analytics/FindCardLink";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
@@ -19,6 +19,7 @@ export function TherapistCardPhone({
   prompt,
   answer,
   href,
+  therapistId,
   sample,
   hidden,
   draft = false,
@@ -34,6 +35,7 @@ export function TherapistCardPhone({
   prompt: string | null;
   answer: string | null;
   href: string;
+  therapistId: string;
   sample: boolean;
   hidden: boolean;
   draft?: boolean;
@@ -107,12 +109,13 @@ export function TherapistCardPhone({
           </div>
         ) : null}
 
-        <Link
+        <FindCardLink
           href={href}
+          therapistId={therapistId}
           className={`${primaryPillClass} mt-6 w-full px-6 py-3.5 text-center`}
         >
           {knowLabel}
-        </Link>
+        </FindCardLink>
       </div>
     </div>
   );

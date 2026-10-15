@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Caprasimo, DM_Sans, Fraunces } from "next/font/google";
+import { SiteAnalytics } from "@/components/analytics/SiteAnalytics";
 import { SiteHeader } from "@/components/SiteHeader";
+import { analyticsDataset } from "@/lib/analytics/payload";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
 import { canonicalOrigin } from "@/lib/site";
@@ -55,13 +57,17 @@ export default async function RootLayout({
     readAudienceCookie(),
   ]);
 
+  const trackVisits = analyticsDataset(navUser?.role) === "on";
+
   return (
     <html
       lang="en"
+      data-ks-analytics={analyticsDataset(navUser?.role)}
       className={`${caprasimo.variable} ${fraunces.variable} ${dmSans.variable}`}
     >
       <body className="min-h-screen antialiased">
         <SiteHeader initialNavUser={navUser} audience={audience} />
+        <SiteAnalytics enabled={trackVisits} />
         {children}
       </body>
     </html>

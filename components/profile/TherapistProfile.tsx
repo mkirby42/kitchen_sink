@@ -215,6 +215,7 @@ export function TherapistProfile({
             name={data.givenName}
             actions={ctas}
             contact={data.contact}
+            therapistId={data.id}
           />
 
           {data.cards.length > 0 ? (

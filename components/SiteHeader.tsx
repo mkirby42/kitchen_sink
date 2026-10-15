@@ -196,6 +196,15 @@ export function SiteHeader({
                 Reviews
               </Link>
             ) : null}
+            {chrome.analytics ? (
+              <Link
+                href={routes.adminAnalytics}
+                className={navClass(path === routes.adminAnalytics)}
+                aria-current={path === routes.adminAnalytics ? "page" : undefined}
+              >
+                Analytics
+              </Link>
+            ) : null}
             {chrome.forTherapists ? (
               <Link
                 href={routes.forTherapists}

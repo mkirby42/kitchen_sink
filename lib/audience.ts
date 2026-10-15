@@ -88,6 +88,7 @@ export function narrowSearchRows(
 export type HeaderChrome = {
   uploads: boolean;
   reviews: boolean;
+  analytics: boolean;
   forTherapists: boolean;
   myProfile: boolean;
   signOut: boolean;
@@ -107,6 +108,7 @@ export function headerChrome(input: {
     return {
       uploads: false,
       reviews: false,
+      analytics: false,
       forTherapists: true,
       myProfile: false,
       signOut: false,
@@ -119,6 +121,7 @@ export function headerChrome(input: {
     return {
       uploads: false,
       reviews: false,
+      analytics: false,
       forTherapists: true,
       myProfile: false,
       signOut: true,
@@ -131,6 +134,7 @@ export function headerChrome(input: {
     return {
       uploads: false,
       reviews: false,
+      analytics: false,
       forTherapists: false,
       myProfile: input.role === "therapist" || input.hasTherapist,
       signOut: true,
@@ -143,6 +147,7 @@ export function headerChrome(input: {
     return {
       uploads: true,
       reviews: true,
+      analytics: true,
       forTherapists: true,
       myProfile: input.hasTherapist,
       signOut: true,
@@ -154,6 +159,7 @@ export function headerChrome(input: {
   return {
     uploads: false,
     reviews: false,
+    analytics: false,
     forTherapists: false,
     myProfile: false,
     signOut: true,
