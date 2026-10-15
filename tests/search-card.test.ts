@@ -123,7 +123,7 @@ describe("Find therapist card", () => {
       },
       { tags: ["Self Discovery"] },
     );
-    expect(chipLabels(desk(html))).toEqual(["Self Discovery"]);
+    expect(chipLabels(desk(html))).toEqual(["Self discovery"]);
     expect(desk(html)).toContain("1 of 1 tag");
     expect(phone(html)).not.toContain("Self Discovery");
     expect(phone(html)).not.toContain("1 of 1 tag");
@@ -256,7 +256,7 @@ describe("Find therapist card", () => {
     );
     const wide = desk(html);
     expect(wide).toContain("Dr. Travis White");
-    expect(wide).toContain("PsyD · Licensed Psychologist");
+    expect(wide).toContain("PsyD · Licensed psychologist");
     expect(wide).not.toContain("yrs");
     expect(wide).toContain("Watch Travis&#x27;s intro");
     expect(wide).toContain("Get to know Travis");
@@ -280,7 +280,8 @@ describe("Find therapist card", () => {
       wide.indexOf("who I work best with..."),
     );
     expect(formats).toContain("Virtual");
-    expect(formats).toContain("In-Person");
+    expect(formats).toContain("In person");
+    expect(formats).not.toContain("In-Person");
     const watch = wide.indexOf("Watch Travis&#x27;s intro");
     const link = wide.indexOf("<a ");
     expect(watch).toBeGreaterThan(-1);
@@ -310,7 +311,7 @@ describe("Find therapist card", () => {
       narrow.indexOf("who I work best with..."),
     );
     expect(phoneFormats).toContain(">Virtual<");
-    expect(phoneFormats).toContain(">In-Person<");
+    expect(phoneFormats).toContain(">In person<");
     expect(narrow.indexOf(">PsyD<")).toBeLessThan(narrow.indexOf("data-find-formats"));
     expect(narrow.indexOf("Get to know Travis")).toBeGreaterThan(
       narrow.indexOf("I help college students find their way."),
@@ -326,7 +327,7 @@ describe("Find therapist card", () => {
     expect(wide).not.toContain("object-cover");
     expect(wide).toContain("Get to know Maya");
     expect(wide).toContain("rounded-full");
-    expect(wide).toContain("LMFT · Licensed Marriage and Family Therapist");
+    expect(wide).toContain("LMFT · Licensed marriage and family therapist");
   });
 
   it("shows a desktop photo without a watch pill when there is no intro video", () => {
@@ -344,12 +345,12 @@ describe("Find therapist card", () => {
 
 describe("credential titles", () => {
   it("expands the licensed codes the desktop card shows", () => {
-    expect(credentialTitle("PsyD")).toBe("PsyD · Licensed Psychologist");
+    expect(credentialTitle("PsyD")).toBe("PsyD · Licensed psychologist");
     expect(credentialTitle("LMFT")).toBe(
-      "LMFT · Licensed Marriage and Family Therapist",
+      "LMFT · Licensed marriage and family therapist",
     );
-    expect(credentialTitle("LCSW")).toBe("LCSW · Licensed Clinical Social Worker");
-    expect(credentialTitle("LPC")).toBe("LPC · Licensed Professional Counselor");
+    expect(credentialTitle("LCSW")).toBe("LCSW · Licensed clinical social worker");
+    expect(credentialTitle("LPC")).toBe("LPC · Licensed professional counselor");
     expect(credentialTitle("PhD")).toBe("PhD");
     expect(credentialTitle("MD")).toBe("MD");
     expect(credentialTitle("  ")).toBeNull();

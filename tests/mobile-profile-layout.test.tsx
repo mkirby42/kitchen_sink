@@ -120,8 +120,8 @@ describe("phone profile layout", () => {
 
     const media = html.indexOf('data-profile-layout="media"');
     const education = html.indexOf("Education");
-    const modalities = html.indexOf("Approach in Therapy");
-    const specialties = html.indexOf("Areas of Interest");
+    const modalities = html.indexOf("Approach in therapy");
+    const specialties = html.indexOf("Areas of interest");
     const phone = html.indexOf('data-profile-show="phone"');
     const know = html.indexOf("Get to know");
     const switchAt = html.indexOf("data-profile-switch");
@@ -147,19 +147,21 @@ describe("phone profile layout", () => {
     expect(lead).not.toContain("PsyD");
 
     expect(html.slice(know, switchAt)).toContain('data-prompt-variant="classic"');
-    expect(html.slice(know, switchAt)).toContain("text-sm font-medium leading-snug text-ink");
-    expect(html.slice(know, switchAt)).toContain("text-[1.75rem]");
+    expect(html.slice(know, switchAt)).toContain("text-prompt");
+    expect(html.slice(know, switchAt)).toContain("text-[20px]");
+    expect(html.slice(know, switchAt)).toContain("md:text-[22px]");
     expect(html.slice(know, switchAt)).toContain("a session with me feels like...");
     expect(html.slice(know, switchAt)).toContain("outside of session, I...");
 
     const phoneSlot = slot(html, "phone");
     expect(phoneSlot).toContain("md:hidden");
-    expect(phoneSlot).toContain("How Travis");
-    expect(phoneSlot).toContain(">works</em>");
+    expect(phoneSlot).toContain("How Travis works");
+    expect(phoneSlot).not.toContain(">works</em>");
+    expect(phoneSlot).toContain(">In person<");
+    expect(phoneSlot).toContain(">Virtual<");
     expect(phoneSlot).not.toContain("Logistics");
     expect(phoneSlot).toContain("1102 West 6th Street, Austin");
-    expect(phoneSlot).toContain(">In person</li>");
-    expect(phoneSlot).toContain(">Virtual</li>");
+    expect(phoneSlot).not.toContain("rounded-full border");
     expect(phoneSlot).not.toContain("I help people find their way.");
     expect(phoneSlot).not.toContain(">Office<");
 
@@ -171,26 +173,28 @@ describe("phone profile layout", () => {
     const visible = deskTree.replace(/&#x27;/g, "'");
     expect(visible).toContain("Watch Travis's intro");
     expect(visible).toContain("In Travis's own");
-    expect(deskTree).toContain("PsyD · Licensed Psychologist");
+    expect(deskTree).toContain("PsyD · Licensed psychologist");
     expect(deskTree).not.toContain("How he");
     expect(deskTree).not.toContain(">Approaches<");
     expect(deskTree).not.toContain("Logistics");
-    expect(deskTree).toContain("Areas of Interest");
-    expect(deskTree).toContain("Approach in Therapy");
-    expect(deskTree.indexOf("Areas of Interest")).toBeLessThan(
-      deskTree.indexOf("Approach in Therapy"),
+    expect(deskTree).toContain("Areas of interest");
+    expect(deskTree).toContain("Approach in therapy");
+    expect(deskTree.indexOf("Areas of interest")).toBeLessThan(
+      deskTree.indexOf("Approach in therapy"),
     );
-    expect(deskTree).toContain("bg-ink px-3.5");
+    expect(deskTree).toContain("bg-pill-bg");
+    expect(deskTree).toContain("Life transitions");
+    expect(deskTree).not.toContain("text-clay\">");
     const stack = deskTree.indexOf('data-cta-placement="stack"');
-    expect(deskTree.indexOf("Book a Session", stack)).toBeLessThan(
-      deskTree.indexOf("Free Consult", stack),
+    expect(deskTree.indexOf("Book a session", stack)).toBeLessThan(
+      deskTree.indexOf("Free consult", stack),
     );
 
     expect(html.slice(switchAt, switchAt + 80)).not.toContain("max-md:hidden");
     expect(html).not.toContain("max-md:block");
     expect(html).toContain('data-cta-placement="dock"');
-    expect(html).toContain("Free Consult");
-    expect(html).toContain("Book a Session");
+    expect(html).toContain("Free consult");
+    expect(html).toContain("Book a session");
     expect(html).toContain("lg:grid-cols-[minmax(0,26.5rem)_minmax(0,1fr)]");
     expect(html).not.toContain("♡");
     expect(html).not.toContain("Hinge");
@@ -202,7 +206,7 @@ describe("phone profile layout", () => {
       html.indexOf('data-profile-layout="phone"'),
       html.indexOf('data-profile-layout="desk"'),
     );
-    const label = "Acceptance and Commitment Therapy (ACT)";
+    const label = "Acceptance and commitment therapy (ACT)";
     const at = phoneTree.indexOf(label);
     expect(at).toBeGreaterThan(-1);
     const open = phoneTree.lastIndexOf("<li", at);

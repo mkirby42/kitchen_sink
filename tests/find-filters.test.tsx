@@ -13,8 +13,10 @@ describe("find filters", () => {
   it("asks what brings you to therapy and lists Self Discovery", () => {
     const html = renderToStaticMarkup(createElement(FindFilters));
     expect(html).toContain("What brings you to therapy?");
-    expect(html).toContain("Self Discovery");
-    expect(html).toContain("Life Transitions");
+    expect(html).toContain("Self discovery");
+    expect(html).toContain("Life transitions");
+    expect(html).toContain("In person");
+    expect(html).not.toContain("In-Person");
     expect(html).toContain("Insurance");
     expect(html).not.toContain("Specialties");
     expect(html).not.toContain("Teens");

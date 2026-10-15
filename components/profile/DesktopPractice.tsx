@@ -1,5 +1,8 @@
 import { Card } from "@/components/ui/Card";
+import { metaLineClass, smallLabelClass } from "@/components/ui/styles";
+import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import { ProfileHeading } from "./ProfileHeading";
+import { TagPills } from "./TagPills";
 
 export function DesktopPractice({
   givenName,
@@ -20,36 +23,18 @@ export function DesktopPractice({
 
   return (
     <section className="mt-10">
-      <ProfileHeading lead={`How ${givenName}`} accent="works" />
+      <ProfileHeading>{`How ${givenName} works`}</ProfileHeading>
       <Card className="mt-4 px-5 py-5 sm:px-6">
         {specialties.length > 0 ? (
           <div>
-            <h3 className="text-base font-medium text-ink">Areas of Interest</h3>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {specialties.map((label) => (
-                <li
-                  key={label}
-                  className="max-w-full rounded-full bg-ink px-3.5 py-1.5 text-sm font-medium whitespace-normal text-paper"
-                >
-                  {label}
-                </li>
-              ))}
-            </ul>
+            <h3 className={smallLabelClass}>Areas of interest</h3>
+            <TagPills labels={specialties} />
           </div>
         ) : null}
         {modalities.length > 0 ? (
           <div className={specialties.length > 0 ? "mt-5" : undefined}>
-            <h3 className="text-base font-medium text-ink">Approach in Therapy</h3>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {modalities.map((label) => (
-                <li
-                  key={label}
-                  className="max-w-full rounded-full border border-line bg-paper px-3.5 py-1.5 text-sm font-medium whitespace-normal text-ink"
-                >
-                  {label}
-                </li>
-              ))}
-            </ul>
+            <h3 className={smallLabelClass}>Approach in therapy</h3>
+            <TagPills labels={modalities} />
           </div>
         ) : null}
         {hasTags && hasQualifications ? (
@@ -57,8 +42,8 @@ export function DesktopPractice({
         ) : null}
         {education.length > 0 ? (
           <div>
-            <h3 className="text-base font-medium text-ink">Education</h3>
-            <ul className="mt-1 space-y-1 text-[15px] text-body">
+            <h3 className={smallLabelClass}>Education</h3>
+            <ul className={`mt-1 space-y-1 ${metaLineClass}`}>
               {education.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -67,10 +52,10 @@ export function DesktopPractice({
         ) : null}
         {credentials.length > 0 ? (
           <div className={education.length > 0 ? "mt-4" : undefined}>
-            <h3 className="text-base font-medium text-ink">Credentials</h3>
-            <ul className="mt-1 space-y-1 text-[15px] text-body">
+            <h3 className={smallLabelClass}>Credentials</h3>
+            <ul className={`mt-1 space-y-1 ${metaLineClass}`}>
               {credentials.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item}>{sentenceCasePhrase(item)}</li>
               ))}
             </ul>
           </div>

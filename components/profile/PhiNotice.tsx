@@ -6,7 +6,7 @@ export function PhiNotice() {
       role="note"
       className="rounded-2xl border border-line bg-cream px-4 py-3 text-sm leading-relaxed text-body"
     >
-      <p className="font-semibold text-black">{PHI_REVIEW_HEADING}</p>
+      <p className="font-medium text-copy">{PHI_REVIEW_HEADING}</p>
       <p className="mt-1">{PHI_REVIEW_WARNING}</p>
     </aside>
   );

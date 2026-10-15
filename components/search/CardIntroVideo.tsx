@@ -96,7 +96,7 @@ function FrameIntro({
       ) : (
         <span
           aria-hidden
-          className="absolute inset-0 flex items-center justify-center font-sans text-7xl font-semibold text-paper/80"
+          className="absolute inset-0 flex items-center justify-center font-sans text-7xl font-medium text-paper/80"
         >
           {initials}
         </span>
@@ -159,7 +159,7 @@ function PortraitIntro({
       ) : (
         <span
           aria-hidden
-          className="absolute inset-0 flex items-center justify-center font-sans text-6xl font-semibold text-paper/80"
+          className="absolute inset-0 flex items-center justify-center font-sans text-6xl font-medium text-paper/80"
         >
           {initials}
         </span>
@@ -173,7 +173,7 @@ function PortraitIntro({
           void videoRef.current?.play();
         }}
         aria-label={watchLabel}
-        className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2.5 rounded-full bg-paper py-1.5 pr-4 pl-1.5 text-sm font-semibold text-ink shadow-[0_10px_28px_rgb(23_23_23/0.18)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
+        className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2.5 rounded-full bg-paper py-1.5 pr-4 pl-1.5 text-sm font-medium text-ink shadow-[0_10px_28px_rgb(23_23_23/0.18)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
       >
         <span
           className="flex size-8 items-center justify-center rounded-full bg-ink"

@@ -1,15 +1,5 @@
-import { sectionTitleClass } from "@/components/ui/styles";
+import { profileSectionHeadingClass } from "@/components/ui/styles";
 
-export function ProfileHeading({
-  lead,
-  accent,
-}: {
-  lead: string;
-  accent: string;
-}) {
-  return (
-    <h2 className={`text-ink ${sectionTitleClass}`}>
-      {lead} <em className="text-clay">{accent}</em>
-    </h2>
-  );
+export function ProfileHeading({ children }: { children: string }) {
+  return <h2 className={profileSectionHeadingClass}>{children}</h2>;
 }

@@ -1,10 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: var(--font-dm-serif), Georgia, "Iowan Old Style", serif;
+  --font-display: var(--font-fraunces), Georgia, "Iowan Old Style", serif;
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  /* Brand wordmark only. Headlines stay DM Serif Display. */
+  /* Brand wordmark only. Headlines are Fraunces. */
   --font-logo: var(--font-caprasimo), Georgia, "Iowan Old Style", serif;
+  /* Public profile and Find type scale. */
+  --color-heading: #2e1f5e;
+  --color-copy: #1f1a2e;
+  --color-meta: #6b6478;
+  --color-prompt: #5a4f7a;
+  --color-pill: #3a2a6b;
+  --color-pill-bg: #efeaf8;
   /* Warm cream page. */
   --color-cream: #fff9e8;
   /* White cards, filter panels, profile surfaces. */
@@ -42,6 +49,7 @@ body {
 
 body {
   font-family: var(--font-sans);
+  font-synthesis: none;
 }
 
 /* Display accents stay upright. <em> carries color, not italic. */

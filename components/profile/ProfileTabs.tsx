@@ -32,6 +32,7 @@ export function ProfileTabs({
           value={tab}
           onChange={setTab}
           fill={fill}
+          tone="quiet"
           options={[
             { value: "profile", label: "Profile" },
             { value: "reviews", label: reviewLabel },

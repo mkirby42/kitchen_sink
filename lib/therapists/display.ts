@@ -32,12 +32,12 @@ export function storagePublicUrl(
   return `${base}/storage/v1/object/public/${bucket}/${key}`;
 }
 
-/** Desktop Find card. "PsyD · Licensed Psychologist". PhD and MD stay the stored code. */
+/** Desktop Find card. "PsyD · Licensed psychologist". PhD and MD stay the stored code. */
 const CREDENTIAL_TITLES: Record<string, string> = {
-  LMFT: "Licensed Marriage and Family Therapist",
-  LCSW: "Licensed Clinical Social Worker",
-  LPC: "Licensed Professional Counselor",
-  PsyD: "Licensed Psychologist",
+  LMFT: "Licensed marriage and family therapist",
+  LCSW: "Licensed clinical social worker",
+  LPC: "Licensed professional counselor",
+  PsyD: "Licensed psychologist",
 };
 
 export function credentialTitle(credential: string | null | undefined) {
