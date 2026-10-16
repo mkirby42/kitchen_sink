@@ -191,6 +191,8 @@ begin
       email = excluded.email,
       phone = excluded.phone,
       about_me = excluded.about_me,
+      -- Keeps writing photo_key. A re-run puts {id}/photo.jpg back after the
+      -- photo-removal update. Card copy for prod is a profile_items update.
       photo_key = excluded.photo_key,
       video_key = excluded.video_key;
 

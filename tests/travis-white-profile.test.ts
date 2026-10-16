@@ -122,13 +122,33 @@ describe("Travis White profile", () => {
     expect(travisWhite.rates).toEqual([
       { service_type: "Individual", duration_minutes: 55, price_cents: 15000 },
     ]);
-    expect(travisWhite.cards.map((card) => card.prompt)).toEqual([
-      "who I work best with...",
-      "my approach to therapy is...",
-      "I specialize in unpacking...",
-      "a session with me feels like...",
-      "outside of session, I...",
+    expect(travisWhite.cards.map((card) => [card.prompt, card.answer])).toEqual([
+      [
+        "I work best with...",
+        "college students, grad students, and early to mid-career professionals find their way.",
+      ],
+      [
+        "My approach to therapy is...",
+        "collaborative, practical, and down-to-earth. Therapy is tailored to your needs and may include insight-oriented work, coping tools, communication skills, and goal-focused support.",
+      ],
+      [
+        "I specialize in unpacking...",
+        "anxiety, depression, panic attacks, relationship concerns, stress, and major life transitions.",
+      ],
+      [
+        "A session with me feels like...",
+        "it is just two people talking. I work collaboratively and like a lot of feedback. Sometimes the work is very structured, with specific goals. Sometimes it is less structured and more exploratory, with a focus on depth, insight, and discovery.",
+      ],
+      [
+        "outside of session, I...",
+        "to run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
+      ],
     ]);
+    expect(sql).toContain("I work best with...");
+    expect(sql).toContain("collaborative, practical, and down-to-earth.");
+    expect(sql).not.toContain("who I work best with...");
+    expect(sql).not.toContain("Collaborative, practical");
+    expect(sql).not.toContain("It is just two people");
     expect(
       travisWhite.cards.some((card) =>
         card.prompt.startsWith("before we start"),
