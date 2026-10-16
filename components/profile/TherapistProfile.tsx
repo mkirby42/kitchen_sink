@@ -79,6 +79,12 @@ export function TherapistProfile({
   const ctas = consultBookActions(data.contact);
   const hasQualifications =
     data.education.length > 0 || data.credentials.length > 0;
+  const modalityLabels = modalityDisplayLabels(data.modalities);
+  const specialtyLabels = directorySpecialties(data.specialties);
+  const hasPhoneFacts =
+    hasQualifications ||
+    modalityLabels.length > 0 ||
+    specialtyLabels.length > 0;
   const practicePanel = (flags?: {
     showAbout?: boolean;
     showLogistics?: boolean;
@@ -170,43 +176,7 @@ export function TherapistProfile({
           ) : null}
         </div>
 
-        <div className="mt-4">
-          {hasQualifications ? (
-            <Card className="px-5 py-5 sm:px-6">
-              <div className="space-y-4">
-                {data.education.length > 0 ? (
-                  <div>
-                    <h2 className={smallLabelClass}>Education</h2>
-                    <ul className={`mt-2 space-y-1 ${metaLineClass}`}>
-                      {data.education.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-                {data.credentials.length > 0 ? (
-                  <div>
-                    <h2 className={smallLabelClass}>Credentials</h2>
-                    <ul className={`mt-2 space-y-1 ${metaLineClass}`}>
-                      {data.credentials.map((item) => (
-                        <li key={item}>{sentenceCasePhrase(item)}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            </Card>
-          ) : null}
-
-          <TagSection
-            title="Approach in therapy"
-            labels={modalityDisplayLabels(data.modalities)}
-          />
-          <TagSection
-            title="Areas of interest"
-            labels={directorySpecialties(data.specialties)}
-          />
-
+        <div>
           <div data-profile-show="phone" className="md:hidden">
             {practicePanel({ showAbout: false })}
           </div>
@@ -249,6 +219,39 @@ export function TherapistProfile({
                 })}
               </ul>
             </section>
+          ) : null}
+
+          {hasPhoneFacts ? (
+            <div className="mt-10 space-y-4">
+              {hasQualifications ? (
+                <Card className="px-5 py-5 sm:px-6">
+                  <div className="space-y-4">
+                    {data.education.length > 0 ? (
+                      <div>
+                        <h2 className={smallLabelClass}>Education</h2>
+                        <ul className={`mt-2 space-y-1 ${metaLineClass}`}>
+                          {data.education.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {data.credentials.length > 0 ? (
+                      <div>
+                        <h2 className={smallLabelClass}>Credentials</h2>
+                        <ul className={`mt-2 space-y-1 ${metaLineClass}`}>
+                          {data.credentials.map((item) => (
+                            <li key={item}>{sentenceCasePhrase(item)}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </div>
+                </Card>
+              ) : null}
+              <TagSection title="Approach in therapy" labels={modalityLabels} />
+              <TagSection title="Areas of interest" labels={specialtyLabels} />
+            </div>
           ) : null}
 
           <div className="mt-10">
