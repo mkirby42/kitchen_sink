@@ -321,6 +321,38 @@ describe("Find therapist card", () => {
     );
   });
 
+  it("uses a video frame instead of initials when there is no photo", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    const html = render({
+      photo_key: null,
+      video_key: "maya/intro.mp4",
+    });
+    const narrow = phone(html);
+    const wide = desk(html);
+    const still = "/object/public/videos/maya/intro.mp4#t=0.1";
+
+    expect(narrow).toContain("data-video-still");
+    expect(narrow).toContain(still);
+    expect(narrow).toContain('preload="metadata"');
+    expect(narrow).toContain("aspect-[4/5]");
+    expect(narrow).toContain("object-cover");
+    expect(narrow).toContain('aria-label="Play intro video for Maya Chen"');
+    expect(narrow).not.toContain(">MC<");
+    expect(narrow).not.toContain("<img");
+    expect(narrow).not.toContain("autoplay");
+    expect(narrow).not.toMatch(/<video[^>]*\scontrols[\s=]/);
+    expect(narrow).toContain("Get to know Maya");
+
+    expect(wide).toContain("data-video-still");
+    expect(wide).toContain(still);
+    expect(wide).toContain("Watch Maya&#x27;s intro");
+    expect(wide).toContain("object-cover");
+    expect(wide).not.toContain(">MC<");
+    expect(wide).not.toContain("<img");
+    expect(wide).not.toContain("autoplay");
+    expect(wide).not.toMatch(/<video[^>]*\scontrols[\s=]/);
+  });
+
   it("drops the desktop portrait when there is no photo or video", () => {
     const wide = desk(render({ photo_key: null, video_key: null }));
     expect(wide).not.toContain("Watch Maya's intro");

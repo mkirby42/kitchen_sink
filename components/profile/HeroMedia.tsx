@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { metaLineClass, therapistNameClass, therapistNameOnPhotoClass } from "@/components/ui/styles";
+import { VideoStill } from "@/components/ui/VideoStill";
 
 type HeroMediaProps = {
   name: string;
@@ -68,6 +69,8 @@ export function HeroMedia({
               alt={name}
               className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
             />
+          ) : videoUrl ? (
+            <VideoStill src={videoUrl} />
           ) : (
             <div
               className="absolute inset-0 flex items-center justify-center bg-black"

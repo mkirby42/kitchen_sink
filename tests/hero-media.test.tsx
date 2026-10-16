@@ -11,6 +11,8 @@ function render(
     videoUrl: string | null;
     years: number | null;
     licenseCaptions: string[];
+    variant: "overlay" | "poster";
+    watchLabel: string | null;
   }> = {},
 ) {
   return renderToStaticMarkup(
@@ -51,6 +53,9 @@ describe("HeroMedia", () => {
     expect(media).toContain("from-black/75");
     expect(media).toContain(">Travis White<");
     expect(media).toContain(texasLicense);
+    expect(media).toContain("photo.jpg");
+    expect(media).not.toContain("data-video-still");
+    expect(media).not.toContain("intro.mp4");
     expect(media).not.toContain("PsyD");
     expect(media).not.toContain("8 yrs practicing");
     expect(media).not.toContain("Virtual");
@@ -94,6 +99,45 @@ describe("HeroMedia", () => {
     expect(details).not.toContain("Virtual");
     expect(details).not.toContain("In person");
     expect(details).not.toContain("1 min intro");
+  });
+
+  it("uses a frame from the video when there is no photo", () => {
+    const { media, details } = splitHero(render({ photoUrl: null }));
+
+    expect(media).toContain("data-video-still");
+    expect(media).toContain("https://example.com/intro.mp4#t=0.1");
+    expect(media).toContain('preload="metadata"');
+    expect(media).toContain("muted");
+    expect(media).toContain("playsInline");
+    expect(media).not.toContain("autoplay");
+    expect(media).not.toMatch(/<video[^>]*\scontrols[\s=]/);
+    expect(media).not.toContain(">TW<");
+    expect(media).not.toContain("<img");
+    expect(media).toContain('aria-label="Play intro video for Travis White"');
+    expect(media).toContain(">Travis White<");
+    expect(media).toContain(texasLicense);
+    expect(details).toContain("8 yrs practicing");
+  });
+
+  it("keeps the desktop watch pill on a video frame when there is no photo", () => {
+    const { media, details } = splitHero(
+      render({
+        photoUrl: null,
+        variant: "poster",
+        watchLabel: "Watch Travis's intro",
+      }),
+    );
+
+    expect(media).toContain('data-hero-variant="poster"');
+    expect(media).toContain("data-video-still");
+    expect(media).toContain("https://example.com/intro.mp4#t=0.1");
+    expect(media).toContain("Watch Travis&#x27;s intro");
+    expect(media).toContain('aria-label="Play intro video for Travis White"');
+    expect(media).not.toContain(">TW<");
+    expect(media).not.toContain("<img");
+    expect(media).not.toContain(">Travis White<");
+    expect(media).not.toContain(texasLicense);
+    expect(details).toBe("");
   });
 
   it("shows initials and the name on the frame when there is no photo or video", () => {
