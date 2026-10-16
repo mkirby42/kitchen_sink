@@ -105,7 +105,7 @@ function slot(html: string, show: "phone" | "desk") {
 }
 
 describe("phone profile layout", () => {
-  it("uses one lead card and stacks details under it, then conversation and the switch", () => {
+  it("uses one lead card, then how-they-work and conversation, then education before own words", () => {
     const html = render();
     const phoneTree = html.slice(
       html.indexOf('data-profile-layout="phone"'),
@@ -118,25 +118,27 @@ describe("phone profile layout", () => {
     expect(html).not.toContain("data-license-badge");
     expect(html).not.toContain('data-prompt-variant="hinge"');
 
-    const media = html.indexOf('data-profile-layout="media"');
-    const education = html.indexOf("Education");
-    const modalities = html.indexOf("Approach in therapy");
-    const specialties = html.indexOf("Areas of interest");
-    const phone = html.indexOf('data-profile-show="phone"');
-    const know = html.indexOf("Get to know");
-    const switchAt = html.indexOf("data-profile-switch");
+    const media = phoneTree.indexOf('data-profile-layout="media"');
+    const education = phoneTree.indexOf("Education");
+    const modalities = phoneTree.indexOf("Approach in therapy");
+    const specialties = phoneTree.indexOf("Areas of interest");
+    const phone = phoneTree.indexOf('data-profile-show="phone"');
+    const know = phoneTree.indexOf("Get to know");
+    const own = phoneTree.indexOf("own words");
+    const switchAt = phoneTree.indexOf("data-profile-switch");
     const desk = html.indexOf('data-profile-layout="desk"');
 
     expect(media).toBeGreaterThan(-1);
-    expect(media).toBeLessThan(education);
+    expect(media).toBeLessThan(phone);
+    expect(phone).toBeLessThan(know);
+    expect(know).toBeLessThan(education);
     expect(education).toBeLessThan(modalities);
     expect(modalities).toBeLessThan(specialties);
-    expect(specialties).toBeLessThan(phone);
-    expect(phone).toBeLessThan(know);
-    expect(know).toBeLessThan(switchAt);
-    expect(switchAt).toBeLessThan(desk);
+    expect(specialties).toBeLessThan(own);
+    expect(own).toBeLessThan(switchAt);
+    expect(html.indexOf("data-profile-switch")).toBeLessThan(desk);
 
-    const lead = html.slice(media, education);
+    const lead = phoneTree.slice(media, phone);
     expect(lead).toContain("https://example.com/photo.jpg");
     expect(lead).toContain("Play intro video for Travis White");
     expect(lead).toContain("bg-transparent");
@@ -146,12 +148,14 @@ describe("phone profile layout", () => {
     expect(lead).toContain("8 yrs practicing");
     expect(lead).not.toContain("PsyD");
 
-    expect(html.slice(know, switchAt)).toContain('data-prompt-variant="classic"');
-    expect(html.slice(know, switchAt)).toContain("text-prompt");
-    expect(html.slice(know, switchAt)).toContain("text-[20px]");
-    expect(html.slice(know, switchAt)).toContain("md:text-[22px]");
-    expect(html.slice(know, switchAt)).toContain("a session with me feels like...");
-    expect(html.slice(know, switchAt)).toContain("outside of session, I...");
+    const conversation = phoneTree.slice(know, education);
+    expect(conversation).toContain('data-prompt-variant="classic"');
+    expect(conversation).toContain("text-prompt");
+    expect(conversation).toContain("text-[20px]");
+    expect(conversation).toContain("md:text-[22px]");
+    expect(conversation).toContain("a session with me feels like...");
+    expect(conversation).toContain("outside of session, I...");
+    expect(conversation).not.toContain("Approach in therapy");
 
     const phoneSlot = slot(html, "phone");
     expect(phoneSlot).toContain("md:hidden");
@@ -182,6 +186,12 @@ describe("phone profile layout", () => {
     expect(deskTree.indexOf("Areas of interest")).toBeLessThan(
       deskTree.indexOf("Approach in therapy"),
     );
+    expect(deskTree.indexOf("Approach in therapy")).toBeLessThan(
+      deskTree.indexOf("Education"),
+    );
+    expect(deskTree.indexOf("Education")).toBeLessThan(
+      deskTree.indexOf("Get to know"),
+    );
     expect(deskTree).toContain("bg-pill-bg");
     expect(deskTree).toContain("Life transitions");
     expect(deskTree).not.toContain("text-clay\">");
@@ -190,7 +200,7 @@ describe("phone profile layout", () => {
       deskTree.indexOf("Free consult", stack),
     );
 
-    expect(html.slice(switchAt, switchAt + 80)).not.toContain("max-md:hidden");
+    expect(phoneTree.slice(switchAt, switchAt + 80)).not.toContain("max-md:hidden");
     expect(html).not.toContain("max-md:block");
     expect(html).toContain('data-cta-placement="dock"');
     expect(html).toContain("Free consult");
@@ -221,14 +231,25 @@ describe("phone profile layout", () => {
     const photo = render({ ...base, videoUrl: null });
     expect(photo.match(/data-hero-media/g)).toHaveLength(2);
     expect(photo).not.toContain("Play intro video");
-    expect(photo.indexOf("https://example.com/photo.jpg")).toBeLessThan(
-      photo.indexOf("Education"),
+    const photoPhone = photo.slice(
+      photo.indexOf('data-profile-layout="phone"'),
+      photo.indexOf('data-profile-layout="desk"'),
+    );
+    expect(photoPhone.indexOf("https://example.com/photo.jpg")).toBeLessThan(
+      photoPhone.indexOf('data-profile-show="phone"'),
+    );
+    expect(photoPhone.indexOf("Get to know")).toBeLessThan(
+      photoPhone.indexOf("Education"),
     );
 
     const video = render({ ...base, photoUrl: null });
-    const media = video.indexOf('data-profile-layout="media"');
-    const education = video.indexOf("Education");
-    expect(video.slice(media, education)).toContain("Play intro video");
+    const videoPhone = video.slice(
+      video.indexOf('data-profile-layout="phone"'),
+      video.indexOf('data-profile-layout="desk"'),
+    );
+    const media = videoPhone.indexOf('data-profile-layout="media"');
+    const phone = videoPhone.indexOf('data-profile-show="phone"');
+    expect(videoPhone.slice(media, phone)).toContain("Play intro video");
     expect(video.match(/data-hero-media/g)).toHaveLength(2);
   });
 });
