@@ -8,7 +8,7 @@ import { TagPills } from "./TagPills";
 export function TagSection({ title, labels }: { title: string; labels: string[] }) {
   if (labels.length === 0) return null;
   return (
-    <Card className="mt-4 px-5 py-5 sm:px-6">
+    <Card className="px-5 py-5 sm:px-6">
       <h2 className={smallLabelClass}>{title}</h2>
       <TagPills labels={labels} />
     </Card>

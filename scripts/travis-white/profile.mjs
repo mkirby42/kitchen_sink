@@ -84,36 +84,38 @@ export const travisWhite = {
   ],
   // Christine Lo, 2026-10-07: do not publish "before we start, you should know...".
   // The other five cards stay. Join still offers that prompt to other therapists.
+  // Christine Lo, 2026-10-16: these five prompts and answers read as one sentence.
+  // Stored on this profile only. The shared join prompts stay as they are.
   cards: [
     {
-      prompt: "who I work best with...",
+      prompt: "I work best with...",
       tag: "about",
       answer:
-        "I help college students, grad students, and early to mid-career professionals find their way.",
+        "college students, grad students, and early to mid-career professionals find their way.",
     },
     {
-      prompt: "my approach to therapy is...",
+      prompt: "My approach to therapy is...",
       tag: "approach",
       answer:
-        "Collaborative, practical, and down-to-earth. Therapy is tailored to your needs and may include insight-oriented work, coping tools, communication skills, and goal-focused support.",
+        "collaborative, practical, and down-to-earth. Therapy is tailored to your needs and may include insight-oriented work, coping tools, communication skills, and goal-focused support.",
     },
     {
       prompt: "I specialize in unpacking...",
       tag: "specialty",
       answer:
-        "Anxiety, depression, panic attacks, relationship concerns, stress, and major life transitions.",
+        "anxiety, depression, panic attacks, relationship concerns, stress, and major life transitions.",
     },
     {
-      prompt: "a session with me feels like...",
+      prompt: "A session with me feels like...",
       tag: "session_vibe",
       answer:
-        "It is just two people talking. I work collaboratively and like a lot of feedback. Sometimes the work is very structured, with specific goals. Sometimes it is less structured and more exploratory, with a focus on depth, insight, and discovery.",
+        "it is just two people talking. I work collaboratively and like a lot of feedback. Sometimes the work is very structured, with specific goals. Sometimes it is less structured and more exploratory, with a focus on depth, insight, and discovery.",
     },
     {
       prompt: "outside of session, I...",
       tag: "session_vibe",
       answer:
-        "I like to run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
+        "to run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
     },
   ],
 };

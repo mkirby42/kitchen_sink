@@ -15,7 +15,7 @@ import {
   travisMedia,
   travisWhite,
 } from "../scripts/travis-white/profile.mjs";
-import { buildApplySql } from "../scripts/travis-white/sql.mjs";
+import { buildApplySql, buildLookupSql, lookupRow } from "../scripts/travis-white/sql.mjs";
 
 const PHOTO_MAX = 5 * 1024 * 1024;
 const VIDEO_MAX = 50 * 1024 * 1024;
@@ -122,13 +122,33 @@ describe("Travis White profile", () => {
     expect(travisWhite.rates).toEqual([
       { service_type: "Individual", duration_minutes: 55, price_cents: 15000 },
     ]);
-    expect(travisWhite.cards.map((card) => card.prompt)).toEqual([
-      "who I work best with...",
-      "my approach to therapy is...",
-      "I specialize in unpacking...",
-      "a session with me feels like...",
-      "outside of session, I...",
+    expect(travisWhite.cards.map((card) => [card.prompt, card.answer])).toEqual([
+      [
+        "I work best with...",
+        "college students, grad students, and early to mid-career professionals find their way.",
+      ],
+      [
+        "My approach to therapy is...",
+        "collaborative, practical, and down-to-earth. Therapy is tailored to your needs and may include insight-oriented work, coping tools, communication skills, and goal-focused support.",
+      ],
+      [
+        "I specialize in unpacking...",
+        "anxiety, depression, panic attacks, relationship concerns, stress, and major life transitions.",
+      ],
+      [
+        "A session with me feels like...",
+        "it is just two people talking. I work collaboratively and like a lot of feedback. Sometimes the work is very structured, with specific goals. Sometimes it is less structured and more exploratory, with a focus on depth, insight, and discovery.",
+      ],
+      [
+        "outside of session, I...",
+        "to run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
+      ],
     ]);
+    expect(sql).toContain("I work best with...");
+    expect(sql).toContain("collaborative, practical, and down-to-earth.");
+    expect(sql).not.toContain("who I work best with...");
+    expect(sql).not.toContain("Collaborative, practical");
+    expect(sql).not.toContain("It is just two people");
     expect(
       travisWhite.cards.some((card) =>
         card.prompt.startsWith("before we start"),
@@ -151,6 +171,27 @@ describe("Travis White profile", () => {
     expect(sql).toContain("Travis state license was not saved");
     expect(sql).toContain("Travis session format was not saved");
     expect(sql).toContain("Travis office address was not saved");
+    const profileUpdate = sql
+      .split("on conflict (id) do update")[1]
+      .split("insert into public.therapists")[0];
+    expect(profileUpdate).not.toMatch(/photo_key\s*=/);
+    expect(profileUpdate).toContain("video_key = excluded.video_key");
+    expect(sql).toContain("uid::text || '/photo.jpg'");
+    const lookup = buildLookupSql();
+    expect(lookup).toContain("p.photo_key");
+    expect(
+      lookupRow(
+        JSON.stringify([
+          { id: TRAVIS_PROFILE_ID, photo_key: null },
+        ]),
+      ),
+    ).toEqual({ id: TRAVIS_PROFILE_ID, photoKey: null });
+    expect(
+      lookupRow(`${TRAVIS_PROFILE_ID}|${TRAVIS_PROFILE_ID}/photo.jpg`),
+    ).toEqual({
+      id: TRAVIS_PROFILE_ID,
+      photoKey: `${TRAVIS_PROFILE_ID}/photo.jpg`,
+    });
   });
 
   it("passes join validation except years practicing, which is unpublished", () => {

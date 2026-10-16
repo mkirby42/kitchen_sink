@@ -191,7 +191,8 @@ begin
       email = excluded.email,
       phone = excluded.phone,
       about_me = excluded.about_me,
-      photo_key = excluded.photo_key,
+      -- Leave photo_key alone. A re-run must not put {id}/photo.jpg back
+      -- after it was cleared. The insert above still sets it for a new row.
       video_key = excluded.video_key;
 
   insert into public.therapists (
@@ -340,5 +341,38 @@ $apply$;
 
 export function buildLookupSql(email = travisWhite.email) {
   const literal = dollarQuote(email.trim().toLowerCase(), "em");
-  return `select id::text as id from auth.users where lower(email) = ${literal};`;
+  return `select u.id::text as id, p.photo_key
+from auth.users u
+left join public.profiles p on p.id = u.id
+where lower(u.email) = ${literal};`;
+}
+
+const UUID_RE =
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
+/** Management API returns JSON. psql -t -A prints id|photo_key. */
+export function lookupRow(payload) {
+  const trimmed = String(payload ?? "").trim();
+  if (!trimmed) return null;
+  try {
+    const parsed = JSON.parse(trimmed);
+    const row = Array.isArray(parsed) ? parsed[0] : parsed;
+    if (row?.id && UUID_RE.test(String(row.id))) {
+      const photo = row.photo_key;
+      return {
+        id: String(row.id),
+        photoKey: photo == null || String(photo).trim() === "" ? null : String(photo),
+      };
+    }
+  } catch {
+    // psql text, handled below.
+  }
+  const match = trimmed.match(UUID_RE);
+  if (!match) return null;
+  const rest = trimmed
+    .slice(match.index + match[0].length)
+    .replace(/^\|/, "")
+    .trim();
+  const photoKey = rest.split("|")[0]?.trim() || null;
+  return { id: match[0], photoKey };
 }
