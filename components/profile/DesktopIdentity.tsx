@@ -55,6 +55,7 @@ export function DesktopIdentity({
         name={data.givenName}
         actions={actions}
         contact={data.contact}
+        therapistId={data.id}
         placement="stack"
       />
       <dl className="mt-4 divide-y divide-line border-t border-line text-sm">

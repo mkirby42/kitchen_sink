@@ -58,6 +58,7 @@ export function TherapistCard({
         prompt={card?.prompt ?? null}
         answer={card?.answer ?? null}
         href={href}
+        therapistId={row.profile_id}
         sample={sample}
         hidden={row.listed === false}
         draft={row.published === false}
@@ -76,6 +77,7 @@ export function TherapistCard({
         prompt={card?.prompt ?? null}
         answer={card?.answer ?? null}
         href={href}
+        therapistId={row.profile_id}
         sample={sample}
         hidden={row.listed === false}
         draft={row.published === false}

@@ -6,6 +6,7 @@ import {
   requestFindHref,
 } from "@/components/search/query";
 import { routes } from "@/lib/routes";
+import { TrackProfileView } from "@/components/analytics/TrackProfileView";
 import {
   ProfileNotFound,
   TherapistProfile,
@@ -101,15 +102,18 @@ export default async function TherapistProfilePage({
   const viewer = await loadViewer(data.id);
 
   return (
-    <TherapistProfile
-      data={presentProfileData(data, viewer.role, audience)}
-      backHref={backHref}
-      viewer={presentReviewViewer(viewer, audience)}
-      manage={profileManageForViewer({
-        viewer,
-        audience,
-        profileId: data.id,
-      })}
-    />
+    <>
+      <TrackProfileView therapistId={data.id} />
+      <TherapistProfile
+        data={presentProfileData(data, viewer.role, audience)}
+        backHref={backHref}
+        viewer={presentReviewViewer(viewer, audience)}
+        manage={profileManageForViewer({
+          viewer,
+          audience,
+          profileId: data.id,
+        })}
+      />
+    </>
   );
 }

@@ -4,17 +4,20 @@ import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { pageSubtitleClass, profileSectionHeadingClass } from "@/components/ui/styles";
+import { trackCta } from "@/lib/analytics/track";
 import type { ConsultBookAction, ContactAction } from "@/lib/therapists/load";
 
 export function ContactCtas({
   name,
   actions,
   contact,
+  therapistId,
   placement = "responsive",
 }: {
   name: string;
   actions: ConsultBookAction[];
   contact: ContactAction[];
+  therapistId?: string;
   /** responsive: md+ grid and a phone dock. stack: full-width column, no dock. */
   placement?: "responsive" | "stack";
 }) {
@@ -50,6 +53,7 @@ export function ContactCtas({
             <CtaButton
               key={action.kind}
               action={action}
+              therapistId={therapistId}
               open={open}
               onOpen={() => setOpen(true)}
               size="md"
@@ -66,6 +70,7 @@ export function ContactCtas({
               <CtaButton
                 key={action.kind}
                 action={action}
+                therapistId={therapistId}
                 open={open}
                 onOpen={() => setOpen(true)}
               />
@@ -81,6 +86,7 @@ export function ContactCtas({
                 <CtaButton
                   key={action.kind}
                   action={action}
+                  therapistId={therapistId}
                   open={open}
                   onOpen={() => setOpen(true)}
                 />
@@ -146,11 +152,13 @@ export function ContactCtas({
 
 function CtaButton({
   action,
+  therapistId,
   open,
   onOpen,
   size = "sm",
 }: {
   action: ConsultBookAction;
+  therapistId?: string;
   open: boolean;
   onOpen: () => void;
   size?: "sm" | "md";
@@ -162,7 +170,10 @@ function CtaButton({
       className="w-full whitespace-nowrap"
       aria-haspopup="dialog"
       aria-expanded={open}
-      onClick={onOpen}
+      onClick={() => {
+        if (therapistId) trackCta(therapistId, action.kind);
+        onOpen();
+      }}
     >
       {action.kind === "consult" ? <ConsultIcon /> : <BookIcon />}
       {action.label}

@@ -15,6 +15,7 @@ describe("judge path routes", () => {
     expect(routes.adminMedia).toBe("/admin/media");
     expect(routes.adminReviews).toBe("/admin/reviews");
     expect(routes.adminStarts).toBe("/admin/starts");
+    expect(routes.adminAnalytics).toBe("/admin/analytics");
     expect(routes.therapist("maya")).toBe("/t/maya");
     expect(routes).not.toHaveProperty("matches");
   });

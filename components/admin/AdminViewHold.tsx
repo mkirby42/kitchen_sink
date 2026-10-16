@@ -5,7 +5,7 @@ export function AdminViewHold() {
     <AccountShell
       eyebrow="Ops"
       title="Admin view"
-      lede="Uploads and the review queue are part of Admin view. Switch back in the header to use them. Your admin access is unchanged."
+      lede="Drafts, uploads, the review queue, and analytics are part of Admin view. Switch back in the header to use them. Your admin access is unchanged."
     />
   );
 }
