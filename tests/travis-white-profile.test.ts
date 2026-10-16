@@ -15,7 +15,7 @@ import {
   travisMedia,
   travisWhite,
 } from "../scripts/travis-white/profile.mjs";
-import { buildApplySql } from "../scripts/travis-white/sql.mjs";
+import { buildApplySql, buildLookupSql, lookupRow } from "../scripts/travis-white/sql.mjs";
 
 const PHOTO_MAX = 5 * 1024 * 1024;
 const VIDEO_MAX = 50 * 1024 * 1024;
@@ -171,6 +171,27 @@ describe("Travis White profile", () => {
     expect(sql).toContain("Travis state license was not saved");
     expect(sql).toContain("Travis session format was not saved");
     expect(sql).toContain("Travis office address was not saved");
+    const profileUpdate = sql
+      .split("on conflict (id) do update")[1]
+      .split("insert into public.therapists")[0];
+    expect(profileUpdate).not.toMatch(/photo_key\s*=/);
+    expect(profileUpdate).toContain("video_key = excluded.video_key");
+    expect(sql).toContain("uid::text || '/photo.jpg'");
+    const lookup = buildLookupSql();
+    expect(lookup).toContain("p.photo_key");
+    expect(
+      lookupRow(
+        JSON.stringify([
+          { id: TRAVIS_PROFILE_ID, photo_key: null },
+        ]),
+      ),
+    ).toEqual({ id: TRAVIS_PROFILE_ID, photoKey: null });
+    expect(
+      lookupRow(`${TRAVIS_PROFILE_ID}|${TRAVIS_PROFILE_ID}/photo.jpg`),
+    ).toEqual({
+      id: TRAVIS_PROFILE_ID,
+      photoKey: `${TRAVIS_PROFILE_ID}/photo.jpg`,
+    });
   });
 
   it("passes join validation except years practicing, which is unpublished", () => {

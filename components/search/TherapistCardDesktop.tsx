@@ -71,7 +71,6 @@ export function TherapistCardDesktop({
               variant="portrait"
               name={name}
               given={given}
-              initials={initials}
               photoUrl={photoUrl}
               videoUrl={videoUrl}
             />

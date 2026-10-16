@@ -50,7 +50,6 @@ export function TherapistCardPhone({
       {videoUrl ? (
         <CardIntroVideo
           name={name}
-          initials={initials}
           photoUrl={photoUrl}
           videoUrl={videoUrl}
         />
