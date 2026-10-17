@@ -141,7 +141,7 @@ describe("Travis White profile", () => {
       ],
       [
         "outside of session, I...",
-        "to run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
+        "run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
       ],
     ]);
     expect(sql).toContain("I work best with...");
