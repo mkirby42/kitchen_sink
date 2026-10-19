@@ -7,6 +7,7 @@ import type {
   TherapistProfileData,
 } from "@/lib/therapists/load";
 import { ContactCtas } from "./ContactCtas";
+import { NotAcceptingClients } from "./NotAcceptingClients";
 import { SessionFormatLine } from "./SessionFormatLine";
 import { credentialLine, yearsPracticingLabel } from "./copy";
 
@@ -46,6 +47,7 @@ export function DesktopIdentity({
         </div>
       ) : null}
       {years ? <p className={`mt-1 ${metaLineClass}`}>{years}</p> : null}
+      <NotAcceptingClients open={data.openToNewClients} className="mt-3" />
       {formats.length > 0 ? (
         <div className="mt-3">
           <SessionFormatLine formats={formats} />

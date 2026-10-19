@@ -393,6 +393,7 @@ describe("draft profile banner", () => {
     reviews: [],
     pendingReview: null,
     contact: [],
+    openToNewClients: true,
   } as TherapistProfileData;
 
   it("shows the draft label on the profile the owner can preview", () => {

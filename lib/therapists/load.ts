@@ -104,6 +104,8 @@ export type TherapistProfileData = {
   hiddenFromPublic?: boolean;
   /** Draft. Public Find and /t/[id] omit it. Owner and admin can still open it. */
   unpublished?: boolean;
+  /** False when the practice is closed to new clients. */
+  openToNewClients: boolean;
 };
 
 const SUPERBILL_LABEL = "out-of-network superbill";
@@ -436,9 +438,10 @@ export async function fetchTherapistProfile(
   const therapist = therapistRes.data;
   if (!profile || !therapist) return null;
   if (!isPublicTherapistRole(profile.role)) return null;
+  const openToNewClients = therapist.open_to_new_clients === true;
   if (
     !canViewDirectoryProfile({
-      openToNewClients: therapist.open_to_new_clients === true,
+      openToNewClients,
       listed: therapist.listed,
       published: therapist.published,
       ...previewDirectoryAccess({
@@ -522,6 +525,7 @@ export async function fetchTherapistProfile(
     }),
     hiddenFromPublic,
     unpublished,
+    openToNewClients,
   };
 }
 
