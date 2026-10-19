@@ -52,6 +52,7 @@ const data: TherapistProfileData = {
   reviews: [],
   pendingReview: null,
   contact: [],
+  openToNewClients: true,
 };
 
 function viewer(

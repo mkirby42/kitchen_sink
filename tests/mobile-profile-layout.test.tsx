@@ -9,6 +9,7 @@ vi.mock("next/navigation", () => ({
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
+import { NOT_ACCEPTING_CLIENTS_LABEL } from "@/lib/therapists/listing";
 import type { TherapistProfileData } from "@/lib/therapists/load";
 
 const visitor: ReviewViewer = {
@@ -84,6 +85,7 @@ const base: TherapistProfileData = {
       value: "(512) 555-0199",
     },
   ],
+  openToNewClients: true,
 };
 
 function render(data: TherapistProfileData = base) {
@@ -251,5 +253,43 @@ describe("phone profile layout", () => {
     const phone = videoPhone.indexOf('data-profile-show="phone"');
     expect(videoPhone.slice(media, phone)).toContain("Play intro video");
     expect(video.match(/data-hero-media/g)).toHaveLength(2);
+  });
+
+  it("shows a soft pill when the practice is closed and nothing when it is open", () => {
+    const open = render();
+    expect(open).not.toContain(NOT_ACCEPTING_CLIENTS_LABEL);
+    expect(open).not.toContain('data-accepting-clients="closed"');
+
+    const html = render({ ...base, openToNewClients: false });
+    const phoneTree = html.slice(
+      html.indexOf('data-profile-layout="phone"'),
+      html.indexOf('data-profile-layout="desk"'),
+    );
+    const deskTree = html.slice(html.indexOf('data-profile-layout="desk"'));
+
+    expect(phoneTree.match(/data-accepting-clients="closed"/g)).toHaveLength(1);
+    expect(deskTree.match(/data-accepting-clients="closed"/g)).toHaveLength(1);
+    const phonePill = phoneTree.slice(
+      phoneTree.indexOf('data-accepting-clients="closed"'),
+      phoneTree.indexOf("</p>", phoneTree.indexOf('data-accepting-clients="closed"')),
+    );
+    expect(phonePill).toContain(NOT_ACCEPTING_CLIENTS_LABEL);
+    expect(phonePill).toContain("bg-pill-bg");
+    expect(phonePill).toContain("text-pill");
+    expect(phoneTree.indexOf(NOT_ACCEPTING_CLIENTS_LABEL)).toBeLessThan(
+      phoneTree.indexOf("How Travis works"),
+    );
+    const nameCard = deskTree.slice(
+      deskTree.indexOf(">Travis White</h1>"),
+      deskTree.indexOf('data-cta-placement="stack"'),
+    );
+    expect(nameCard).toContain(NOT_ACCEPTING_CLIENTS_LABEL);
+    expect(nameCard).toContain("bg-pill-bg");
+    expect(deskTree.indexOf("How Travis works")).toBeGreaterThan(
+      deskTree.indexOf(NOT_ACCEPTING_CLIENTS_LABEL),
+    );
+    expect(deskTree.slice(deskTree.indexOf("How Travis works"))).not.toContain(
+      NOT_ACCEPTING_CLIENTS_LABEL,
+    );
   });
 });

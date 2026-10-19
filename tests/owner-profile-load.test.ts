@@ -10,7 +10,10 @@ vi.mock("next/navigation", () => ({
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
 import { loadReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
-import { ADMIN_ONLY_HIDDEN_LABEL } from "@/lib/therapists/listing";
+import {
+  ADMIN_ONLY_HIDDEN_LABEL,
+  NOT_ACCEPTING_CLIENTS_LABEL,
+} from "@/lib/therapists/listing";
 import { fetchTherapistProfile } from "@/lib/therapists/load";
 
 const THERAPIST_ID = "e635d882-fd07-4a7c-bd2e-145b1b71669a";
@@ -121,6 +124,7 @@ describe("owner profile load", () => {
 
     expect(data?.id).toBe(THERAPIST_ID);
     expect(data?.name).toBe("Christine Lo TEST");
+    expect(data?.openToNewClients).toBe(false);
     expect(data?.hiddenFromPublic).toBe(true);
     expect(viewer).toEqual({
       userId: THERAPIST_ID,
@@ -138,6 +142,7 @@ describe("owner profile load", () => {
     expect(html).toContain("Edit profile");
     expect(html).toContain(routes.joinEdit);
     expect(html).toContain(ADMIN_ONLY_HIDDEN_LABEL);
+    expect(html).toContain(NOT_ACCEPTING_CLIENTS_LABEL);
     expect(html).toContain("Christine Lo TEST");
   });
 
@@ -153,6 +158,7 @@ describe("owner profile load", () => {
       THERAPIST_ID,
     );
     expect(data?.name).toBe("Christine Lo TEST");
+    expect(data?.openToNewClients).toBe(true);
     expect(data?.hiddenFromPublic).toBe(true);
   });
 

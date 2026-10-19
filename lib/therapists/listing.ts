@@ -12,6 +12,8 @@ export const ADMIN_ONLY_HIDDEN_LABEL = "Admin only — hidden from public";
 
 export const DRAFT_PROFILE_LABEL = "Draft — not published";
 
+export const NOT_ACCEPTING_CLIENTS_LABEL = "Not accepting new clients";
+
 /**
  * Public Find and /t/[id] require an open, listed, published practice.
  * A signed-in admin may also open someone else's unlisted profile.
