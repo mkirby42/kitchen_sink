@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   AI_USER_AGENTS,
-  PRIVATE_PATH_PREFIX,
+  PRIVATE_PATHS,
   canonicalOrigin,
   isMissingPublishedColumn,
   llmsTxt,
@@ -26,8 +26,8 @@ describe("robots policy", () => {
     ]);
     for (const rule of rules) {
       expect(rule.allow).toBe("/");
-      expect(rule.disallow).toBe(PRIVATE_PATH_PREFIX);
-      expect(rule.disallow).not.toBe("/");
+      expect(rule.disallow).toEqual([...PRIVATE_PATHS]);
+      expect(rule.disallow).not.toContain("/");
     }
   });
 });
@@ -46,6 +46,7 @@ describe("sitemap entries", () => {
       `${ORIGIN}/t/${id}`,
     ]);
     expect(urls.some((url) => url.includes("/admin"))).toBe(false);
+    expect(urls.some((url) => url.includes("/referrals"))).toBe(false);
     expect(urls.some((url) => url.includes("/profile-deleted"))).toBe(false);
   });
 
