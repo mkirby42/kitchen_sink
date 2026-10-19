@@ -12,6 +12,12 @@ export const routes = {
   adminReviews: "/admin/reviews",
   adminStarts: "/admin/starts",
   adminAnalytics: "/admin/analytics",
+  adminReferrals: "/admin/referrals",
+  referrals: "/referrals",
+  referralNew: "/referrals/new",
+  referralMine: "/referrals/mine",
+  referralPost: (id: string) => `/referrals/${id}`,
+  referralShare: (id: string) => `/referrals/s/${id}`,
   therapist: (id: string) => `/t/${id}`,
 } as const;
 

@@ -89,6 +89,8 @@ export type HeaderChrome = {
   uploads: boolean;
   reviews: boolean;
   analytics: boolean;
+  referralBoard: boolean;
+  referralQueue: boolean;
   forTherapists: boolean;
   myProfile: boolean;
   signOut: boolean;
@@ -99,16 +101,24 @@ export type HeaderChrome = {
 export function headerChrome(input: {
   role: ProfileRole | null;
   hasTherapist: boolean;
+  published?: boolean;
   audience: SiteAudience;
 }): HeaderChrome {
   const admin = input.role === "admin";
   const audience = admin ? input.audience : "admin";
+  const published = input.published === true;
+  const referralBoard =
+    published &&
+    (input.role === "therapist" || (admin && audience === "therapist"));
+  const referralQueue = admin && audience === "admin";
 
   if (!input.role) {
     return {
       uploads: false,
       reviews: false,
       analytics: false,
+      referralBoard: false,
+      referralQueue: false,
       forTherapists: true,
       myProfile: false,
       signOut: false,
@@ -122,6 +132,8 @@ export function headerChrome(input: {
       uploads: false,
       reviews: false,
       analytics: false,
+      referralBoard: false,
+      referralQueue: false,
       forTherapists: true,
       myProfile: false,
       signOut: true,
@@ -135,6 +147,8 @@ export function headerChrome(input: {
       uploads: false,
       reviews: false,
       analytics: false,
+      referralBoard,
+      referralQueue: false,
       forTherapists: false,
       myProfile: input.role === "therapist" || input.hasTherapist,
       signOut: true,
@@ -148,6 +162,8 @@ export function headerChrome(input: {
       uploads: true,
       reviews: true,
       analytics: true,
+      referralBoard: false,
+      referralQueue,
       forTherapists: true,
       myProfile: input.hasTherapist,
       signOut: true,
@@ -160,6 +176,8 @@ export function headerChrome(input: {
     uploads: false,
     reviews: false,
     analytics: false,
+    referralBoard: false,
+    referralQueue: false,
     forTherapists: false,
     myProfile: false,
     signOut: true,
