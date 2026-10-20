@@ -87,7 +87,7 @@ export function ReferralBoard({
     <ReferralShell
       eyebrow="Referral board"
       title="Referral board"
-      lede="For therapists with a published profile. Kitchen Sink approves each post. A post stays up for one week."
+      lede="When your caseload is full or you want to help a client find a better fit, use the referral board to share what they're looking for. We'll connect you with interested therapists so you can share the list with the client and help them find their therapist."
       action={
         <Button href={routes.referralNew} variant="solid" size="sm">
           + Refer
