@@ -9,7 +9,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 import { travisMedia, travisWhite } from "./travis-white/profile.mjs";
-import { buildApplySql, buildLookupSql } from "./travis-white/sql.mjs";
+import { buildApplySql, buildLookupSql, lookupRow } from "./travis-white/sql.mjs";
 
 const PROJECT_REF = "udgngzzzgrxjxljgtxpf";
 const DEFAULT_URL = `https://${PROJECT_REF}.supabase.co`;
@@ -113,28 +113,8 @@ async function runManagementQuery(token, query) {
   return text;
 }
 
-function idFromLookup(payload) {
-  const trimmed = payload.trim();
-  if (!trimmed) return null;
-  try {
-    const parsed = JSON.parse(trimmed);
-    const row = Array.isArray(parsed) ? parsed[0] : parsed;
-    if (row?.id) return String(row.id);
-  } catch {
-    // psql -t -A prints the uuid alone.
-  }
-  const match = trimmed.match(
-    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
-  );
-  return match ? match[0] : null;
-}
-
-async function uploadMedia(url, serviceKey, id) {
-  const photo = readFileSync(resolve(root, travisMedia.photoPath));
+async function uploadMedia(url, serviceKey, id, { uploadPhoto }) {
   const video = readFileSync(resolve(root, travisMedia.videoPath));
-  if (photo.length > PHOTO_MAX) {
-    throw new Error(`Photo is ${photo.length} bytes. The photos bucket allows 5MB.`);
-  }
   if (video.length > VIDEO_MAX) {
     throw new Error(`Video is ${video.length} bytes. The videos bucket allows 50MB.`);
   }
@@ -143,13 +123,19 @@ async function uploadMedia(url, serviceKey, id) {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const photoUp = await supabase.storage
-    .from("photos")
-    .upload(`${id}/photo.jpg`, photo, {
-      upsert: true,
-      contentType: travisMedia.photoContentType,
-    });
-  if (photoUp.error) throw new Error(`photo: ${photoUp.error.message}`);
+  if (uploadPhoto) {
+    const photo = readFileSync(resolve(root, travisMedia.photoPath));
+    if (photo.length > PHOTO_MAX) {
+      throw new Error(`Photo is ${photo.length} bytes. The photos bucket allows 5MB.`);
+    }
+    const photoUp = await supabase.storage
+      .from("photos")
+      .upload(`${id}/photo.jpg`, photo, {
+        upsert: true,
+        contentType: travisMedia.photoContentType,
+      });
+    if (photoUp.error) throw new Error(`photo: ${photoUp.error.message}`);
+  }
 
   const videoUp = await supabase.storage
     .from("videos")
@@ -171,13 +157,14 @@ async function main() {
 
   await runSql(buildApplySql());
   const lookup = await runSql(buildLookupSql());
-  const id = idFromLookup(lookup);
-  if (!id) throw new Error(`Profile SQL ran but no auth user id came back.\n${lookup}`);
+  const row = lookupRow(lookup);
+  if (!row) throw new Error(`Profile SQL ran but no auth user id came back.\n${lookup}`);
 
-  await uploadMedia(url, serviceKey, id);
+  // A cleared photo_key stays cleared. Do not upload photo.jpg back over it.
+  await uploadMedia(url, serviceKey, row.id, { uploadPhoto: Boolean(row.photoKey) });
   console.log(`Applied Travis White (${travisWhite.email})`);
-  console.log(`profile id: ${id}`);
-  console.log(`https://kitchen-sink-tau.vercel.app/t/${id}`);
+  console.log(`profile id: ${row.id}`);
+  console.log(`https://kitchen-sink-tau.vercel.app/t/${row.id}`);
   console.log(
     `Claim: /forgot-password for ${travisWhite.email}, then /join?mode=signin, then Edit.`,
   );

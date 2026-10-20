@@ -2,12 +2,12 @@
 
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { VideoStill } from "@/components/ui/VideoStill";
 
 type CardIntroVideoProps = {
   name: string;
   /** First name for the desktop “Watch {name}'s intro” pill. */
   given?: string;
-  initials: string;
   photoUrl: string | null;
   videoUrl: string;
   /** `frame` is the phone full-bleed portrait. `portrait` fills the desktop card column. */
@@ -17,7 +17,6 @@ type CardIntroVideoProps = {
 export function CardIntroVideo({
   name,
   given,
-  initials,
   photoUrl,
   videoUrl,
   variant = "frame",
@@ -26,31 +25,21 @@ export function CardIntroVideo({
     return (
       <PortraitIntro
         given={given?.trim() || name}
-        initials={initials}
         photoUrl={photoUrl}
         videoUrl={videoUrl}
       />
     );
   }
 
-  return (
-    <FrameIntro
-      name={name}
-      initials={initials}
-      photoUrl={photoUrl}
-      videoUrl={videoUrl}
-    />
-  );
+  return <FrameIntro name={name} photoUrl={photoUrl} videoUrl={videoUrl} />;
 }
 
 function FrameIntro({
   name,
-  initials,
   photoUrl,
   videoUrl,
 }: {
   name: string;
-  initials: string;
   photoUrl: string | null;
   videoUrl: string;
 }) {
@@ -75,16 +64,7 @@ function FrameIntro({
   }
 
   return (
-    <button
-      type="button"
-      onClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setPlaying(true);
-      }}
-      aria-label={`Play intro video for ${name}`}
-      className={`${frame} group block text-left focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset`}
-    >
+    <div className={frame}>
       {photoUrl ? (
         // Public Storage URLs; next/image is out of scope this weekend.
         // eslint-disable-next-line @next/next/no-img-element
@@ -94,36 +74,40 @@ function FrameIntro({
           className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
         />
       ) : (
-        <span
-          aria-hidden
-          className="absolute inset-0 flex items-center justify-center font-sans text-7xl font-medium text-paper/80"
-        >
-          {initials}
-        </span>
+        <VideoStill src={videoUrl} />
       )}
-      <span
-        className="pointer-events-none absolute top-1/2 left-1/2 flex size-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] border-white bg-white/10 group-hover:bg-white/20"
-        aria-hidden
+      <button
+        type="button"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setPlaying(true);
+        }}
+        aria-label={`Play intro video for ${name}`}
+        className="group absolute inset-0 z-10 block focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
       >
-        <svg
-          viewBox="0 0 24 24"
-          className="ml-1.5 h-10 w-10 fill-white drop-shadow-[0_1px_2px_rgba(27,39,68,0.55)]"
+        <span
+          className="pointer-events-none absolute top-1/2 left-1/2 flex size-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[3px] border-white bg-white/10 group-hover:bg-white/20"
+          aria-hidden
         >
-          <path d="M8 5.5v13l11-6.5-11-6.5z" />
-        </svg>
-      </span>
-    </button>
+          <svg
+            viewBox="0 0 24 24"
+            className="ml-1.5 h-10 w-10 fill-white drop-shadow-[0_1px_2px_rgba(27,39,68,0.55)]"
+          >
+            <path d="M8 5.5v13l11-6.5-11-6.5z" />
+          </svg>
+        </span>
+      </button>
+    </div>
   );
 }
 
 function PortraitIntro({
   given,
-  initials,
   photoUrl,
   videoUrl,
 }: {
   given: string;
-  initials: string;
   photoUrl: string | null;
   videoUrl: string;
 }) {
@@ -157,12 +141,7 @@ function PortraitIntro({
           className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
         />
       ) : (
-        <span
-          aria-hidden
-          className="absolute inset-0 flex items-center justify-center font-sans text-6xl font-medium text-paper/80"
-        >
-          {initials}
-        </span>
+        <VideoStill src={videoUrl} />
       )}
       <button
         type="button"
