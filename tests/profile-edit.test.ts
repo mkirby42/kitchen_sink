@@ -46,6 +46,7 @@ const data: TherapistProfileData = {
   reviews: [],
   pendingReview: null,
   contact: [],
+  openToNewClients: true,
 };
 
 const owner: ReviewViewer = {

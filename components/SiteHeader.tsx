@@ -92,14 +92,19 @@ export function SiteHeader({
         supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
         supabase
           .from("therapists")
-          .select("profile_id")
+          .select("profile_id, published")
           .eq("profile_id", user.id)
           .maybeSingle(),
       ]);
 
       const role = parseProfileRole(profile?.role);
 
-      setNavUser({ id: user.id, role, hasTherapist: Boolean(therapist) });
+      setNavUser({
+        id: user.id,
+        role,
+        hasTherapist: Boolean(therapist),
+        published: therapist?.published === true,
+      });
     }
 
     void loadNavUser();
@@ -123,6 +128,7 @@ export function SiteHeader({
   const chrome = headerChrome({
     role: navUser?.role ?? null,
     hasTherapist: Boolean(navUser?.hasTherapist),
+    published: navUser?.published === true,
     audience,
   });
   const switcher = chrome.switcher ? (
@@ -169,6 +175,15 @@ export function SiteHeader({
             >
               Find a Therapist
             </Link>
+            {chrome.referralBoard ? (
+              <Link
+                href={routes.referrals}
+                className={navClass(path.startsWith(routes.referrals))}
+                aria-current={path.startsWith(routes.referrals) ? "page" : undefined}
+              >
+                Referrals
+              </Link>
+            ) : null}
             {chrome.uploads ? (
               <Link
                 href={routes.adminStarts}
@@ -203,6 +218,15 @@ export function SiteHeader({
                 aria-current={path === routes.adminAnalytics ? "page" : undefined}
               >
                 Analytics
+              </Link>
+            ) : null}
+            {chrome.referralQueue ? (
+              <Link
+                href={routes.adminReferrals}
+                className={navClass(path === routes.adminReferrals)}
+                aria-current={path === routes.adminReferrals ? "page" : undefined}
+              >
+                Referrals
               </Link>
             ) : null}
             {chrome.forTherapists ? (

@@ -115,7 +115,7 @@ export const travisWhite = {
       prompt: "outside of session, I...",
       tag: "session_vibe",
       answer:
-        "to run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
+        "run a lot, train BJJ when I can, and love to cook and eat. I also play board games when I can find the time.",
     },
   ],
 };

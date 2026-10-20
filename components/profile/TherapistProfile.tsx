@@ -100,6 +100,7 @@ export function TherapistProfile({
       showAbout={flags?.showAbout}
       showLogistics={flags?.showLogistics}
       givenName={data.givenName}
+      openToNewClients={data.openToNewClients}
     />
   );
 

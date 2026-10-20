@@ -57,6 +57,36 @@ describe("site header", () => {
     expect(html).not.toContain("Join as a Therapist");
     expect(html).not.toContain("Interest");
     expect(html).not.toContain("/matches");
+    expect(html).not.toContain("Referrals");
+  });
+
+  it("shows Referrals for a published therapist and the queue for an admin", () => {
+    const therapist = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "11111111-1111-4111-8111-111111111111",
+          role: "therapist",
+          hasTherapist: true,
+          published: true,
+        },
+      }),
+    );
+    expect(therapist).toContain("Referrals");
+    expect(therapist).toContain('href="/referrals"');
+    expect(therapist).not.toContain('href="/admin/referrals"');
+
+    const admin = renderToStaticMarkup(
+      createElement(SiteHeader, {
+        initialNavUser: {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+          role: "admin",
+          hasTherapist: true,
+          published: true,
+        },
+      }),
+    );
+    expect(admin).toContain('href="/admin/referrals"');
+    expect(admin).not.toContain('href="/referrals"');
   });
 
   it("lets an admin join as a therapist and keeps Uploads", () => {
