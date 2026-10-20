@@ -15,6 +15,7 @@ import { closesLabel, interestCountLabel, postedAgo } from "@/lib/referrals/time
 import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { Check, ReferralPills, ReferralShell } from "./ReferralBits";
+import { ReferralHowItWorks } from "./ReferralHowItWorks";
 
 export function ReferralBoard({
   posts,
@@ -93,6 +94,7 @@ export function ReferralBoard({
         </Button>
       }
     >
+      <ReferralHowItWorks />
       <div className="mb-4 flex justify-end">
         <Link href={routes.referralMine} className={textLinkClass}>
           My referrals
