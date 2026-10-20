@@ -223,6 +223,13 @@ describe("referral screens", () => {
     expect(board).toContain("Posted 2h ago");
     expect(board).toContain("4 therapists interested");
     expect(board).toContain("+ Refer");
+    const introAt = board.search(
+      /When your caseload is full or you want to help a client find a better fit, use the referral board to share what they(?:'|&#x27;)re looking for\. We(?:'|&#x27;)ll connect you with interested therapists so you can share the list with the client and help them find their therapist\./,
+    );
+    const howAt = board.indexOf("How it works");
+    expect(introAt).toBeGreaterThan(-1);
+    expect(howAt).toBeGreaterThan(introAt);
+    expect(board).not.toContain("For therapists with a published profile");
     expect(board).toContain("How it works");
     expect(board).toContain("01 — Post a referral");
     expect(board).toContain("02 — We approve it");
