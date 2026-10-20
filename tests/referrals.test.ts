@@ -223,7 +223,20 @@ describe("referral screens", () => {
     expect(board).toContain("Posted 2h ago");
     expect(board).toContain("4 therapists interested");
     expect(board).toContain("+ Refer");
+    expect(board).toContain("How it works");
+    expect(board).toContain("01 — Post a referral");
+    expect(board).toContain("02 — We approve it");
+    expect(board).toContain("03 — Therapists tap interested");
+    expect(board).toContain("04 — You follow up off the board");
+    expect(board).toContain("05 — Refresh after the week");
+    expect(board).toContain("bg-gold/35");
+    expect(board).toContain("bg-lavender");
+    expect(board).toContain("rounded-box bg-paper");
+    expect(board).toContain("Kitchen Sink stores no client name, email, or phone.");
+    expect(board).toContain("aria-expanded=\"true\"");
+    expect(board).toContain("Hide");
     expect(board).not.toContain("Open to everyone");
+    expect(board).not.toContain("Clients can post");
 
     const interested = renderToStaticMarkup(
       createElement(InterestedList, {
