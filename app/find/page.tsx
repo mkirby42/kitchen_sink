@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { FindFilters } from "@/components/search/FindFilters";
-import { TherapistCard } from "@/components/search/TherapistCard";
+import { FindResultList } from "@/components/search/FindResultList";
 import { Card } from "@/components/ui/Card";
 import { pageTitleClass } from "@/components/ui/styles";
 import {
@@ -77,13 +77,7 @@ export default async function FindPage({ searchParams }: FindPageProps) {
             <p className="text-sm text-mute">
               {resultCountLabel(rows.length)}
             </p>
-            <ul className="space-y-6">
-              {rows.map((row) => (
-                <li key={row.profile_id}>
-                  <TherapistCard row={row} filters={filters} />
-                </li>
-              ))}
-            </ul>
+            <FindResultList rows={rows} filters={filters} />
           </>
         )}
       </div>
