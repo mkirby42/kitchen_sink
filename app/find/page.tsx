@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { FindCarousel } from "@/components/search/FindCarousel";
+import { FindDesktopFilters } from "@/components/search/FindDesktopFilters";
 import { FindFilters } from "@/components/search/FindFilters";
 import { TherapistCard } from "@/components/search/TherapistCard";
 import { Card } from "@/components/ui/Card";
@@ -13,7 +15,12 @@ import {
 import { narrowSearchRows } from "@/lib/audience";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
-import { parseFindSearchParams, searchTherapists } from "@/lib/search/rpc";
+import {
+  parseFindSearchParams,
+  searchTherapists,
+  type SearchFilters,
+  type SearchRow,
+} from "@/lib/search/rpc";
 
 export const dynamic = "force-dynamic";
 
@@ -46,11 +53,12 @@ export default async function FindPage({ searchParams }: FindPageProps) {
     : found;
 
   return (
-    <main className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-24">
-      <div className="mx-auto max-w-3xl">
-        <h1 className={`text-center ${pageTitleClass}`}>
-          Find your therapist
-        </h1>
+    <main className="mx-auto max-w-5xl px-5 py-12 sm:px-8 sm:py-16 md:max-w-6xl md:py-14">
+      <h1 className={`text-center md:text-left md:text-heading ${pageTitleClass}`}>
+        Find your therapist
+      </h1>
+
+      <div className="mx-auto max-w-3xl md:hidden">
         <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-body sm:text-lg">
           Tap your must-haves below — we&apos;ll show therapists who match some
           selected tag.
@@ -63,30 +71,85 @@ export default async function FindPage({ searchParams }: FindPageProps) {
         </Card>
       </div>
 
-      <div className="mt-10 space-y-6">
-        {rows === null ? (
-          <Card as="div" className="px-6 py-10 text-center text-mute">
-            <p>Therapist search isn&apos;t available right now.</p>
-          </Card>
-        ) : rows.length === 0 ? (
-          <Card as="div" className="px-6 py-10 text-center text-mute">
-            <p>No therapists match</p>
-          </Card>
-        ) : (
-          <>
-            <p className="text-sm text-mute">
-              {resultCountLabel(rows.length)}
-            </p>
-            <ul className="space-y-6">
-              {rows.map((row) => (
-                <li key={row.profile_id}>
-                  <TherapistCard row={row} filters={filters} />
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+      <div className="hidden md:block">
+        <Suspense fallback={null}>
+          <FindDesktopFilters matchCount={rows?.length ?? null} />
+        </Suspense>
+      </div>
+
+      <div className="mt-10 space-y-6 md:hidden">
+        <FindPhoneResults rows={rows} filters={filters} />
+      </div>
+
+      <div id="find-results" className="mt-8 hidden md:block">
+        <FindDesktopResults rows={rows} filters={filters} />
       </div>
     </main>
+  );
+}
+
+function FindPhoneResults({
+  rows,
+  filters,
+}: {
+  rows: SearchRow[] | null;
+  filters: SearchFilters;
+}) {
+  if (rows === null) {
+    return (
+      <Card as="div" className="px-6 py-10 text-center text-mute">
+        <p>Therapist search isn&apos;t available right now.</p>
+      </Card>
+    );
+  }
+  if (rows.length === 0) {
+    return (
+      <Card as="div" className="px-6 py-10 text-center text-mute">
+        <p>No therapists match</p>
+      </Card>
+    );
+  }
+  return (
+    <>
+      <p className="text-sm text-mute">{resultCountLabel(rows.length)}</p>
+      <ul className="space-y-6">
+        {rows.map((row) => (
+          <li key={row.profile_id}>
+            <TherapistCard row={row} filters={filters} variant="phone" />
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+function FindDesktopResults({
+  rows,
+  filters,
+}: {
+  rows: SearchRow[] | null;
+  filters: SearchFilters;
+}) {
+  if (rows === null) {
+    return (
+      <Card as="div" className="px-6 py-10 text-center text-mute">
+        <p>Therapist search isn&apos;t available right now.</p>
+      </Card>
+    );
+  }
+  if (rows.length === 0) {
+    return (
+      <Card as="div" className="px-6 py-10 text-center text-mute">
+        <p>No therapists match</p>
+      </Card>
+    );
+  }
+  return (
+    <FindCarousel
+      slides={rows.map((row) => ({
+        id: row.profile_id,
+        card: <TherapistCard row={row} filters={filters} variant="desk" />,
+      }))}
+    />
   );
 }
