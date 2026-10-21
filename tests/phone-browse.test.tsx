@@ -5,7 +5,6 @@ import { FindResultList } from "@/components/search/FindResultList";
 import {
   browseStep,
   clampIndex,
-  deskResultsClass,
   phoneBrowseKey,
   phoneBrowseRootClass,
   phoneScrollerClass,
@@ -101,7 +100,7 @@ describe("phone browse index", () => {
 });
 
 describe("phone Find results", () => {
-  it("keeps horizontal scrolling from trapping the page and leaves the desktop list stacked", () => {
+  it("keeps horizontal scrolling from trapping the page", () => {
     expect(phoneScrollerClass).toContain("overflow-x-auto");
     expect(phoneScrollerClass).toContain("snap-x");
     expect(phoneScrollerClass).toContain("snap-mandatory");
@@ -115,16 +114,12 @@ describe("phone Find results", () => {
     expect(phoneScrollerClass).not.toContain("h-screen");
     expect(phoneSlideClass).toContain("[scroll-snap-stop:always]");
     expect(phoneBrowseRootClass).toBe("md:hidden");
-    expect(deskResultsClass).toContain("hidden");
-    expect(deskResultsClass).toContain("md:block");
-    expect(deskResultsClass).toContain("space-y-6");
   });
 
   it("shows one card at a time with a position, dots, and labeled previous/next buttons", () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     const html = render([travis, row(), ada]);
-    const phone = slice(html, 'data-phone-browse=""', 'data-find-results="desk"');
-    const desk = slice(html, 'data-find-results="desk"', "");
+    const phone = slice(html, 'data-phone-browse=""', "");
 
     expect(phone).toContain(phoneBrowseRootClass);
     expect(phone).toContain(phoneScrollerClass);
@@ -145,24 +140,20 @@ describe("phone Find results", () => {
     const active = slice(phone, 'data-phone-slide="active"', 'data-phone-slide="inactive"');
     expect(active).toContain("Travis White");
     expect(active).not.toContain("inert");
-
-    expect(desk).toContain(deskResultsClass);
-    expect(desk).toContain('data-find-card="desk"');
-    expect(desk).toContain("Travis White");
-    expect(desk).toContain("Maya Chen");
-    expect(desk).not.toContain('aria-label="Previous therapist"');
+    expect(html).not.toContain('data-find-results="desk"');
+    expect(html).not.toContain('data-find-card="desk"');
   });
 
   it("renders a single therapist without a pager", () => {
     const html = render([row()]);
-    const phone = slice(html, 'data-phone-browse=""', 'data-find-results="desk"');
+    const phone = slice(html, 'data-phone-browse=""', "");
     expect(phone).toContain("Maya Chen");
     expect(phone).toContain('data-phone-slide="active"');
     expect(phone).not.toContain("1 of 1");
     expect(phone).not.toContain("Previous therapist");
     expect(phone).not.toContain("Next therapist");
     expect(phone).not.toContain("inert");
-    expect(html).toContain(deskResultsClass);
+    expect(html).not.toContain('data-find-card="desk"');
   });
 
   it("puts the filter set on the browse so a filter change can remount at the first card", () => {

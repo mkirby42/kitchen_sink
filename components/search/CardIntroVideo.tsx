@@ -113,7 +113,7 @@ function PortraitIntro({
 }) {
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const watchLabel = `Watch ${given}'s intro`;
+  const watchLabel = "Watch intro";
 
   if (playing) {
     return (
@@ -151,7 +151,7 @@ function PortraitIntro({
           flushSync(() => setPlaying(true));
           void videoRef.current?.play();
         }}
-        aria-label={watchLabel}
+        aria-label={`Watch intro for ${given}`}
         className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2.5 rounded-full bg-paper py-1.5 pr-4 pl-1.5 text-sm font-medium text-ink shadow-[0_10px_28px_rgb(23_23_23/0.18)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
       >
         <span

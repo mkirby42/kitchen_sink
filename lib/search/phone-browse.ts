@@ -10,9 +10,6 @@ export const phoneSlideClass =
 
 export const phoneBrowseRootClass = "md:hidden";
 
-/** Desktop Find results. Same stacked list as before. */
-export const deskResultsClass = "hidden space-y-6 md:block";
-
 export function clampIndex(index: number, count: number) {
   if (count <= 0) return 0;
   return Math.min(count - 1, Math.max(0, index));
