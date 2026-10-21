@@ -85,3 +85,8 @@ input.ks-field[type="number"]::-webkit-inner-spin-button {
   margin: 0;
   -webkit-appearance: none;
 }
+
+/* Phone Find browse. Firefox uses scrollbar-width on the scroller. */
+[data-phone-scroller]::-webkit-scrollbar {
+  display: none;
+}
