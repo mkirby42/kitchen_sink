@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { FindCarousel } from "@/components/search/FindCarousel";
 import { FindDesktopFilters } from "@/components/search/FindDesktopFilters";
 import { FindFilters } from "@/components/search/FindFilters";
+import { FindResultList } from "@/components/search/FindResultList";
 import { TherapistCard } from "@/components/search/TherapistCard";
 import { Card } from "@/components/ui/Card";
 import { pageTitleClass } from "@/components/ui/styles";
@@ -112,13 +113,7 @@ function FindPhoneResults({
   return (
     <>
       <p className="text-sm text-mute">{resultCountLabel(rows.length)}</p>
-      <ul className="space-y-6">
-        {rows.map((row) => (
-          <li key={row.profile_id}>
-            <TherapistCard row={row} filters={filters} variant="phone" />
-          </li>
-        ))}
-      </ul>
+      <FindResultList rows={rows} filters={filters} />
     </>
   );
 }
