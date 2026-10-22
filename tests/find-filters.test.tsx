@@ -1,27 +1,37 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { FindFilters } from "@/components/search/FindFilters";
-import { eyebrowClass } from "@/components/ui/styles";
+import { PhoneFilterBar } from "@/components/search/PhoneFilterBar";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push() {} }),
   useSearchParams: () => new URLSearchParams(),
 }));
 
-describe("find filters", () => {
-  it("asks what brings you to therapy and lists Self Discovery", () => {
-    const html = renderToStaticMarkup(createElement(FindFilters));
-    expect(html).toContain("What brings you to therapy?");
-    expect(html).toContain("Self discovery");
-    expect(html).toContain("Life transitions");
-    expect(html).toContain("In person");
-    expect(html).not.toContain("In-Person");
+const filters = {
+  tags: [],
+  virtual: false,
+  inPerson: false,
+  state: null,
+};
+
+describe("phone find filters", () => {
+  it("uses the same pills as the web filters", () => {
+    const html = renderToStaticMarkup(
+      createElement(PhoneFilterBar, {
+        filters,
+        matchCount: 2,
+        open: null,
+        onOpen() {},
+      }),
+    );
+    expect(html).toContain("Where you live");
     expect(html).toContain("Insurance");
-    expect(html).not.toContain("Specialties");
-    expect(html).not.toContain("Teens");
-    expect(html).toContain(eyebrowClass);
-    expect(html).not.toContain("uppercase");
-    expect(html).not.toContain("px-5 py-2.5");
+    expect(html).toContain("What&#x27;s going on");
+    expect(html).toContain("In person or online");
+    expect(html).not.toContain("What brings you to therapy?");
+    expect(html).not.toContain("Session format");
+    expect(html).not.toContain("Years in practice");
+    expect(html).not.toContain("Self discovery");
   });
 });

@@ -47,6 +47,14 @@ export function credentialTitle(credential: string | null | undefined) {
   return title ? `${code} · ${title}` : code;
 }
 
+export function givenName(name: string) {
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts[0]?.replace(/\./g, "").toLowerCase() === "dr") {
+    return parts[1] ?? parts[0];
+  }
+  return parts[0] ?? name;
+}
+
 export function initials(name: string) {
   return name
     .split(/\s+/)

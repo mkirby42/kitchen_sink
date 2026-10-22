@@ -11,11 +11,13 @@ import {
   ProfileNotFound,
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
-import { presentProfileData, presentReviewViewer } from "@/lib/audience";
+import { narrowSearchRows, presentProfileData, presentReviewViewer } from "@/lib/audience";
 import { profileManageForViewer } from "@/lib/profile/manage";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadReviewViewer, type ReviewViewer } from "@/lib/reviews/viewer";
-import { parseFindSearchParams } from "@/lib/search/rpc";
+import { matchSlot } from "@/lib/search/phone-find";
+import { parseFindSearchParams, searchTherapists } from "@/lib/search/rpc";
+import type { PhoneProfileBrowse } from "@/components/profile/PhoneProfileSwipe";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { therapistMetaDescription } from "@/lib/site";
 import { loadTherapistProfile } from "@/lib/therapists/load";
@@ -95,11 +97,21 @@ export default async function TherapistProfilePage({
   );
   if (requestedProfile !== cleanProfile) redirect(cleanProfile);
   const audience = await readAudienceCookie();
-  const data = await loadTherapistProfile(id, audience);
+  const [data, found] = await Promise.all([
+    loadTherapistProfile(id, audience),
+    searchTherapists(filters).catch(() => null),
+  ]);
 
   if (!data) return <ProfileNotFound backHref={backHref} />;
 
   const viewer = await loadViewer(data.id);
+  const matches = found
+    ? narrowSearchRows(found, {
+        roleIsAdmin: viewer.role === "admin",
+        audience,
+      })
+    : null;
+  const browse = phoneProfileBrowse(matches, data.id, filters, backHref);
 
   return (
     <>
@@ -107,6 +119,7 @@ export default async function TherapistProfilePage({
       <TherapistProfile
         data={presentProfileData(data, viewer.role, audience)}
         backHref={backHref}
+        browse={browse}
         viewer={presentReviewViewer(viewer, audience)}
         manage={profileManageForViewer({
           viewer,
@@ -116,4 +129,30 @@ export default async function TherapistProfilePage({
       />
     </>
   );
+}
+
+function phoneProfileBrowse(
+  rows: Awaited<ReturnType<typeof searchTherapists>>,
+  id: string,
+  filters: ReturnType<typeof parseFindSearchParams>,
+  allHref: string,
+): PhoneProfileBrowse | null {
+  if (!rows) return null;
+  const slot = matchSlot(
+    rows.map((row) => row.profile_id),
+    id,
+  );
+  if (!slot) return null;
+  const next = slot.nextIndex == null ? null : rows[slot.nextIndex];
+  const prev = slot.prevIndex == null ? null : rows[slot.prevIndex];
+  return {
+    index: slot.index,
+    count: slot.count,
+    allHref,
+    prevHref: prev ? buildTherapistHref(prev.profile_id, filters) : null,
+    nextHref: next ? buildTherapistHref(next.profile_id, filters) : null,
+    nextName: next?.name ?? null,
+    nextCredential: next?.credential ?? null,
+    nextAnswer: next?.card_answer?.trim() || null,
+  };
 }

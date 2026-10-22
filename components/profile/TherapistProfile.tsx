@@ -32,6 +32,10 @@ import { directorySpecialties } from "@/lib/tags/presets";
 import { AboutPanel } from "./ProfileAbout";
 import { ContactCtas } from "./ContactCtas";
 import { DesktopProfile } from "./DesktopProfile";
+import {
+  PhoneProfileSwipe,
+  type PhoneProfileBrowse,
+} from "./PhoneProfileSwipe";
 import { HeroMedia } from "./HeroMedia";
 import { VoicePromptCard } from "./VoicePromptCard";
 import { ProfileHeading } from "./ProfileHeading";
@@ -48,12 +52,15 @@ export function TherapistProfile({
   backHref,
   viewer,
   manage,
+  browse = null,
 }: {
   data: TherapistProfileData;
   backHref: string;
   viewer: ReviewViewer;
   /** Omit to derive from `viewer`. Pass null to hide the controls. */
   manage?: ProfileManageState | null;
+  /** Phone pager across the current Find set. Omitted when there is nothing to swipe. */
+  browse?: PhoneProfileBrowse | null;
 }) {
   const actions =
     manage === undefined
@@ -155,7 +162,7 @@ export function TherapistProfile({
         </div>
       ) : null}
 
-      <div data-profile-layout="phone" className="md:hidden">
+      <PhoneProfileSwipe browse={browse}>
       <div className="mt-6">
         <div
           data-profile-layout="media"
@@ -279,7 +286,7 @@ export function TherapistProfile({
           </div>
         </div>
       </div>
-      </div>
+      </PhoneProfileSwipe>
 
       <DesktopProfile data={data} viewer={viewer} />
     </main>
