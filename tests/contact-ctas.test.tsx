@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ContactCtas } from "@/components/profile/ContactCtas";
+import { ContactSheet } from "@/components/profile/ContactSheet";
 import type { ConsultBookAction, ContactAction } from "@/lib/therapists/load";
 
 const contact: ContactAction[] = [
@@ -15,6 +16,12 @@ const contact: ContactAction[] = [
     kind: "phone",
     label: "Call",
     href: "tel:+15125550199",
+    value: "(512) 555-0199",
+  },
+  {
+    kind: "text",
+    label: "Text",
+    href: "sms:+15125550199",
     value: "(512) 555-0199",
   },
 ];
@@ -59,5 +66,49 @@ describe("ContactCtas", () => {
   it("renders nothing without contact or actions", () => {
     expect(render({ contact: [] })).toBe("");
     expect(render({ actions: [] })).toBe("");
+  });
+
+  it("keeps mailto off the booking buttons until the sheet is open", () => {
+    const html = render();
+    expect(html).toContain('aria-haspopup="dialog"');
+    expect(html).not.toContain("mailto:");
+    expect(html).not.toContain("tel:");
+    expect(html).not.toContain("sms:");
+  });
+});
+
+describe("ContactSheet", () => {
+  it("lists email, call, and text, and only those rows leave the page", () => {
+    const html = renderToStaticMarkup(
+      createElement(ContactSheet, {
+        open: true,
+        name: "Travis",
+        contact,
+        onClose() {},
+      }),
+    );
+    expect(html).toContain('data-contact-sheet=""');
+    expect(html).toContain('role="dialog"');
+    expect(html).toContain("Reach Travis");
+    expect(html).toContain("Kitchen Sink doesn&#x27;t book sessions");
+    expect(html).toContain('href="mailto:travis@example.com"');
+    expect(html).toContain('href="tel:+15125550199"');
+    expect(html).toContain('href="sms:+15125550199"');
+    expect(html).toContain(">Email<");
+    expect(html).toContain(">Call<");
+    expect(html).toContain(">Text<");
+    expect(html).toContain(">Close<");
+  });
+
+  it("stays closed until a booking button opens it", () => {
+    const html = renderToStaticMarkup(
+      createElement(ContactSheet, {
+        open: false,
+        name: "Travis",
+        contact,
+        onClose() {},
+      }),
+    );
+    expect(html).toBe("");
   });
 });

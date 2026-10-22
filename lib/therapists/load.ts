@@ -190,7 +190,7 @@ export type ConsultBookAction = {
   href: string;
 };
 
-/** Screenshot CTAs: still mailto/tel, never a calendar. */
+/** Profile pills. They open the contact sheet, never a calendar. */
 export function consultBookActions(
   contact: ContactAction[],
 ): ConsultBookAction[] {

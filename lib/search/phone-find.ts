@@ -159,23 +159,15 @@ export function stackCards(
   return [{ prompt, answer }];
 }
 
-export function phoneBookAction(extra: {
-  consultHref: string | null;
-  bookHref: string | null;
-} | null) {
-  if (extra?.consultHref) {
-    return {
-      href: extra.consultHref,
-      label: "Book a free consult",
-      cta: "consult" as const,
-    };
+/** Which pinned label to show. The button opens the contact sheet, not this href. */
+export function phoneBookAction(
+  contact: readonly { kind: string }[] | null | undefined,
+) {
+  if (contact?.some((item) => item.kind === "email")) {
+    return { label: "Book a free consult", cta: "consult" as const };
   }
-  if (extra?.bookHref) {
-    return {
-      href: extra.bookHref,
-      label: "Book a session",
-      cta: "book" as const,
-    };
+  if (contact?.some((item) => item.kind === "phone" || item.kind === "text")) {
+    return { label: "Book a session", cta: "book" as const };
   }
   return null;
 }

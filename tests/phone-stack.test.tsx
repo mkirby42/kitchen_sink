@@ -65,8 +65,26 @@ function extra(id: string, overrides: Partial<PhoneStackExtra> = {}): PhoneStack
     ],
     licenseStates: ["TX"],
     superbill: true,
-    consultHref: "mailto:travis@example.com",
-    bookHref: "tel:+15125550199",
+    contact: [
+      {
+        kind: "email",
+        label: "Email",
+        href: "mailto:travis@example.com",
+        value: "travis@example.com",
+      },
+      {
+        kind: "phone",
+        label: "Call",
+        href: "tel:+15125550199",
+        value: "(512) 555-0199",
+      },
+      {
+        kind: "text",
+        label: "Text",
+        href: "sms:+15125550199",
+        value: "(512) 555-0199",
+      },
+    ],
     rates: [
       { service_type: "Individual", duration_minutes: 55, price_cents: 15000 },
     ],
@@ -121,7 +139,7 @@ describe("phone profile stack", () => {
     const html = renderToStaticMarkup(
       createElement(PhoneProfileStack, {
         rows: [travis, row()],
-        extras: [extra(travis.profile_id), extra(row().profile_id, { superbill: false, consultHref: null, bookHref: null, rates: [] })],
+        extras: [extra(travis.profile_id), extra(row().profile_id, { superbill: false, contact: [], rates: [] })],
         filters,
         onBack() {},
       }),
@@ -141,7 +159,9 @@ describe("phone profile stack", () => {
     expect(html).toContain("a session with me feels like...");
     expect(html).toContain("Licensed in Texas");
     expect(html).toContain("Book a free consult");
-    expect(html).toContain("mailto:travis@example.com");
+    expect(html).toContain('aria-haspopup="dialog"');
+    expect(html).not.toContain("mailto:");
+    expect(html).not.toContain("tel:");
     expect(html).not.toContain("15-min");
     expect(html).toContain("Individual session (55 min)");
     expect(html).toContain("Paying yourself? Get reimbursed later");

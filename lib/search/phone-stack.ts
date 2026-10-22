@@ -1,14 +1,13 @@
 import type { StackCard } from "@/lib/search/phone-find";
 import { supabasePublicConfig } from "@/lib/supabase/env";
-import { contactActions } from "@/lib/therapists/load";
+import { contactActions, type ContactAction } from "@/lib/therapists/load";
 
 export type PhoneStackExtra = {
   id: string;
   cards: StackCard[];
   licenseStates: string[];
   superbill: boolean;
-  consultHref: string | null;
-  bookHref: string | null;
+  contact: ContactAction[];
   rates: {
     service_type: string;
     duration_minutes: number;
@@ -44,8 +43,7 @@ function emptyExtra(id: string): PhoneStackExtra {
     cards: [],
     licenseStates: [],
     superbill: false,
-    consultHref: null,
-    bookHref: null,
+    contact: [],
     rates: [],
   };
 }
@@ -116,11 +114,7 @@ export async function loadPhoneStackExtras(
         phone: profile?.phone,
         outreach,
       });
-      extra.consultHref = actions.find((action) => action.kind === "email")?.href ?? null;
-      extra.bookHref =
-        actions.find((action) => action.kind === "phone")?.href ??
-        actions.find((action) => action.kind === "text")?.href ??
-        null;
+      extra.contact = actions;
       extra.rates = rateRows
         .filter((row) => row.therapist_id === id)
         .sort((a, b) => a.price_cents - b.price_cents);
