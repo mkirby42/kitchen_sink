@@ -206,16 +206,14 @@ describe("phone profile stack", () => {
       contact: [],
     });
     const html = renderToStaticMarkup(
-      createElement(
-        PhoneProfileStack,
-        {
-          rows: [travis, row()],
-          booking: [bookingFor(travisProfile), bookingFor(maya)],
-          onBack() {},
-        },
-        column(travisProfile),
-        column(maya),
-      ),
+      <PhoneProfileStack
+        rows={[travis, row()]}
+        booking={[bookingFor(travisProfile), bookingFor(maya)]}
+        onBack={() => {}}
+      >
+        {column(travisProfile)}
+        {column(maya)}
+      </PhoneProfileStack>,
     );
     expect(html).toContain("All 2");
     expect(html).toContain("1 of 2");
@@ -267,15 +265,13 @@ describe("phone profile stack", () => {
       years: null,
     });
     const html = renderToStaticMarkup(
-      createElement(
-        PhoneProfileStack,
-        {
-          rows: [row({ card_prompt: null, card_answer: null })],
-          booking: [bookingFor(solo)],
-          onBack() {},
-        },
-        column(solo),
-      ),
+      <PhoneProfileStack
+        rows={[row({ card_prompt: null, card_answer: null })]}
+        booking={[bookingFor(solo)]}
+        onBack={() => {}}
+      >
+        {column(solo)}
+      </PhoneProfileStack>,
     );
     expect(html).toContain("All 1");
     expect(html).toContain("Maya Chen");
