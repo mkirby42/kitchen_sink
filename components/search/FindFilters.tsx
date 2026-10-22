@@ -13,7 +13,11 @@ import {
   resolveLicenseState,
 } from "@/lib/tags/presets";
 import type { SearchFilters } from "@/lib/search/rpc";
-import { buildFindHref, filtersFromSearchParams } from "./query";
+import {
+  buildFindHref,
+  filtersFromSearchParams,
+  findViewFromSearchParams,
+} from "./query";
 
 function FilterGroup({
   title,
@@ -194,7 +198,8 @@ export function FindFilters() {
   const filters = filtersFromSearchParams(searchParams);
 
   function apply(next: SearchFilters) {
-    router.push(buildFindHref(next), { scroll: false });
+    const view = findViewFromSearchParams(searchParams);
+    router.push(buildFindHref(next, { layout: view.layout }), { scroll: false });
   }
 
   const mustHaveCount = filters.tags.length + (filters.state ? 1 : 0);
