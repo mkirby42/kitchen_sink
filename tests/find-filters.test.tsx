@@ -33,5 +33,7 @@ describe("phone find filters", () => {
     expect(html).not.toContain("Session format");
     expect(html).not.toContain("Years in practice");
     expect(html).not.toContain("Self discovery");
+    expect(html).toMatch(/data-phone-pills="" class="[^"]*\bflex-wrap\b/);
+    expect(html).not.toMatch(/data-phone-pills="" class="[^"]*overflow-x/);
   });
 });
