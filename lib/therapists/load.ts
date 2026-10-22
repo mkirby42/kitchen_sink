@@ -427,7 +427,8 @@ export async function fetchTherapistProfile(
     supabase
       .from("profile_items")
       .select("prompt, answer, tag")
-      .eq("therapist_id", id),
+      .eq("therapist_id", id)
+      .order("position", { ascending: true }),
     fetchReviewRows(supabase, id),
     viewerDirectoryAccess(supabase),
   ]);
