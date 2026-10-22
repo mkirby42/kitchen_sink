@@ -41,12 +41,22 @@ export function guardWeakenReason(base, head) {
   if (cases(after) < cases(before)) {
     return "a test case was removed";
   }
-  for (const literal of assertionLiterals(before)) {
-    if (!after.includes(literal)) {
+  const beforeLiterals = countLiterals(assertionLiterals(before));
+  const afterLiterals = countLiterals(assertionLiterals(after));
+  for (const [literal, count] of beforeLiterals) {
+    if ((afterLiterals.get(literal) ?? 0) < count) {
       return `an assertion no longer requires ${JSON.stringify(literal)}`;
     }
   }
   return null;
+}
+
+function countLiterals(literals) {
+  const counts = new Map();
+  for (const literal of literals) {
+    counts.set(literal, (counts.get(literal) ?? 0) + 1);
+  }
+  return counts;
 }
 
 export function assertionLiterals(source) {
@@ -267,6 +277,10 @@ function selfTest() {
   const weaker = 'expect(html).toContain("Show therapists");\n';
   if (guardWeakenReason(kept, weaker) == null) {
     throw new Error("self-test: replaced assertion was allowed");
+  }
+  const twice = `${kept}${kept}`;
+  if (guardWeakenReason(twice, `${kept}${weaker}`) == null) {
+    throw new Error("self-test: one of two identical assertions was dropped");
   }
   if (guardWeakenReason(kept, `${kept}expect(html).toContain("also");\n`) != null) {
     throw new Error("self-test: an added assertion was rejected");
