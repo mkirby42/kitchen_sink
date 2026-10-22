@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 import { TherapistCard } from "@/components/search/TherapistCard";
-import { credentialTitle, yearsPracticing } from "@/lib/therapists/display";
+import { credentialTitle } from "@/lib/therapists/display";
 import {
   ADMIN_ONLY_HIDDEN_LABEL,
   DRAFT_PROFILE_LABEL,
@@ -47,11 +47,6 @@ function phone(html: string) {
   return html.slice(start, end === -1 ? undefined : end);
 }
 
-function desk(html: string) {
-  const start = html.indexOf('data-find-card="desk"');
-  return html.slice(start);
-}
-
 function render(
   overrides: Partial<SearchRow> = {},
   filterOverrides: Partial<SearchFilters> = {},
@@ -72,9 +67,6 @@ describe("Find therapist card", () => {
     expect(html).toContain("LMFT");
     expect(html).toContain("Virtual");
     expect(phone(html)).toContain("Get to know Maya");
-    expect(desk(html)).toContain(
-      `${yearsPracticing("2017-01-01")} years in practice`,
-    );
     expect(phone(html)).not.toContain("in practice");
     expect(html).not.toContain("yrs");
     expect(html).not.toContain("Book free consult");
@@ -92,7 +84,7 @@ describe("Find therapist card", () => {
     expect(html).not.toContain("Sliding scale");
   });
 
-  it("lists only specialties and insurance that match the filters", () => {
+  it("keeps specialty and insurance chips off the phone card", () => {
     const html = render(
       {
         specialty_labels: ["Anxiety", "Trauma & PTSD"],
@@ -102,13 +94,7 @@ describe("Find therapist card", () => {
       },
       { tags: ["Anxiety", "Depression", "Aetna"] },
     );
-    const wide = desk(html);
-    expect(wide).toContain("Can help with");
-    expect(wide).toContain("Worry, stress or panic");
-    expect(wide).toContain("Something hard happened");
-    expect(wide).toContain("Aetna");
-    expect(wide).toContain("Cigna");
-    expect(wide).not.toContain("2 of 3 tags");
+    expect(html).not.toContain("Can help with");
     const narrow = phone(html);
     expect(narrow).toContain(">Virtual<");
     expect(narrow).not.toContain("In-Person");
@@ -119,7 +105,7 @@ describe("Find therapist card", () => {
     expect(html).not.toContain("border-clay bg-clay");
   });
 
-  it("shows a stored Teens specialty as Self Discovery", () => {
+  it("does not put a stored Teens specialty on the phone card", () => {
     const html = render(
       {
         specialty_labels: ["Teens"],
@@ -128,9 +114,7 @@ describe("Find therapist card", () => {
       },
       { tags: ["Self Discovery"] },
     );
-    expect(desk(html)).toContain("Self discovery");
-    expect(desk(html)).toContain("Can help with");
-    expect(desk(html)).not.toContain("1 of 1 tag");
+    expect(html).not.toContain("Can help with");
     expect(phone(html)).not.toContain("Self Discovery");
     expect(phone(html)).not.toContain("1 of 1 tag");
     expect(html).not.toContain("Teens");
@@ -145,10 +129,8 @@ describe("Find therapist card", () => {
     expect(phone(html)).toContain(">Virtual<");
     expect(phone(html)).not.toContain("Worry, stress or panic");
     expect(phone(html)).not.toContain(">Aetna<");
-    expect(desk(html)).toContain("Online");
-    expect(desk(html)).toContain("Worry, stress or panic");
-    expect(desk(html)).toContain("Aetna");
-    expect(desk(html)).not.toContain(">Anxiety<");
+    expect(phone(html)).not.toContain("Can help with");
+    expect(html).not.toContain("Worry, stress or panic");
   });
 
   it("badges an unlisted profile and leaves listed cards unmarked", () => {
@@ -229,12 +211,7 @@ describe("Find therapist card", () => {
     expect(promptAt).toBeGreaterThan(-1);
     expect(answerAt).toBeGreaterThan(promptAt);
     expect(ctaAt).toBeGreaterThan(answerAt);
-    const widePeek = desk(withCard);
-    expect(widePeek).toContain("I WORK BEST WITH...");
-    expect(widePeek).not.toContain("who I work best with...");
-    expect(widePeek).toContain(promptAnswerClass);
-    expect(widePeek).not.toContain("✦");
-    expect(widePeek).not.toContain("“");
+    expect(withCard).not.toContain("I WORK BEST WITH...");
 
     const blank = render({
       card_prompt: "   ",
@@ -243,7 +220,7 @@ describe("Find therapist card", () => {
     expect(blank).not.toContain("unused");
   });
 
-  it("styles the desktop card like the wide mock and keeps the phone card", () => {
+  it("keeps the phone card beside the intro and the conversation answer", () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     const html = render(
       {
@@ -263,47 +240,9 @@ describe("Find therapist card", () => {
       },
       { tags: ["Anxiety"] },
     );
-    const wide = desk(html);
-    expect(wide).toContain("Dr. Travis White");
-    expect(wide).toContain("PsyD · Licensed psychologist");
-    expect(wide).toContain("years in practice");
-    expect(wide).not.toContain("yrs");
-    expect(wide).toContain("Watch intro");
-    expect(wide).toContain('aria-label="Watch intro for Travis"');
-    expect(wide).not.toContain("0:30");
-    expect(wide).toContain("Get to know Travis");
-    expect(wide).toContain("→");
-    expect(wide).toContain("I WORK BEST WITH...");
-    expect(wide).not.toContain("who I work best with...");
-    expect(wide).toContain("I help college students find their way.");
-    expect(wide).toContain(promptAnswerClass);
-    expect(wide).not.toContain("✦");
-    expect(wide).not.toContain("“");
-    expect(wide).toContain("object-cover");
-    expect(wide).not.toContain("1 of 1 tag");
-    expect(wide).not.toContain("intro.mp4");
-    expect(wide).not.toContain("<video");
-    expect(wide).not.toContain("Book free consult");
-    expect(wide).not.toContain("Next opening");
-    const topics = wide.slice(wide.indexOf("data-find-topics"));
-    expect(topics).toContain("Worry, stress or panic");
-    expect(topics).toContain("Something hard happened");
-    expect(topics).toContain("Aetna");
-    const formats = wide.slice(
-      wide.indexOf("data-find-formats"),
-      wide.indexOf("I WORK BEST WITH..."),
-    );
-    expect(formats).toContain("In person · Online");
-    expect(formats).not.toContain("Virtual");
-    expect(formats).not.toContain("In-Person");
-    const watch = wide.indexOf("Watch intro");
-    const link = wide.indexOf("<a ");
-    expect(watch).toBeGreaterThan(-1);
-    expect(link).toBeGreaterThan(watch);
-    expect(wide.slice(0, link)).not.toContain("<a ");
-    expect(wide).toContain(
-      'href="/t/11111111-1111-4111-8111-111111111111?tags=Anxiety"',
-    );
+    expect(html).not.toContain("Can help with");
+    expect(html).not.toContain("I WORK BEST WITH...");
+    expect(html).not.toContain("Watch intro");
 
     const narrow = phone(html);
     expect(narrow).toContain('aria-label="Play intro video for Dr. Travis White"');
@@ -342,7 +281,6 @@ describe("Find therapist card", () => {
       video_key: "maya/intro.mp4",
     });
     const narrow = phone(html);
-    const wide = desk(html);
     const still = "/object/public/videos/maya/intro.mp4#t=0.1";
 
     expect(narrow).toContain("data-video-still");
@@ -356,61 +294,7 @@ describe("Find therapist card", () => {
     expect(narrow).not.toContain("autoplay");
     expect(narrow).not.toMatch(/<video[^>]*\scontrols[\s=]/);
     expect(narrow).toContain("Get to know Maya");
-
-    expect(wide).toContain("data-video-still");
-    expect(wide).toContain(still);
-    expect(wide).toContain("Watch intro");
-    expect(wide).toContain('aria-label="Watch intro for Maya"');
-    expect(wide).toContain("object-cover");
-    expect(wide).not.toContain(">MC<");
-    expect(wide).not.toContain("<img");
-    expect(wide).not.toContain("autoplay");
-    expect(wide).not.toMatch(/<video[^>]*\scontrols[\s=]/);
-  });
-
-  it("drops the desktop portrait when there is no photo or video", () => {
-    const wide = desk(render({ photo_key: null, video_key: null }));
-    expect(wide).not.toContain("Watch Maya's intro");
-    expect(wide).not.toContain("object-cover");
-    expect(wide).toContain("Get to know Maya");
-    expect(wide).toContain("rounded-full");
-    expect(wide).toContain("LMFT · Licensed marriage and family therapist");
-  });
-
-  it("keeps a different conversation prompt on the desktop card", () => {
-    const wide = desk(
-      render({
-        card_prompt: "my approach to therapy is...",
-        card_answer: "Slow and practical.",
-      }),
-    );
-    expect(wide).toContain("my approach to therapy is...");
-    expect(wide).toContain("Slow and practical.");
-    expect(wide).not.toContain("I WORK BEST WITH...");
-  });
-
-  it("shows the filtered license state and hides it when no state is selected", () => {
-    expect(desk(render({}, { state: "TX" }))).toContain("Licensed in Texas");
-    expect(desk(render())).not.toContain("Licensed in");
-  });
-
-  it("omits years when the practice start date is missing", () => {
-    const wide = desk(render({ start_date_of_practice: null, credential: "PsyD" }));
-    expect(wide).toContain("PsyD · Licensed psychologist");
-    expect(wide).not.toContain("in practice");
-  });
-
-  it("shows a desktop photo without a watch pill when there is no intro video", () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
-    const wide = desk(
-      render({ photo_key: "maya/photo.jpg", video_key: null, credential: "PhD" }),
-    );
-    expect(wide).toContain("object-cover");
-    expect(wide).toContain("/object/public/photos/maya/photo.jpg");
-    expect(wide).not.toContain("Watch Maya's intro");
-    expect(wide).toContain("PhD");
-    expect(wide).not.toContain("Licensed psychologist");
-    expect(wide).not.toContain("Licensed Psychologist");
+    expect(html).not.toContain("Watch intro");
   });
 });
 
