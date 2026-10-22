@@ -97,18 +97,20 @@ export function FindDesktopDetail({
               ) : null}
               {detail.book ? (
                 <FindConsultLink
-                  href={detail.book.href}
                   therapistId={detail.id}
                   cta={detail.book.cta}
                   label="Book a session"
                   tone="paper"
+                  name={detail.name}
+                  contact={detail.contact}
                 />
               ) : null}
               {detail.consult ? (
                 <FindConsultLink
-                  href={detail.consult.href}
                   therapistId={detail.id}
                   cta={detail.consult.cta}
+                  name={detail.name}
+                  contact={detail.contact}
                 />
               ) : null}
             </div>
