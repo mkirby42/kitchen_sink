@@ -86,7 +86,11 @@ export function PhoneFind({
               {rows.map((row) => (
                 <li key={row.profile_id}>
                   <Card className="overflow-hidden p-0">
-                    <TherapistCardPhone row={row} filters={filters} />
+                    <TherapistCardPhone
+                      row={row}
+                      filters={filters}
+                      cards={extras.find((extra) => extra.id === row.profile_id)?.cards}
+                    />
                   </Card>
                 </li>
               ))}

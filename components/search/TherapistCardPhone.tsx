@@ -1,10 +1,10 @@
 import { FindCardLink } from "@/components/analytics/FindCardLink";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
-import { VideoStill } from "@/components/ui/VideoStill";
+import { PhoneListPortrait } from "@/components/search/PhoneListPortrait";
 import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 import { buildTherapistHref } from "@/components/search/query";
 import { metaLineClass } from "@/components/ui/styles";
-import { phoneListFacts } from "@/lib/search/phone-find";
+import { phoneListFacts, type StackCard } from "@/lib/search/phone-find";
 import { desktopFormatBadge } from "@/lib/search/find-desktop";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
@@ -23,12 +23,26 @@ function cardInitials(name: string) {
 export function TherapistCardPhone({
   row,
   filters,
+  cards,
 }: {
   row: SearchRow;
   filters: SearchFilters;
+  /** Conversation cards already loaded for the phone stack. */
+  cards?: readonly StackCard[];
 }) {
   const photoUrl = storagePublicUrl("photos", row.photo_key);
   const videoUrl = storagePublicUrl("videos", row.video_key);
+  if (photoUrl || videoUrl) {
+    return (
+      <PhoneListPortrait
+        row={row}
+        filters={filters}
+        cards={cards}
+        photoUrl={photoUrl}
+        videoUrl={videoUrl}
+      />
+    );
+  }
   const prompt = row.card_prompt?.trim() ?? "";
   const answer = row.card_answer?.trim() ?? "";
   const showCard = Boolean(prompt && answer);
@@ -48,34 +62,12 @@ export function TherapistCardPhone({
       className="flex gap-3 p-3 md:hidden"
     >
       <span className="relative size-[4.5rem] shrink-0 overflow-hidden rounded-2xl bg-heading">
-        {photoUrl ? (
-          // Public Storage URLs; next/image is out of scope this weekend.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={photoUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
-          />
-        ) : videoUrl ? (
-          <VideoStill src={videoUrl} />
-        ) : (
-          <span
-            aria-hidden
-            className="absolute inset-0 flex items-center justify-center font-sans text-lg font-medium text-white"
-          >
-            {mark}
-          </span>
-        )}
-        {videoUrl ? (
-          <span
-            aria-hidden
-            className="absolute right-1 bottom-1 flex size-6 items-center justify-center rounded-full bg-paper text-ink shadow-card"
-          >
-            <svg viewBox="0 0 24 24" className="ml-0.5 h-3 w-3 fill-current">
-              <path d="M9 7.2v9.6l8.2-4.8L9 7.2z" />
-            </svg>
-          </span>
-        ) : null}
+        <span
+          aria-hidden
+          className="absolute inset-0 flex items-center justify-center font-sans text-lg font-medium text-white"
+        >
+          {mark}
+        </span>
       </span>
       <span className="min-w-0 flex-1">
         {format ? (

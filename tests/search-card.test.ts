@@ -49,11 +49,13 @@ function phone(html: string) {
 function render(
   overrides: Partial<SearchRow> = {},
   filterOverrides: Partial<SearchFilters> = {},
+  cards?: { prompt: string; answer: string }[],
 ) {
   return renderToStaticMarkup(
     createElement(TherapistCard, {
       row: row(overrides),
       filters: { ...filters, ...filterOverrides },
+      cards,
     }),
   );
 }
@@ -139,23 +141,31 @@ describe("Find therapist card", () => {
   });
 
   it("badges an unlisted profile and leaves listed cards unmarked", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     expect(render({ listed: false })).toContain(ADMIN_ONLY_HIDDEN_LABEL);
+    expect(render({ listed: false, photo_key: "maya/photo.jpg" })).toContain(
+      ADMIN_ONLY_HIDDEN_LABEL,
+    );
     expect(render()).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
     expect(render({ listed: true })).not.toContain(ADMIN_ONLY_HIDDEN_LABEL);
     expect(render({ published: false })).toContain(DRAFT_PROFILE_LABEL);
+    expect(render({ published: false, photo_key: "maya/photo.jpg" })).toContain(
+      DRAFT_PROFILE_LABEL,
+    );
     expect(render({ published: true })).not.toContain(DRAFT_PROFILE_LABEL);
   });
 
-  it("keeps a square photo and no play control when there is no intro video", () => {
+  it("fills a 4:5 frame with the photo and no play control when there is no intro video", () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     const html = render({ photo_key: "maya/photo.jpg", video_key: null });
     const narrow = phone(html);
-    expect(narrow).toContain("size-[4.5rem]");
-    expect(narrow).not.toContain("aspect-[4/5]");
+    expect(narrow).toContain("aspect-[4/5]");
     expect(narrow).toContain("object-cover");
+    expect(narrow).not.toContain("size-[4.5rem]");
     expect(narrow).toContain("/object/public/photos/maya/photo.jpg");
     expect(narrow).not.toContain("Play intro video");
     expect(narrow).not.toContain("<video");
+    expect(narrow).not.toContain("0:30");
     expect(narrow).not.toMatch(/<img[^>]*rounded-full/);
     expect(narrow).toContain('aria-label="Get to know Maya"');
     expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
@@ -163,23 +173,24 @@ describe("Find therapist card", () => {
     expect(html).not.toContain("sm:flex-row");
   });
 
-  it("shows a poster and play badge without loading the video file", () => {
+  it("shows a 4:5 poster and centered play control without loading the video file", () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     const html = render({
       photo_key: "maya/photo.jpg",
       video_key: "maya/intro.mp4",
     });
     const narrow = phone(html);
-    expect(narrow).toContain("size-[4.5rem]");
+    expect(narrow).toContain("aspect-[4/5]");
     expect(narrow).toContain("object-cover");
-    expect(narrow).not.toContain("aspect-[4/5]");
+    expect(narrow).not.toContain("size-[4.5rem]");
     expect(narrow).toContain("/object/public/photos/maya/photo.jpg");
     expect(narrow).not.toContain("intro.mp4");
     expect(narrow).not.toContain("<video");
     expect(narrow).not.toContain("autoPlay");
     expect(narrow).not.toContain("autoplay");
-    expect(narrow).not.toContain("Play intro video");
+    expect(narrow).toContain('aria-label="Play intro video for Maya Chen"');
     expect(narrow).toContain('aria-label="Get to know Maya"');
+    expect(narrow).not.toContain("0:30");
     expect(narrow).not.toContain("→");
     expect(html).toContain('href="/t/11111111-1111-4111-8111-111111111111"');
     expect(html).toContain("rounded-card");
@@ -241,26 +252,30 @@ describe("Find therapist card", () => {
     expect(html).not.toContain("Can help with");
     expect(html).not.toContain("I WORK BEST WITH...");
     expect(html).not.toContain("Watch intro");
+    expect(html).not.toContain("0:30");
 
     const narrow = phone(html);
     expect(narrow).toContain('aria-label="Get to know Travis"');
-    expect(narrow).not.toContain("Play intro video");
-    expect(narrow).toContain("size-[4.5rem]");
+    expect(narrow).toContain('aria-label="Play intro video for Dr. Travis White"');
+    expect(narrow).toContain("aspect-[4/5]");
     expect(narrow).toContain("object-cover");
-    expect(narrow).not.toContain("aspect-[4/5]");
+    expect(narrow).not.toContain("size-[4.5rem]");
+    expect(narrow).not.toContain("intro.mp4");
     expect(narrow).toContain("PsyD · Licensed psychologist");
     expect(narrow).not.toContain("Licensed Psychologist");
-    expect(narrow).toContain(`${yearsPracticing("2017-01-01")} yrs`);
-    expect(narrow).toContain("Takes Aetna");
+    expect(narrow).not.toContain(" yrs");
+    expect(narrow).not.toContain("Takes Aetna");
     expect(narrow).not.toContain("Watch Travis");
     expect(narrow).not.toContain("→");
-    expect(narrow).toContain("who I work best with...");
+    expect(narrow).toContain("I work best with...");
+    expect(narrow).not.toContain("who I work best with...");
     expect(narrow).toContain("I help college students find their way.");
+    expect(narrow).toContain("font-display");
     expect(narrow).not.toContain("1 of 1 tag");
     expect(narrow).not.toContain(">Anxiety<");
     const phoneFormats = narrow.slice(
       narrow.indexOf("data-find-formats"),
-      narrow.indexOf("who I work best with..."),
+      narrow.indexOf("I work best with..."),
     );
     expect(phoneFormats).toContain("In person · Online");
     expect(phoneFormats).not.toContain("Virtual");
@@ -269,7 +284,32 @@ describe("Find therapist card", () => {
     );
   });
 
-  it("uses a video frame instead of initials when there is no photo", () => {
+  it("uses the saved who-I-work-best-with card when it is not the first prompt", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    const html = phone(
+      render(
+        {
+          photo_key: "maya/photo.jpg",
+          card_prompt: "my approach to therapy is...",
+          card_answer: "Collaborative.",
+        },
+        {},
+        [
+          { prompt: "my approach to therapy is...", answer: "Collaborative." },
+          {
+            prompt: "who I work best with...",
+            answer: "College students finding their way.",
+          },
+        ],
+      ),
+    );
+    expect(html).toContain("I work best with...");
+    expect(html).toContain("College students finding their way.");
+    expect(html).not.toContain("Collaborative.");
+    expect(html).not.toContain("my approach to therapy is...");
+  });
+
+  it("uses a 4:5 video frame instead of initials when there is no photo", () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     const html = render({
       photo_key: null,
@@ -281,13 +321,14 @@ describe("Find therapist card", () => {
     expect(narrow).toContain("data-video-still");
     expect(narrow).toContain(still);
     expect(narrow).toContain('preload="metadata"');
-    expect(narrow).toContain("size-[4.5rem]");
-    expect(narrow).not.toContain("aspect-[4/5]");
+    expect(narrow).toContain("aspect-[4/5]");
+    expect(narrow).not.toContain("size-[4.5rem]");
     expect(narrow).toContain("object-cover");
-    expect(narrow).not.toContain('aria-label="Play intro video for Maya Chen"');
+    expect(narrow).toContain('aria-label="Play intro video for Maya Chen"');
     expect(narrow).not.toContain(">MC<");
     expect(narrow).not.toContain("<img");
     expect(narrow).not.toContain("autoplay");
+    expect(narrow).not.toContain("0:30");
     expect(narrow).not.toMatch(/<video[^>]*\scontrols[\s=]/);
     expect(narrow).toContain('aria-label="Get to know Maya"');
     expect(html).not.toContain("Watch intro");
