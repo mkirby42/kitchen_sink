@@ -9,7 +9,11 @@ import { filtersFromSearchParams } from "@/components/search/query";
 import { Card } from "@/components/ui/Card";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { pageTitleClass } from "@/components/ui/styles";
-import { therapistsFitLabel, type PhoneSheet } from "@/lib/search/phone-find";
+import {
+  therapistsFitLabel,
+  type PhoneSheet,
+  type StackCard,
+} from "@/lib/search/phone-find";
 import { phoneBrowseKey } from "@/lib/search/phone-browse";
 import type { PhoneStackBooking } from "@/lib/search/phone-stack";
 import type { SearchRow } from "@/lib/search/rpc";
@@ -18,11 +22,14 @@ export function PhoneFind({
   rows,
   booking,
   slides,
+  listCards,
 }: {
   rows: SearchRow[] | null;
   booking: PhoneStackBooking[];
   /** Phone profile columns, one per row, same order. */
   slides: ReactNode;
+  /** Conversation cards per row, same order. The list portrait prefers who-I-work-best-with. */
+  listCards?: readonly (readonly StackCard[] | undefined)[];
 }) {
   const filters = filtersFromSearchParams(useSearchParams());
   const [mode, setMode] = useState<"list" | "one">("list");
@@ -87,10 +94,14 @@ export function PhoneFind({
             </Card>
           ) : (
             <ul data-phone-list="" className="mt-4 space-y-3">
-              {rows.map((row) => (
+              {rows.map((row, index) => (
                 <li key={row.profile_id}>
                   <Card className="overflow-hidden p-0">
-                    <TherapistCardPhone row={row} filters={filters} />
+                    <TherapistCardPhone
+                      row={row}
+                      filters={filters}
+                      cards={listCards?.[index]}
+                    />
                   </Card>
                 </li>
               ))}

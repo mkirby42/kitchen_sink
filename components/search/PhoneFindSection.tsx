@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { PhoneProfileColumn } from "@/components/profile/PhoneProfileColumn";
 import { PhoneFind } from "@/components/search/PhoneFind";
 import { presentProfileData, presentReviewViewer, type SiteAudience } from "@/lib/audience";
+import type { StackCard } from "@/lib/search/phone-find";
 import type { PhoneStackBooking } from "@/lib/search/phone-stack";
 import type { SearchRow } from "@/lib/search/rpc";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
@@ -23,10 +24,12 @@ export async function PhoneFindSection({
       };
 
   const booking: PhoneStackBooking[] = [];
+  const listCards: (readonly StackCard[] | undefined)[] = [];
   const slides = (rows ?? []).map((row, index) => {
     const data = loaded.profiles[index] ?? null;
     if (!data) {
       booking.push(null);
+      listCards.push(undefined);
       return (
         <p
           key={row.profile_id}
@@ -48,6 +51,7 @@ export async function PhoneFindSection({
       actions: consultBookActions(presented.contact),
       contact: presented.contact,
     });
+    listCards.push(presented.cards);
     return (
       <PhoneProfileColumn
         key={presented.id}
@@ -60,7 +64,12 @@ export async function PhoneFindSection({
 
   return (
     <Suspense fallback={null}>
-      <PhoneFind rows={rows} booking={booking} slides={slides} />
+      <PhoneFind
+        rows={rows}
+        booking={booking}
+        slides={slides}
+        listCards={listCards}
+      />
     </Suspense>
   );
 }

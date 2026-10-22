@@ -5,6 +5,7 @@ import {
   matchSlot,
   phoneBookAction,
   phoneListFacts,
+  phoneListQuote,
   phonePills,
   stackCards,
   swipeForLabel,
@@ -96,6 +97,35 @@ describe("phone find copy", () => {
       inPerson: false,
       state: "TX",
     });
+  });
+
+  it("prefers the who-I-work-best-with answer for the list portrait", () => {
+    expect(phoneListQuote(row())).toEqual({
+      label: "I work best with...",
+      answer: "College students.",
+    });
+    expect(
+      phoneListQuote(row({ card_prompt: "I work best with...", card_answer: "Grads." })),
+    ).toEqual({ label: "I work best with...", answer: "Grads." });
+    expect(
+      phoneListQuote(
+        row({
+          card_prompt: "my approach to therapy is...",
+          card_answer: "Collaborative.",
+        }),
+        [
+          { prompt: "my approach to therapy is...", answer: "Collaborative." },
+          { prompt: " who I work best with... ", answer: " Students. " },
+        ],
+      ),
+    ).toEqual({ label: "I work best with...", answer: "Students." });
+    expect(
+      phoneListQuote(
+        row({ card_prompt: "a session with me feels like...", card_answer: "Easy." }),
+        [{ prompt: "a session with me feels like...", answer: "Easy." }],
+      ),
+    ).toEqual({ label: "a session with me feels like...", answer: "Easy." });
+    expect(phoneListQuote(row({ card_prompt: " ", card_answer: "nope" }))).toBeNull();
   });
 
   it("shows stored facts and skips a missing year or plan", () => {

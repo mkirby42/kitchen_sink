@@ -178,6 +178,31 @@ describe("phone Find list", () => {
     expect(html).not.toContain("0:30");
   });
 
+  it("uses the loaded who-I-work-best-with card on the media list card", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    const html = renderToStaticMarkup(
+      createElement(PhoneFind, {
+        rows: [travis],
+        booking: [],
+        slides: null,
+        listCards: [
+          [
+            { prompt: "my approach to therapy is...", answer: "Collaborative." },
+            {
+              prompt: "who I work best with...",
+              answer: "College students finding their way.",
+            },
+          ],
+        ],
+      }),
+    );
+    expect(html).toContain("aspect-[4/5]");
+    expect(html).toContain("I work best with...");
+    expect(html).toContain("College students finding their way.");
+    expect(html).not.toContain("Collaborative.");
+    expect(html).not.toContain("my approach to therapy is...");
+  });
+
   it("does not call a failed search zero matches", () => {
     const html = renderToStaticMarkup(
       createElement(PhoneFind, { rows: null, booking: [], slides: null }),

@@ -98,6 +98,40 @@ export function takesPlans(labels: readonly string[], filters: SearchFilters) {
   return desktopInsuranceLabels(source);
 }
 
+const WORK_BEST = /work best with/i;
+
+/** Mockup label. Stored prompts are “who I work best with...” or “I work best with...”. */
+export const PHONE_LIST_WORK_BEST_LABEL = "I work best with...";
+
+/**
+ * Quote under the phone list portrait. Prefer the saved who-I-work-best-with
+ * card (loaded profile cards, or the one already on the search row). Otherwise
+ * the first conversation card. Null when nothing is saved.
+ */
+export function phoneListQuote(
+  row: Pick<SearchRow, "card_prompt" | "card_answer">,
+  cards?: readonly { prompt: string; answer: string }[],
+) {
+  const saved = (cards ?? [])
+    .map((card) => ({
+      prompt: card.prompt.trim(),
+      answer: card.answer.trim(),
+    }))
+    .filter((card) => card.prompt && card.answer);
+  const prompt = row.card_prompt?.trim() ?? "";
+  const answer = row.card_answer?.trim() ?? "";
+  const fromRow = prompt && answer ? { prompt, answer } : null;
+  const best =
+    saved.find((card) => WORK_BEST.test(card.prompt)) ??
+    (fromRow && WORK_BEST.test(fromRow.prompt) ? fromRow : null);
+  const chosen = best ?? saved[0] ?? fromRow;
+  if (!chosen) return null;
+  return {
+    label: WORK_BEST.test(chosen.prompt) ? PHONE_LIST_WORK_BEST_LABEL : chosen.prompt,
+    answer: chosen.answer,
+  };
+}
+
 export function phoneListFacts(
   row: Pick<SearchRow, "insurance_labels" | "start_date_of_practice">,
   filters: SearchFilters,
