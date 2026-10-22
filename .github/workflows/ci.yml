@@ -4,17 +4,61 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 env:
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
   NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
 jobs:
-  check:
+  product-guards:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Refuse quiet edits to product decisions
+        env:
+          PRODUCT_GUARD_BASE: ${{ github.event.pull_request.base.sha }}
+          PRODUCT_GUARD_HEAD: ${{ github.sha }}
+          PRODUCT_GUARD_APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'product-decision-approved') }}
+          GITHUB_EVENT_NAME: pull_request
+        run: |
+          base="$PRODUCT_GUARD_BASE"
+          if git cat-file -e "${base}:scripts/check-product-guards.mjs" 2>/dev/null; then
+            git show "${base}:scripts/check-product-guards.mjs" > /tmp/check-product-guards.mjs
+          else
+            cp scripts/check-product-guards.mjs /tmp/check-product-guards.mjs
+          fi
+          node /tmp/check-product-guards.mjs
+
+  check:
+    runs-on: ubuntu-latest
+    env:
+      PRODUCT_GUARD_BASE: ${{ github.event.pull_request.base.sha }}
+      PRODUCT_GUARD_HEAD: ${{ github.sha }}
+      PRODUCT_GUARD_APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'product-decision-approved') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Refuse quiet edits to product decisions
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_EVENT_NAME: pull_request
+        run: |
+          base="$PRODUCT_GUARD_BASE"
+          if git cat-file -e "${base}:scripts/check-product-guards.mjs" 2>/dev/null; then
+            git show "${base}:scripts/check-product-guards.mjs" > /tmp/check-product-guards.mjs
+          else
+            cp scripts/check-product-guards.mjs /tmp/check-product-guards.mjs
+          fi
+          node /tmp/check-product-guards.mjs
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -39,3 +83,17 @@ jobs:
             exit 1
           fi
           curl -fsS -X POST "$VERCEL_DEPLOY_HOOK"
+
+  release:
+    needs: deploy
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag the deploy and publish a GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: node scripts/tag-release.mjs
