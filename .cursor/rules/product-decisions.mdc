@@ -1,0 +1,13 @@
+---
+description: Lock Christine's live product decisions. Do not rewrite guard tests to pass CI.
+alwaysApply: true
+---
+
+# Product decisions
+
+Read `docs/product-decisions.md` before changing Find, the therapist profile, the homepage, the header, join copy, or the referral board.
+
+- The checks in `tests/guards/` stay. Do not delete, skip, or rewrite one so CI goes green.
+- Do not edit `docs/product-decisions.md` to drop or reword a live ask.
+- If the task conflicts with a registered ask, stop. Say which ask in the PR description. Wait for the `product-decision-approved` label.
+- Pending decisions and already-replaced asks in that file are not bugs. Do not build them back.

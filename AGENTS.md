@@ -24,6 +24,12 @@ Short. No essays. Update REQUIREMENTS when behavior changes.
 
 Commit when asked. Repo: `mkirby42/kitchen_sink`, not the org. Never commit `.env` or the service role key.
 
+## Product decisions
+
+Live asks are in [docs/product-decisions.md](docs/product-decisions.md). The tests in `tests/guards/` lock them.
+
+Never delete, skip, or rewrite a guard test to make CI pass. Never edit the registry to drop an ask. If a new ask conflicts with a registered one, stop. Name the conflict in the PR description and wait for the `product-decision-approved` label. Do not restore a pending or already-replaced ask.
+
 ## Next.js 16
 
 Request interceptor file is `proxy.ts`, not `middleware.ts`. Do not re-enable `agentRules` in `next.config.ts` — it overwrites this file.
