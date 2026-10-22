@@ -16,7 +16,7 @@ import {
 import { narrowSearchRows } from "@/lib/audience";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
-import { buildFindDetail } from "@/lib/search/find-grid";
+import { buildFindDetail } from "@/lib/search/find-detail";
 import {
   parseFindSearchParams,
   searchTherapists,

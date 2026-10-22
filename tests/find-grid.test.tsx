@@ -5,13 +5,15 @@ import { FindDesktopResults } from "@/components/search/FindDesktopResults";
 import {
   buildFindDetail,
   detailConsult,
+  splitDetailCards,
+  type FindDetailProfile,
+} from "@/lib/search/find-detail";
+import {
   gridFitLine,
   gridShowMoreLabel,
   gridVisibleCount,
   gridYearsLabel,
-  splitDetailCards,
   takesInsuranceLine,
-  type FindDetailProfile,
 } from "@/lib/search/find-grid";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import { yearsPracticing } from "@/lib/therapists/display";
@@ -281,10 +283,103 @@ describe("desktop find profile", () => {
     expect(html).toContain("Out-of-network superbill");
     expect(html).toContain("Paying yourself? Get reimbursed later");
     expect(html).toContain("Book a free 15-min consult");
+    expect(html).toContain("Book a session");
     expect(html).toContain("mailto:travis@example.com");
+    expect(html).toContain("tel:+15125542231");
     expect(html).toContain("All matches");
     expect(html).not.toContain("$");
+    expect(html).not.toContain("Cash pay");
+    expect(html).not.toContain("Areas of interest");
+    expect(html).not.toContain(">Fees<");
+    expect(html).not.toContain(">Identity<");
     expect(html).not.toContain("You might click with me if");
+  });
+
+  it("shows every public intake answer that was saved and skips the empty ones", () => {
+    const rows = [row(1, { name: "Travis White", insurance_labels: ["Cash Pay Only"] })];
+    const detail = buildFindDetail({
+      row: rows[0],
+      profile: profile({
+        insurance: ["Cash Pay Only"],
+        superbill: false,
+        licenses: [{ state: "TX", number: "38047" }],
+        credentials: ["EMDR trained"],
+        education: ["M.A. Counseling Psychology"],
+        specialties: ["Life Transitions"],
+        modalities: ["CBT"],
+        identity: ["BIPOC", "LGBTQ+"],
+        rates: [
+          { service_type: "Individual", duration_minutes: 50, price_cents: 15000 },
+        ],
+        slidingScale: true,
+        office: {
+          address: "1102 West 6th Street",
+          address2: null,
+          state: "TX",
+          zip: "78703",
+        },
+        about: "I sit with people while they sort out a next step.",
+        voiceUrl: "https://example.com/voice.mp3",
+        voicePrompt: "Why I do this work",
+        reviews: [
+          {
+            id: "review-1",
+            stars: 5,
+            understood: 5,
+            communication: 5,
+            fit: 5,
+            body: "Steady and direct.",
+            session_format: null,
+            duration_label: null,
+            reviewer_name: "Alex",
+            anonymous: false,
+            created_at: "2026-01-02T00:00:00Z",
+            mine: false,
+            status: "approved",
+          },
+        ],
+      }),
+      filterState: "TX",
+      now: new Date("2026-10-22T12:00:00Z"),
+    });
+    const html = renderToStaticMarkup(
+      createElement(FindDesktopResults, {
+        rows,
+        filters: { tags: [], virtual: false, inPerson: false, state: "TX" },
+        view: { layout: "grid", more: 0, therapistId: id },
+        detail,
+      }),
+    );
+    expect(html).toContain("PsyD · Licensed psychologist · EMDR trained");
+    expect(html).toContain("Licensed in Texas (#38047)");
+    expect(html).toContain("Cash pay");
+    expect(html).not.toContain("Out-of-network superbill");
+    expect(html).toContain("1102 West 6th Street");
+    expect(html).toContain("TX 78703");
+    expect(html).toContain("Areas of interest");
+    expect(html).toContain("Life transitions");
+    expect(html).toContain("Approach in therapy");
+    expect(html).toContain("Cognitive behavioral therapy (CBT)");
+    expect(html).toContain(">Identity<");
+    expect(html).toContain("BIPOC");
+    expect(html).toContain("LGBTQ+");
+    expect(html).toContain("Education");
+    expect(html).toContain("M.A. Counseling Psychology");
+    expect(html).toContain(">Fees<");
+    expect(html).toContain("Individual session (50 min)");
+    expect(html).toContain("$150");
+    expect(html).toContain("Sliding scale");
+    expect(html).toContain("Available");
+    expect(html).toContain("Why I do this work");
+    expect(html).toContain("Play voice prompt for Travis White");
+    expect(html).toContain("In Travis");
+    expect(html).toContain("I sit with people while they sort out a next step.");
+    expect(html).toContain(">Reviews<");
+    expect(html).toContain("Steady and direct.");
+    expect(html).toContain("Alex");
+    expect(html).not.toContain("None listed");
+    expect(html).not.toContain("No reviews yet");
+    expect(html).not.toContain("travis@example.com</");
   });
 
   it("omits years, the consult, the intro, and a license the row does not have", () => {
@@ -326,5 +421,14 @@ describe("desktop find profile", () => {
     expect(html).not.toContain("Out-of-network superbill");
     expect(html).not.toContain("I work best with...");
     expect(html).not.toContain("Second photo");
+    expect(html).not.toContain("Areas of interest");
+    expect(html).not.toContain(">Fees<");
+    expect(html).not.toContain(">Identity<");
+    expect(html).not.toContain(">Education<");
+    expect(html).not.toContain(">Reviews<");
+    expect(html).not.toContain("own words");
+    expect(html).not.toContain("Book a session");
+    expect(html).not.toContain("Cash pay");
+    expect(html).not.toContain("None listed");
   });
 });

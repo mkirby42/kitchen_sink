@@ -5,7 +5,8 @@ import { FindGrid } from "@/components/search/FindGrid";
 import { FindLayoutToggle } from "@/components/search/FindLayoutToggle";
 import { buildFindHref, type FindPageView } from "@/components/search/query";
 import { Card } from "@/components/ui/Card";
-import { gridFitLine, type FindDetailContent } from "@/lib/search/find-grid";
+import type { FindDetailContent } from "@/lib/search/find-detail";
+import { gridFitLine } from "@/lib/search/find-grid";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 
 export function FindDesktopResults({

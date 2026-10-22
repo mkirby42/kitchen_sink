@@ -236,6 +236,44 @@ export function hasSuperbill(labels: string[], flag: boolean) {
   );
 }
 
+const CASH_PAY_LABEL = "cash pay only";
+
+export function cashPayOffered(labels: readonly string[]) {
+  return labels.some((label) => label.toLowerCase() === CASH_PAY_LABEL);
+}
+
+export type PracticeFeeRow = { label: string; value: string };
+
+/** Payment rows that have an answer. Empty insurance is omitted. */
+export function practiceFeeRows(input: {
+  rates: readonly ProfileRate[];
+  sliding: string | null;
+  inNetwork: readonly string[];
+  cashPay: boolean;
+  superbill: boolean;
+}): PracticeFeeRow[] {
+  const rows: PracticeFeeRow[] = [];
+  for (const rate of input.rates) {
+    const price = formatUsdFromCents(rate.price_cents);
+    if (!price) continue;
+    rows.push({
+      label: `${rate.service_type} session (${rate.duration_minutes} min)`,
+      value: price,
+    });
+  }
+  if (input.sliding) {
+    rows.push({ label: "Sliding scale", value: input.sliding });
+  }
+  if (input.inNetwork.length > 0) {
+    rows.push({ label: "In-network", value: input.inNetwork.join(" · ") });
+  }
+  if (input.cashPay) rows.push({ label: "Cash pay", value: "Accepted" });
+  if (input.superbill) {
+    rows.push({ label: "Out-of-network", value: "Superbill provided" });
+  }
+  return rows;
+}
+
 export function reviewAverage(stars: number[]) {
   if (stars.length === 0) return null;
   const mean = stars.reduce((sum, n) => sum + n, 0) / stars.length;

@@ -162,8 +162,41 @@ describe("profile edit control", () => {
     expect(off).not.toContain("sliding scale available");
     expect(off).not.toContain("Cash pay fee");
     expect(off).not.toContain(">Insurance<");
-    expect(off).toContain("In-network");
-    expect(off).toContain("None listed");
+    expect(off).not.toContain("In-network");
+    expect(off).not.toContain("Out-of-network");
+    expect(off).not.toContain("None listed");
+    expect(off).not.toContain("Not listed");
+  });
+
+  it("shows identity and cash pay when saved, and skips them when empty", () => {
+    const html = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: {
+          ...data,
+          identity: ["BIPOC", "LGBTQ+"],
+          insurance: ["Cash Pay Only"],
+        },
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(html).toContain(">Identity<");
+    expect(html).toContain("BIPOC");
+    expect(html).toContain("LGBTQ+");
+    expect(html).toContain("Cash pay");
+    expect(html).toContain("Accepted");
+    expect(html).not.toContain("None listed");
+    expect(html).not.toContain("Not listed");
+
+    const empty = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data,
+        backHref: routes.find,
+        viewer: visitor,
+      }),
+    );
+    expect(empty).not.toContain(">Identity<");
+    expect(empty).not.toContain("Cash pay");
   });
 
   it("shows every custom rate label the same way as a preset", () => {
