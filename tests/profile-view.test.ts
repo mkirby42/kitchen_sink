@@ -4,10 +4,12 @@ import {
   profileOffice,
 } from "@/lib/therapists/display";
 import {
+  cashPayOffered,
   consultBookActions,
   contactActions,
   givenName,
   inNetworkInsurance,
+  practiceFeeRows,
   licenseCaptions,
   licenseLine,
   reviewAverage,
@@ -103,6 +105,37 @@ describe("profile view helpers", () => {
         "Out-of-Network Superbill",
       ]),
     ).toEqual(["Aetna", "BCBS", "Cigna"]);
+  });
+
+  it("omits empty payment rows and keeps cash pay when they offer it", () => {
+    expect(cashPayOffered(["Aetna", "Cash Pay Only"])).toBe(true);
+    expect(cashPayOffered(["Aetna"])).toBe(false);
+    expect(
+      practiceFeeRows({
+        rates: [],
+        sliding: null,
+        inNetwork: [],
+        cashPay: false,
+        superbill: false,
+      }),
+    ).toEqual([]);
+    expect(
+      practiceFeeRows({
+        rates: [
+          { service_type: "Individual", duration_minutes: 50, price_cents: 16500 },
+        ],
+        sliding: "Available",
+        inNetwork: ["Aetna"],
+        cashPay: true,
+        superbill: true,
+      }),
+    ).toEqual([
+      { label: "Individual session (50 min)", value: "$165" },
+      { label: "Sliding scale", value: "Available" },
+      { label: "In-network", value: "Aetna" },
+      { label: "Cash pay", value: "Accepted" },
+      { label: "Out-of-network", value: "Superbill provided" },
+    ]);
   });
 
   it("averages review stars", () => {

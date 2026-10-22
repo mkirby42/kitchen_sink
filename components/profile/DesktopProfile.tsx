@@ -88,6 +88,7 @@ export function DesktopProfile({
           givenName={data.givenName}
           specialties={directorySpecialties(data.specialties)}
           modalities={modalityDisplayLabels(data.modalities)}
+          identity={data.identity}
           education={data.education}
           credentials={data.credentials}
         />

@@ -1,22 +1,14 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { TrackProfileView } from "@/components/analytics/TrackProfileView";
+import { NotAcceptingClients } from "@/components/profile/NotAcceptingClients";
 import { FindConsultLink } from "@/components/search/FindConsultLink";
+import { FindDetailStack } from "@/components/search/FindDetailStack";
 import { FindDetailStage } from "@/components/search/FindDetailStage";
-import {
-  ArrowMark,
-  BadgeMark,
-  CardMark,
-  ClockMark,
-  DocMark,
-  PinMark,
-  ScreenMark,
-} from "@/components/search/find-marks";
+import { ArrowMark } from "@/components/search/find-marks";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
-import { Card } from "@/components/ui/Card";
 import { metaLineClass, textActionClass } from "@/components/ui/styles";
 import { carouselStatus } from "@/lib/search/find-desktop";
-import type { FindDetailContent } from "@/lib/search/find-grid";
+import type { FindDetailContent } from "@/lib/search/find-detail";
 import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
 
 export function FindDesktopDetail({
@@ -35,7 +27,7 @@ export function FindDesktopDetail({
   backHref: string;
 }) {
   const status = carouselStatus(index, count);
-  const showBar = Boolean(nextHref || detail.consult);
+  const showBar = Boolean(nextHref || detail.consult || detail.book);
 
   return (
     <div data-find-detail={detail.id} className={showBar ? "pb-28" : undefined}>
@@ -54,6 +46,7 @@ export function FindDesktopDetail({
         {detail.credentialLine ? (
           <p className={`mt-1 ${metaLineClass}`}>{detail.credentialLine}</p>
         ) : null}
+        <NotAcceptingClients open={!detail.closed} className="mt-3" />
         {detail.draft ? (
           <HiddenFromPublicBadge variant="card" label={DRAFT_PROFILE_LABEL} />
         ) : null}
@@ -84,13 +77,7 @@ export function FindDesktopDetail({
         />
       </div>
 
-      <div className="mx-auto mt-5 max-w-3xl space-y-3">
-        {detail.lead ? <PromptCard card={detail.lead} /> : null}
-        <Facts detail={detail} />
-        {detail.rest.map((card, index) => (
-          <PromptCard key={`${card.prompt}-${index}`} card={card} />
-        ))}
-      </div>
+      <FindDetailStack detail={detail} />
 
       {showBar ? (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream/95">
@@ -108,6 +95,15 @@ export function FindDesktopDetail({
                   <span aria-hidden> →</span>
                 </Link>
               ) : null}
+              {detail.book ? (
+                <FindConsultLink
+                  href={detail.book.href}
+                  therapistId={detail.id}
+                  cta={detail.book.cta}
+                  label="Book a session"
+                  tone="paper"
+                />
+              ) : null}
               {detail.consult ? (
                 <FindConsultLink
                   href={detail.consult.href}
@@ -120,79 +116,6 @@ export function FindDesktopDetail({
         </div>
       ) : null}
     </div>
-  );
-}
-
-function PromptCard({
-  card,
-}: {
-  card: { prompt: string; answer: string };
-}) {
-  return (
-    <Card as="div" className="px-6 py-5">
-      <p className="font-sans text-[14px] leading-5 text-meta">{card.prompt}</p>
-      <p className="mt-2 font-display text-[22px] leading-8 text-copy">
-        {card.answer}
-      </p>
-    </Card>
-  );
-}
-
-function Facts({ detail }: { detail: FindDetailContent }) {
-  const facts: { key: string; icon: ReactNode; label: string }[] = [];
-  if (detail.inPerson) {
-    facts.push({ key: "in-person", icon: <PinMark />, label: "In person" });
-  }
-  if (detail.virtual) {
-    facts.push({ key: "online", icon: <ScreenMark />, label: "Online" });
-  }
-  if (detail.yearsLabel) {
-    facts.push({ key: "years", icon: <ClockMark />, label: detail.yearsLabel });
-  }
-  for (const label of detail.licenseFacts) {
-    facts.push({ key: label, icon: <BadgeMark />, label });
-  }
-  if (facts.length === 0 && !detail.insuranceLine && !detail.superbill) return null;
-
-  return (
-    <Card as="div" className="px-5 py-4">
-      {facts.length > 0 ? (
-        <div className="flex flex-wrap gap-x-5 gap-y-2">
-          {facts.map((fact) => (
-            <span
-              key={fact.key}
-              className="inline-flex items-center gap-1.5 font-sans text-[14px] leading-5 text-copy"
-            >
-              {fact.icon}
-              {fact.label}
-            </span>
-          ))}
-        </div>
-      ) : null}
-      {detail.insuranceLine ? (
-        <p
-          className={`flex items-start gap-2 font-sans text-[15px] leading-6 text-copy ${facts.length > 0 ? "mt-4 border-t border-line pt-4" : ""}`}
-        >
-          <CardMark />
-          {detail.insuranceLine}
-        </p>
-      ) : null}
-      {detail.superbill ? (
-        <div
-          className={`flex items-start gap-2 ${facts.length > 0 || detail.insuranceLine ? "mt-4 border-t border-line pt-4" : ""}`}
-        >
-          <DocMark />
-          <div>
-            <p className="font-sans text-[15px] leading-5 font-medium text-copy">
-              Out-of-network superbill
-            </p>
-            <p className="mt-0.5 font-sans text-[13px] leading-5 text-meta">
-              Paying yourself? Get reimbursed later
-            </p>
-          </div>
-        </div>
-      ) : null}
-    </Card>
   );
 }
 
