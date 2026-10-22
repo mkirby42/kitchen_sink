@@ -284,8 +284,9 @@ describe("desktop find profile", () => {
     expect(html).toContain("Paying yourself? Get reimbursed later");
     expect(html).toContain("Book a free 15-min consult");
     expect(html).toContain("Book a session");
-    expect(html).toContain("mailto:travis@example.com");
-    expect(html).toContain("tel:+15125542231");
+    expect(html).toContain('aria-haspopup="dialog"');
+    expect(html).not.toContain("mailto:");
+    expect(html).not.toContain("tel:");
     expect(html).toContain("All matches");
     expect(html).not.toContain("$");
     expect(html).not.toContain("Cash pay");

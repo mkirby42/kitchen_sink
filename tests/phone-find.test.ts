@@ -116,7 +116,7 @@ describe("phone find copy", () => {
     expect(licenseFacts([], null)).toEqual([]);
   });
 
-  it("prefers loaded prompts and a real contact link", () => {
+  it("prefers loaded prompts and email for the pinned consult", () => {
     expect(stackCards(row(), [])).toEqual([
       { prompt: "who I work best with...", answer: "College students." },
     ]);
@@ -129,15 +129,13 @@ describe("phone find copy", () => {
       [],
     );
     expect(
-      phoneBookAction({ consultHref: "mailto:a@b.c", bookHref: "tel:+1" }),
+      phoneBookAction([{ kind: "email" }, { kind: "phone" }]),
     ).toEqual({
-      href: "mailto:a@b.c",
       label: "Book a free consult",
       cta: "consult",
     });
-    expect(phoneBookAction({ consultHref: null, bookHref: "tel:+1" })?.label).toBe(
-      "Book a session",
-    );
+    expect(phoneBookAction([{ kind: "text" }])?.label).toBe("Book a session");
+    expect(phoneBookAction([])).toBeNull();
     expect(phoneBookAction(null)).toBeNull();
     expect(swipeForLabel(2, 4)).toBe("Swipe for 2 of 4");
   });

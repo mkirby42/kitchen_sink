@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { ContactSheet } from "@/components/profile/ContactSheet";
 import { CardIntroVideo } from "@/components/search/CardIntroVideo";
 import { useHorizontalSnap } from "@/components/search/useHorizontalSnap";
 import { useSwipeHint } from "@/components/search/useSwipeHint";
@@ -67,7 +68,16 @@ export function PhoneProfileStack({
   const { show: showHint, dismiss } = useSwipeHint(many);
   const byId = new Map(extras.map((extra) => [extra.id, extra]));
   const active = rows[snap.index];
-  const book = phoneBookAction(active ? byId.get(active.profile_id) ?? null : null);
+  const activeExtra = active ? byId.get(active.profile_id) : undefined;
+  const book = phoneBookAction(activeExtra?.contact);
+  const activeId = active?.profile_id ?? "";
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [seenId, setSeenId] = useState(activeId);
+  if (activeId !== seenId) {
+    setSeenId(activeId);
+    setOpenId(null);
+  }
+  const contactOpen = openId === activeId && activeId !== "";
 
   useEffect(() => {
     if (snap.index > 0) dismiss();
@@ -156,7 +166,7 @@ export function PhoneProfileStack({
               }}
               data-phone-slide={position === snap.index ? "active" : "inactive"}
               className={`min-w-0 snap-start [scroll-snap-stop:always] ${
-                phoneBookAction(byId.get(row.profile_id) ?? null) ? "pb-28" : "pb-4"
+                phoneBookAction(byId.get(row.profile_id)?.contact) ? "pb-28" : "pb-4"
               }`}
               aria-hidden={position === snap.index ? undefined : true}
               inert={position === snap.index ? undefined : true}
@@ -182,15 +192,26 @@ export function PhoneProfileStack({
       </div>
       {book && active ? (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
-          <a
-            href={book.href}
-            className={`${primaryPillClass} w-full px-6 py-3.5`}
-            onClick={() => trackCta(active.profile_id, book.cta)}
+          <button
+            type="button"
+            className={`${primaryPillClass} w-full cursor-pointer px-6 py-3.5`}
+            aria-haspopup="dialog"
+            aria-expanded={contactOpen}
+            onClick={() => {
+              trackCta(active.profile_id, book.cta);
+              setOpenId(active.profile_id);
+            }}
           >
             {book.label}
-          </a>
+          </button>
         </div>
       ) : null}
+      <ContactSheet
+        open={contactOpen}
+        name={givenName(active?.name ?? "")}
+        contact={activeExtra?.contact ?? []}
+        onClose={() => setOpenId(null)}
+      />
     </div>
   );
 }
