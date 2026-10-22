@@ -105,7 +105,7 @@ export const PHONE_LIST_WORK_BEST_LABEL = "I work best with...";
 
 /**
  * Quote under the phone list portrait. Prefer the saved who-I-work-best-with
- * card (already on the search row, or on the phone stack extras). Otherwise
+ * card (loaded profile cards, or the one already on the search row). Otherwise
  * the first conversation card. Null when nothing is saved.
  */
 export function phoneListQuote(

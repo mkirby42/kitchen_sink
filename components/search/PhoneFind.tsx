@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { PhoneFilterBar } from "@/components/search/PhoneFilterBar";
 import { PhoneProfileStack } from "@/components/search/PhoneProfileStack";
@@ -9,17 +9,27 @@ import { filtersFromSearchParams } from "@/components/search/query";
 import { Card } from "@/components/ui/Card";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { pageTitleClass } from "@/components/ui/styles";
-import { therapistsFitLabel, type PhoneSheet } from "@/lib/search/phone-find";
+import {
+  therapistsFitLabel,
+  type PhoneSheet,
+  type StackCard,
+} from "@/lib/search/phone-find";
 import { phoneBrowseKey } from "@/lib/search/phone-browse";
-import type { PhoneStackExtra } from "@/lib/search/phone-stack";
+import type { PhoneStackBooking } from "@/lib/search/phone-stack";
 import type { SearchRow } from "@/lib/search/rpc";
 
 export function PhoneFind({
   rows,
-  extras,
+  booking,
+  slides,
+  listCards,
 }: {
   rows: SearchRow[] | null;
-  extras: PhoneStackExtra[];
+  booking: PhoneStackBooking[];
+  /** Phone profile columns, one per row, same order. */
+  slides: ReactNode;
+  /** Conversation cards per row, same order. The list portrait prefers who-I-work-best-with. */
+  listCards?: readonly (readonly StackCard[] | undefined)[];
 }) {
   const filters = filtersFromSearchParams(useSearchParams());
   const [mode, setMode] = useState<"list" | "one">("list");
@@ -36,10 +46,11 @@ export function PhoneFind({
             rows.map((row) => row.profile_id),
           )}
           rows={rows}
-          extras={extras}
-          filters={filters}
+          booking={booking}
           onBack={() => setMode("list")}
-        />
+        >
+          {slides}
+        </PhoneProfileStack>
       ) : (
         <>
           <h1 className={`text-center ${pageTitleClass}`}>Find your therapist</h1>
@@ -83,13 +94,13 @@ export function PhoneFind({
             </Card>
           ) : (
             <ul data-phone-list="" className="mt-4 space-y-3">
-              {rows.map((row) => (
+              {rows.map((row, index) => (
                 <li key={row.profile_id}>
                   <Card className="overflow-hidden p-0">
                     <TherapistCardPhone
                       row={row}
                       filters={filters}
-                      cards={extras.find((extra) => extra.id === row.profile_id)?.cards}
+                      cards={listCards?.[index]}
                     />
                   </Card>
                 </li>
