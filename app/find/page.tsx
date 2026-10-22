@@ -70,7 +70,7 @@ export default async function FindPage({ searchParams }: FindPageProps) {
   return (
     <main className="mx-auto max-w-5xl px-5 py-12 sm:px-8 sm:py-16 md:max-w-7xl md:py-14">
       <div className="md:hidden">
-        <PhoneFindSection rows={rows} />
+        <PhoneFindSection rows={rows} audience={audience} />
       </div>
 
       <div className="hidden md:block">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { PhoneFilterBar } from "@/components/search/PhoneFilterBar";
 import { PhoneProfileStack } from "@/components/search/PhoneProfileStack";
@@ -11,15 +11,18 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { pageTitleClass } from "@/components/ui/styles";
 import { therapistsFitLabel, type PhoneSheet } from "@/lib/search/phone-find";
 import { phoneBrowseKey } from "@/lib/search/phone-browse";
-import type { PhoneStackExtra } from "@/lib/search/phone-stack";
+import type { PhoneStackBooking } from "@/lib/search/phone-stack";
 import type { SearchRow } from "@/lib/search/rpc";
 
 export function PhoneFind({
   rows,
-  extras,
+  booking,
+  slides,
 }: {
   rows: SearchRow[] | null;
-  extras: PhoneStackExtra[];
+  booking: PhoneStackBooking[];
+  /** Phone profile columns, one per row, same order. */
+  slides: ReactNode;
 }) {
   const filters = filtersFromSearchParams(useSearchParams());
   const [mode, setMode] = useState<"list" | "one">("list");
@@ -36,10 +39,11 @@ export function PhoneFind({
             rows.map((row) => row.profile_id),
           )}
           rows={rows}
-          extras={extras}
-          filters={filters}
+          booking={booking}
           onBack={() => setMode("list")}
-        />
+        >
+          {slides}
+        </PhoneProfileStack>
       ) : (
         <>
           <h1 className={`text-center ${pageTitleClass}`}>Find your therapist</h1>

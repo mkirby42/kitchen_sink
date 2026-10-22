@@ -1,12 +1,18 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { PhoneProfileColumn } from "@/components/profile/PhoneProfileColumn";
 import { PhoneFilterSheet } from "@/components/search/PhoneFilterBar";
 import { PhoneFind } from "@/components/search/PhoneFind";
 import { PhoneProfileStack } from "@/components/search/PhoneProfileStack";
 import { SWIPE_HINT } from "@/lib/search/phone-find";
-import type { PhoneStackExtra } from "@/lib/search/phone-stack";
+import type { PhoneStackBooking } from "@/lib/search/phone-stack";
+import type { ReviewViewer } from "@/lib/reviews/viewer";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
+import {
+  consultBookActions,
+  type TherapistProfileData,
+} from "@/lib/therapists/load";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push() {} }),
@@ -53,18 +59,62 @@ const travis = row({
   insurance_labels: ["Aetna"],
 });
 
-function extra(id: string, overrides: Partial<PhoneStackExtra> = {}): PhoneStackExtra {
+const visitor: ReviewViewer = {
+  userId: null,
+  role: null,
+  isOwner: false,
+};
+
+function profile(
+  id: string,
+  overrides: Partial<TherapistProfileData> = {},
+): TherapistProfileData {
   return {
     id,
+    name: "Travis White",
+    givenName: "Travis",
+    email: "travis@example.com",
+    phone: "(512) 555-0199",
+    about: "I help people find their way.",
+    photoUrl: "https://example.com/photo.jpg",
+    videoUrl: "https://example.com/intro.mp4",
+    voiceUrl: null,
+    voicePrompt: null,
+    credential: "PsyD",
+    years: 8,
+    virtual: true,
+    inPerson: true,
+    office: {
+      address: "1102 West 6th Street, Austin",
+      address2: null,
+      state: "TX",
+      zip: "78703",
+    },
+    education: ["Doctor of Clinical Psychology"],
+    credentials: ["Licensed Psychologist"],
+    slidingScale: false,
+    slidingScaleMinCents: null,
+    slidingScaleMaxCents: null,
+    superbill: true,
+    licenses: [{ number: "38047", state: "TX" }],
+    rates: [
+      { service_type: "Individual", duration_minutes: 55, price_cents: 15000 },
+    ],
+    tags: [],
+    specialties: ["Anxiety"],
+    modalities: ["CBT"],
+    insurance: ["Aetna", "Out-of-Network Superbill"],
+    inNetwork: ["Aetna"],
+    identity: [],
     cards: [
       {
-        prompt: "who I work best with...",
-        answer: "College students and early-career professionals.",
+        prompt: "a session with me feels like...",
+        answer: "It is just two people talking.",
+        tag: "session_vibe",
       },
-      { prompt: "a session with me feels like...", answer: "Two people talking." },
     ],
-    licenseStates: ["TX"],
-    superbill: true,
+    reviews: [],
+    pendingReview: null,
     contact: [
       {
         kind: "email",
@@ -78,24 +128,38 @@ function extra(id: string, overrides: Partial<PhoneStackExtra> = {}): PhoneStack
         href: "tel:+15125550199",
         value: "(512) 555-0199",
       },
-      {
-        kind: "text",
-        label: "Text",
-        href: "sms:+15125550199",
-        value: "(512) 555-0199",
-      },
     ],
-    rates: [
-      { service_type: "Individual", duration_minutes: 55, price_cents: 15000 },
-    ],
+    openToNewClients: true,
     ...overrides,
   };
+}
+
+function bookingFor(data: TherapistProfileData): PhoneStackBooking {
+  return {
+    id: data.id,
+    givenName: data.givenName,
+    actions: consultBookActions(data.contact),
+    contact: data.contact,
+  };
+}
+
+function column(data: TherapistProfileData) {
+  return createElement(PhoneProfileColumn, {
+    key: data.id,
+    data,
+    viewer: visitor,
+    showContact: false,
+  });
 }
 
 describe("phone Find list", () => {
   it("lists compact cards, web filter pills, and the one-at-a-time toggle", () => {
     const html = renderToStaticMarkup(
-      createElement(PhoneFind, { rows: [travis, row()], extras: [] }),
+      createElement(PhoneFind, {
+        rows: [travis, row()],
+        booking: [],
+        slides: null,
+      }),
     );
     expect(html).toContain('data-phone-mode="list"');
     expect(html).toContain("Find your therapist");
@@ -116,7 +180,7 @@ describe("phone Find list", () => {
 
   it("does not call a failed search zero matches", () => {
     const html = renderToStaticMarkup(
-      createElement(PhoneFind, { rows: null, extras: [] }),
+      createElement(PhoneFind, { rows: null, booking: [], slides: null }),
     );
     expect(html).toContain("Therapist search isn&#x27;t available right now.");
     expect(html).not.toContain("therapists fit");
@@ -125,7 +189,7 @@ describe("phone Find list", () => {
 
   it("still offers one at a time when a single therapist is listed", () => {
     const html = renderToStaticMarkup(
-      createElement(PhoneFind, { rows: [row()], extras: [] }),
+      createElement(PhoneFind, { rows: [row()], booking: [], slides: null }),
     );
     expect(html).toContain("1 therapist fits");
     expect(html).toContain("One at a time");
@@ -134,15 +198,22 @@ describe("phone Find list", () => {
 });
 
 describe("phone profile stack", () => {
-  it("swipes between profiles and pins a consult when an email is listed", () => {
-    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+  it("renders the opened phone profile and pins both booking buttons", () => {
+    const travisProfile = profile(travis.profile_id);
+    const maya = profile(row().profile_id, {
+      name: "Maya Chen",
+      givenName: "Maya",
+      contact: [],
+    });
     const html = renderToStaticMarkup(
-      createElement(PhoneProfileStack, {
-        rows: [travis, row()],
-        extras: [extra(travis.profile_id), extra(row().profile_id, { superbill: false, contact: [], rates: [] })],
-        filters,
-        onBack() {},
-      }),
+      <PhoneProfileStack
+        rows={[travis, row()]}
+        booking={[bookingFor(travisProfile), bookingFor(maya)]}
+        onBack={() => {}}
+      >
+        {column(travisProfile)}
+        {column(maya)}
+      </PhoneProfileStack>,
     );
     expect(html).toContain("All 2");
     expect(html).toContain("1 of 2");
@@ -152,40 +223,70 @@ describe("phone profile stack", () => {
     expect(html).toContain('aria-label="Next therapist"');
     expect(html).toContain("auto-cols-[86%]");
     expect(html).toContain("[touch-action:pan-x_pan-y]");
-    expect(html).toContain("Watch intro");
-    expect(html).not.toContain("0:30");
-    expect(html).not.toContain("intro.mp4");
-    expect(html).toContain("I WORK BEST WITH...");
+    expect(html.match(/data-phone-profile-column/g)).toHaveLength(2);
+    expect(html).toContain('data-hero-variant="overlay"');
+    expect(html).toContain("Play intro video for Travis White");
+    expect(html).toContain(">Travis White</h1>");
+    expect(html).toContain("Licensed by State of Texas / 38047");
+    expect(html).toContain("How Travis works");
+    expect(html).toContain("Get to know Travis");
     expect(html).toContain("a session with me feels like...");
-    expect(html).toContain("Licensed in Texas");
-    expect(html).toContain("Book a free consult");
+    expect(html).toContain("Approach in therapy");
+    expect(html).toContain("Areas of interest");
+    expect(html).toContain("own words");
+    expect(html).toContain('data-cta-placement="dock"');
+    expect(html.match(/data-cta-placement="dock"/g)).toHaveLength(1);
+    expect(html).toContain("Free consult");
+    expect(html).toContain("Book a session");
     expect(html).toContain('aria-haspopup="dialog"');
     expect(html).not.toContain("mailto:");
     expect(html).not.toContain("tel:");
+    expect(html).not.toContain("sms:");
+    expect(html).not.toContain("Book a free consult");
+    expect(html).not.toContain("Watch intro");
+    expect(html).not.toContain("I WORK BEST WITH...");
+    expect(html).not.toContain("intro.mp4");
     expect(html).not.toContain("15-min");
-    expect(html).toContain("Individual session (55 min)");
-    expect(html).toContain("Paying yourself? Get reimbursed later");
     expect(html).not.toContain("$165");
   });
 
-  it("omits swipe chrome, booking, and fees when that data is absent", () => {
+  it("omits swipe chrome and both buttons when there is nothing to book or swipe", () => {
+    const solo = profile(row().profile_id, {
+      name: "Maya Chen",
+      givenName: "Maya",
+      contact: [],
+      videoUrl: null,
+      about: null,
+      education: [],
+      credentials: [],
+      cards: [],
+      rates: [],
+      insurance: [],
+      inNetwork: [],
+      modalities: [],
+      specialties: [],
+      licenses: [],
+      years: null,
+    });
     const html = renderToStaticMarkup(
-      createElement(PhoneProfileStack, {
-        rows: [row({ start_date_of_practice: null, insurance_labels: [], card_prompt: null, card_answer: null })],
-        extras: [],
-        filters,
-        onBack() {},
-      }),
+      <PhoneProfileStack
+        rows={[row({ card_prompt: null, card_answer: null })]}
+        booking={[bookingFor(solo)]}
+        onBack={() => {}}
+      >
+        {column(solo)}
+      </PhoneProfileStack>,
     );
     expect(html).toContain("All 1");
+    expect(html).toContain("Maya Chen");
+    expect(html).toContain('data-phone-profile-column=""');
     expect(html).not.toContain("1 of 1");
     expect(html).not.toContain(SWIPE_HINT);
     expect(html).not.toContain("Swipe for");
-    expect(html).not.toContain("Book a free consult");
+    expect(html).not.toContain("Free consult");
     expect(html).not.toContain("Book a session");
-    expect(html).not.toContain("Fees");
-    expect(html).not.toContain("Paying yourself");
-    expect(html).not.toContain(" yrs");
+    expect(html).not.toContain("Book a free consult");
+    expect(html).not.toContain('data-cta-placement="dock"');
   });
 });
 

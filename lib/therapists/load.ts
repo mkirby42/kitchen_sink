@@ -1,7 +1,11 @@
 import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { previewDirectoryAccess, type SiteAudience } from "@/lib/audience";
-import { isPublicTherapistRole, parseProfileRole } from "@/lib/role";
+import {
+  isPublicTherapistRole,
+  parseProfileRole,
+  type ProfileRole,
+} from "@/lib/role";
 import {
   canonicalSpecialtyLabels,
   licenseStateLabel,
@@ -341,24 +345,31 @@ export function toProfileReview(
   };
 }
 
-async function viewerDirectoryAccess(supabase: SupabaseClient): Promise<{
+type DirectoryViewer = {
   userId: string | null;
   isAdmin: boolean;
-}> {
+  role: ProfileRole | null;
+};
+
+async function viewerDirectoryAccess(
+  supabase: SupabaseClient,
+): Promise<DirectoryViewer> {
   try {
     const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) return { userId: null, isAdmin: false };
+    if (error || !data.user) return { userId: null, isAdmin: false, role: null };
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", data.user.id)
       .maybeSingle();
+    const role = parseProfileRole(profile?.role);
     return {
       userId: data.user.id,
-      isAdmin: parseProfileRole(profile?.role) === "admin",
+      isAdmin: role === "admin",
+      role,
     };
   } catch {
-    return { userId: null, isAdmin: false };
+    return { userId: null, isAdmin: false, role: null };
   }
 }
 
@@ -407,7 +418,7 @@ function labelsOf(tags: ProfileTag[], kind: string) {
 export async function fetchTherapistProfile(
   supabase: SupabaseClient,
   rawId: string,
-  options?: { audience?: SiteAudience },
+  options?: { audience?: SiteAudience; viewer?: DirectoryViewer },
 ): Promise<TherapistProfileData | null> {
   const id = resolveTherapistId(rawId);
 
@@ -448,7 +459,7 @@ export async function fetchTherapistProfile(
       .eq("therapist_id", id)
       .order("position", { ascending: true }),
     fetchReviewRows(supabase, id),
-    viewerDirectoryAccess(supabase),
+    options?.viewer ?? viewerDirectoryAccess(supabase),
   ]);
 
   if (profileRes.error || therapistRes.error) return null;
@@ -546,6 +557,41 @@ export async function fetchTherapistProfile(
     unpublished,
     openToNewClients,
   };
+}
+
+/** Same profile load as `/t/[id]`, one auth check, for the phone one-at-a-time stack. */
+export async function loadTherapistProfiles(
+  ids: readonly string[],
+  audience: SiteAudience = "admin",
+): Promise<{
+  profiles: (TherapistProfileData | null)[];
+  viewer: { userId: string | null; role: ProfileRole | null };
+}> {
+  const empty = {
+    profiles: ids.map(() => null),
+    viewer: { userId: null, role: null as ProfileRole | null },
+  };
+  if (!ids.length || !supabasePublicConfig()) return empty;
+  try {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    const viewer = await viewerDirectoryAccess(supabase);
+    const profiles = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          return await fetchTherapistProfile(supabase, id, { audience, viewer });
+        } catch {
+          return null;
+        }
+      }),
+    );
+    return {
+      profiles,
+      viewer: { userId: viewer.userId, role: viewer.role },
+    };
+  } catch {
+    return empty;
+  }
 }
 
 export const loadTherapistProfile = cache(
