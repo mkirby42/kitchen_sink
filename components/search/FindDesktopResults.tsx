@@ -1,8 +1,8 @@
 import { FindCarousel } from "@/components/search/FindCarousel";
 import { FindDesktopDetail } from "@/components/search/FindDesktopDetail";
+import { FindDirectoryCard } from "@/components/search/FindDirectoryCard";
 import { FindGrid } from "@/components/search/FindGrid";
 import { FindLayoutToggle } from "@/components/search/FindLayoutToggle";
-import { TherapistCard } from "@/components/search/TherapistCard";
 import { buildFindHref, type FindPageView } from "@/components/search/query";
 import { Card } from "@/components/ui/Card";
 import { gridFitLine, type FindDetailContent } from "@/lib/search/find-grid";
@@ -79,7 +79,13 @@ export function FindDesktopResults({
         <FindCarousel
           slides={rows.map((row) => ({
             id: row.profile_id,
-            card: <TherapistCard row={row} filters={filters} variant="desk" />,
+            card: (
+              <FindDirectoryCard
+                row={row}
+                filters={filters}
+                view={{ layout: "one" }}
+              />
+            ),
           }))}
         />
       ) : (

@@ -29,7 +29,6 @@ export function FindResultList({
           key={row.profile_id}
           row={row}
           filters={filters}
-          variant="phone"
         />
       ))}
     </PhoneTherapistBrowse>
