@@ -114,15 +114,14 @@ describe("phone find guards", () => {
 
   it("swipes through the phone profile one at a time", () => {
     const html = renderToStaticMarkup(
-      createElement(PhoneProfileStack, {
-        rows: [row(1), row(2)],
-        booking: [],
-        onBack() {},
-        children: [
-          createElement("div", null, "Profile one"),
-          createElement("div", null, "Profile two"),
-        ],
-      }),
+      <PhoneProfileStack
+        rows={[row(1), row(2)]}
+        booking={[]}
+        onBack={() => {}}
+      >
+        <div>Profile one</div>
+        <div>Profile two</div>
+      </PhoneProfileStack>,
     );
     expect(html).toContain("All 2");
     expect(html).toContain("1 of 2");
