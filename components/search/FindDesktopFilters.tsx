@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tag } from "@/components/ui/Tag";
 import { cx } from "@/components/ui/styles";
@@ -38,10 +38,6 @@ export function FindDesktopFilters({
   const searchParams = useSearchParams();
   const filters = filtersFromSearchParams(searchParams);
   const [open, setOpen] = useState<Menu>(initialOpen);
-
-  useEffect(() => {
-    if (initialOpen === null) setOpen(null);
-  }, [initialOpen]);
 
   function apply(next: SearchFilters) {
     const view = findViewFromSearchParams(searchParams);

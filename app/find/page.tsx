@@ -97,6 +97,7 @@ export default async function FindPage({ searchParams }: FindPageProps) {
       <div className="hidden md:block">
         <Suspense fallback={null}>
           <FindDesktopFilters
+            key={detail ? "detail" : "list"}
             matchCount={rows?.length ?? null}
             initialOpen={detail ? null : "topics"}
             leading={
