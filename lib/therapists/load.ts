@@ -14,11 +14,15 @@ import {
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import {
   formatUsdFromCents,
+  givenName,
   profileOffice,
   storagePublicUrl,
   yearsPracticing,
   type ProfileOffice,
 } from "./display";
+import { hasSuperbill, inNetworkInsurance } from "./insurance";
+
+export { givenName, hasSuperbill, inNetworkInsurance };
 import { resolveTherapistId } from "./ids";
 
 export type ProfileLicense = {
@@ -107,16 +111,6 @@ export type TherapistProfileData = {
   /** False when the practice is closed to new clients. */
   openToNewClients: boolean;
 };
-
-const SUPERBILL_LABEL = "out-of-network superbill";
-
-export function givenName(name: string) {
-  const parts = name.split(/\s+/).filter(Boolean);
-  if (parts[0]?.replace(/\./g, "").toLowerCase() === "dr") {
-    return parts[1] ?? parts[0];
-  }
-  return parts[0] ?? name;
-}
 
 export function licenseLine(licenses: ProfileLicense[]) {
   if (licenses.length === 0) return null;
@@ -220,20 +214,6 @@ export function consultBookActions(
     });
   }
   return actions;
-}
-
-export function inNetworkInsurance(labels: string[]) {
-  return labels.filter(
-    (label) =>
-      label.toLowerCase() !== SUPERBILL_LABEL &&
-      label.toLowerCase() !== "cash pay only",
-  );
-}
-
-export function hasSuperbill(labels: string[], flag: boolean) {
-  return (
-    flag || labels.some((label) => label.toLowerCase() === SUPERBILL_LABEL)
-  );
 }
 
 export function reviewAverage(stars: number[]) {

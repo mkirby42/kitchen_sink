@@ -11,7 +11,7 @@ import {
   licenseStateLabel,
 } from "@/lib/tags/presets";
 import { yearsPracticing } from "@/lib/therapists/display";
-import { hasSuperbill, inNetworkInsurance } from "@/lib/therapists/load";
+import { hasSuperbill, inNetworkInsurance } from "@/lib/therapists/insurance";
 
 export type PhoneSheet = "place" | "insurance" | "topics" | "format";
 

@@ -10,11 +10,11 @@ import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
 import {
   credentialTitle,
+  givenName,
   initials,
   storagePublicUrl,
 } from "@/lib/therapists/display";
 import { MAYA_ID } from "@/lib/therapists/ids";
-import { givenName } from "@/lib/therapists/load";
 
 function cardInitials(name: string) {
   return initials(name.replace(/^(dr\.?|prof\.?)\s+/i, ""));

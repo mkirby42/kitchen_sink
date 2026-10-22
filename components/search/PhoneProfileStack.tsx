@@ -27,10 +27,10 @@ import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
 import {
   credentialTitle,
   formatUsdFromCents,
+  givenName,
   initials,
   storagePublicUrl,
 } from "@/lib/therapists/display";
-import { givenName } from "@/lib/therapists/load";
 import { browseStep } from "@/lib/search/phone-browse";
 
 function onBrowseKeyDown(
