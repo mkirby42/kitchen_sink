@@ -42,29 +42,12 @@ export function TherapistCard({
   const href = buildTherapistHref(row.profile_id, filters);
   const given = givenName(row.name);
   const mark = cardInitials(row.name);
-  const code = row.credential?.trim() || null;
   const licensed = licensedInLabel(filters.state);
 
   return (
     <Card as="article" className="overflow-hidden p-0">
       {variant === "desk" ? null : (
-        <TherapistCardPhone
-          name={row.name}
-          given={given}
-          initials={mark}
-          credential={code}
-          photoUrl={photo}
-          videoUrl={videoUrl}
-          virtual={row.virtual_practice}
-          inPerson={row.in_person_practice}
-          prompt={card?.prompt ?? null}
-          answer={card?.answer ?? null}
-          href={href}
-          therapistId={row.profile_id}
-          sample={sample}
-          hidden={row.listed === false}
-          draft={row.published === false}
-        />
+        <TherapistCardPhone row={row} filters={filters} />
       )}
       {variant === "phone" ? null : (
         <TherapistCardDesktop

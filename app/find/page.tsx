@@ -3,16 +3,11 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { FindCarousel } from "@/components/search/FindCarousel";
 import { FindDesktopFilters } from "@/components/search/FindDesktopFilters";
-import { FindFilters } from "@/components/search/FindFilters";
-import { FindResultList } from "@/components/search/FindResultList";
+import { PhoneFindSection } from "@/components/search/PhoneFindSection";
 import { TherapistCard } from "@/components/search/TherapistCard";
 import { Card } from "@/components/ui/Card";
 import { pageTitleClass } from "@/components/ui/styles";
-import {
-  buildFindHref,
-  requestFindHref,
-  resultCountLabel,
-} from "@/components/search/query";
+import { buildFindHref, requestFindHref } from "@/components/search/query";
 import { narrowSearchRows } from "@/lib/audience";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
@@ -55,22 +50,9 @@ export default async function FindPage({ searchParams }: FindPageProps) {
 
   return (
     <main className="mx-auto max-w-5xl px-5 py-12 sm:px-8 sm:py-16 md:max-w-6xl md:py-14">
-      <h1 className={`text-center md:text-left md:text-heading ${pageTitleClass}`}>
+      <h1 className={`hidden text-left md:block md:text-heading ${pageTitleClass}`}>
         Find your therapist
       </h1>
-
-      <div className="mx-auto max-w-3xl md:hidden">
-        <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-body sm:text-lg">
-          Tap your must-haves below — we&apos;ll show therapists who match some
-          selected tag.
-        </p>
-
-        <Card className="mt-10 px-5 py-8 sm:px-8 sm:py-10">
-          <Suspense fallback={null}>
-            <FindFilters />
-          </Suspense>
-        </Card>
-      </div>
 
       <div className="hidden md:block">
         <Suspense fallback={null}>
@@ -78,43 +60,14 @@ export default async function FindPage({ searchParams }: FindPageProps) {
         </Suspense>
       </div>
 
-      <div className="mt-10 space-y-6 md:hidden">
-        <FindPhoneResults rows={rows} filters={filters} />
+      <div className="md:hidden">
+        <PhoneFindSection rows={rows} />
       </div>
 
       <div id="find-results" className="mt-8 hidden md:block">
         <FindDesktopResults rows={rows} filters={filters} />
       </div>
     </main>
-  );
-}
-
-function FindPhoneResults({
-  rows,
-  filters,
-}: {
-  rows: SearchRow[] | null;
-  filters: SearchFilters;
-}) {
-  if (rows === null) {
-    return (
-      <Card as="div" className="px-6 py-10 text-center text-mute">
-        <p>Therapist search isn&apos;t available right now.</p>
-      </Card>
-    );
-  }
-  if (rows.length === 0) {
-    return (
-      <Card as="div" className="px-6 py-10 text-center text-mute">
-        <p>No therapists match</p>
-      </Card>
-    );
-  }
-  return (
-    <>
-      <p className="text-sm text-mute">{resultCountLabel(rows.length)}</p>
-      <FindResultList rows={rows} filters={filters} />
-    </>
   );
 }
 
