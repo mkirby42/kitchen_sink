@@ -3,7 +3,9 @@ import {
   buildFindHref,
   buildTherapistHref,
   filtersFromSearchParams,
+  parseFindPageView,
   requestFindHref,
+  requestFindPageHref,
   resultCountLabel,
 } from "@/components/search/query";
 import { allowedSearchTags } from "@/lib/tags/presets";
@@ -157,6 +159,48 @@ describe("find search URL", () => {
         state: null,
       }),
     ).toBe("/t/maya");
+  });
+
+  it("round-trips the desktop grid view and drops a junk profile id", () => {
+    const id = "3b354f1e-50a1-4a17-b536-cc7fce1296fe";
+    const filters = {
+      tags: ["Aetna"],
+      virtual: false,
+      inPerson: false,
+      state: null,
+    };
+    expect(buildFindHref(filters)).toBe("/find?tags=Aetna");
+    expect(
+      buildFindHref(filters, { layout: "one", more: 1, therapistId: id }),
+    ).toBe(`/find?tags=Aetna&layout=one&more=1&t=${id}`);
+    expect(parseFindPageView({ layout: "one", more: "1", t: id })).toEqual({
+      layout: "one",
+      more: 1,
+      therapistId: id,
+    });
+    expect(parseFindPageView({ layout: "nope", more: "9", t: "travis" })).toEqual({
+      layout: "grid",
+      more: 0,
+      therapistId: null,
+    });
+    const raw = { tags: "Aetna", layout: "one", more: "1", t: id };
+    expect(requestFindPageHref(raw)).toBe(
+      buildFindHref(parseFindSearchParams(raw), parseFindPageView(raw)),
+    );
+    expect(
+      requestFindPageHref({ tags: "Aetna", layout: "nope", more: "0", t: "nope" }),
+    ).not.toBe(
+      buildFindHref(
+        parseFindSearchParams({ tags: "Aetna" }),
+        parseFindPageView({ layout: "nope", more: "0", t: "nope" }),
+      ),
+    );
+    expect(
+      buildFindHref(
+        parseFindSearchParams({ tags: "Aetna" }),
+        parseFindPageView({ layout: "nope", more: "0", t: "nope" }),
+      ),
+    ).toBe("/find?tags=Aetna");
   });
 });
 

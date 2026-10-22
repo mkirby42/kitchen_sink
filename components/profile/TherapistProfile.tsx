@@ -11,6 +11,7 @@ import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { initials, officeAddressLines } from "@/lib/therapists/display";
 import {
+  cashPayOffered,
   consultBookActions,
   hasSuperbill,
   licenseCaptions,
@@ -91,7 +92,8 @@ export function TherapistProfile({
   const hasPhoneFacts =
     hasQualifications ||
     modalityLabels.length > 0 ||
-    specialtyLabels.length > 0;
+    specialtyLabels.length > 0 ||
+    data.identity.length > 0;
   const practicePanel = (flags?: {
     showAbout?: boolean;
     showLogistics?: boolean;
@@ -108,6 +110,7 @@ export function TherapistProfile({
       showLogistics={flags?.showLogistics}
       givenName={data.givenName}
       openToNewClients={data.openToNewClients}
+      cashPay={cashPayOffered(data.insurance)}
     />
   );
 
@@ -259,6 +262,7 @@ export function TherapistProfile({
               ) : null}
               <TagSection title="Approach in therapy" labels={modalityLabels} />
               <TagSection title="Areas of interest" labels={specialtyLabels} />
+              <TagSection title="Identity" labels={data.identity} />
             </div>
           ) : null}
 

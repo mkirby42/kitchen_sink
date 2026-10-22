@@ -24,6 +24,7 @@ describe("sentence case", () => {
       "Cognitive behavioral therapy (CBT)",
     );
     expect(sentenceCasePhrase("Attachment-Based")).toBe("Attachment-based");
+    expect(sentenceCasePhrase("LGBTQ+")).toBe("LGBTQ+");
     expect(sentenceCaseSegments("PsyD · Licensed Psychologist")).toBe(
       "PsyD · Licensed psychologist",
     );

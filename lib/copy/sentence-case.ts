@@ -9,6 +9,7 @@ const ACRONYMS: Record<string, string> = {
   ifs: "IFS",
   lcsw: "LCSW",
   lgbtq: "LGBTQ",
+  "lgbtq+": "LGBTQ+",
   lmft: "LMFT",
   lpc: "LPC",
   md: "MD",

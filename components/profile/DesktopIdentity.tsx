@@ -1,12 +1,14 @@
 import { Card } from "@/components/ui/Card";
 import { metaLineClass, therapistNameClass } from "@/components/ui/styles";
 import { sentenceCaseSegments } from "@/lib/copy/sentence-case";
-import { formatUsdFromCents } from "@/lib/therapists/display";
-import type {
-  ConsultBookAction,
-  TherapistProfileData,
+import {
+  cashPayOffered,
+  practiceFeeRows,
+  type ConsultBookAction,
+  type TherapistProfileData,
 } from "@/lib/therapists/load";
 import { ContactCtas } from "./ContactCtas";
+import { FeeRows } from "./FeeRows";
 import { NotAcceptingClients } from "./NotAcceptingClients";
 import { SessionFormatLine } from "./SessionFormatLine";
 import { credentialLine, yearsPracticingLabel } from "./copy";
@@ -30,6 +32,14 @@ export function DesktopIdentity({
 }) {
   const summary = credentialLine(data.credential, data.credentials);
   const years = yearsPracticingLabel(data.years);
+  const fees = practiceFeeRows({
+    rates: data.rates,
+    sliding,
+    inNetwork: data.inNetwork,
+    cashPay: cashPayOffered(data.insurance),
+    superbill,
+  });
+  const showLedger = fees.length > 0 || officeLines.length > 0;
 
   return (
     <Card className="mt-4 px-5 py-5 sm:px-6">
@@ -60,53 +70,23 @@ export function DesktopIdentity({
         therapistId={data.id}
         placement="stack"
       />
-      <dl className="mt-4 divide-y divide-line border-t border-line text-sm">
-        {data.rates.map((rate) => (
-          <div
-            key={`${rate.service_type}-${rate.duration_minutes}`}
-            className="flex items-baseline justify-between gap-4 py-3"
-          >
-            <dt className="min-w-0 break-words text-mute">
-              {rate.service_type} session ({rate.duration_minutes} min)
-            </dt>
-            <dd className="shrink-0 font-medium text-body">
-              {formatUsdFromCents(rate.price_cents)}
-            </dd>
-          </div>
-        ))}
-        {sliding ? (
-          <div className="flex items-baseline justify-between gap-4 py-3">
-            <dt className="text-mute">Sliding scale</dt>
-            <dd className="font-medium text-body">{sliding}</dd>
-          </div>
-        ) : null}
-        <div className="flex items-start justify-between gap-4 py-3">
-          <dt className="text-mute">In-network</dt>
-          <dd className="max-w-[62%] text-right font-medium text-body">
-            {data.inNetwork.length > 0
-              ? data.inNetwork.join(" · ")
-              : "None listed"}
-          </dd>
-        </div>
-        <div className="flex items-baseline justify-between gap-4 py-3">
-          <dt className="text-mute">Out-of-network</dt>
-          <dd className="font-medium text-body">
-            {superbill ? "Superbill provided" : "Not listed"}
-          </dd>
-        </div>
-        {officeLines.length > 0 ? (
-          <div className="flex items-start justify-between gap-4 py-3">
-            <dt className="text-mute">Office</dt>
-            <dd className={`text-right not-italic ${metaLineClass}`}>
-              {officeLines.map((line, index) => (
-                <span key={`${index}-${line}`} className="block">
-                  {line}
-                </span>
-              ))}
-            </dd>
-          </div>
-        ) : null}
-      </dl>
+      {showLedger ? (
+        <dl className="mt-4 divide-y divide-line border-t border-line text-sm">
+          <FeeRows rows={fees} />
+          {officeLines.length > 0 ? (
+            <div className="flex items-start justify-between gap-4 py-3">
+              <dt className="text-mute">Office</dt>
+              <dd className={`text-right not-italic ${metaLineClass}`}>
+                {officeLines.map((line, index) => (
+                  <span key={`${index}-${line}`} className="block">
+                    {line}
+                  </span>
+                ))}
+              </dd>
+            </div>
+          ) : null}
+        </dl>
+      ) : null}
     </Card>
   );
 }

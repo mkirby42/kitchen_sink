@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tag } from "@/components/ui/Tag";
 import { cx } from "@/components/ui/styles";
@@ -9,7 +9,11 @@ import { isFindTopicSpecialty } from "@/lib/tags/plain-language";
 import { INSURANCE_PRESETS, licenseStateLabel } from "@/lib/tags/presets";
 import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import { PlacePanel, TopicPanel } from "./FindFilterPanels";
-import { buildFindHref, filtersFromSearchParams } from "./query";
+import {
+  buildFindHref,
+  filtersFromSearchParams,
+  findViewFromSearchParams,
+} from "./query";
 
 type Menu = "topics" | "place" | "insurance" | "format" | null;
 
@@ -21,16 +25,23 @@ function toggleTag(tags: string[], label: string) {
 
 export function FindDesktopFilters({
   matchCount,
+  leading,
+  initialOpen = "topics",
 }: {
   matchCount: number | null;
+  /** Desktop page title, so the pills can sit on the same row. */
+  leading?: ReactNode;
+  /** Closed on the clicked-in profile so that page leads with the therapist. */
+  initialOpen?: Menu;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filters = filtersFromSearchParams(searchParams);
-  const [open, setOpen] = useState<Menu>("topics");
+  const [open, setOpen] = useState<Menu>(initialOpen);
 
   function apply(next: SearchFilters) {
-    router.push(buildFindHref(next), { scroll: false });
+    const view = findViewFromSearchParams(searchParams);
+    router.push(buildFindHref(next, { layout: view.layout }), { scroll: false });
   }
 
   function toggleMenu(menu: Exclude<Menu, null>) {
@@ -45,8 +56,20 @@ export function FindDesktopFilters({
     : "Where you live";
 
   return (
-    <div className="mt-8" data-find-desktop="filters">
-      <div className="flex flex-wrap gap-2">
+    <div className={leading ? undefined : "mt-8"} data-find-desktop="filters">
+      <div
+        className={
+          leading
+            ? "flex flex-wrap items-center justify-between gap-x-6 gap-y-3"
+            : "flex flex-wrap gap-2"
+        }
+      >
+        {leading}
+        <div
+          className={
+            leading ? "flex min-w-0 flex-1 flex-wrap justify-center gap-2" : "contents"
+          }
+        >
         <FilterPill
           label={placeLabel}
           open={open === "place"}
@@ -75,6 +98,7 @@ export function FindDesktopFilters({
           controls="find-format"
           onClick={() => toggleMenu("format")}
         />
+        </div>
       </div>
 
       {open === "topics" ? (

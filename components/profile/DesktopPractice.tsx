@@ -8,21 +8,28 @@ export function DesktopPractice({
   givenName,
   specialties,
   modalities,
+  identity = [],
   education,
   credentials,
+  className = "mt-10",
 }: {
   givenName: string;
   specialties: string[];
   modalities: string[];
+  identity?: string[];
   education: string[];
   credentials: string[];
+  className?: string;
 }) {
-  const hasTags = specialties.length > 0 || modalities.length > 0;
+  const hasTags =
+    specialties.length > 0 || modalities.length > 0 || identity.length > 0;
   const hasQualifications = education.length > 0 || credentials.length > 0;
   if (!hasTags && !hasQualifications) return null;
+  const hasApproachBefore = specialties.length > 0;
+  const hasIdentityBefore = hasApproachBefore || modalities.length > 0;
 
   return (
-    <section className="mt-10">
+    <section className={className}>
       <ProfileHeading>{`How ${givenName} works`}</ProfileHeading>
       <Card className="mt-4 px-5 py-5 sm:px-6">
         {specialties.length > 0 ? (
@@ -32,9 +39,15 @@ export function DesktopPractice({
           </div>
         ) : null}
         {modalities.length > 0 ? (
-          <div className={specialties.length > 0 ? "mt-5" : undefined}>
+          <div className={hasApproachBefore ? "mt-5" : undefined}>
             <h3 className={smallLabelClass}>Approach in therapy</h3>
             <TagPills labels={modalities} />
+          </div>
+        ) : null}
+        {identity.length > 0 ? (
+          <div className={hasIdentityBefore ? "mt-5" : undefined}>
+            <h3 className={smallLabelClass}>Identity</h3>
+            <TagPills labels={identity} />
           </div>
         ) : null}
         {hasTags && hasQualifications ? (
