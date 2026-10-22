@@ -74,6 +74,8 @@ export type FindDetailContent = FindDetailPublic & {
   rest: FindDetailCard[];
   consult: { href: string; cta: "consult" | "book" } | null;
   book: { href: string; cta: "book" } | null;
+  /** Every listed outreach row. Booking buttons open these; they do not navigate. */
+  contact: ContactAction[];
   hidden: boolean;
   draft: boolean;
 };
@@ -211,6 +213,7 @@ export function buildFindDetail(input: {
     rest,
     consult,
     book: detailBookLink(profile?.contact ?? [], consult?.href ?? null),
+    contact: profile?.contact ?? [],
     hidden: row.listed === false,
     draft: row.published === false,
     ...detailPublicFields({

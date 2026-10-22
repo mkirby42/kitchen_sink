@@ -238,6 +238,10 @@ describe("phone profile stack", () => {
     expect(html.match(/data-cta-placement="dock"/g)).toHaveLength(1);
     expect(html).toContain("Free consult");
     expect(html).toContain("Book a session");
+    expect(html).toContain('aria-haspopup="dialog"');
+    expect(html).not.toContain("mailto:");
+    expect(html).not.toContain("tel:");
+    expect(html).not.toContain("sms:");
     expect(html).not.toContain("Book a free consult");
     expect(html).not.toContain("Watch intro");
     expect(html).not.toContain("I WORK BEST WITH...");
