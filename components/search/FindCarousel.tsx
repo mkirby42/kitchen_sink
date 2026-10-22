@@ -60,24 +60,30 @@ export function FindCarousel({ slides }: { slides: FindSlide[] }) {
   const status = carouselStatus(index, count);
 
   return (
-    <section aria-roledescription="carousel" aria-label="Matching therapists">
-      <p aria-live="polite" className="mb-4 font-sans text-[15px] leading-6 text-meta">
-        {status}
-      </p>
-      <div
-        ref={scroller}
-        onScroll={onScroll}
-        className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-[8%] px-[8%] pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {slides.map((slide, i) => (
-          <div
-            key={slide.id}
-            className="w-[84%] shrink-0 snap-center"
-            inert={i === index ? undefined : true}
-          >
-            {slide.card}
-          </div>
-        ))}
+    <section
+      aria-roledescription="carousel"
+      aria-label="Matching therapists"
+      data-find-layout="one"
+    >
+      <div className="mx-auto w-full max-w-lg">
+        <p aria-live="polite" className="mb-4 font-sans text-[15px] leading-6 text-meta">
+          {status}
+        </p>
+        <div
+          ref={scroller}
+          onScroll={onScroll}
+          className="relative flex snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {slides.map((slide, i) => (
+            <div
+              key={slide.id}
+              className="shrink-0 basis-full snap-center"
+              inert={i === index ? undefined : true}
+            >
+              {slide.card}
+            </div>
+          ))}
+        </div>
       </div>
       <div className="mt-5 flex items-center justify-center gap-4">
         <button

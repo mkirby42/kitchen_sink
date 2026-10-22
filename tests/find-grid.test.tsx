@@ -135,14 +135,46 @@ describe("desktop find grid", () => {
     expect(next).not.toContain("Show 1 more");
   });
 
-  it("keeps one-at-a-time as the carousel", () => {
+  it("shows the same card one at a time, without the chip cloud", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     const html = results(2, { layout: "one" });
+    const card = html.slice(html.indexOf('data-find-card="one"'));
+    const name = card.indexOf(">Therapist 01<");
+    const credential = card.indexOf("PsyD · Licensed psychologist");
+    const prompt = card.indexOf("I work best with...");
+    const answer = card.indexOf("College students finding their way.");
+    const takes = card.indexOf("Takes Aetna");
+    const years = card.indexOf("yrs in practice");
+
     expect(html).toContain("Therapist 1 of 2 who fit what you told us");
-    expect(html).toContain("Get to know Therapist");
+    expect(html).toContain('data-find-layout="one"');
+    expect(html).toContain("max-w-lg");
+    expect(html).toContain("Therapist 02");
     expect(html).toContain('aria-label="Previous therapist"');
-    expect(html).not.toContain("data-find-layout=\"grid\"");
+    expect(html).toContain('aria-label="Next therapist"');
+    expect(html).toContain('aria-label="Play intro video for Therapist 01"');
+    expect(html).toContain("In person · Online");
+    expect(name).toBeGreaterThan(-1);
+    expect(name).toBeLessThan(credential);
+    expect(credential).toBeLessThan(prompt);
+    expect(prompt).toBeLessThan(answer);
+    expect(answer).toBeLessThan(takes);
+    expect(takes).toBeLessThan(years);
+    expect(html).toContain("layout=one");
+    expect(html).toContain("&amp;t=");
+    expect(html).not.toContain('href="/t/');
+    expect(html).not.toContain('data-find-card="desk"');
+    expect(html).not.toContain('data-find-layout="grid"');
+    expect(html).not.toContain("Can help with");
+    expect(html).not.toContain("Get to know");
+    expect(html).not.toContain("Watch intro");
+    expect(html).not.toContain("I WORK BEST WITH");
+    expect(html).not.toContain("Licensed in");
+    expect(html).not.toContain("Worry, stress or panic");
+    expect(html).not.toContain("Out-of-network");
     expect(html).not.toContain("Show 8 more");
     expect(html).not.toContain("Click anyone to see their full profile");
+    expect(html).not.toContain("$");
   });
 });
 
