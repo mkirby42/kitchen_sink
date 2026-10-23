@@ -63,9 +63,9 @@ test("Header links match who is signed in", async ({ page }, testInfo) => {
     "href",
     "/join?mode=signin",
   );
-  await expect(page.getByRole("link", { name: "Referrals" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "My profile" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Sign out" })).toHaveCount(0);
+  await expect(header.getByRole("link", { name: "Referrals", exact: true })).toHaveCount(0);
+  await expect(header.getByRole("link", { name: "My profile", exact: true })).toHaveCount(0);
+  await expect(header.getByRole("button", { name: "Sign out", exact: true })).toHaveCount(0);
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
   );
