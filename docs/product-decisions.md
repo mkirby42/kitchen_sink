@@ -1,6 +1,6 @@
 # Product decisions
 
-Christine's asks that are live in the product today. Each one has a guard test. Those tests are the lock.
+Christine's asks that are live in the product today. Each one has a guard test. Those tests are the lock. Browser checks in `tests/guards/browser/` are guard tests too. They run in the `e2e` job against the test Supabase project, at a phone width and a desktop width.
 
 A pull request that edits this file, or deletes, skips, or weakens a file in `tests/guards/`, fails CI unless the PR has the label `product-decision-approved`. Adding a new ask to this list is an edit and needs that label too. Create the label once in the GitHub repo before you need it.
 
@@ -18,6 +18,7 @@ Where you live, Insurance, What's going on, In person or online. Same order on t
 
 - Landed: 2026-10-21, #114. Phone sheet 2026-10-22, #115. Wrapping pills 2026-10-22, #119.
 - Guard: `tests/guards/find-filters.test.tsx`
+- Browser: `tests/guards/browser/find-filters.test.ts`
 
 ### What's going on is seven plain-language topics
 
@@ -25,6 +26,7 @@ The pill opens "What would you like help with?" The line under it says you don't
 
 - Landed: 2026-10-21, #114. Phone copy 2026-10-22, #115.
 - Guard: `tests/guards/find-filters.test.tsx`
+- Browser: `tests/guards/browser/find-filters.test.ts`
 
 ### Desktop Find is a grid of eight
 
@@ -32,6 +34,7 @@ The default is a grid, two columns, four from the wide breakpoint. The line is "
 
 - Landed: 2026-10-22, #116.
 - Guard: `tests/guards/find-cards.test.tsx`
+- Browser: `tests/guards/browser/find-cards.test.ts`
 
 ### A Find card has no price, no specialty pills, and no match count
 
@@ -39,6 +42,7 @@ Grid and one-at-a-time cards show the photo or intro, the format, the name, the 
 
 - Landed: no price 2026-10-07, #60. This card shape 2026-10-22, #116 and #118.
 - Guard: `tests/guards/find-cards.test.tsx`
+- Browser: `tests/guards/browser/find-cards.test.ts`
 
 ### One at a time uses that same card
 
@@ -46,6 +50,7 @@ Desktop one-at-a-time is the grid card, one at a time, with "Therapist n of N wh
 
 - Landed: 2026-10-22, #118.
 - Guard: `tests/guards/find-cards.test.tsx`
+- Browser: `tests/guards/browser/find-cards.test.ts`
 
 ### Opening a desktop card stays on Find
 
@@ -53,6 +58,7 @@ The detail shows the name, Watch intro when a video is saved, the conversation c
 
 - Landed: 2026-10-22, #116, #117, and #120.
 - Guard: `tests/guards/find-detail.test.tsx`
+- Browser: `tests/guards/browser/find-detail.test.ts`
 
 ### The phone Find page lists, and can switch to one at a time
 
@@ -60,6 +66,7 @@ The headline is "Find your therapist". Under the pills: "{N} therapists fit" and
 
 - Landed: 2026-10-22, #115.
 - Guard: `tests/guards/phone-find.test.tsx`
+- Browser: `tests/guards/browser/phone-find.test.ts`
 
 ### A phone list card with a photo is a tall frame
 
@@ -67,6 +74,7 @@ The frame is 4:5. In person · Online sits on it. The name and credential sit on
 
 - Landed: 2026-10-08, #88. Vertical intro 2026-10-22, #122.
 - Guard: `tests/guards/phone-find.test.tsx`
+- Browser: `tests/guards/browser/phone-find.test.ts`
 
 ### A phone list card with no photo and no video is the initials card
 
@@ -81,6 +89,7 @@ All N, n of N, a one-time "Swipe for the next therapist", and a preview of the n
 
 - Landed: 2026-10-22, #121.
 - Guard: `tests/guards/phone-find.test.tsx`
+- Browser: `tests/guards/browser/phone-find.test.ts`
 
 ### The profile photo keeps the face clear
 
@@ -88,6 +97,7 @@ The play control is see-through. On the phone the photo shows the name and the l
 
 - Landed: 2026-10-07, #50, #52, #53, #54, #56.
 - Guard: `tests/guards/profile.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts`
 
 ### Profile sections use her words, in this order, on the phone
 
@@ -95,6 +105,7 @@ How {name} works (formats, office address, rates, sliding scale when offered, in
 
 - Landed: address 2026-10-07, #51 and #58. Headings 2026-10-08, #80 and #82. Phone order 2026-10-16, #105. Wrapping pills 2026-10-09, #91.
 - Guard: `tests/guards/profile.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts`
 
 ### Book and Free consult open a contact sheet
 
@@ -102,6 +113,7 @@ The buttons say Free consult and Book a session. On the phone they pin to the bo
 
 - Landed: pinned buttons 2026-10-07, #59. Sheet 2026-10-22, #120.
 - Guard: `tests/guards/profile.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts`
 
 ### A closed practice says Not accepting new clients
 
@@ -109,6 +121,7 @@ One soft pill when they are not taking new clients. An open practice does not sh
 
 - Landed: 2026-10-19, #110.
 - Guard: `tests/guards/profile.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts`
 
 ### The owner can Edit and Delete from the profile
 
@@ -116,6 +129,7 @@ Edit and Delete sit with Back to search. A visitor does not see them.
 
 - Landed: 2026-10-12, #94.
 - Guard: `tests/guards/profile.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts`
 
 ### Public type is Fraunces, DM Sans, and a Caprasimo wordmark
 
@@ -130,6 +144,7 @@ Page headings and conversation answers are Fraunces. Everything else is DM Sans.
 
 - Landed: 2026-10-07, #45, #66, and #67. Heading 2026-10-08, #84.
 - Guard: `tests/guards/home-nav.test.tsx`
+- Browser: `tests/guards/browser/home-nav.test.ts`
 
 ### Why Kitchen Sink links to the newsletter
 
@@ -137,6 +152,7 @@ The homepage band says Why Kitchen Sink? and The story behind the name and our W
 
 - Landed: 2026-10-08, #85. Let's Connect URL 2026-10-12, #97.
 - Guard: `tests/guards/home-nav.test.tsx`
+- Browser: `tests/guards/browser/home-nav.test.ts`
 
 ### Header links match who is signed in
 
@@ -144,6 +160,7 @@ Signed out: Home, Find a Therapist, For Therapists, Why Kitchen Sink?, Therapist
 
 - Landed: For Therapists 2026-10-07, #45. Why link 2026-10-08, #85. Referrals 2026-10-19, #109.
 - Guard: `tests/guards/home-nav.test.tsx`
+- Browser: `tests/guards/browser/home-nav.test.ts` (signed out). A published therapist's Referrals link is in `tests/guards/browser/profile.test.ts`.
 
 ### Join says Areas of Interest and can add a label
 
