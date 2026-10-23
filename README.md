@@ -147,6 +147,6 @@ These are product gaps, not a freeze. See REQUIREMENTS **Not built yet**.
 
 ## CI
 
-GitHub Actions on PR and `main`: lint, typecheck, tests, build. Push to `main` deploys production to Vercel after those checks pass. PRs still get Vercel previews.
+GitHub Actions on PR and `main`: lint, typecheck, tests, build. The `e2e` job seeds the test Supabase project and runs Playwright against `next start` in the job. Push to `main` deploys production to Vercel after the check job passes. The deploy does not wait on `e2e`. PRs still get Vercel previews.
 
-Repo secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_DEPLOY_HOOK`. Never put the service role key in CI.
+Repo secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_DEPLOY_HOOK` (production). Browser tests use `TEST_SUPABASE_URL`, `TEST_SUPABASE_ANON_KEY`, and `TEST_SUPABASE_SERVICE_ROLE_KEY` for project `kxlonrjirrrjiinclamc` only. Never put the production service role key in CI.

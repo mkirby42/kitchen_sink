@@ -69,6 +69,74 @@ jobs:
       - run: npm test
       - run: npm run build
 
+  # Browser tests against the dedicated test Supabase project.
+  # Job env overrides the workflow NEXT_PUBLIC_* secrets, which point at production.
+  # Deploy does not wait on this job.
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+      TEST_SUPABASE_ANON_KEY: ${{ secrets.TEST_SUPABASE_ANON_KEY }}
+      TEST_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TEST_SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.TEST_SUPABASE_ANON_KEY }}
+      RESEND_API_KEY: ""
+      RESEND_FROM: ""
+      SUPABASE_SERVICE_ROLE_KEY: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Skip when the test Supabase secrets are missing
+        id: secrets
+        run: |
+          if [ -z "$TEST_SUPABASE_URL" ] || [ -z "$TEST_SUPABASE_ANON_KEY" ] || [ -z "$TEST_SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "TEST Supabase secrets are not set (TEST_SUPABASE_URL, TEST_SUPABASE_ANON_KEY, TEST_SUPABASE_SERVICE_ROLE_KEY). Skipping browser tests."
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          case "$TEST_SUPABASE_URL$NEXT_PUBLIC_SUPABASE_URL" in
+            *udgngzzzgrxjxljgtxpf*)
+              echo "e2e is pointed at the production project udgngzzzgrxjxljgtxpf. Refusing to run."
+              exit 1
+              ;;
+          esac
+      - name: Install Playwright Chromium
+        if: steps.secrets.outputs.skip != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Seed the test project
+        if: steps.secrets.outputs.skip != 'true'
+        run: npm run seed:test
+      - name: Build the app against the test project
+        if: steps.secrets.outputs.skip != 'true'
+        run: |
+          ok=0
+          for attempt in 1 2 3; do
+            if npm run build; then
+              ok=1
+              break
+            fi
+            echo "next build failed (attempt ${attempt}). Retrying the font fetch."
+            sleep $((attempt * 5))
+          done
+          test "$ok" = 1
+      - name: Run Playwright
+        if: steps.secrets.outputs.skip != 'true'
+        run: npx playwright test
+      - name: Upload Playwright report
+        if: failure() && steps.secrets.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
   deploy:
     needs: check
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
