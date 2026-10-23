@@ -105,9 +105,9 @@ jobs:
               exit 1
               ;;
           esac
-      - name: Install Playwright Chromium
+      - name: Install Playwright browsers
         if: steps.secrets.outputs.skip != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium firefox webkit
       - name: Seed the test project
         if: steps.secrets.outputs.skip != 'true'
         run: npm run seed:test

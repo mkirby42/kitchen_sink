@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Find a therapist",
   description:
-    "Search therapists by specialty, insurance, virtual or in-person, and license state.",
+    "Search therapists by specialty, insurance, online or in-person, and license state.",
   alternates: { canonical: "/find" },
 };
 

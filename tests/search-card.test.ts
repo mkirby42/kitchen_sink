@@ -189,6 +189,9 @@ describe("Find therapist card", () => {
     expect(narrow).not.toContain("autoPlay");
     expect(narrow).not.toContain("autoplay");
     expect(narrow).toContain('aria-label="Play intro video for Maya Chen"');
+    expect(narrow).toContain("bg-transparent");
+    expect(narrow).toContain("border-paper/80");
+    expect(narrow).not.toContain("bg-clay");
     expect(narrow).toContain('aria-label="Get to know Maya"');
     expect(narrow).not.toContain("0:30");
     expect(narrow).not.toContain("→");

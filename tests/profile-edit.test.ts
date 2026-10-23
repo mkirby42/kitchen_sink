@@ -277,7 +277,7 @@ describe("profile edit control", () => {
     expect(html).not.toContain("In-Person");
     const logisticsAt = html.indexOf("How Maya");
     const inPersonAt = html.indexOf(">In person<");
-    const virtualAt = html.indexOf(">Virtual<");
+    const virtualAt = html.indexOf(">Online<");
     const addressAt = html.indexOf("1102 West 6th Street, Austin");
     expect(inPersonAt).toBeGreaterThan(logisticsAt);
     expect(virtualAt).toBeGreaterThan(inPersonAt);
@@ -315,7 +315,8 @@ describe("profile edit control", () => {
     expect(html).not.toContain(">Office<");
     expect(html).not.toContain("1102 West 6th Street");
     expect(html).toContain(">In person<");
-    expect(html).toContain(">Virtual<");
+    expect(html).toContain(">Online<");
+    expect(html).not.toContain(">Virtual<");
     expect(html).toContain("Education");
     expect(html).toContain("How Maya");
   });
@@ -340,7 +341,8 @@ describe("profile edit control", () => {
     );
     expect(html).not.toContain(">Office<");
     expect(html).not.toContain("1102 West 6th Street");
-    expect(html).toContain(">Virtual<");
+    expect(html).toContain(">Online<");
+    expect(html).not.toContain(">Virtual<");
     expect(html).not.toContain(">In person<");
     expect(html).toContain("How Maya");
   });

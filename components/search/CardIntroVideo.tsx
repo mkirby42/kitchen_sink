@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { flushSync } from "react-dom";
+import { FrameVideo } from "@/components/ui/FrameVideo";
 import { VideoStill } from "@/components/ui/VideoStill";
 
 type CardIntroVideoProps = {
@@ -44,24 +45,8 @@ function FrameIntro({
   videoUrl: string;
 }) {
   const [playing, setPlaying] = useState(false);
-  // Full-bleed phone portrait. Poster crops to the frame; playback stays whole.
+  // Full-bleed phone portrait. The still crops to the frame; playback stays whole.
   const frame = "relative aspect-[4/5] w-full overflow-hidden bg-black";
-
-  if (playing) {
-    return (
-      <div className={frame}>
-        <video
-          className="absolute inset-0 h-full w-full bg-black object-contain"
-          src={videoUrl}
-          poster={photoUrl ?? undefined}
-          preload="none"
-          controls
-          playsInline
-          autoPlay
-        />
-      </div>
-    );
-  }
 
   return (
     <div className={frame}>
@@ -76,6 +61,10 @@ function FrameIntro({
       ) : (
         <VideoStill src={videoUrl} />
       )}
+      {playing ? (
+        <FrameVideo src={videoUrl} label={`Intro video for ${name}`} fit="contain" />
+      ) : null}
+      {playing ? null : (
       <button
         type="button"
         onClick={(event) => {
@@ -98,6 +87,7 @@ function FrameIntro({
           </svg>
         </span>
       </button>
+      )}
     </div>
   );
 }
@@ -112,23 +102,7 @@ function PortraitIntro({
   videoUrl: string;
 }) {
   const [playing, setPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const watchLabel = "Watch intro";
-
-  if (playing) {
-    return (
-      <video
-        ref={videoRef}
-        className="absolute inset-0 h-full w-full bg-black object-contain"
-        src={videoUrl}
-        poster={photoUrl ?? undefined}
-        preload="none"
-        controls
-        playsInline
-        autoPlay
-      />
-    );
-  }
 
   return (
     <>
@@ -143,13 +117,16 @@ function PortraitIntro({
       ) : (
         <VideoStill src={videoUrl} />
       )}
+      {playing ? (
+        <FrameVideo src={videoUrl} label={`Intro video for ${given}`} fit="contain" />
+      ) : null}
+      {playing ? null : (
       <button
         type="button"
         onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();
           flushSync(() => setPlaying(true));
-          void videoRef.current?.play();
         }}
         aria-label={`Watch intro for ${given}`}
         className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2.5 rounded-full bg-paper py-1.5 pr-4 pl-1.5 text-sm font-medium text-ink shadow-[0_10px_28px_rgb(23_23_23/0.18)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
@@ -164,6 +141,7 @@ function PortraitIntro({
         </span>
         {watchLabel}
       </button>
+      )}
     </>
   );
 }

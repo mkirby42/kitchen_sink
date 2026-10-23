@@ -143,8 +143,8 @@ describe("profile view helpers", () => {
   });
 
   it("lists in-person and virtual as separate logistics pills", () => {
-    expect(sessionFormatPills(true, true)).toEqual(["In person", "Virtual"]);
-    expect(sessionFormatPills(true, false)).toEqual(["Virtual"]);
+    expect(sessionFormatPills(true, true)).toEqual(["In person", "Online"]);
+    expect(sessionFormatPills(true, false)).toEqual(["Online"]);
     expect(sessionFormatPills(false, true)).toEqual(["In person"]);
     expect(sessionFormatPills(false, false)).toEqual([]);
   });

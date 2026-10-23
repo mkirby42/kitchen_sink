@@ -5,6 +5,7 @@ import { FindDesktopResults } from "@/components/search/FindDesktopResults";
 import {
   buildFindDetail,
   detailConsult,
+  detailCredentialLine,
   splitDetailCards,
   type FindDetailProfile,
 } from "@/lib/search/find-detail";
@@ -220,6 +221,20 @@ describe("desktop find profile", () => {
     };
   }
 
+  it("does not repeat the licensed title on the credential line", () => {
+    expect(detailCredentialLine("PsyD", ["Licensed Psychologist"])).toBe(
+      "PsyD · Licensed psychologist",
+    );
+    expect(detailCredentialLine("PsyD", ["PsyD", " Licensed psychologist "])).toBe(
+      "PsyD · Licensed psychologist",
+    );
+    expect(detailCredentialLine("PsyD", ["EMDR trained"])).toBe(
+      "PsyD · Licensed psychologist · EMDR trained",
+    );
+    expect(detailCredentialLine("PhD", ["PhD"])).toBe("PhD");
+    expect(detailCredentialLine(null, [])).toBeNull();
+  });
+
   it("orders the work-best card first and prefers email for the consult", () => {
     expect(
       splitDetailCards([
@@ -267,6 +282,10 @@ describe("desktop find profile", () => {
     expect(html).toContain("Travis White");
     expect(html).toContain("PsyD · Licensed psychologist");
     expect(html).toContain("Watch intro");
+    expect(html).toContain("data-find-stage");
+    expect(html).toContain("aspect-[4/5]");
+    expect(html).toContain("max-w-[26.5rem]");
+    expect(html).not.toContain("aspect-[16/10]");
     expect(html).not.toContain("0:30");
     expect(html).not.toContain("Second photo");
     expect(html).toContain('aria-label="Previous therapist"');
@@ -375,7 +394,8 @@ describe("desktop find profile", () => {
     expect(html).toContain("Play voice prompt for Travis White");
     expect(html).toContain("In Travis");
     expect(html).toContain("I sit with people while they sort out a next step.");
-    expect(html).toContain(">Reviews<");
+    expect(html).toContain("data-profile-switch");
+    expect(html).toContain("Reviews · 1");
     expect(html).toContain("Steady and direct.");
     expect(html).toContain("Alex");
     expect(html).not.toContain("None listed");

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FindCardLink } from "@/components/analytics/FindCardLink";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
+import { FrameVideo } from "@/components/ui/FrameVideo";
 import { VideoStill } from "@/components/ui/VideoStill";
 import { buildTherapistHref } from "@/components/search/query";
 import { desktopFormatBadge } from "@/lib/search/find-desktop";
@@ -43,30 +44,21 @@ export function PhoneListPortrait({
   return (
     <div data-find-card="phone" data-phone-list-media="" className="md:hidden">
       <div className="relative aspect-[4/5] overflow-hidden bg-black">
-        {playing && videoUrl ? (
-          <video
-            className="absolute inset-0 h-full w-full bg-black object-cover object-[center_18%]"
-            src={videoUrl}
-            poster={photoUrl ?? undefined}
-            preload="none"
-            controls
-            playsInline
-            autoPlay
-            aria-label={`Intro video for ${row.name}`}
+        {photoUrl ? (
+          // Public Storage URLs; next/image is out of scope.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photoUrl}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
           />
+        ) : videoUrl ? (
+          <VideoStill src={videoUrl} />
+        ) : null}
+        {playing && videoUrl ? (
+          <FrameVideo src={videoUrl} label={`Intro video for ${row.name}`} />
         ) : (
           <>
-            {photoUrl ? (
-              // Public Storage URLs; next/image is out of scope.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={photoUrl}
-                alt=""
-                className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
-              />
-            ) : videoUrl ? (
-              <VideoStill src={videoUrl} />
-            ) : null}
             <FindCardLink
               href={href}
               therapistId={row.profile_id}
@@ -100,9 +92,13 @@ export function PhoneListPortrait({
                   event.stopPropagation();
                   setPlaying(true);
                 }}
-                className="absolute top-1/2 left-1/2 z-20 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-clay text-paper shadow-[0_10px_28px_rgb(23_23_23/0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
+                className="absolute top-1/2 left-1/2 z-20 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-paper/80 bg-transparent text-paper hover:bg-paper/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
               >
-                <svg viewBox="0 0 24 24" className="ml-1 size-7 fill-current" aria-hidden>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="ml-1 size-7 fill-paper drop-shadow-[0_1px_2px_rgba(27,39,68,0.7)]"
+                  aria-hidden
+                >
                   <path d="M8 5.5v13l11-6.5-11-6.5z" />
                 </svg>
               </button>

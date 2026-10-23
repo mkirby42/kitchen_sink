@@ -108,16 +108,26 @@ export function detailLicenseFacts(
   return facts;
 }
 
-/** Licensed title, then any additional credentials they saved. */
+/**
+ * Licensed title, then any additional credentials they saved.
+ * Skips an extra that only repeats the code or its expanded title
+ * ("PsyD · Licensed psychologist" plus a stored "Licensed Psychologist").
+ */
 export function detailCredentialLine(
   credential: string | null | undefined,
   extra: readonly string[] = [],
 ) {
   const title = credentialTitle(credential);
+  const code = credential?.trim() ?? "";
+  const suffix =
+    title && code && title.toLowerCase().startsWith(`${code.toLowerCase()} · `)
+      ? title.slice(code.length + 3)
+      : "";
   const seen = new Set<string>();
-  const code = credential?.trim().toLowerCase() ?? "";
-  if (code) seen.add(code);
-  if (title) seen.add(title.toLowerCase());
+  for (const value of [code, title ?? "", suffix]) {
+    const key = value.trim().toLowerCase();
+    if (key) seen.add(key);
+  }
   const extras: string[] = [];
   for (const raw of extra) {
     const label = sentenceCasePhrase(raw.trim());

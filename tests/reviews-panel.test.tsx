@@ -145,7 +145,8 @@ describe("ReviewsPanel", () => {
     expect(html).toContain("Right fit");
     expect(html).toContain("4.0");
     expect(html).toContain("Based on 1 client review");
-    expect(html).toContain("Virtual · 8 months with Maya · ");
+    expect(html).toContain("Online · 8 months with Maya · ");
+    expect(html).not.toContain("Virtual");
     expect(html).not.toContain("No reviews yet.");
   });
 

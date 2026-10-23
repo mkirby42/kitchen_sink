@@ -17,13 +17,21 @@ export function reviewAuthorLabel(review: {
   return name || "Client";
 }
 
+/** Stored session format. "Virtual" is the old word; profiles say Online. */
+export function publicSessionFormat(value: string | null | undefined) {
+  const text = value?.trim() ?? "";
+  if (!text) return null;
+  if (text.toLowerCase() === "virtual") return "Online";
+  return text;
+}
+
 export function reviewMeta(review: {
   session_format: string | null;
   duration_label: string | null;
   created_at: string;
 }) {
   return [
-    review.session_format,
+    publicSessionFormat(review.session_format),
     review.duration_label,
     formatReviewDate(review.created_at),
   ]

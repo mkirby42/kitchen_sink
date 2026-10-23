@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FrameVideo } from "@/components/ui/FrameVideo";
 import { metaLineClass, therapistNameClass, therapistNameOnPhotoClass } from "@/components/ui/styles";
 import { VideoStill } from "@/components/ui/VideoStill";
 
@@ -52,16 +53,7 @@ export function HeroMedia({
               : "relative aspect-[3/4] min-h-[28rem] w-full"
           }
         >
-          {showVideo && videoUrl ? (
-            <video
-              className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
-              src={videoUrl}
-              poster={photoUrl ?? undefined}
-              controls
-              autoPlay
-              playsInline
-            />
-          ) : photoUrl ? (
+          {photoUrl ? (
             // Public Storage URLs; next/image is out of scope this weekend.
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -81,6 +73,10 @@ export function HeroMedia({
               </span>
             </div>
           )}
+
+          {showVideo && videoUrl ? (
+            <FrameVideo src={videoUrl} label={`Intro video for ${name}`} />
+          ) : null}
 
           {videoUrl && !showVideo ? (
             <button

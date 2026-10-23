@@ -36,6 +36,46 @@ export default defineConfig({
       grepInvert: /@phone-only/,
       use: { viewport: { width: 1280, height: 900 } },
     },
+    {
+      name: "firefox-phone",
+      testMatch: "**/find-profile-pass.test.ts",
+      grepInvert: /@desktop-only/,
+      use: {
+        ...devices["Desktop Firefox"],
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
+      name: "firefox-desktop",
+      testMatch: "**/find-profile-pass.test.ts",
+      grepInvert: /@phone-only/,
+      use: {
+        ...devices["Desktop Firefox"],
+        viewport: { width: 1280, height: 900 },
+      },
+    },
+    {
+      name: "webkit-phone",
+      testMatch: "**/find-profile-pass.test.ts",
+      grepInvert: /@desktop-only/,
+      use: {
+        ...devices["Desktop Safari"],
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
+      name: "webkit-desktop",
+      testMatch: "**/find-profile-pass.test.ts",
+      grepInvert: /@phone-only/,
+      use: {
+        ...devices["Desktop Safari"],
+        viewport: { width: 1280, height: 900 },
+      },
+    },
   ],
   webServer: {
     command: `npm run start -- --hostname 127.0.0.1 --port ${port}`,
