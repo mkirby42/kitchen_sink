@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FindCardLink } from "@/components/analytics/FindCardLink";
+import { FrameVideo } from "@/components/ui/FrameVideo";
 import { VideoStill } from "@/components/ui/VideoStill";
 import { PersonMark } from "@/components/search/find-marks";
 
@@ -23,32 +24,24 @@ export function GridCardMedia({
   const [playing, setPlaying] = useState(false);
 
   return (
-    <div className="relative aspect-[4/5] bg-[#E4DCCE]">
-      {playing && videoUrl ? (
-        <video
-          className="absolute inset-0 h-full w-full bg-black object-contain"
-          src={videoUrl}
-          poster={photoUrl ?? undefined}
-          preload="none"
-          controls
-          playsInline
-          autoPlay
+    <div className="relative aspect-[4/5] overflow-hidden bg-[#E4DCCE]">
+      {photoUrl ? (
+        // Public Storage URLs; next/image is out of scope.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={photoUrl}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
         />
+      ) : videoUrl ? (
+        <VideoStill src={videoUrl} />
+      ) : (
+        <PersonMark />
+      )}
+      {playing && videoUrl ? (
+        <FrameVideo src={videoUrl} label={`Intro video for ${name}`} fit="contain" />
       ) : (
         <>
-          {photoUrl ? (
-            // Public Storage URLs; next/image is out of scope.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={photoUrl}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
-            />
-          ) : videoUrl ? (
-            <VideoStill src={videoUrl} />
-          ) : (
-            <PersonMark />
-          )}
           <FindCardLink
             href={href}
             therapistId={therapistId}

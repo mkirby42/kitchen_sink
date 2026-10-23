@@ -268,7 +268,7 @@ export function reviewAverage(stars: number[]) {
 export function sessionFormatPills(virtual: boolean, inPerson: boolean) {
   const pills: string[] = [];
   if (inPerson) pills.push("In person");
-  if (virtual) pills.push("Virtual");
+  if (virtual) pills.push("Online");
   return pills;
 }
 

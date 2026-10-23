@@ -138,7 +138,8 @@ describe("review display", () => {
       }),
     );
     expect(formatReviewDate("nope")).toBeNull();
-    expect(reviewMeta(review)).toContain("Virtual · 8 months with Maya · ");
+    expect(reviewMeta(review)).toContain("Online · 8 months with Maya · ");
+    expect(reviewMeta(review)).not.toContain("Virtual");
   });
 
   it("keeps pending reviews out of the public list and treats a missing status as published", () => {

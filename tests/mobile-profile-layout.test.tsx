@@ -164,7 +164,8 @@ describe("phone profile layout", () => {
     expect(phoneSlot).toContain("How Travis works");
     expect(phoneSlot).not.toContain(">works</em>");
     expect(phoneSlot).toContain(">In person<");
-    expect(phoneSlot).toContain(">Virtual<");
+    expect(phoneSlot).toContain(">Online<");
+    expect(phoneSlot).not.toContain(">Virtual<");
     expect(phoneSlot).not.toContain("Logistics");
     expect(phoneSlot).toContain("1102 West 6th Street, Austin");
     expect(phoneSlot).not.toContain("rounded-full border");

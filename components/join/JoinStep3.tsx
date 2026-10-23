@@ -136,7 +136,7 @@ export function JoinStep3({
               setDraft((current) => ({ ...current, virtual: !current.virtual }))
             }
           >
-            Virtual
+            Online
           </Tag>
           <Tag
             selected={draft.inPerson}

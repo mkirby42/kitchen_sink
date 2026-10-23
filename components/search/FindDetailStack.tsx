@@ -3,6 +3,7 @@ import { AboutLead } from "@/components/profile/AboutLead";
 import { DesktopPractice } from "@/components/profile/DesktopPractice";
 import { FeeRows } from "@/components/profile/FeeRows";
 import { ProfileHeading } from "@/components/profile/ProfileHeading";
+import { ProfileTabs } from "@/components/profile/ProfileTabs";
 import { possessive } from "@/components/profile/copy";
 import { VoicePromptCard } from "@/components/profile/VoicePromptCard";
 import {
@@ -44,8 +45,7 @@ export function FindDetailStack({ detail }: { detail: FindDetailContent }) {
         credentials={detail.credentials}
       />
       <Fees detail={detail} />
-      <About detail={detail} />
-      <Reviews detail={detail} />
+      <OwnWords detail={detail} />
     </div>
   );
 }
@@ -170,20 +170,32 @@ function Fees({ detail }: { detail: FindDetailContent }) {
   );
 }
 
-function About({ detail }: { detail: FindDetailContent }) {
-  if (!detail.about) return null;
+function OwnWords({ detail }: { detail: FindDetailContent }) {
+  if (!detail.about && detail.reviews.length === 0) return null;
   return (
     <section className="pt-3">
       <ProfileHeading>{`In ${possessive(detail.givenName)} own words`}</ProfileHeading>
-      <Card as="div" className="mt-4 px-6 py-5">
-        <AboutLead about={detail.about} />
-      </Card>
+      <ProfileTabs
+        flush
+        fill={false}
+        reviewCount={detail.reviews.length}
+        about={
+          detail.about ? (
+            <Card as="div" className="px-6 py-5">
+              <AboutLead about={detail.about} />
+            </Card>
+          ) : null
+        }
+        reviews={<DetailReviews detail={detail} />}
+      />
     </section>
   );
 }
 
-function Reviews({ detail }: { detail: FindDetailContent }) {
-  if (detail.reviews.length === 0) return null;
+function DetailReviews({ detail }: { detail: FindDetailContent }) {
+  if (detail.reviews.length === 0) {
+    return <p className="font-sans text-[15px] text-mute">No reviews yet.</p>;
+  }
   const average = reviewAverage(
     detail.reviews
       .map((review) => review.stars)
@@ -191,8 +203,7 @@ function Reviews({ detail }: { detail: FindDetailContent }) {
   );
   const noun = detail.reviews.length === 1 ? "review" : "reviews";
   return (
-    <section className="pt-3">
-      <ProfileHeading>Reviews</ProfileHeading>
+    <div>
       {average != null ? (
         <p className="mt-2 font-sans text-[15px] leading-6 text-meta">
           {formatRating(average)} from {detail.reviews.length} {noun}
@@ -221,6 +232,6 @@ function Reviews({ detail }: { detail: FindDetailContent }) {
           );
         })}
       </ul>
-    </section>
+    </div>
   );
 }

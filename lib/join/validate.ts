@@ -193,7 +193,7 @@ export function step3Errors(draft: JoinDraft): string[] {
   const errors: string[] = [];
 
   if (!draft.virtual && !draft.inPerson) {
-    errors.push("Select virtual or in-person practice");
+    errors.push("Select online or in-person practice");
   }
 
   if (draft.inPerson) {
