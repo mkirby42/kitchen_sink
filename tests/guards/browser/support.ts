@@ -16,6 +16,6 @@ export async function signIn(page: Page, email: string) {
   await page.goto("/join?mode=signin");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(PASSWORD);
-  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByRole("button", { name: "Sign in →" }).click();
   await expect(page.getByRole("link", { name: "Therapist log in" })).toHaveCount(0);
 }

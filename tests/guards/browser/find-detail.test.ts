@@ -29,7 +29,7 @@ test(
     await expect(detail.getByText(PRICE_LABEL)).toBeVisible();
     await expect(detail.getByText("Available")).toBeVisible();
     await expect(page.getByRole("link", { name: "All matches" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Next therapist" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Next therapist", exact: true })).toHaveCount(2);
 
     const consult = page.getByRole("button", { name: "Book a free 15-min consult" });
     await expect(consult).toBeVisible();

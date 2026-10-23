@@ -47,6 +47,7 @@ test(
     await page.goto("/find");
     const card = page.locator("[data-find-card='phone']").filter({ hasText: ada.name });
     const frame = card.locator(".aspect-\\[4\\/5\\]");
+    await expect(frame).toBeVisible();
     const box = await frame.boundingBox();
     expect(box).not.toBeNull();
     expect((box?.height ?? 0) / (box?.width ?? 1)).toBeGreaterThan(1.2);

@@ -45,6 +45,7 @@ test("Why Kitchen Sink links to the newsletter", async ({ page }, testInfo) => {
 test("Header links match who is signed in", async ({ page }, testInfo) => {
   expect(testInfo.title).toBe("Header links match who is signed in");
   await page.goto("/");
+  const header = page.getByRole("banner");
   for (const name of [
     "Home",
     "Find a Therapist",
@@ -52,14 +53,16 @@ test("Header links match who is signed in", async ({ page }, testInfo) => {
     "Why Kitchen Sink?",
     "Therapist log in",
   ]) {
-    await expect(page.getByRole("link", { name })).toBeVisible();
+    await expect(header.getByRole("link", { name, exact: true })).toBeVisible();
   }
-  expect(await page.getByRole("link", { name: "For Therapists" }).getAttribute("href")).toBe(
+  await expect(header.getByRole("link", { name: "For Therapists", exact: true })).toHaveAttribute(
+    "href",
     "/for-therapists",
   );
-  expect(
-    await page.getByRole("link", { name: "Therapist log in" }).getAttribute("href"),
-  ).toBe("/join?mode=signin");
+  await expect(header.getByRole("link", { name: "Therapist log in", exact: true })).toHaveAttribute(
+    "href",
+    "/join?mode=signin",
+  );
   await expect(page.getByRole("link", { name: "Referrals" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "My profile" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Sign out" })).toHaveCount(0);

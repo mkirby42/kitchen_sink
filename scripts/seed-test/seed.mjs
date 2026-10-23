@@ -45,24 +45,34 @@ async function findAuthUser(service, email) {
 async function deleteAuthUser(service, id) {
   const existing = await service.auth.admin.getUserById(id);
   if (existing.error || !existing.data?.user) return;
+  for (const bucket of ["photos", "videos", "voice"]) {
+    const listed = await service.storage.from(bucket).list(id);
+    const names = (listed.data ?? []).map((file) => `${id}/${file.name}`);
+    if (names.length > 0) {
+      const removed = await service.storage.from(bucket).remove(names);
+      if (removed.error) throw new Error(`${id} ${bucket}: ${removed.error.message}`);
+    }
+  }
+  await service.from("profiles").delete().eq("id", id);
   unwrap(`delete ${id}`, await service.auth.admin.deleteUser(id));
 }
 
 async function resetAuthUser(service, sample) {
-  await deleteAuthUser(service, sample.id);
-  const stray = await findAuthUser(service, sample.email);
-  if (stray && stray.id !== sample.id) {
-    await deleteAuthUser(service, stray.id);
+  const byId = await service.auth.admin.getUserById(sample.id);
+  if (!byId.error && byId.data?.user) {
+    unwrap(
+      `update ${sample.email}`,
+      await service.auth.admin.updateUserById(sample.id, {
+        email: sample.email,
+        password: PASSWORD,
+        email_confirm: true,
+      }),
+    );
+    return;
   }
-  const created = await service.auth.admin.createUser({
-    id: sample.id,
-    email: sample.email,
-    password: PASSWORD,
-    email_confirm: true,
-  });
-  if (!created.error) return;
-  const again = await findAuthUser(service, sample.email);
-  if (again) await deleteAuthUser(service, again.id);
+
+  const stray = await findAuthUser(service, sample.email);
+  if (stray && stray.id !== sample.id) await deleteAuthUser(service, stray.id);
   unwrap(
     `create ${sample.email}`,
     await service.auth.admin.createUser({
@@ -118,16 +128,12 @@ async function signIn(url, anonKey, sample) {
 }
 
 async function publish(service, url, anonKey, sample) {
+  unwrap(
+    `clear ${sample.name}`,
+    await service.from("profiles").delete().eq("id", sample.id),
+  );
   const user = await signIn(url, anonKey, sample);
-  const args = joinArgs(sample);
-  let saved = await user.rpc("complete_therapist_join", args);
-  if (saved.error?.message.includes("already been completed")) {
-    unwrap(
-      `clear ${sample.name}`,
-      await service.from("profiles").delete().eq("id", sample.id),
-    );
-    saved = await user.rpc("complete_therapist_join", args);
-  }
+  const saved = await user.rpc("complete_therapist_join", joinArgs(sample));
   if (saved.error) throw new Error(`${sample.name}: ${saved.error.message}`);
   await user.auth.signOut();
 }
