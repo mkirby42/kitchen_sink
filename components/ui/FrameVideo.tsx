@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const fitClass = {
   /** Phone and the desktop Find detail. Crops a 9:16 intro to the frame. */
@@ -24,11 +24,6 @@ export function FrameVideo({
   fit?: keyof typeof fitClass;
 }) {
   const [ready, setReady] = useState(false);
-  const [node, setNode] = useState<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    if (node && node.readyState >= 2) setReady(true);
-  }, [node]);
 
   return (
     <video
@@ -40,7 +35,9 @@ export function FrameVideo({
       playsInline
       autoPlay
       aria-label={label}
-      ref={setNode}
+      ref={(element) => {
+        if (element && element.readyState >= 2) setReady(true);
+      }}
       onLoadedData={() => setReady(true)}
     />
   );
