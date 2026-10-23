@@ -104,7 +104,9 @@ test(
     ).toHaveLength(1);
 
     await play.click();
-    const video = frame.locator("video[data-frame-video]");
+    // The name lives on the frame overlay, which unmounts while the intro plays.
+    const video = page.locator("[data-find-card='phone'] video[data-frame-video]");
+    await expect(video).toHaveCount(1);
     await expect(video).toHaveAttribute("data-frame-video", "ready");
     await expect(video).toHaveCSS("object-fit", "cover");
     const videoBox = await box(video);
