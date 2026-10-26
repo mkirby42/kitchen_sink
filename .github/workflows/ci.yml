@@ -74,6 +74,10 @@ jobs:
   # Deploy does not wait on this job.
   e2e:
     runs-on: ubuntu-latest
+    # Preinstalled browsers pinned to lockfile 1.64.1; avoids the per-run install hang.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-jammy
+      options: --user 1001
     env:
       TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
       TEST_SUPABASE_ANON_KEY: ${{ secrets.TEST_SUPABASE_ANON_KEY }}
@@ -105,9 +109,6 @@ jobs:
               exit 1
               ;;
           esac
-      - name: Install Playwright browsers
-        if: steps.secrets.outputs.skip != 'true'
-        run: npx playwright install --with-deps chromium firefox webkit
       - name: Seed the test project
         if: steps.secrets.outputs.skip != 'true'
         run: npm run seed:test
