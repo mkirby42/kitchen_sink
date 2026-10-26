@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { submitProfileStart } from "@/lib/profile-start/actions";
 import { PROFILE_START_LINK_MAX } from "@/lib/profile-start/validate";
@@ -10,6 +10,46 @@ import { TextField } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
 import { fieldLabelClass, sectionTitleClass, textLinkClass } from "@/components/ui/styles";
 
+export function ProfileStartSuccessDialog({
+  message,
+  onDismiss,
+}: {
+  message: string;
+  onDismiss: () => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || dialog.open) return;
+    dialog.showModal();
+  }, []);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      onClose={onDismiss}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) dialogRef.current?.close();
+      }}
+      className="m-auto w-[min(calc(100%-2rem),24rem)] rounded-card border-0 bg-paper p-6 text-center text-body shadow-overlay backdrop:bg-black/40"
+    >
+      <h2 id={titleId} className={`text-black ${sectionTitleClass}`}>
+        You&apos;re in.
+      </h2>
+      <p className="mt-2 text-sm font-medium text-ink">Request submitted</p>
+      <p className="mx-auto mt-3 max-w-sm text-base leading-relaxed text-body">{message}</p>
+      <form method="dialog" className="mt-6">
+        <Button type="submit">Got it</Button>
+      </form>
+    </dialog>
+  );
+}
+
 export function ProfileStartForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -18,6 +58,11 @@ export function ProfileStartForm() {
   const [message, setMessage] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   function setLink(index: number, value: string) {
     setLinks((current) => current.map((link, i) => (i === index ? value : link)));
@@ -44,23 +89,13 @@ export function ProfileStartForm() {
     }
   }
 
-  if (confirmation) {
-    return (
-      <div id="get-started" className="rounded-card bg-paper px-6 py-8 text-center shadow-card sm:px-8">
-        <h2 className={`text-black ${sectionTitleClass}`}>You&apos;re in.</h2>
-        <p className="mx-auto mt-3 max-w-sm text-base leading-relaxed text-body" role="status">
-          {confirmation}
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <form
-      id="get-started"
-      onSubmit={(event) => void submit(event)}
-      className="relative rounded-card bg-paper px-6 py-8 shadow-card sm:px-8"
-    >
+    <>
+      <form
+        id="get-started"
+        onSubmit={(event) => void submit(event)}
+        className="relative rounded-card bg-paper px-6 py-8 shadow-card sm:px-8"
+      >
       <h2 className={`text-center text-black ${sectionTitleClass}`}>
         Get my profile started
       </h2>
@@ -148,7 +183,7 @@ export function ProfileStartForm() {
       ) : null}
 
       <div className="mt-6">
-        <Button type="submit" variant="gold" className="w-full" disabled={submitting}>
+        <Button type="submit" variant="gold" className="w-full" disabled={submitting || !mounted}>
           {submitting ? "Sending…" : "Start my profile →"}
         </Button>
       </div>
@@ -167,6 +202,13 @@ export function ProfileStartForm() {
           Log in
         </Link>
       </p>
-    </form>
+      </form>
+      {confirmation ? (
+        <ProfileStartSuccessDialog
+          message={confirmation}
+          onDismiss={() => setConfirmation("")}
+        />
+      ) : null}
+    </>
   );
 }

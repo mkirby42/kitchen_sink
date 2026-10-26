@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
@@ -12,17 +11,33 @@ import { textLinkClass } from "@/components/ui/styles";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 
+const ALREADY_HAS_ACCOUNT = /already|registered|exists/i;
+const SIGN_IN_HINT = "Switch to Sign in if you already have an account.";
+
+/** Keep Supabase's already-registered copy and point the person at Sign in. */
+export function joinAuthErrorCopy(message: string): string {
+  const text = message.trim() || "Unable to authenticate.";
+  if (!ALREADY_HAS_ACCOUNT.test(text) || /switch to sign in/i.test(text)) return text;
+  const spaced = /[.!?]$/.test(text) ? text : `${text}.`;
+  return `${spaced} ${SIGN_IN_HINT}`;
+}
+
 export function JoinAuth({
   initialMode = "signup",
 }: {
   initialMode?: "signup" | "signin";
 }) {
-  const router = useRouter();
   const [mode, setMode] = useState<"signup" | "signin">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [messageRole, setMessageRole] = useState<"alert" | "status">("status");
   const [submitting, setSubmitting] = useState(false);
+
+  function showMessage(text: string, role: "alert" | "status") {
+    setMessage(text);
+    setMessageRole(role);
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,20 +52,26 @@ export function JoinAuth({
           : await supabase.auth.signInWithPassword({ email, password });
 
       if (result.error) {
-        setMessage(result.error.message);
+        showMessage(joinAuthErrorCopy(result.error.message), "alert");
         return;
       }
 
       if (result.data.session) {
-        router.refresh();
+        // Full navigation so the session cookie is on the next document request.
+        // router.refresh() can race that cookie and paint an empty form.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- session cookie must land before the next render
+        window.location.assign("/join");
         return;
       }
 
       if (mode === "signup" && result.data.user) {
-        setMessage("Check your email to confirm, then sign in.");
+        showMessage("Check your email to confirm, then sign in.", "status");
       }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to authenticate.");
+      showMessage(
+        joinAuthErrorCopy(error instanceof Error ? error.message : "Unable to authenticate."),
+        "alert",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -77,6 +98,7 @@ export function JoinAuth({
           onChange={(option) => {
             setMode(option);
             setMessage("");
+            setMessageRole("status");
           }}
           options={[
             { value: "signup", label: "Sign up" },
@@ -114,7 +136,7 @@ export function JoinAuth({
           </p>
         ) : null}
 
-        {message ? <Notice>{message}</Notice> : null}
+        {message ? <Notice role={messageRole}>{message}</Notice> : null}
 
         <div className="flex justify-center pt-2">
           <Button type="submit" disabled={submitting}>
