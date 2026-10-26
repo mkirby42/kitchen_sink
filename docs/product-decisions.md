@@ -148,17 +148,25 @@ Page headings and conversation answers are Fraunces. Everything else is DM Sans.
 
 ### Homepage does not promote the Beehiiv newsletter
 
-The homepage has no newsletter band, no "Why Kitchen Sink?" heading on the page body, and no Read the story or Subscribe links. The header "Why Kitchen Sink?" link is unchanged for now.
+The homepage has no newsletter band, no "Why Kitchen Sink?" heading on the page body, and no Read the story or Subscribe links.
 
 - Landed: 2026-10-26. Replaces the homepage band from #85 and #97.
 - Guard: `tests/guards/home-nav.test.tsx`
 - Browser: `tests/guards/browser/home-nav.test.ts`
 
+### The header has no Why Kitchen Sink? link
+
+The header does not include a Why Kitchen Sink? link for anyone, signed out or signed in. It does not open the Beehiiv story.
+
+- Landed: 2026-10-26.
+- Guard: `tests/guards/home-nav.test.tsx`
+- Browser: `tests/guards/browser/home-nav.test.ts`
+
 ### Header links match who is signed in
 
-Signed out: Home, Find a Therapist, For Therapists, Why Kitchen Sink?, Therapist log in. A published therapist sees Referrals. An unpublished therapist does not.
+Signed out: Home, Find a Therapist, For Therapists, Therapist log in. A published therapist sees Referrals. An unpublished therapist does not.
 
-- Landed: For Therapists 2026-10-07, #45. Why link 2026-10-08, #85. Referrals 2026-10-19, #109.
+- Landed: For Therapists 2026-10-07, #45. Why link removed 2026-10-26. Referrals 2026-10-19, #109.
 - Guard: `tests/guards/home-nav.test.tsx`
 - Browser: `tests/guards/browser/home-nav.test.ts` (signed out). A published therapist's Referrals link is in `tests/guards/browser/profile.test.ts`.
 
@@ -202,7 +210,7 @@ These three were live and then removed. Christine has not picked which version s
 
 Later asks won. Do not treat these as unfinished work.
 
-- Homepage Beehiiv band (Read the story / Subscribe) from #85/#97 was removed. The header Why link still goes to Beehiiv pending Christine.
+- Homepage Beehiiv band (Read the story / Subscribe) from #85/#97 was removed. The header Why Kitchen Sink? link (#85) was removed 2026-10-26.
 - Homepage audience toggle and "Meet clients who are ready to bring it all." (#45). The page is the therapist-start block plus the Gets You card.
 - "Find a therapist who actually fits." (#45). The card says Gets You (#84).
 - Clay emphasis on "therapist" in the Find headline (#73). The headline is plain "Find your therapist" (#114).

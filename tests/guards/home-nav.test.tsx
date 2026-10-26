@@ -18,8 +18,6 @@ vi.mock("@/lib/supabase/env", () => ({
   supabasePublicConfig: () => null,
 }));
 
-const story = "https://everythingbutkitchensink.beehiiv.com/p/let-s-connect";
-
 describe("homepage guards", () => {
   it("keeps the therapist start and the Gets You card", () => {
     const html = renderToStaticMarkup(createElement(HomeHero, homePanels()));
@@ -61,8 +59,8 @@ describe("header guards", () => {
     expect(html).toContain("text-gold");
     expect(html).toContain("For Therapists");
     expect(html).toContain('href="/for-therapists"');
-    expect(html).toContain("Why Kitchen Sink?");
-    expect(html).toContain(`href="${story}"`);
+    expect(html).not.toContain("Why Kitchen Sink?");
+    expect(html).not.toContain("everythingbutkitchensink.beehiiv.com");
     expect(html).toContain("Therapist log in");
     expect(html).not.toContain("Referrals");
   });
@@ -76,7 +74,7 @@ describe("header guards", () => {
     );
     expect(published).toContain("Referrals");
     expect(published).toContain('href="/referrals"');
-    expect(published).toContain("Why Kitchen Sink?");
+    expect(published).not.toContain("Why Kitchen Sink?");
     expect(published).not.toContain("For Therapists");
 
     const draft = renderToStaticMarkup(
@@ -85,6 +83,6 @@ describe("header guards", () => {
       }),
     );
     expect(draft).not.toContain("Referrals");
-    expect(draft).toContain("Why Kitchen Sink?");
+    expect(draft).not.toContain("Why Kitchen Sink?");
   });
 });

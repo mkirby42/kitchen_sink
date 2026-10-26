@@ -85,8 +85,9 @@ describe("llms.txt", () => {
     expect(body).toContain("delete their own profile");
     expect(body).toContain("forgot-password");
     expect(body).toContain(`[Home](${ORIGIN})`);
-    expect(body).toContain(
-      "[Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/let-s-connect)",
+    expect(body).toContain("header does not link to the Kitchen Sink newsletter");
+    expect(body).not.toContain(
+      "https://everythingbutkitchensink.beehiiv.com/p/let-s-connect",
     );
     expect(body).toContain("homepage does not include a newsletter band");
     expect(body).not.toContain(

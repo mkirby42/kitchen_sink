@@ -1,6 +1,7 @@
 // Product-decision guard. Do not weaken this file to make CI pass.
 // Registry: "The homepage is the therapist start plus the find card"
 // Registry: "Homepage does not promote the Beehiiv newsletter"
+// Registry: "The header has no Why Kitchen Sink? link"
 // Registry: "Header links match who is signed in"
 import { expect, test } from "@playwright/test";
 
@@ -33,10 +34,14 @@ test("Homepage does not promote the Beehiiv newsletter", async ({ page }, testIn
   await expect(page.getByText("The story behind the name and our Why.")).toHaveCount(0);
   await expect(page.getByRole("link", { name: /Read the story/ })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Subscribe to the newsletter" })).toHaveCount(0);
-  const headerWhy = page.getByRole("banner").getByRole("link", { name: "Why Kitchen Sink?" });
-  await expect(headerWhy).toBeVisible();
-  expect(await headerWhy.getAttribute("href")).toBe(STORY);
-  expect(await headerWhy.getAttribute("target")).toBe("_blank");
+  await expect(
+    page.getByRole("banner").getByRole("link", { name: "Why Kitchen Sink?" }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("banner").locator(`a[href="${STORY}"]`)).toHaveCount(0);
+  const headerTargets = await page.getByRole("banner").locator("a").evaluateAll((nodes) =>
+    nodes.map((node) => node.getAttribute("target") ?? ""),
+  );
+  expect(headerTargets).not.toContain("_blank");
 });
 
 test("Header links match who is signed in", async ({ page }, testInfo) => {
@@ -47,7 +52,6 @@ test("Header links match who is signed in", async ({ page }, testInfo) => {
     "Home",
     "Find a Therapist",
     "For Therapists",
-    "Why Kitchen Sink?",
     "Therapist log in",
   ]) {
     await expect(header.getByRole("link", { name, exact: true })).toBeVisible();
@@ -60,6 +64,7 @@ test("Header links match who is signed in", async ({ page }, testInfo) => {
     "href",
     "/join?mode=signin",
   );
+  await expect(header.getByRole("link", { name: "Why Kitchen Sink?", exact: true })).toHaveCount(0);
   await expect(header.getByRole("link", { name: "Referrals", exact: true })).toHaveCount(0);
   await expect(header.getByRole("link", { name: "My profile", exact: true })).toHaveCount(0);
   await expect(header.getByRole("button", { name: "Sign out", exact: true })).toHaveCount(0);
