@@ -78,6 +78,7 @@ describe("phone find guards", () => {
       }),
     );
     expect(html).toContain("aspect-[4/5]");
+    expect(html).toContain("mx-auto aspect-[4/5] w-full max-w-md");
     expect(html).toContain("In person · Online");
     expect(html).toContain("Therapist 01");
     expect(html).toContain("PsyD · Licensed psychologist");
