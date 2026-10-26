@@ -43,7 +43,7 @@ export function PhoneListPortrait({
 
   return (
     <div data-find-card="phone" data-phone-list-media="" className="md:hidden">
-      <div className="relative aspect-[4/5] overflow-hidden bg-black">
+      <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden bg-black">
         {photoUrl ? (
           // Public Storage URLs; next/image is out of scope.
           // eslint-disable-next-line @next/next/no-img-element
