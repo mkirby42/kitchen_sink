@@ -17,6 +17,10 @@ import {
 import { Card } from "@/components/ui/Card";
 import { smallLabelClass } from "@/components/ui/styles";
 import { formatRating, reviewAuthorLabel, reviewMeta } from "@/lib/reviews/format";
+import {
+  publicCredentialLines,
+  publicEducationLines,
+} from "@/lib/profile/public-facts";
 import type { FindDetailContent } from "@/lib/search/find-detail";
 import { reviewAverage } from "@/lib/therapists/load";
 
@@ -40,9 +44,6 @@ export function FindDetailStack({ detail }: { detail: FindDetailContent }) {
         givenName={detail.givenName}
         specialties={detail.specialties}
         modalities={detail.modalities}
-        identity={detail.identity}
-        education={detail.education}
-        credentials={detail.credentials}
       />
       <Fees detail={detail} />
       <OwnWords detail={detail} />
@@ -74,6 +75,7 @@ function Facts({ detail }: { detail: FindDetailContent }) {
     facts.push({ key: label, icon: <BadgeMark />, label });
   }
   const blocks = [
+    ...qualificationBlocks(detail),
     detail.insuranceLine ? (
       <p
         key="insurance"
@@ -155,6 +157,43 @@ function Facts({ detail }: { detail: FindDetailContent }) {
         </div>
       ) : null}
     </Card>
+  );
+}
+
+function qualificationBlocks(detail: FindDetailContent) {
+  const education = publicEducationLines(detail.id, detail.education);
+  const credentials = publicCredentialLines(detail.credentials);
+  return [
+    education.length > 0 ? (
+      <QualificationBlock key="education" label="Education" lines={education} />
+    ) : null,
+    credentials.length > 0 ? (
+      <QualificationBlock key="credentials" label="Credentials" lines={credentials} />
+    ) : null,
+  ];
+}
+
+function QualificationBlock({
+  label,
+  lines,
+}: {
+  label: string;
+  lines: readonly string[];
+}) {
+  return (
+    <div className="flex items-start gap-2">
+      <span className="mt-0.5">
+        <BadgeMark />
+      </span>
+      <div>
+        <p className="font-sans text-[15px] leading-5 font-medium text-copy">{label}</p>
+        {lines.map((line, index) => (
+          <p key={`${index}-${line}`} className="mt-0.5 font-sans text-[15px] leading-6 text-copy">
+            {line}
+          </p>
+        ))}
+      </div>
+    </div>
   );
 }
 

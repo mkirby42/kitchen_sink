@@ -251,11 +251,11 @@ Therapist profiles are public while that therapist is open to new clients, publi
 
 ## Profile contents
 
-- Name, years practicing, education, and credentials. Below a computer-width screen the licensed credential is not repeated on the photo. On a wider screen it leads the credential line under the name
+- Name, years practicing, education, and credentials. Education and credentials sit in the facts card, under the license line and above insurance. One public profile omits education lines. Below a computer-width screen the licensed credential is not repeated on the photo. On a wider screen it leads the credential line under the name
 - State licenses (number and state)
-- How {FirstName} works: in-person and online as separate labels, plus the office address when the therapist sees people in person and saved a street address. On a computer-width screen that heading sits over areas of interest, approach, education, and credentials, and the address is an Office row on the name card
+- How {FirstName} works: in-person and online as separate labels, plus the office address when the therapist sees people in person and saved a street address. On a computer-width screen that heading sits over areas of interest and approach, and the address is an Office row on the name card
 - A profile photo, plus either a short intro video or a voice prompt (all three are allowed), required to publish
-- Specialties, modalities, insurance, and identity tags
+- Specialties, modalities, and insurance. Identity tags are collected on join and edit and are not shown on the public profile
 - Rates: service type, session length in minutes, and price. Sliding scale when the therapist offers it
 - A short about section, conversation cards, and published reviews. A review is published only after an admin approves it. Clients are told not to include personal health information. Rejected reviews are deleted and not kept.
 - Contact: email, phone, and/or text, as the therapist listed them

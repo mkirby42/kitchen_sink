@@ -168,7 +168,7 @@ describe("profile edit control", () => {
     expect(off).not.toContain("Not listed");
   });
 
-  it("shows identity and cash pay when saved, and skips them when empty", () => {
+  it("hides identity on the public profile and still shows cash pay when saved", () => {
     const html = renderToStaticMarkup(
       createElement(TherapistProfile, {
         data: {
@@ -180,9 +180,9 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(html).toContain(">Identity<");
-    expect(html).toContain("BIPOC");
-    expect(html).toContain("LGBTQ+");
+    expect(html).not.toContain(">Identity<");
+    expect(html).not.toContain("BIPOC");
+    expect(html).not.toContain("LGBTQ+");
     expect(html).toContain("Cash pay");
     expect(html).toContain("Accepted");
     expect(html).not.toContain("None listed");

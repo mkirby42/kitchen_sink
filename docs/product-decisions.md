@@ -101,17 +101,48 @@ The play control is see-through. On the phone the photo shows the name and the l
 
 ### Profile sections use her words, in this order, on the phone
 
-How {name} works (formats, office address, rates, sliding scale when offered, in-network). Then Get to know {name}. Then education, Approach in therapy, Areas of interest. Then In {name}'s own words. Approach spells out a bare acronym (Cognitive behavioral therapy (CBT)). Tag pills wrap instead of scrolling sideways.
+How {name} works (formats, office address, rates, sliding scale when offered, in-network, plus the education and credential rows in that same facts card). Then Get to know {name}. Then Approach in therapy, Areas of interest. Then In {name}'s own words. Education and credentials are not their own sections. Identity tags are not on this page. Approach spells out a bare acronym (Cognitive behavioral therapy (CBT)). Tag pills wrap instead of scrolling sideways.
 
-- Landed: address 2026-10-07, #51 and #58. Headings 2026-10-08, #80 and #82. Phone order 2026-10-16, #105. Wrapping pills 2026-10-09, #91.
+- Landed: address 2026-10-07, #51 and #58. Headings 2026-10-08, #80 and #82. Phone order 2026-10-16, #105. Wrapping pills 2026-10-09, #91. Facts-card education and hidden identity 2026-10-26.
 - Guard: `tests/guards/profile.test.tsx`
 - Browser: `tests/guards/browser/profile.test.ts`
 
 ### Book and Free consult open a contact sheet
 
-The buttons say Free consult and Book a session. On the phone they pin to the bottom. They open "Reach {name}" and say Kitchen Sink doesn't book sessions. Only Email, Call, and Text leave the site.
+The buttons say Free consult and Book a session. Free consult is on the left and Book a session is on the right, on the phone dock and in the desktop name card. On the phone they pin to the bottom. They open "Reach {name}" and say Kitchen Sink doesn't book sessions. Only Email, Call, and Text leave the site.
 
-- Landed: pinned buttons 2026-10-07, #59. Sheet 2026-10-22, #120.
+- Landed: pinned buttons 2026-10-07, #59. Sheet 2026-10-22, #120. Left/right order 2026-10-26.
+- Guard: `tests/guards/profile.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts`
+
+### Education and credentials sit in the facts card
+
+On every public profile, phone and desktop, and on the Find detail, education and credentials are rows in the facts card. They sit under the license line and above insurance. They are not their own Education or Credentials sections. An empty list is omitted. The rows use the same line treatment as the other facts in that card.
+
+- Landed: 2026-10-26.
+- Guard: `tests/guards/profile.test.tsx` and `tests/guards/find-detail.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts` and `tests/guards/browser/find-detail.test.ts`
+
+### Travis White's public profile hides education
+
+The public profile and the Find detail omit education for profile id `3b354f1e-50a1-4a17-b536-cc7fce1296fe` (`TRAVIS_PROFILE_ID` in `scripts/travis-white/profile.mjs`), on the phone and on desktop. Other therapists still show education. His credentials still show when they are saved. Join, edit, and the stored qualifications are unchanged.
+
+- Landed: 2026-10-26.
+- Guard: `tests/guards/profile.test.tsx` and `tests/guards/find-detail.test.tsx`
+
+### Identity tags stay off the public profile
+
+Identity labels (BIPOC, LGBTQIA+, and any other saved identity tag) are not shown on `/t/[id]` or the Find detail. Join and edit still collect them. Nothing is removed from the tags table.
+
+- Landed: 2026-10-26.
+- Guard: `tests/guards/profile.test.tsx` and `tests/guards/find-detail.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts` and `tests/guards/browser/find-detail.test.ts`
+
+### Free consult is on the left and Book a session is on the right
+
+The profile buttons say Free consult and Book a session. Free consult is the left button. Book a session is the right button. The phone dock and the desktop name card use that same order. They still open the contact sheet.
+
+- Landed: 2026-10-26.
 - Guard: `tests/guards/profile.test.tsx`
 - Browser: `tests/guards/browser/profile.test.ts`
 
@@ -218,3 +249,6 @@ Later asks won. Do not treat these as unfinished work.
 - Phone Find opening as a sideways swipe (#113). List is the default (#115). Sideways swipe remains inside one-at-a-time.
 - Public profile specialties limited to the Find preset list (#68). Custom areas of interest show on the profile again (#101).
 - Caprasimo or Nunito as body text (#89). Body is DM Sans and headings are Fraunces (#104). Caprasimo stays on the wordmark (#92).
+- Phone profile listed education as its own section after Get to know {name}, before Approach in therapy (#105, 2026-10-16). Education and credentials now sit in the facts card, under the license line and above insurance (2026-10-26).
+- Identity tags on the published profile and the Find click-in. Hidden on public profiles 2026-10-26. Join and edit still collect them.
+- Desktop name card listed Book a session before Free consult. Free consult is on the left and Book a session is on the right (2026-10-26).

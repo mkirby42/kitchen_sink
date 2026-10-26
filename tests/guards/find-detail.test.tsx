@@ -4,6 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { FindDesktopDetail } from "@/components/search/FindDesktopDetail";
+import { TRAVIS_PROFILE_ID } from "@/lib/profile/public-facts";
 import { buildFindDetail } from "@/lib/search/find-detail";
 import type { SearchRow } from "@/lib/search/rpc";
 
@@ -109,8 +110,13 @@ describe("desktop find detail guard", () => {
     expect(html).toContain("Approach in therapy");
     expect(html).toContain("Cognitive behavioral therapy (CBT)");
     expect(html).toContain("State University");
-    expect(html).toContain("Identity");
-    expect(html).toContain("BIPOC");
+    expect(html).toContain("Education");
+    expect(html).toContain("Credentials");
+    expect(html.indexOf("Licensed in Texas")).toBeLessThan(html.indexOf("Education"));
+    expect(html.indexOf("Education")).toBeLessThan(html.indexOf("State University"));
+    expect(html.indexOf("State University")).toBeLessThan(html.indexOf("Aetna"));
+    expect(html).not.toContain("Identity");
+    expect(html).not.toContain("BIPOC");
     expect(html).toContain("1102 West 6th Street");
     expect(html).toContain("I sit with people.");
     expect(html).toContain("$150");
@@ -119,5 +125,48 @@ describe("desktop find detail guard", () => {
     expect(html).toContain('aria-haspopup="dialog"');
     expect(html).not.toContain("mailto:");
     expect(html).not.toContain("tel:");
+  });
+
+  it("hides Travis White's education in the Find facts card and keeps credentials", () => {
+    const detail = buildFindDetail({
+      row: { ...row, profile_id: TRAVIS_PROFILE_ID },
+      filterState: "TX",
+      now: new Date("2026-10-22T12:00:00Z"),
+      profile: {
+        name: "Travis White",
+        credential: "PsyD",
+        photoUrl: null,
+        videoUrl: null,
+        virtual: true,
+        inPerson: true,
+        insurance: ["Aetna"],
+        superbill: false,
+        licenses: [{ state: "TX", number: "38047" }],
+        cards: [],
+        contact: [],
+        credentials: ["Licensed Psychologist"],
+        education: ["State University"],
+        identity: ["BIPOC"],
+        givenName: "Travis",
+      },
+    });
+    const html = renderToStaticMarkup(
+      createElement(FindDesktopDetail, {
+        detail,
+        index: 0,
+        count: 1,
+        previousHref: null,
+        nextHref: null,
+        backHref: "/find",
+      }),
+    );
+    expect(html).not.toContain("Education");
+    expect(html).not.toContain("State University");
+    expect(html).toContain("Credentials");
+    expect(html).toContain("Licensed psychologist");
+    expect(html.indexOf("Licensed in Texas")).toBeLessThan(html.indexOf("Credentials"));
+    expect(html.indexOf("Credentials")).toBeLessThan(html.indexOf("Aetna"));
+    expect(html).not.toContain("Identity");
+    expect(html).not.toContain("BIPOC");
   });
 });

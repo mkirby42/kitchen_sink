@@ -17,7 +17,7 @@ export function ContactCtas({
   actions: ConsultBookAction[];
   contact: ContactAction[];
   therapistId?: string;
-  /** responsive: md+ grid and a phone dock. stack: full-width column, no dock. */
+  /** responsive: md+ grid and a phone dock. stack: name-card row, no dock. */
   placement?: "responsive" | "stack";
 }) {
   const [open, setOpen] = useState(false);
@@ -26,19 +26,12 @@ export function ContactCtas({
 
   const columns =
     actions.length > 1 ? "grid-cols-2 gap-3" : "grid-cols-1";
-  const stacked =
-    placement === "stack"
-      ? [
-          ...actions.filter((action) => action.kind === "book"),
-          ...actions.filter((action) => action.kind !== "book"),
-        ]
-      : actions;
 
   return (
     <>
       {placement === "stack" ? (
-        <div data-cta-placement="stack" className="mt-4 flex flex-col gap-2.5">
-          {stacked.map((action) => (
+        <div data-cta-placement="stack" className={`mt-4 grid ${columns}`}>
+          {actions.map((action) => (
             <CtaButton
               key={action.kind}
               action={action}
