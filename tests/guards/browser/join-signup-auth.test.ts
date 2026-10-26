@@ -7,9 +7,6 @@ import {
   testSupabaseConfigured,
 } from "../../test-supabase";
 
-const CREATED = "Account created. Continuing…";
-const CONFIRM = "Check your email to confirm, then sign in.";
-
 /** Prefer the visible form alert with text (layout may also expose an empty live region). */
 async function formAlertText(page: Page): Promise<string> {
   const alert = page.getByRole("alert").filter({ hasText: /./ }).first();
@@ -17,19 +14,18 @@ async function formAlertText(page: Page): Promise<string> {
   return ((await alert.textContent()) ?? "").trim();
 }
 
-/** Signup form outcome. A session navigates to the join wizard; confirmation stays on the form. */
-async function signupSignal(page: Page) {
-  if (await formAlertText(page)) return "alert";
-  if (await page.getByText(CREATED).isVisible()) return "created";
-  if (await page.getByText(CONFIRM).isVisible()) return "confirm";
+/** Sign-in left the auth form for the join wizard, a profile, or a hard nav off mode=signin. */
+async function leftSignIn(page: Page): Promise<boolean> {
   const url = new URL(page.url());
-  if (url.pathname === "/join" && url.searchParams.get("mode") !== "signup") return "left-signup";
-  if (await page.getByText("Step 1 of 4").isVisible()) return "left-signup";
-  return "";
+  if (url.pathname === "/join" && url.searchParams.get("mode") !== "signin") return true;
+  if (url.pathname.startsWith("/t/")) return true;
+  if (await page.getByText("Step 1 of 4").isVisible()) return true;
+  if (await page.getByText("Signing you in…").isVisible()) return true;
+  return false;
 }
 
 test(
-  "therapist sign-up creates an Auth user",
+  "therapist Auth user lands and sign-in leaves the form",
   { tag: "@desktop-only" },
   async ({ page }) => {
     test.skip(!testSupabaseConfigured(), "TEST_SUPABASE_* is not configured");
@@ -38,73 +34,56 @@ test(
     const email = `signup-e2e-${randomUUID()}@gmail.com`;
     const password = `Signup-${randomUUID()}Aa1`;
     const service = createTestServiceClient();
+    let userId: string | null = null;
 
     try {
-      await page.goto("/join?mode=signup");
+      // Do not call public signUp: hosted test Auth's built-in email is 2/hour
+      // project-wide and returns "email rate limit exceeded". Admin createUser
+      // with email_confirm is the day-1 Auth landing check.
+      const created = await service.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+      if (created.error || !created.data.user) {
+        throw new Error(created.error?.message ?? "admin createUser returned no user");
+      }
+      userId = created.data.user.id;
+
+      const authUser = await findAuthUserByEmail(service, email);
+      expect(authUser?.id).toBe(userId);
+      expect(authUser?.email?.toLowerCase()).toBe(email.toLowerCase());
+
+      // Exercise the #131 session hard-nav: sign-in that returns a session must
+      // leave the sign-in form (join wizard / profile / hard nav to /join).
+      await page.goto("/join?mode=signin");
       await page.getByLabel("Email").fill(email);
       await page.getByLabel("Password").fill(password);
-      await page.getByRole("button", { name: "Create account →" }).click();
+      await page.getByRole("button", { name: "Sign in →" }).click();
 
-      // Success copy, the join wizard, or an error. Auth is the day-1 check, including
-      // when the form only says to confirm email.
-      let signal = "";
       try {
         await expect
-          .poll(
-            async () => {
-              const user = await findAuthUserByEmail(service, email);
-              if (user?.email?.toLowerCase() === email.toLowerCase()) return "user";
-              signal = await signupSignal(page);
-              return signal;
-            },
-            { timeout: 20_000, intervals: [400, 800, 1200] },
-          )
-          .not.toBe("");
+          .poll(async () => leftSignIn(page), {
+            timeout: 20_000,
+            intervals: [400, 800, 1200],
+          })
+          .toBe(true);
       } catch (error) {
-        const user = await findAuthUserByEmail(service, email);
-        if (user?.email?.toLowerCase() !== email.toLowerCase()) {
-          const alertText = await formAlertText(page);
-          throw new Error(
-            alertText
-              ? `Therapist sign-up did not create an Auth user for ${email}: ${alertText}`
-              : `Therapist sign-up did not create an Auth user for ${email}.`,
-            { cause: error },
-          );
-        }
+        const alertText = await formAlertText(page);
+        throw new Error(
+          alertText
+            ? `Therapist sign-in did not leave the form for ${email}: ${alertText}`
+            : `Therapist sign-in did not leave the form for ${email}.`,
+          { cause: error },
+        );
       }
-
-      const alertText = await formAlertText(page);
-      const sawAlert = signal === "alert" || Boolean(alertText);
-
-      let authEmail = "";
-      try {
-        await expect
-          .poll(
-            async () => {
-              const user = await findAuthUserByEmail(service, email);
-              authEmail = user?.email?.toLowerCase() ?? "";
-              return authEmail;
-            },
-            { timeout: sawAlert ? 8_000 : 20_000, intervals: [400, 800, 1200] },
-          )
-          .toBe(email.toLowerCase());
-      } catch (error) {
-        const latestAlert = alertText || (await formAlertText(page));
-        if (latestAlert) {
-          throw new Error(
-            `Therapist sign-up did not create an Auth user for ${email}: ${latestAlert}`,
-            { cause: error },
-          );
-        }
-        throw new Error(`Therapist sign-up did not create an Auth user for ${email}.`, {
-          cause: error,
-        });
-      }
-
-      expect(authEmail).toBe(email.toLowerCase());
     } finally {
-      const user = await findAuthUserByEmail(service, email);
-      if (user) await deleteAuthUser(service, user.id);
+      if (userId) {
+        await deleteAuthUser(service, userId);
+      } else {
+        const user = await findAuthUserByEmail(service, email);
+        if (user) await deleteAuthUser(service, user.id);
+      }
     }
   },
 );
