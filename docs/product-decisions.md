@@ -146,11 +146,11 @@ Page headings and conversation answers are Fraunces. Everything else is DM Sans.
 - Guard: `tests/guards/home-nav.test.tsx`
 - Browser: `tests/guards/browser/home-nav.test.ts`
 
-### Why Kitchen Sink links to the newsletter
+### Homepage does not promote the Beehiiv newsletter
 
-The homepage band says Why Kitchen Sink? and The story behind the name and our Why. Read the story and Subscribe to the newsletter open Beehiiv in a new tab. The header has the same Why Kitchen Sink? link, including for a signed-in therapist.
+The homepage has no newsletter band, no "Why Kitchen Sink?" heading on the page body, and no Read the story or Subscribe links. The header "Why Kitchen Sink?" link is unchanged for now.
 
-- Landed: 2026-10-08, #85. Let's Connect URL 2026-10-12, #97.
+- Landed: 2026-10-26. Replaces the homepage band from #85 and #97.
 - Guard: `tests/guards/home-nav.test.tsx`
 - Browser: `tests/guards/browser/home-nav.test.ts`
 
@@ -202,6 +202,7 @@ These three were live and then removed. Christine has not picked which version s
 
 Later asks won. Do not treat these as unfinished work.
 
+- Homepage Beehiiv band (Read the story / Subscribe) from #85/#97 was removed. The header Why link still goes to Beehiiv pending Christine.
 - Homepage audience toggle and "Meet clients who are ready to bring it all." (#45). The page is the therapist-start block plus the Gets You card.
 - "Find a therapist who actually fits." (#45). The card says Gets You (#84).
 - Clay emphasis on "therapist" in the Find headline (#73). The headline is plain "Find your therapist" (#114).

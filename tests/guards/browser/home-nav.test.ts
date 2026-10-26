@@ -1,11 +1,10 @@
 // Product-decision guard. Do not weaken this file to make CI pass.
 // Registry: "The homepage is the therapist start plus the find card"
-// Registry: "Why Kitchen Sink links to the newsletter"
+// Registry: "Homepage does not promote the Beehiiv newsletter"
 // Registry: "Header links match who is signed in"
 import { expect, test } from "@playwright/test";
 
 const STORY = "https://everythingbutkitchensink.beehiiv.com/p/let-s-connect";
-const SUBSCRIBE = "https://everythingbutkitchensink.beehiiv.com/";
 
 test("The homepage is the therapist start plus the find card", async ({ page }, testInfo) => {
   expect(testInfo.title).toBe(
@@ -26,18 +25,16 @@ test("The homepage is the therapist start plus the find card", async ({ page }, 
   await expect(page.getByRole("link", { name: "Uploads" })).toHaveCount(0);
 });
 
-test("Why Kitchen Sink links to the newsletter", async ({ page }, testInfo) => {
-  expect(testInfo.title).toBe("Why Kitchen Sink links to the newsletter");
+test("Homepage does not promote the Beehiiv newsletter", async ({ page }, testInfo) => {
+  expect(testInfo.title).toBe("Homepage does not promote the Beehiiv newsletter");
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Why Kitchen Sink\?/ })).toBeVisible();
-  await expect(page.getByText("The story behind the name and our Why.")).toBeVisible();
-  const story = page.getByRole("link", { name: /Read the story/ });
-  const subscribe = page.getByRole("link", { name: "Subscribe to the newsletter" });
-  expect(await story.getAttribute("href")).toBe(STORY);
-  expect(await story.getAttribute("target")).toBe("_blank");
-  expect(await subscribe.getAttribute("href")).toBe(SUBSCRIBE);
-  expect(await subscribe.getAttribute("target")).toBe("_blank");
-  const headerWhy = page.getByRole("link", { name: "Why Kitchen Sink?" });
+  await expect(page.getByRole("heading", { name: /Why Kitchen Sink\?/ })).toHaveCount(0);
+  await expect(page.getByText("From the newsletter")).toHaveCount(0);
+  await expect(page.getByText("The story behind the name and our Why.")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /Read the story/ })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Subscribe to the newsletter" })).toHaveCount(0);
+  const headerWhy = page.getByRole("banner").getByRole("link", { name: "Why Kitchen Sink?" });
+  await expect(headerWhy).toBeVisible();
   expect(await headerWhy.getAttribute("href")).toBe(STORY);
   expect(await headerWhy.getAttribute("target")).toBe("_blank");
 });

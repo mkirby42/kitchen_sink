@@ -64,7 +64,7 @@ describe("home hero", () => {
     expect(html).not.toContain("Meet clients who are ready to bring it all.");
   });
 
-  it("adds the newsletter Why band without changing the find card", () => {
+  it("keeps the find card and leaves off the newsletter band", () => {
     const html = renderToStaticMarkup(
       createElement(HomeHero, homePanels()),
     );
@@ -72,25 +72,11 @@ describe("home hero", () => {
     expect(html).toContain("Find a therapist who Gets You.");
     expect(html).not.toContain("Find a therapist who actually fits.");
     expect(html).not.toContain("Find someone who actually fits.");
-    expect(html).toContain("From the newsletter");
-    expect(html).toContain("uppercase");
-    expect(html).toContain("Why ");
-    expect(html).toContain("Kitchen Sink?");
-    expect(html).toContain("text-black");
-    expect(html).toContain("text-gold");
-    expect(html).toContain("bg-ink");
-    expect(html).toContain("The story behind the name and our Why.");
-    expect(html).toContain("Read the story");
-    expect(html).toContain("Subscribe to the newsletter");
-    expect(html).toContain(
-      'href="https://everythingbutkitchensink.beehiiv.com/p/let-s-connect"',
-    );
-    expect(html).toContain(
-      'href="https://everythingbutkitchensink.beehiiv.com/"',
-    );
-    expect(html.match(/target="_blank"/g)).toHaveLength(2);
-    expect(html.match(/rel="noopener noreferrer"/g)).toHaveLength(2);
-    expect(html).toContain("bg-gold");
-    expect(html).toContain("underline");
+    expect(html).not.toContain("From the newsletter");
+    expect(html).not.toContain("Why Kitchen Sink?");
+    expect(html).not.toContain("The story behind the name and our Why.");
+    expect(html).not.toContain("Read the story");
+    expect(html).not.toContain("Subscribe to the newsletter");
+    expect(html).not.toContain("everythingbutkitchensink.beehiiv.com");
   });
 });

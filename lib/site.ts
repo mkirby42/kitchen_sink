@@ -239,7 +239,7 @@ The site does not book appointments or take payment. To reach a therapist, use t
 
 A therapist with a published profile can post a de-identified referral for a client. Other published therapists can say they are interested. The poster emails their client from their own email app. That board is not public, and Kitchen Sink does not store the client's name or contact info.
 
-The homepage links out to the Kitchen Sink newsletter: [Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/let-s-connect) and [subscribe](https://everythingbutkitchensink.beehiiv.com/).
+The header links to the Kitchen Sink newsletter story: [Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/let-s-connect). The homepage does not include a newsletter band.
 
 A signed-in therapist can delete their own profile from the edit screen. That removes the public page. The login stays, so they can join again. Email sign-in includes a forgot-password link. The reset email does not say whether that address has an account.
 
