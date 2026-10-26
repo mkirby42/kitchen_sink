@@ -44,10 +44,8 @@ describe("site header", () => {
       }),
     );
     expect(html).toContain("Find a Therapist");
-    expect(html).toContain("Why Kitchen Sink?");
-    expect(html).toContain(
-      'href="https://everythingbutkitchensink.beehiiv.com/p/let-s-connect"',
-    );
+    expect(html).not.toContain("Why Kitchen Sink?");
+    expect(html).not.toContain("everythingbutkitchensink.beehiiv.com");
     expect(html).toContain("My profile");
     expect(html).toContain(
       `href="${routes.therapist("11111111-1111-4111-8111-111111111111")}"`,
@@ -234,16 +232,10 @@ describe("site header", () => {
     expect(html).toContain('href="/for-therapists"');
     expect(html).toContain("Therapist log in");
     expect(html).toContain('href="/join?mode=signin"');
-    expect(html).toContain("Why Kitchen Sink?");
-    expect(html).toContain(
-      'href="https://everythingbutkitchensink.beehiiv.com/p/let-s-connect"',
-    );
-    expect(html).toContain('target="_blank"');
-    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).not.toContain("Why Kitchen Sink?");
+    expect(html).not.toContain("everythingbutkitchensink.beehiiv.com");
+    expect(html).not.toContain('target="_blank"');
     expect(html.indexOf("For Therapists")).toBeLessThan(
-      html.indexOf("Why Kitchen Sink?"),
-    );
-    expect(html.indexOf("Why Kitchen Sink?")).toBeLessThan(
       html.indexOf("Therapist log in"),
     );
     expect(html).not.toContain("Join as a Therapist");
