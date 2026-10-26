@@ -42,17 +42,14 @@ describe("homepage guards", () => {
     expect(html).not.toContain("Review queue");
   });
 
-  it("links Why Kitchen Sink to the newsletter in a new tab", () => {
+  it("does not promote the Beehiiv newsletter on the homepage", () => {
     const html = renderToStaticMarkup(createElement(HomeHero, homePanels()));
-    expect(html).toContain("Why ");
-    expect(html).toContain("Kitchen Sink?");
-    expect(html).toContain("The story behind the name and our Why.");
-    expect(html).toContain("Read the story");
-    expect(html).toContain("Subscribe to the newsletter");
-    expect(html).toContain(`href="${story}"`);
-    expect(html).toContain('href="https://everythingbutkitchensink.beehiiv.com/"');
-    expect(html).toContain('target="_blank"');
-    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).not.toContain("From the newsletter");
+    expect(html).not.toContain("Why Kitchen Sink?");
+    expect(html).not.toContain("The story behind the name and our Why.");
+    expect(html).not.toContain("Subscribe to the newsletter");
+    expect(html).not.toContain("Read the story");
+    expect(html).not.toContain("everythingbutkitchensink.beehiiv.com");
   });
 });
 

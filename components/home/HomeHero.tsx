@@ -1,5 +1,4 @@
 import { TherapistStart } from "@/components/home/TherapistStart";
-import { NewsletterWhy } from "@/components/home/NewsletterWhy";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -36,8 +35,6 @@ export function HomeHero({ client }: { client: HomePanel }) {
           ))}
         </div>
       </Card>
-
-      <NewsletterWhy />
     </main>
   );
 }

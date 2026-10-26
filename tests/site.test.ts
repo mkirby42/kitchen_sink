@@ -88,7 +88,8 @@ describe("llms.txt", () => {
     expect(body).toContain(
       "[Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/let-s-connect)",
     );
-    expect(body).toContain(
+    expect(body).toContain("homepage does not include a newsletter band");
+    expect(body).not.toContain(
       "[subscribe](https://everythingbutkitchensink.beehiiv.com/)",
     );
     expect(body).toContain(`[Find a therapist](${ORIGIN}/find)`);
