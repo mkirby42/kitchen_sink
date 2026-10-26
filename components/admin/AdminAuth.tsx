@@ -1,8 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
@@ -18,14 +17,19 @@ export function AdminAuth({
   title?: string;
   lede?: string;
 }) {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!mounted || submitting) return;
     setMessage("");
     setSubmitting(true);
 
@@ -34,19 +38,26 @@ export function AdminAuth({
       const result = await supabase.auth.signInWithPassword({ email, password });
       if (result.error) {
         setMessage(result.error.message);
+        setSubmitting(false);
         return;
       }
-      if (result.data.session) router.refresh();
+      if (result.data.session) {
+        // Same cookie race as JoinAuth: hard navigate instead of router.refresh().
+        setMessage("Signing you in…");
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- session cookie must land before the next render
+        window.location.assign(window.location.pathname + window.location.search);
+        return;
+      }
+      setSubmitting(false);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to sign in.");
-    } finally {
       setSubmitting(false);
     }
   }
 
   return (
     <AccountShell eyebrow="Ops" title={title} lede={lede}>
-      <form method="post" onSubmit={submit} className="space-y-5">
+      <form method="post" onSubmit={(event) => void submit(event)} className="space-y-5">
         <TextField
           label="Email"
           type="email"
@@ -71,7 +82,7 @@ export function AdminAuth({
         </p>
         {message ? <Notice role="alert">{message}</Notice> : null}
         <div className="flex justify-center pt-2">
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting || !mounted}>
             {submitting ? "Please wait…" : "Sign in →"}
           </Button>
         </div>
