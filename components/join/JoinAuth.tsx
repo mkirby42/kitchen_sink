@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
@@ -33,6 +33,11 @@ export function JoinAuth({
   const [message, setMessage] = useState("");
   const [messageRole, setMessageRole] = useState<"alert" | "status">("status");
   const [submitting, setSubmitting] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   function showMessage(text: string, role: "alert" | "status") {
     setMessage(text);
@@ -41,6 +46,7 @@ export function JoinAuth({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!mounted || submitting) return;
     setMessage("");
     setSubmitting(true);
 
@@ -53,12 +59,18 @@ export function JoinAuth({
 
       if (result.error) {
         showMessage(joinAuthErrorCopy(result.error.message), "alert");
+        setSubmitting(false);
         return;
       }
 
       if (result.data.session) {
         // Full navigation so the session cookie is on the next document request.
-        // router.refresh() can race that cookie and paint an empty form.
+        // router.refresh() can race that cookie and paint an empty form (sign-up
+        // and sign-in). Keep fields and "Please wait…" until the document leaves.
+        showMessage(
+          mode === "signin" ? "Signing you in…" : "Account created. Continuing…",
+          "status",
+        );
         // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- session cookie must land before the next render
         window.location.assign("/join");
         return;
@@ -67,12 +79,12 @@ export function JoinAuth({
       if (mode === "signup" && result.data.user) {
         showMessage("Check your email to confirm, then sign in.", "status");
       }
+      setSubmitting(false);
     } catch (error) {
       showMessage(
         joinAuthErrorCopy(error instanceof Error ? error.message : "Unable to authenticate."),
         "alert",
       );
-    } finally {
       setSubmitting(false);
     }
   }
@@ -107,7 +119,7 @@ export function JoinAuth({
         />
       </div>
 
-      <form onSubmit={submit} className="mt-8 space-y-5">
+      <form method="post" onSubmit={(event) => void submit(event)} className="mt-8 space-y-5">
         <TextField
           label="Email"
           type="email"
@@ -139,7 +151,7 @@ export function JoinAuth({
         {message ? <Notice role={messageRole}>{message}</Notice> : null}
 
         <div className="flex justify-center pt-2">
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting || !mounted}>
             {submitting
               ? "Please wait…"
               : mode === "signup"
