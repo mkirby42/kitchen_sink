@@ -4,10 +4,12 @@ import {
   licensedInLabel,
 } from "@/lib/search/find-desktop";
 import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
-import { isFindTopicSpecialty } from "@/lib/tags/plain-language";
+import { isSelectedFindTopic } from "@/lib/tags/plain-language";
 import {
+  FIND_TOPIC_OTHER,
   INSURANCE_PRESETS,
   SPECIALTY_PRESETS,
+  isFindInsuranceChoice,
   licenseStateLabel,
 } from "@/lib/tags/presets";
 import { yearsPracticing } from "@/lib/therapists/display";
@@ -33,7 +35,7 @@ export function therapistsFitLabel(count: number) {
 }
 
 export function phonePills(filters: SearchFilters): PhonePill[] {
-  const insurance = filters.tags.filter((tag) => INSURANCE.has(tag));
+  const insurance = filters.tags.filter((tag) => isFindInsuranceChoice(tag));
   let insuranceLabel = "Insurance";
   if (insurance.length === 1) insuranceLabel = sentenceCasePhrase(insurance[0]);
   else if (insurance.length > 1) insuranceLabel = `Insurance · ${insurance.length}`;
@@ -57,7 +59,7 @@ export function phonePills(filters: SearchFilters): PhonePill[] {
     {
       id: "topics",
       label: "What's going on",
-      pressed: filters.tags.some((tag) => isFindTopicSpecialty(tag)),
+      pressed: filters.tags.some((tag) => isSelectedFindTopic(tag)),
     },
     {
       id: "format",
@@ -77,12 +79,14 @@ export function clearPhoneSheet(
   if (sheet === "insurance") {
     return {
       ...filters,
-      tags: filters.tags.filter((tag) => !INSURANCE.has(tag)),
+      tags: filters.tags.filter((tag) => !isFindInsuranceChoice(tag)),
     };
   }
   return {
     ...filters,
-    tags: filters.tags.filter((tag) => !SPECIALTY.has(tag)),
+    tags: filters.tags.filter(
+      (tag) => !SPECIALTY.has(tag) && tag !== FIND_TOPIC_OTHER,
+    ),
   };
 }
 

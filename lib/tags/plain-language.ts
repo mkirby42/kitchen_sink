@@ -1,4 +1,4 @@
-import { SPECIALTY_PRESETS } from "@/lib/tags/presets";
+import { FIND_TOPIC_OTHER, SPECIALTY_PRESETS } from "@/lib/tags/presets";
 
 /** Desktop Find topic. `specialty` is the stored tag the chip filters on. */
 export type FindTopic = {
@@ -63,6 +63,18 @@ const TOPIC_SPECIALTIES = new Set<string>(
   FIND_TOPICS.map((topic) => topic.specialty),
 );
 
+/** Last What's going on option. `tag` is the address marker, not a join preset. */
+export const FIND_TOPIC_OTHER_OPTION = {
+  plain: "Other",
+  clinical: "Another specialty",
+  tag: FIND_TOPIC_OTHER,
+} as const;
+
 export function isFindTopicSpecialty(label: string) {
   return TOPIC_SPECIALTIES.has(label);
+}
+
+/** A named Find topic, or the Find-only Other marker. */
+export function isSelectedFindTopic(tag: string) {
+  return isFindTopicSpecialty(tag) || tag === FIND_TOPIC_OTHER;
 }

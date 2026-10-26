@@ -45,20 +45,60 @@ export const INSURANCE_PRESETS = [
   "Out-of-Network Superbill",
 ] as const;
 
+/**
+ * Find address marker for insurance Other. Not an `INSURANCE_PRESETS` chip,
+ * so Join does not offer it.
+ */
+export const FIND_INSURANCE_OTHER = "Other";
+
+/**
+ * Find address marker for What's going on → Other.
+ * Distinct from FIND_INSURANCE_OTHER: both filters share `tags`.
+ */
+export const FIND_TOPIC_OTHER = "Other topic";
+
+/** Find insurance sheet and desktop menu. Join keeps `INSURANCE_PRESETS`. */
+export const FIND_INSURANCE_OPTIONS = [
+  ...INSURANCE_PRESETS,
+  FIND_INSURANCE_OTHER,
+] as const;
+
 const SEARCH_FILTER_TAGS = new Set<string>([
   ...SPECIALTY_PRESETS,
   ...INSURANCE_PRESETS,
 ]);
 
-export function allowedSearchTags(tags: string[]) {
-  return canonicalSpecialtyLabels(tags).filter((tag) =>
-    SEARCH_FILTER_TAGS.has(tag),
+const FIND_OTHER_SENTINELS = new Set<string>([
+  FIND_INSURANCE_OTHER,
+  FIND_TOPIC_OTHER,
+]);
+
+export function isFindOtherMarker(tag: string) {
+  return FIND_OTHER_SENTINELS.has(tag);
+}
+
+export function isFindInsuranceChoice(tag: string) {
+  return (
+    (INSURANCE_PRESETS as readonly string[]).includes(tag) ||
+    tag === FIND_INSURANCE_OTHER
   );
 }
 
-/** Query labels. Self Discovery also matches a specialty row still stored as Teens. */
+export function allowedSearchTags(tags: string[]) {
+  return canonicalSpecialtyLabels(tags).filter(
+    (tag) => SEARCH_FILTER_TAGS.has(tag) || FIND_OTHER_SENTINELS.has(tag),
+  );
+}
+
+/**
+ * Query labels. Self Discovery also matches a specialty row still stored as Teens.
+ * Other markers are not stored presets. When one is selected, the RPC gets no tag
+ * list so it returns the format and state cohort (still capped at 24). Find then
+ * keeps named-tag OR Other matches in `applyFindOtherMatches`.
+ */
 export function searchQueryTags(tags: string[]) {
   const selected = allowedSearchTags(tags);
+  if (selected.some((tag) => FIND_OTHER_SENTINELS.has(tag))) return [];
   const query = [...selected];
   for (const [legacy, current] of Object.entries(LEGACY_SPECIALTY_LABELS)) {
     if (selected.includes(current) && !query.includes(legacy)) {

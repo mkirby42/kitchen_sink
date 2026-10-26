@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { FindDesktopFilters } from "@/components/search/FindDesktopFilters";
 import { PhoneFilterBar } from "@/components/search/PhoneFilterBar";
 import type { SearchFilters } from "@/lib/search/rpc";
+import type { PhoneSheet } from "@/lib/search/phone-find";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push() {} }),
@@ -29,7 +30,7 @@ const topics = [
   "Trouble focusing",
 ];
 
-function phone(filters: SearchFilters, open: "topics" | null) {
+function phone(filters: SearchFilters, open: PhoneSheet | null) {
   return renderToStaticMarkup(
     createElement(PhoneFilterBar, {
       filters,
@@ -69,6 +70,9 @@ describe("find filter guards", () => {
     expect(html).toContain("ADHD");
     expect(html).toContain("Show 4 therapists");
     expect(html).toContain("Clear all");
+    expect(html.indexOf("Trouble focusing")).toBeLessThan(html.indexOf("Another specialty"));
+    expect(html).toContain("Other");
+    expect(html).toContain("Another specialty");
     expect(html).not.toContain("Self discovery");
     expect(html).not.toContain("Self Discovery");
     expect(html).not.toContain("Immigration");
@@ -106,5 +110,31 @@ describe("find filter guards", () => {
     expect(html).not.toContain("Years in practice");
     expect(html).not.toContain("Self discovery");
     expect(html).not.toContain("Immigration");
+    expect(html.indexOf("Trouble focusing")).toBeLessThan(html.indexOf("Another specialty"));
+    expect(html).toContain("Other");
+    expect(html).toContain("Another specialty");
+  });
+
+  it("lists Other last on Insurance, on the phone and on desktop", () => {
+    const phoneHtml = phone(empty, "insurance");
+    expect(phoneHtml.indexOf("Aetna")).toBeGreaterThan(-1);
+    expect(phoneHtml.indexOf("Out-of-network superbill")).toBeLessThan(
+      phoneHtml.indexOf("Other"),
+    );
+    expect(phoneHtml).not.toContain("Another specialty");
+
+    const desktopHtml = renderToStaticMarkup(
+      createElement(FindDesktopFilters, {
+        matchCount: 4,
+        initialOpen: "insurance",
+      }),
+    );
+    const panel = desktopHtml.slice(desktopHtml.indexOf('id="find-insurance"'));
+    expect(panel.indexOf("Aetna")).toBeGreaterThan(-1);
+    expect(panel.indexOf("Out-of-network superbill")).toBeLessThan(
+      panel.indexOf("Other"),
+    );
+    expect(panel).not.toContain("Another specialty");
+    expect(panel).not.toContain("Feeling down or stuck");
   });
 });

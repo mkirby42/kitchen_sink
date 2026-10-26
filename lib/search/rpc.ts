@@ -1,3 +1,4 @@
+import { applyFindOtherMatches } from "@/lib/search/find-other";
 import { createClient } from "@/lib/supabase/server";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import {
@@ -102,5 +103,8 @@ export async function searchTherapists(filters: SearchFilters) {
     searchRpcArgs(filters),
   );
   if (error) throw error;
-  return normalizeSearchRows((data ?? []) as SearchRow[], filters.tags);
+  return applyFindOtherMatches(
+    normalizeSearchRows((data ?? []) as SearchRow[], filters.tags),
+    filters.tags,
+  );
 }

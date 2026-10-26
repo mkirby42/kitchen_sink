@@ -1,6 +1,7 @@
 // Product-decision guard. Do not weaken this file to make CI pass.
 // Registry: "Find filters are four pills, and the phone row wraps"
-// Registry: "What's going on is seven plain-language topics"
+// Registry: "What's going on is seven plain-language topics, plus Other"
+// Registry: "Insurance includes Other"
 import { expect, test } from "@playwright/test";
 import { TOPICS } from "./support";
 
@@ -70,11 +71,38 @@ test("What's going on is seven plain-language topics", async ({ page }, testInfo
   expect(text).toContain("Anxiety, panic disorder");
   expect(text).toContain("Trauma, PTSD");
   expect(text).toContain("ADHD");
+  expect(text).toContain("Other");
+  expect(text).toContain("Another specialty");
+  expect(text.indexOf("Trouble focusing")).toBeLessThan(text.indexOf("Another specialty"));
   expect(text).toMatch(/Show \d+ therapists/);
   expect(text).not.toContain("Self Discovery");
   expect(text).not.toContain("Self discovery");
   expect(text).not.toContain("Immigration");
   expect(text).not.toContain("Family or parenting");
   expect(text).not.toContain("Burnout or work stress");
+  expect(text).not.toContain("What brings you to therapy?");
+});
+
+test("Insurance includes Other", async ({ page }, testInfo) => {
+  expect(testInfo.title).toBe("Insurance includes Other");
+  await page.goto("/find");
+
+  if (testInfo.project.name === "phone") {
+    await page.getByRole("button", { name: "Insurance" }).click();
+  } else {
+    await page.locator('[data-find-desktop="filters"]').getByRole("button", { name: "Insurance" }).click();
+  }
+
+  const sheet =
+    testInfo.project.name === "phone"
+      ? page.locator("[data-phone-sheet='insurance']")
+      : page.locator("#find-insurance");
+  await expect(sheet.getByRole("button", { name: "Other" })).toBeVisible();
+  const text = await sheet.innerText();
+  expect(text).toContain("Aetna");
+  expect(text).toContain("Out-of-network superbill");
+  expect(text.indexOf("Out-of-network superbill")).toBeLessThan(text.indexOf("Other"));
+  expect(text).not.toContain("Another specialty");
+  expect(text).not.toContain("Self Discovery");
   expect(text).not.toContain("What brings you to therapy?");
 });

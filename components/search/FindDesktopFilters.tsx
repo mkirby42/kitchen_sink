@@ -5,8 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Tag } from "@/components/ui/Tag";
 import { cx } from "@/components/ui/styles";
 import type { SearchFilters } from "@/lib/search/rpc";
-import { isFindTopicSpecialty } from "@/lib/tags/plain-language";
-import { INSURANCE_PRESETS, licenseStateLabel } from "@/lib/tags/presets";
+import { isSelectedFindTopic } from "@/lib/tags/plain-language";
+import {
+  FIND_INSURANCE_OPTIONS,
+  isFindInsuranceChoice,
+  licenseStateLabel,
+} from "@/lib/tags/presets";
 import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import { PlacePanel, TopicPanel } from "./FindFilterPanels";
 import {
@@ -48,9 +52,7 @@ export function FindDesktopFilters({
     setOpen((current) => (current === menu ? null : menu));
   }
 
-  const insuranceOn = filters.tags.some((tag) =>
-    (INSURANCE_PRESETS as readonly string[]).includes(tag),
-  );
+  const insuranceOn = filters.tags.some((tag) => isFindInsuranceChoice(tag));
   const placeLabel = filters.state
     ? `Where you live · ${licenseStateLabel(filters.state)}`
     : "Where you live";
@@ -87,7 +89,7 @@ export function FindDesktopFilters({
         <FilterPill
           label="What's going on"
           open={open === "topics"}
-          pressed={filters.tags.some((tag) => isFindTopicSpecialty(tag))}
+          pressed={filters.tags.some((tag) => isSelectedFindTopic(tag))}
           controls="find-whats-going-on"
           onClick={() => toggleMenu("topics")}
         />
@@ -121,7 +123,7 @@ export function FindDesktopFilters({
           id="find-insurance"
           className="mt-3 flex max-w-xl flex-wrap gap-2 rounded-card bg-paper p-4 shadow-card"
         >
-          {INSURANCE_PRESETS.map((label) => (
+          {FIND_INSURANCE_OPTIONS.map((label) => (
             <Tag
               key={label}
               selected={filters.tags.includes(label)}

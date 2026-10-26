@@ -74,6 +74,18 @@ describe("phone find copy", () => {
     expect(phonePills({ ...filters, tags: ["Aetna", "BCBS"] })[1].label).toBe(
       "Insurance · 2",
     );
+    const insuranceOther = phonePills({ ...filters, tags: ["Other"] });
+    expect(insuranceOther[1]).toMatchObject({ label: "Other", pressed: true });
+    expect(insuranceOther[2].pressed).toBe(false);
+    const topicOther = phonePills({ ...filters, tags: ["Other topic"] });
+    expect(topicOther[1]).toMatchObject({ label: "Insurance", pressed: false });
+    expect(topicOther[2]).toMatchObject({
+      label: "What's going on",
+      pressed: true,
+    });
+    expect(phonePills({ ...filters, tags: ["Aetna", "Other"] })[1].label).toBe(
+      "Insurance · 2",
+    );
   });
 
   it("clears one sheet and leaves the others", () => {
@@ -97,6 +109,15 @@ describe("phone find copy", () => {
       inPerson: false,
       state: "TX",
     });
+    const marked: SearchFilters = {
+      ...filters,
+      tags: ["Anxiety", "Aetna", "Other", "Other topic"],
+    };
+    expect(clearPhoneSheet(marked, "insurance").tags).toEqual([
+      "Anxiety",
+      "Other topic",
+    ]);
+    expect(clearPhoneSheet(marked, "topics").tags).toEqual(["Aetna", "Other"]);
   });
 
   it("prefers the who-I-work-best-with answer for the list portrait", () => {
