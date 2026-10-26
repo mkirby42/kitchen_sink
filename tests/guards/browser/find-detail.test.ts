@@ -25,6 +25,16 @@ test(
     await expect(detail.getByRole("button", { name: "Watch intro" })).toBeVisible();
     await expect(detail.getByText(WORK_ANSWER)).toBeVisible();
     await expect(detail.getByText("Cognitive behavioral therapy (CBT)")).toBeVisible();
+    await expect(detail.getByRole("heading", { name: "Education" })).toHaveCount(0);
+    await expect(detail.getByRole("heading", { name: "Identity" })).toHaveCount(0);
+    await expect(detail.getByText("Sample State University")).toBeVisible();
+    const facts = await detail.innerText();
+    const licenseAt = facts.indexOf("Licensed in Texas");
+    const schoolAt = facts.indexOf("Sample State University");
+    const insuranceAt = facts.indexOf("Aetna");
+    expect(licenseAt).toBeGreaterThan(-1);
+    expect(schoolAt).toBeGreaterThan(licenseAt);
+    expect(insuranceAt).toBeGreaterThan(schoolAt);
     await expect(detail.getByText(OFFICE_STREET)).toBeVisible();
     await expect(detail.getByText(PRICE_LABEL)).toBeVisible();
     await expect(detail.getByText("Available")).toBeVisible();

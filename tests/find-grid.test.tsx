@@ -380,11 +380,17 @@ describe("desktop find profile", () => {
     expect(html).toContain("Life transitions");
     expect(html).toContain("Approach in therapy");
     expect(html).toContain("Cognitive behavioral therapy (CBT)");
-    expect(html).toContain(">Identity<");
-    expect(html).toContain("BIPOC");
-    expect(html).toContain("LGBTQ+");
+    expect(html).not.toContain(">Identity<");
+    expect(html).not.toContain("BIPOC");
+    expect(html).not.toContain("LGBTQ+");
     expect(html).toContain("Education");
     expect(html).toContain("M.A. Counseling Psychology");
+    expect(html.indexOf("Licensed in Texas")).toBeLessThan(
+      html.indexOf("M.A. Counseling Psychology"),
+    );
+    expect(html.indexOf("M.A. Counseling Psychology")).toBeLessThan(
+      html.indexOf("Cash pay"),
+    );
     expect(html).toContain(">Fees<");
     expect(html).toContain("Individual session (50 min)");
     expect(html).toContain("$150");

@@ -1,7 +1,12 @@
 import { bodyCopyClass, metaLineClass, profileSectionHeadingClass } from "@/components/ui/styles";
+import {
+  publicCredentialLines,
+  publicEducationLines,
+} from "@/lib/profile/public-facts";
 import { practiceFeeRows, type TherapistProfileData } from "@/lib/therapists/load";
 import { FeeRows } from "./FeeRows";
 import { NotAcceptingClients } from "./NotAcceptingClients";
+import { QualificationFacts } from "./QualificationFacts";
 import { SessionFormatLine } from "./SessionFormatLine";
 
 export function AboutPanel({
@@ -17,6 +22,9 @@ export function AboutPanel({
   givenName,
   openToNewClients,
   cashPay = false,
+  profileId,
+  education = [],
+  credentials = [],
 }: {
   about: string | null;
   rates: TherapistProfileData["rates"];
@@ -32,6 +40,9 @@ export function AboutPanel({
   /** Missing means open, so an older caller does not flash a closed pill. */
   openToNewClients?: boolean;
   cashPay?: boolean;
+  profileId?: string;
+  education?: readonly string[];
+  credentials?: readonly string[];
 }) {
   const aboutCopy = showAbout === false ? null : about;
   const logistics = showLogistics !== false;
@@ -44,8 +55,15 @@ export function AboutPanel({
         superbill,
       })
     : [];
+  const educationLines =
+    logistics && profileId ? publicEducationLines(profileId, education) : [];
+  const credentialLines = logistics ? publicCredentialLines(credentials) : [];
   const hasLogistics =
-    formats.length > 0 || officeLines.length > 0 || fees.length > 0;
+    formats.length > 0 ||
+    officeLines.length > 0 ||
+    fees.length > 0 ||
+    educationLines.length > 0 ||
+    credentialLines.length > 0;
 
   if (!aboutCopy && !logistics) return null;
   if (!logistics) {
@@ -73,6 +91,13 @@ export function AboutPanel({
             <div className="mt-3">
               <SessionFormatLine formats={formats} />
             </div>
+          ) : null}
+          {profileId && (educationLines.length > 0 || credentialLines.length > 0) ? (
+            <QualificationFacts
+              profileId={profileId}
+              education={education}
+              credentials={credentials}
+            />
           ) : null}
           {officeLines.length > 0 ? (
             <address className={`mt-3 not-italic ${metaLineClass}`}>

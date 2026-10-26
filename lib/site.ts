@@ -239,7 +239,7 @@ The site does not book appointments or take payment. To reach a therapist, use t
 
 A therapist with a published profile can post a de-identified referral for a client. Other published therapists can say they are interested. The poster emails their client from their own email app. That board is not public, and Kitchen Sink does not store the client's name or contact info.
 
-The header links to the Kitchen Sink newsletter story: [Why Kitchen Sink?](https://everythingbutkitchensink.beehiiv.com/p/let-s-connect). The homepage does not include a newsletter band.
+The header does not link to the Kitchen Sink newsletter. The homepage does not include a newsletter band.
 
 A signed-in therapist can delete their own profile from the edit screen. That removes the public page. The login stays, so they can join again. Email sign-in includes a forgot-password link. The reset email does not say whether that address has an account.
 
@@ -251,11 +251,11 @@ Therapist profiles are public while that therapist is open to new clients, publi
 
 ## Profile contents
 
-- Name, years practicing, education, and credentials. Below a computer-width screen the licensed credential is not repeated on the photo. On a wider screen it leads the credential line under the name
+- Name, years practicing, education, and credentials. Education and credentials sit in the facts card, under the license line and above insurance. One public profile omits education lines. Below a computer-width screen the licensed credential is not repeated on the photo. On a wider screen it leads the credential line under the name
 - State licenses (number and state)
-- How {FirstName} works: in-person and online as separate labels, plus the office address when the therapist sees people in person and saved a street address. On a computer-width screen that heading sits over areas of interest, approach, education, and credentials, and the address is an Office row on the name card
+- How {FirstName} works: in-person and online as separate labels, plus the office address when the therapist sees people in person and saved a street address. On a computer-width screen that heading sits over areas of interest and approach, and the address is an Office row on the name card
 - A profile photo, plus either a short intro video or a voice prompt (all three are allowed), required to publish
-- Specialties, modalities, insurance, and identity tags
+- Specialties, modalities, and insurance. Identity tags are collected on join and edit and are not shown on the public profile
 - Rates: service type, session length in minutes, and price. Sliding scale when the therapist offers it
 - A short about section, conversation cards, and published reviews. A review is published only after an admin approves it. Clients are told not to include personal health information. Rejected reviews are deleted and not kept.
 - Contact: email, phone, and/or text, as the therapist listed them

@@ -109,17 +109,48 @@ The play control is see-through. On the phone the photo shows the name and the l
 
 ### Profile sections use her words, in this order, on the phone
 
-How {name} works (formats, office address, rates, sliding scale when offered, in-network). Then Get to know {name}. Then education, Approach in therapy, Areas of interest. Then In {name}'s own words. Approach spells out a bare acronym (Cognitive behavioral therapy (CBT)). Tag pills wrap instead of scrolling sideways.
+How {name} works (formats, office address, rates, sliding scale when offered, in-network, plus the education and credential rows in that same facts card). Then Get to know {name}. Then Approach in therapy, Areas of interest. Then In {name}'s own words. Education and credentials are not their own sections. Identity tags are not on this page. Approach spells out a bare acronym (Cognitive behavioral therapy (CBT)). Tag pills wrap instead of scrolling sideways.
 
-- Landed: address 2026-10-07, #51 and #58. Headings 2026-10-08, #80 and #82. Phone order 2026-10-16, #105. Wrapping pills 2026-10-09, #91.
+- Landed: address 2026-10-07, #51 and #58. Headings 2026-10-08, #80 and #82. Phone order 2026-10-16, #105. Wrapping pills 2026-10-09, #91. Facts-card education and hidden identity 2026-10-26.
 - Guard: `tests/guards/profile.test.tsx`
 - Browser: `tests/guards/browser/profile.test.ts`
 
 ### Book and Free consult open a contact sheet
 
-The buttons say Free consult and Book a session. On the phone they pin to the bottom. They open "Reach {name}" and say Kitchen Sink doesn't book sessions. Only Email, Call, and Text leave the site.
+The buttons say Free consult and Book a session. Free consult is on the left and Book a session is on the right, on the phone dock and in the desktop name card. On the phone they pin to the bottom. They open "Reach {name}" and say Kitchen Sink doesn't book sessions. Only Email, Call, and Text leave the site.
 
-- Landed: pinned buttons 2026-10-07, #59. Sheet 2026-10-22, #120.
+- Landed: pinned buttons 2026-10-07, #59. Sheet 2026-10-22, #120. Left/right order 2026-10-26.
+- Guard: `tests/guards/profile.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts`
+
+### Education and credentials sit in the facts card
+
+On every public profile, phone and desktop, and on the Find detail, education and credentials are rows in the facts card. They sit under the license line and above insurance. They are not their own Education or Credentials sections. An empty list is omitted. The rows use the same line treatment as the other facts in that card.
+
+- Landed: 2026-10-26.
+- Guard: `tests/guards/profile.test.tsx` and `tests/guards/find-detail.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts` and `tests/guards/browser/find-detail.test.ts`
+
+### Travis White's public profile hides education
+
+The public profile and the Find detail omit education for profile id `3b354f1e-50a1-4a17-b536-cc7fce1296fe` (`TRAVIS_PROFILE_ID` in `scripts/travis-white/profile.mjs`), on the phone and on desktop. Other therapists still show education. His credentials still show when they are saved. Join, edit, and the stored qualifications are unchanged.
+
+- Landed: 2026-10-26.
+- Guard: `tests/guards/profile.test.tsx` and `tests/guards/find-detail.test.tsx`
+
+### Identity tags stay off the public profile
+
+Identity labels (BIPOC, LGBTQIA+, and any other saved identity tag) are not shown on `/t/[id]` or the Find detail. Join and edit still collect them. Nothing is removed from the tags table.
+
+- Landed: 2026-10-26.
+- Guard: `tests/guards/profile.test.tsx` and `tests/guards/find-detail.test.tsx`
+- Browser: `tests/guards/browser/profile.test.ts` and `tests/guards/browser/find-detail.test.ts`
+
+### Free consult is on the left and Book a session is on the right
+
+The profile buttons say Free consult and Book a session. Free consult is the left button. Book a session is the right button. The phone dock and the desktop name card use that same order. They still open the contact sheet.
+
+- Landed: 2026-10-26.
 - Guard: `tests/guards/profile.test.tsx`
 - Browser: `tests/guards/browser/profile.test.ts`
 
@@ -156,17 +187,25 @@ Page headings and conversation answers are Fraunces. Everything else is DM Sans.
 
 ### Homepage does not promote the Beehiiv newsletter
 
-The homepage has no newsletter band, no "Why Kitchen Sink?" heading on the page body, and no Read the story or Subscribe links. The header "Why Kitchen Sink?" link is unchanged for now.
+The homepage has no newsletter band, no "Why Kitchen Sink?" heading on the page body, and no Read the story or Subscribe links.
 
 - Landed: 2026-10-26. Replaces the homepage band from #85 and #97.
 - Guard: `tests/guards/home-nav.test.tsx`
 - Browser: `tests/guards/browser/home-nav.test.ts`
 
+### The header has no Why Kitchen Sink? link
+
+The header does not include a Why Kitchen Sink? link for anyone, signed out or signed in. It does not open the Beehiiv story.
+
+- Landed: 2026-10-26.
+- Guard: `tests/guards/home-nav.test.tsx`
+- Browser: `tests/guards/browser/home-nav.test.ts`
+
 ### Header links match who is signed in
 
-Signed out: Home, Find a Therapist, For Therapists, Why Kitchen Sink?, Therapist log in. A published therapist sees Referrals. An unpublished therapist does not.
+Signed out: Home, Find a Therapist, For Therapists, Therapist log in. A published therapist sees Referrals. An unpublished therapist does not.
 
-- Landed: For Therapists 2026-10-07, #45. Why link 2026-10-08, #85. Referrals 2026-10-19, #109.
+- Landed: For Therapists 2026-10-07, #45. Why link removed 2026-10-26. Referrals 2026-10-19, #109.
 - Guard: `tests/guards/home-nav.test.tsx`
 - Browser: `tests/guards/browser/home-nav.test.ts` (signed out). A published therapist's Referrals link is in `tests/guards/browser/profile.test.ts`.
 
@@ -210,7 +249,7 @@ These three were live and then removed. Christine has not picked which version s
 
 Later asks won. Do not treat these as unfinished work.
 
-- Homepage Beehiiv band (Read the story / Subscribe) from #85/#97 was removed. The header Why link still goes to Beehiiv pending Christine.
+- Homepage Beehiiv band (Read the story / Subscribe) from #85/#97 was removed. The header Why Kitchen Sink? link (#85) was removed 2026-10-26.
 - Homepage audience toggle and "Meet clients who are ready to bring it all." (#45). The page is the therapist-start block plus the Gets You card.
 - "Find a therapist who actually fits." (#45). The card says Gets You (#84).
 - Clay emphasis on "therapist" in the Find headline (#73). The headline is plain "Find your therapist" (#114).
@@ -218,3 +257,6 @@ Later asks won. Do not treat these as unfinished work.
 - Phone Find opening as a sideways swipe (#113). List is the default (#115). Sideways swipe remains inside one-at-a-time.
 - Public profile specialties limited to the Find preset list (#68). Custom areas of interest show on the profile again (#101).
 - Caprasimo or Nunito as body text (#89). Body is DM Sans and headings are Fraunces (#104). Caprasimo stays on the wordmark (#92).
+- Phone profile listed education as its own section after Get to know {name}, before Approach in therapy (#105, 2026-10-16). Education and credentials now sit in the facts card, under the license line and above insurance (2026-10-26).
+- Identity tags on the published profile and the Find click-in. Hidden on public profiles 2026-10-26. Join and edit still collect them.
+- Desktop name card listed Book a session before Free consult. Free consult is on the left and Book a session is on the right (2026-10-26).

@@ -19,7 +19,6 @@ import { signIn } from "./support";
 const PHONE_ORDER = [
   "How Ada works",
   "Get to know Ada",
-  "Education",
   "Approach in therapy",
   "Areas of interest",
   "In Ada's own words",
@@ -66,7 +65,16 @@ test(
       previous = index;
     }
     await expect(phone.getByText("Cognitive behavioral therapy (CBT)")).toBeVisible();
+    await expect(phone.getByRole("heading", { name: "Education" })).toHaveCount(0);
+    await expect(phone.getByRole("heading", { name: "Identity" })).toHaveCount(0);
     await expect(phone.getByText("Sample State University")).toBeVisible();
+    const body = await phone.innerText();
+    const licenseAt = body.indexOf(LICENSE_LINE);
+    const schoolAt = body.indexOf("Sample State University");
+    const insuranceAt = body.indexOf("Aetna");
+    expect(licenseAt).toBeGreaterThan(-1);
+    expect(schoolAt).toBeGreaterThan(licenseAt);
+    expect(insuranceAt).toBeGreaterThan(schoolAt);
     await expect(phone.getByText(OFFICE_STREET)).toBeVisible();
     await expect(phone.getByText(PRICE_LABEL)).toBeVisible();
     await expect(phone.getByText("Sliding scale")).toBeVisible();
@@ -92,6 +100,11 @@ test(
     const consult = dock.getByRole("button", { name: "Free consult" });
     await expect(book).toBeVisible();
     await expect(consult).toBeVisible();
+    const consultBox = await consult.boundingBox();
+    const bookBox = await book.boundingBox();
+    expect(consultBox).not.toBeNull();
+    expect(bookBox).not.toBeNull();
+    expect(consultBox!.x).toBeLessThan(bookBox!.x);
     await consult.click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("heading", { name: "Reach Ada" })).toBeVisible();
@@ -154,6 +167,14 @@ test(
     await page.goto(`/t/${bea.id}`);
     const desk = page.locator("[data-profile-layout='desk']");
     await expect(desk.getByText(VOICE_TITLE)).toBeVisible();
+    const stack = desk.locator("[data-cta-placement='stack']");
+    const consult = stack.getByRole("button", { name: "Free consult" });
+    const book = stack.getByRole("button", { name: "Book a session" });
+    const consultBox = await consult.boundingBox();
+    const bookBox = await book.boundingBox();
+    expect(consultBox).not.toBeNull();
+    expect(bookBox).not.toBeNull();
+    expect(consultBox!.x).toBeLessThan(bookBox!.x);
     await expect(desk.getByRole("button", { name: "Watch Bea's intro" })).toHaveCount(0);
   },
 );

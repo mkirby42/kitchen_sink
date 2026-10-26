@@ -132,9 +132,9 @@ describe("phone profile layout", () => {
 
     expect(media).toBeGreaterThan(-1);
     expect(media).toBeLessThan(phone);
-    expect(phone).toBeLessThan(know);
-    expect(know).toBeLessThan(education);
-    expect(education).toBeLessThan(modalities);
+    expect(phone).toBeLessThan(education);
+    expect(education).toBeLessThan(know);
+    expect(know).toBeLessThan(modalities);
     expect(modalities).toBeLessThan(specialties);
     expect(specialties).toBeLessThan(own);
     expect(own).toBeLessThan(switchAt);
@@ -150,7 +150,7 @@ describe("phone profile layout", () => {
     expect(lead).toContain("8 yrs practicing");
     expect(lead).not.toContain("PsyD");
 
-    const conversation = phoneTree.slice(know, education);
+    const conversation = phoneTree.slice(know, modalities);
     expect(conversation).toContain('data-prompt-variant="classic"');
     expect(conversation).toContain("text-prompt");
     expect(conversation).toContain("text-[20px]");
@@ -162,6 +162,10 @@ describe("phone profile layout", () => {
     const phoneSlot = slot(html, "phone");
     expect(phoneSlot).toContain("md:hidden");
     expect(phoneSlot).toContain("How Travis works");
+    expect(phoneTree.indexOf(texas)).toBeLessThan(phoneTree.indexOf("Education"));
+    expect(phoneSlot.indexOf("Education")).toBeLessThan(phoneSlot.indexOf("Aetna"));
+    expect(phoneSlot.indexOf("Credentials")).toBeLessThan(phoneSlot.indexOf("Aetna"));
+    expect(phoneSlot).not.toContain(">Identity<");
     expect(phoneSlot).not.toContain(">works</em>");
     expect(phoneSlot).toContain(">In person<");
     expect(phoneSlot).toContain(">Online<");
@@ -186,21 +190,29 @@ describe("phone profile layout", () => {
     expect(deskTree).not.toContain("Logistics");
     expect(deskTree).toContain("Areas of interest");
     expect(deskTree).toContain("Approach in therapy");
+    expect(deskTree.indexOf("Licensed by State of Texas / 38047")).toBeLessThan(
+      deskTree.indexOf("Education"),
+    );
+    expect(deskTree.indexOf("Education")).toBeLessThan(deskTree.indexOf("Aetna"));
+    expect(deskTree.indexOf("Education")).toBeLessThan(
+      deskTree.indexOf("Areas of interest"),
+    );
     expect(deskTree.indexOf("Areas of interest")).toBeLessThan(
       deskTree.indexOf("Approach in therapy"),
     );
     expect(deskTree.indexOf("Approach in therapy")).toBeLessThan(
-      deskTree.indexOf("Education"),
-    );
-    expect(deskTree.indexOf("Education")).toBeLessThan(
       deskTree.indexOf("Get to know"),
     );
     expect(deskTree).toContain("bg-pill-bg");
     expect(deskTree).toContain("Life transitions");
     expect(deskTree).not.toContain("text-clay\">");
     const stack = deskTree.indexOf('data-cta-placement="stack"');
-    expect(deskTree.indexOf("Book a session", stack)).toBeLessThan(
-      deskTree.indexOf("Free consult", stack),
+    expect(deskTree.indexOf("Free consult", stack)).toBeLessThan(
+      deskTree.indexOf("Book a session", stack),
+    );
+    const dock = phoneTree.indexOf('data-cta-placement="dock"');
+    expect(phoneTree.indexOf("Free consult", dock)).toBeLessThan(
+      phoneTree.indexOf("Book a session", dock),
     );
 
     expect(phoneTree.slice(switchAt, switchAt + 80)).not.toContain("max-md:hidden");
@@ -241,8 +253,8 @@ describe("phone profile layout", () => {
     expect(photoPhone.indexOf("https://example.com/photo.jpg")).toBeLessThan(
       photoPhone.indexOf('data-profile-show="phone"'),
     );
-    expect(photoPhone.indexOf("Get to know")).toBeLessThan(
-      photoPhone.indexOf("Education"),
+    expect(photoPhone.indexOf("Education")).toBeLessThan(
+      photoPhone.indexOf("Get to know"),
     );
 
     const video = render({ ...base, photoUrl: null });
