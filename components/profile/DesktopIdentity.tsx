@@ -10,6 +10,7 @@ import {
 import { ContactCtas } from "./ContactCtas";
 import { FeeRows } from "./FeeRows";
 import { NotAcceptingClients } from "./NotAcceptingClients";
+import { QualificationFacts } from "./QualificationFacts";
 import { SessionFormatLine } from "./SessionFormatLine";
 import { credentialLine, yearsPracticingLabel } from "./copy";
 
@@ -56,6 +57,11 @@ export function DesktopIdentity({
           ))}
         </div>
       ) : null}
+      <QualificationFacts
+        profileId={data.id}
+        education={data.education}
+        credentials={data.credentials}
+      />
       {years ? <p className={`mt-1 ${metaLineClass}`}>{years}</p> : null}
       <NotAcceptingClients open={data.openToNewClients} className="mt-3" />
       {formats.length > 0 ? (

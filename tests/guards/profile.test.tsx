@@ -10,6 +10,7 @@ vi.mock("next/navigation", () => ({
 
 import { ContactSheet } from "@/components/profile/ContactSheet";
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
+import { TRAVIS_PROFILE_ID } from "@/lib/profile/public-facts";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
 import type { TherapistProfileData } from "@/lib/therapists/load";
@@ -109,7 +110,6 @@ describe("profile guards", () => {
     const order = [
       "How Travis works",
       "Get to know Travis",
-      "Education",
       "Approach in therapy",
       "Areas of interest",
       "In Travis&#x27;s own words",
@@ -120,9 +120,20 @@ describe("profile guards", () => {
       expect(next).toBeGreaterThan(at);
       at = next;
     }
+    const licenseAt = phone.indexOf("Licensed by State of Texas / 38047");
+    const educationAt = phone.indexOf("Education");
+    const schoolAt = phone.indexOf("Doctor of Clinical Psychology");
+    const credentialsAt = phone.indexOf("Credentials");
+    const insuranceAt = phone.indexOf("Aetna");
+    expect(educationAt).toBeGreaterThan(licenseAt);
+    expect(schoolAt).toBeGreaterThan(educationAt);
+    expect(credentialsAt).toBeGreaterThan(educationAt);
+    expect(insuranceAt).toBeGreaterThan(credentialsAt);
+    expect(phone.indexOf("Get to know Travis")).toBeGreaterThan(insuranceAt);
+    expect(phone).not.toContain(">Identity<");
     expect(phone).toContain("1102 West 6th Street, Austin");
     expect(phone).toContain("Cognitive behavioral therapy (CBT)");
-    expect(phone).toContain("BIPOC");
+    expect(phone).not.toContain("BIPOC");
     expect(phone).toContain("Individual session (55 min)");
     expect(phone).toContain("$150");
     expect(phone).toContain("Sliding scale");
@@ -134,6 +145,23 @@ describe("profile guards", () => {
     const desk = html.slice(html.indexOf('data-profile-layout="desk"'));
     expect(desk).toContain("Watch Travis&#x27;s intro");
     expect(desk).toContain("bg-transparent");
+    expect(desk.indexOf("Licensed by State of Texas / 38047")).toBeLessThan(
+      desk.indexOf("Education"),
+    );
+    expect(desk.indexOf("Education")).toBeLessThan(desk.indexOf("Aetna"));
+    expect(desk.indexOf("Credentials")).toBeLessThan(desk.indexOf("Aetna"));
+    expect(desk).not.toContain(">Identity<");
+    expect(desk).not.toContain("BIPOC");
+  });
+
+  it("omits education on Travis White's public profile and still shows credentials", () => {
+    const html = render({ ...data, id: TRAVIS_PROFILE_ID }, visitor);
+    expect(html).not.toContain("Education");
+    expect(html).not.toContain("Doctor of Clinical Psychology");
+    expect(html).toContain("Credentials");
+    expect(html).toContain("Licensed psychologist");
+    expect(html).not.toContain(">Identity<");
+    expect(html).not.toContain("BIPOC");
   });
 
   it("says Not accepting new clients only when the practice is closed", () => {
@@ -146,6 +174,14 @@ describe("profile guards", () => {
     expect(html).toContain("Free consult");
     expect(html).toContain("Book a session");
     expect(html).toContain('data-cta-placement="dock"');
+    const dock = html.indexOf('data-cta-placement="dock"');
+    const stack = html.indexOf('data-cta-placement="stack"');
+    expect(html.indexOf("Free consult", dock)).toBeLessThan(
+      html.indexOf("Book a session", dock),
+    );
+    expect(html.indexOf("Free consult", stack)).toBeLessThan(
+      html.indexOf("Book a session", stack),
+    );
     expect(html).toContain('aria-haspopup="dialog"');
     expect(html).not.toContain("mailto:");
     expect(html).not.toContain("tel:");

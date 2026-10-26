@@ -1,11 +1,8 @@
 import { Card } from "@/components/ui/Card";
 import {
-  metaLineClass,
   pageSubtitleClass,
   profilePageHeadingClass,
-  smallLabelClass,
 } from "@/components/ui/styles";
-import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { initials, officeAddressLines } from "@/lib/therapists/display";
 import {
@@ -62,15 +59,10 @@ export function PhoneProfileColumn({
       .filter((n): n is number => n != null),
   );
   const ctas = consultBookActions(data.contact);
-  const hasQualifications =
-    data.education.length > 0 || data.credentials.length > 0;
   const modalityLabels = modalityDisplayLabels(data.modalities);
   const specialtyLabels = directorySpecialties(data.specialties);
   const hasPhoneFacts =
-    hasQualifications ||
-    modalityLabels.length > 0 ||
-    specialtyLabels.length > 0 ||
-    data.identity.length > 0;
+    modalityLabels.length > 0 || specialtyLabels.length > 0;
   const practicePanel = (flags?: {
     showAbout?: boolean;
     showLogistics?: boolean;
@@ -88,6 +80,9 @@ export function PhoneProfileColumn({
       givenName={data.givenName}
       openToNewClients={data.openToNewClients}
       cashPay={cashPayOffered(data.insurance)}
+      profileId={data.id}
+      education={data.education}
+      credentials={data.credentials}
     />
   );
 
@@ -174,35 +169,8 @@ export function PhoneProfileColumn({
 
           {hasPhoneFacts ? (
             <div className="mt-10 space-y-4">
-              {hasQualifications ? (
-                <Card className="px-5 py-5 sm:px-6">
-                  <div className="space-y-4">
-                    {data.education.length > 0 ? (
-                      <div>
-                        <h2 className={smallLabelClass}>Education</h2>
-                        <ul className={`mt-2 space-y-1 ${metaLineClass}`}>
-                          {data.education.map((item) => (
-                            <li key={item}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null}
-                    {data.credentials.length > 0 ? (
-                      <div>
-                        <h2 className={smallLabelClass}>Credentials</h2>
-                        <ul className={`mt-2 space-y-1 ${metaLineClass}`}>
-                          {data.credentials.map((item) => (
-                            <li key={item}>{sentenceCasePhrase(item)}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null}
-                  </div>
-                </Card>
-              ) : null}
               <TagSection title="Approach in therapy" labels={modalityLabels} />
               <TagSection title="Areas of interest" labels={specialtyLabels} />
-              <TagSection title="Identity" labels={data.identity} />
             </div>
           ) : null}
 
