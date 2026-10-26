@@ -1,5 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
+import {
+  createTestServiceClient,
+  testSupabaseConfigured,
+  waitForAuthUser,
+} from "../test-supabase";
 import { createAnonClient, dbConfigured, search } from "./client";
 
 describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
@@ -31,9 +36,20 @@ describe.skipIf(!dbConfigured())("complete_therapist_join", () => {
     const supabase = createAnonClient();
     const signUp = await supabase.auth.signUp({ email, password });
 
-    // Hosted Auth can disable signups or require email confirmation. In either
-    // case there is no authenticated session with which to exercise the RPC.
+    // Hosted Auth can require email confirmation. That still creates an Auth
+    // user, but there is no session with which to exercise the RPC.
+    // A signup that creates no Auth user is a failure when the test project
+    // service role is configured. The prod check job has no TEST_SUPABASE_*
+    // secrets, so it keeps the warn-and-return path.
     if (signUp.error || !signUp.data.session || !signUp.data.user) {
+      if (testSupabaseConfigured()) {
+        const authUser = await waitForAuthUser(createTestServiceClient(), email);
+        if (!authUser) {
+          throw new Error(
+            `Auth signup created no user: ${signUp.error?.message ?? "no session and no Auth user"}`,
+          );
+        }
+      }
       console.warn(
         "Skipping complete_therapist_join assertions because Auth signup did not return a session:",
         signUp.error?.message ?? "email confirmation is required",

@@ -4,6 +4,7 @@ import {
   TEST_REF,
   assertTestProject,
 } from "../scripts/seed-test/guard.mjs";
+import { readTestSupabase } from "./test-supabase";
 
 function jwt(payload: Record<string, string>) {
   return `header.${Buffer.from(JSON.stringify(payload)).toString("base64url")}.sig`;
@@ -57,5 +58,60 @@ describe("test project seed guard", () => {
         serviceKey: anon,
       }),
     ).toThrow(/anon key/);
+  });
+
+  it("stays unconfigured when TEST_SUPABASE_* is missing, even if prod env is set", () => {
+    const keys = [
+      "TEST_SUPABASE_URL",
+      "TEST_SUPABASE_ANON_KEY",
+      "TEST_SUPABASE_SERVICE_ROLE_KEY",
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "SUPABASE_SERVICE_ROLE_KEY_KITCHEN_SINK",
+    ];
+    const saved = new Map(keys.map((key) => [key, process.env[key]]));
+    try {
+      for (const key of keys) delete process.env[key];
+      process.env.NEXT_PUBLIC_SUPABASE_URL = `https://${PROD_REF}.supabase.co`;
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = jwt({ ref: PROD_REF, role: "anon" });
+      process.env.SUPABASE_SERVICE_ROLE_KEY = jwt({ ref: PROD_REF, role: "service_role" });
+      process.env.SUPABASE_SERVICE_ROLE_KEY_KITCHEN_SINK = jwt({
+        ref: PROD_REF,
+        role: "service_role",
+      });
+      expect(readTestSupabase()).toBeNull();
+
+      process.env.TEST_SUPABASE_URL = url;
+      expect(readTestSupabase()).toBeNull();
+    } finally {
+      for (const [key, value] of saved) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
+  });
+
+  it("refuses TEST_SUPABASE_* when it points at production", () => {
+    const keys = [
+      "TEST_SUPABASE_URL",
+      "TEST_SUPABASE_ANON_KEY",
+      "TEST_SUPABASE_SERVICE_ROLE_KEY",
+    ] as const;
+    const saved = new Map(keys.map((key) => [key, process.env[key]]));
+    try {
+      process.env.TEST_SUPABASE_URL = `https://${PROD_REF}.supabase.co`;
+      process.env.TEST_SUPABASE_ANON_KEY = jwt({ ref: PROD_REF, role: "anon" });
+      process.env.TEST_SUPABASE_SERVICE_ROLE_KEY = jwt({
+        ref: PROD_REF,
+        role: "service_role",
+      });
+      expect(() => readTestSupabase()).toThrow(PROD_REF);
+    } finally {
+      for (const [key, value] of saved) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
   });
 });
