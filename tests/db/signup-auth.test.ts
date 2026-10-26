@@ -10,7 +10,7 @@ import {
 } from "../test-supabase";
 
 describe.skipIf(!testSupabaseConfigured())("therapist signup creates an Auth user", () => {
-  const email = `signup-e2e-${randomUUID()}@example.test`;
+  const email = `signup-e2e-${randomUUID()}@gmail.com`;
   const password = `Signup-${randomUUID()}Aa1`;
 
   afterAll(async () => {
