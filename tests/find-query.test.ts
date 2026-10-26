@@ -8,7 +8,14 @@ import {
   requestFindPageHref,
   resultCountLabel,
 } from "@/components/search/query";
-import { allowedSearchTags } from "@/lib/tags/presets";
+import {
+  FIND_INSURANCE_OPTIONS,
+  FIND_INSURANCE_OTHER,
+  FIND_TOPIC_OTHER,
+  INSURANCE_PRESETS,
+  SPECIALTY_PRESETS,
+  allowedSearchTags,
+} from "@/lib/tags/presets";
 import {
   normalizeSearchRows,
   parseFindSearchParams,
@@ -237,6 +244,66 @@ describe("search filter tags", () => {
         state: null,
       }).p_tags,
     ).toEqual(["Self Discovery", "Aetna", "Teens"]);
+  });
+
+  it("keeps insurance Other and topic Other as separate address markers", () => {
+    expect(INSURANCE_PRESETS).not.toContain("Other");
+    expect(SPECIALTY_PRESETS).not.toContain("Other");
+    expect(FIND_INSURANCE_OPTIONS.at(-1)).toBe(FIND_INSURANCE_OTHER);
+    expect(FIND_INSURANCE_OPTIONS.slice(0, -1)).toEqual([...INSURANCE_PRESETS]);
+    expect(
+      allowedSearchTags(["Other", "Other topic", "Eating Disorders", "Aetna"]),
+    ).toEqual(["Other", "Other topic", "Aetna"]);
+    expect(parseFindSearchParams({ tags: "Other,Other topic,Aetna" })).toEqual({
+      tags: ["Other", "Other topic", "Aetna"],
+      virtual: false,
+      inPerson: false,
+      state: null,
+    });
+    expect(
+      buildFindHref({
+        tags: ["Aetna", FIND_INSURANCE_OTHER, FIND_TOPIC_OTHER],
+        virtual: false,
+        inPerson: false,
+        state: null,
+      }),
+    ).toBe("/find?tags=Aetna%2COther%2COther+topic");
+    expect(buildFindHref(parseFindSearchParams({ tags: "Other,Other topic" }))).toBe(
+      "/find?tags=Other%2COther+topic",
+    );
+  });
+
+  it("drops named tags and raises the RPC limit when Other is selected", () => {
+    expect(
+      searchRpcArgs({
+        tags: ["Aetna", "Other"],
+        virtual: false,
+        inPerson: false,
+        state: "CA",
+      }),
+    ).toEqual({
+      p_tags: [],
+      p_virtual: false,
+      p_in_person: false,
+      p_state: "CA",
+      p_limit: 500,
+      p_offset: 0,
+    });
+    expect(
+      searchRpcArgs({
+        tags: ["Anxiety", "Other topic"],
+        virtual: true,
+        inPerson: false,
+        state: null,
+      }),
+    ).toEqual({
+      p_tags: [],
+      p_virtual: true,
+      p_in_person: false,
+      p_state: null,
+      p_limit: 500,
+      p_offset: 0,
+    });
   });
 });
 

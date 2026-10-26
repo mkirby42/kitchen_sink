@@ -1,11 +1,17 @@
+import { applyFindOtherMatches } from "@/lib/search/find-other";
 import { createClient } from "@/lib/supabase/server";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import {
   allowedLicenseState,
   allowedSearchTags,
   canonicalSpecialtyLabels,
+  isFindOtherMarker,
   searchQueryTags,
 } from "@/lib/tags/presets";
+
+/** Public Find page. Other uses a larger cohort so post-filtering is not the first page. */
+const FIND_PAGE_LIMIT = 24;
+const FIND_OTHER_RPC_LIMIT = 500;
 
 export type SearchRow = {
   profile_id: string;
@@ -63,12 +69,13 @@ export function parseFindSearchParams(
 }
 
 export function searchRpcArgs(filters: SearchFilters) {
+  const otherSelected = filters.tags.some((tag) => isFindOtherMarker(tag));
   return {
     p_tags: searchQueryTags(filters.tags),
     p_virtual: filters.virtual,
     p_in_person: filters.inPerson,
     p_state: allowedLicenseState(filters.state),
-    p_limit: 24,
+    p_limit: otherSelected ? FIND_OTHER_RPC_LIMIT : FIND_PAGE_LIMIT,
     p_offset: 0,
   };
 }
@@ -102,5 +109,8 @@ export async function searchTherapists(filters: SearchFilters) {
     searchRpcArgs(filters),
   );
   if (error) throw error;
-  return normalizeSearchRows((data ?? []) as SearchRow[], filters.tags);
+  return applyFindOtherMatches(
+    normalizeSearchRows((data ?? []) as SearchRow[], filters.tags),
+    filters.tags,
+  );
 }

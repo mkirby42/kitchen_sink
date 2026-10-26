@@ -20,11 +20,19 @@ Where you live, Insurance, What's going on, In person or online. Same order on t
 - Guard: `tests/guards/find-filters.test.tsx`
 - Browser: `tests/guards/browser/find-filters.test.ts`
 
-### What's going on is seven plain-language topics
+### What's going on is seven plain-language topics, plus Other
 
-The pill opens "What would you like help with?" The line under it says you don't need the clinical term; it's in small print. The topics are Feeling down or stuck, Worry, stress or panic, Something hard happened, Losing someone, Relationship trouble, Big life changes, and Trouble focusing. The button says Show N therapists. The phone sheet has Clear all. Self Discovery and Immigration show only when that tag is already in the address, so it can be cleared. Topics with no stored specialty (family, burnout, substances, food, identity) are not offered.
+The pill opens "What would you like help with?" The line under it says you don't need the clinical term; it's in small print. The topics are Feeling down or stuck, Worry, stress or panic, Something hard happened, Losing someone, Relationship trouble, Big life changes, and Trouble focusing, then Other (small print: Another specialty). The button says Show N therapists. The phone sheet has Clear all. Self Discovery and Immigration show only when that tag is already in the address, so it can be cleared. Topics with no stored specialty (family, burnout, substances, food, identity) are not offered as named chips. Other matches a therapist who has at least one specialty that is not one of those seven — Self Discovery, Immigration, a custom label, or the literal specialty Other. A named topic and Other are OR. The address marker is `Other topic`, so it stays independent of insurance Other. Join does not gain an Other chip.
 
-- Landed: 2026-10-21, #114. Phone copy 2026-10-22, #115.
+- Landed: 2026-10-21, #114. Phone copy 2026-10-22, #115. Other 2026-10-26.
+- Guard: `tests/guards/find-filters.test.tsx`
+- Browser: `tests/guards/browser/find-filters.test.ts`
+
+### Insurance includes Other
+
+The insurance sheet and the desktop insurance menu list Aetna, BCBS, Cigna, Optum, Cash Pay Only, and Out-of-Network Superbill, then Other. Other matches a therapist who has at least one insurance label that is not one of those presets, or the literal insurance Other. A named plan and Other are OR. The address marker is `Other`. Join keeps the preset list and does not add an Other chip.
+
+- Landed: 2026-10-26.
 - Guard: `tests/guards/find-filters.test.tsx`
 - Browser: `tests/guards/browser/find-filters.test.ts`
 
@@ -233,7 +241,7 @@ CI fails a PR that edits this file or weakens `tests/guards/` unless the label i
 
 These three were live and then removed. Christine has not picked which version she wants. No guard test requires the old version. Do not restore them in passing. Bringing one back conflicts with a live guard above and needs the label.
 
-- **What brings you to therapy?** The Oct 7 specialty filter, including Self Discovery and Immigration as normal options. #71, 2026-10-07. Replaced by What's going on and the seven topics, #114 and #115.
+- **What brings you to therapy?** The Oct 7 specialty filter, including Self Discovery and Immigration as normal options. #71, 2026-10-07. Replaced by What's going on and the seven topics, #114 and #115. Find Other (2026-10-26) is not this list.
 - **Only the matching specialty and insurance pills on Find cards.** #61, 2026-10-07. #114 put the old card treatment back, and #116 / #118 removed the pills.
 - **"3 of 4 tags" on Find cards.** The overlap count. Removed from the card in #114, 2026-10-21. The helper `overlapCopy` is still in the repo. The card does not show it.
 

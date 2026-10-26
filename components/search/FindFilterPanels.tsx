@@ -4,7 +4,11 @@ import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { cx, fieldClass, primaryPillClass } from "@/components/ui/styles";
 import { showTherapistsLabel } from "@/lib/search/find-desktop";
-import { FIND_TOPICS, isFindTopicSpecialty } from "@/lib/tags/plain-language";
+import {
+  FIND_TOPICS,
+  FIND_TOPIC_OTHER_OPTION,
+  isFindTopicSpecialty,
+} from "@/lib/tags/plain-language";
 import {
   SPECIALTY_PRESETS,
   filterLicenseStates,
@@ -45,6 +49,12 @@ export function TopicPanel({
             onClick={() => onToggle(topic.specialty)}
           />
         ))}
+        <TopicChip
+          plain={FIND_TOPIC_OTHER_OPTION.plain}
+          clinical={FIND_TOPIC_OTHER_OPTION.clinical}
+          selected={tags.includes(FIND_TOPIC_OTHER_OPTION.tag)}
+          onClick={() => onToggle(FIND_TOPIC_OTHER_OPTION.tag)}
+        />
         {extras.map((label) => (
           <TopicChip
             key={label}

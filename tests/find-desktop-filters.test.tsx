@@ -52,6 +52,52 @@ describe("desktop find filters", () => {
     expect(html).not.toContain("What brings you to therapy?");
     expect(html).not.toContain("Self discovery");
     expect(html).not.toContain("Immigration");
+    expect(html).toContain("Other");
+    expect(html).toContain("Another specialty");
+    expect(html.indexOf("Trouble focusing")).toBeLessThan(
+      html.indexOf("Another specialty"),
+    );
+  });
+
+  it("lists Other after the insurance presets", () => {
+    const html = renderToStaticMarkup(
+      createElement(FindDesktopFilters, {
+        matchCount: 3,
+        initialOpen: "insurance",
+      }),
+    );
+    const panel = html.slice(html.indexOf('id="find-insurance"'));
+    expect(panel.indexOf("Out-of-network superbill")).toBeLessThan(
+      panel.indexOf("Other"),
+    );
+    expect(panel).not.toContain("Another specialty");
+  });
+
+  it("selects insurance Other and topic Other independently", () => {
+    nav.params = new URLSearchParams("tags=Other");
+    const topics = renderToStaticMarkup(
+      createElement(FindDesktopFilters, { matchCount: 1, initialOpen: "topics" }),
+    );
+    const topicAt = topics.indexOf("Another specialty");
+    expect(topics.slice(topicAt - 500, topicAt)).toContain('aria-pressed="false"');
+
+    nav.params = new URLSearchParams("tags=Other+topic");
+    const insurance = renderToStaticMarkup(
+      createElement(FindDesktopFilters, {
+        matchCount: 1,
+        initialOpen: "insurance",
+      }),
+    );
+    const insuranceAt = insurance.indexOf("Out-of-network superbill");
+    const otherAt = insurance.indexOf("Other", insuranceAt);
+    expect(insurance.slice(otherAt - 500, otherAt)).toContain('aria-pressed="false"');
+
+    nav.params = new URLSearchParams("tags=Other,Other+topic");
+    const both = renderToStaticMarkup(
+      createElement(FindDesktopFilters, { matchCount: 1, initialOpen: "topics" }),
+    );
+    const bothAt = both.indexOf("Another specialty");
+    expect(both.slice(bothAt - 500, bothAt)).toContain('aria-pressed="true"');
   });
 
   it("keeps an address specialty that the panel does not list by default", () => {

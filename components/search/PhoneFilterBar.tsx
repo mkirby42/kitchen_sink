@@ -10,9 +10,13 @@ import {
   type PhoneSheet,
 } from "@/lib/search/phone-find";
 import { showTherapistsLabel } from "@/lib/search/find-desktop";
-import { FIND_TOPICS, isFindTopicSpecialty } from "@/lib/tags/plain-language";
 import {
-  INSURANCE_PRESETS,
+  FIND_TOPICS,
+  FIND_TOPIC_OTHER_OPTION,
+  isFindTopicSpecialty,
+} from "@/lib/tags/plain-language";
+import {
+  FIND_INSURANCE_OPTIONS,
   SPECIALTY_PRESETS,
   filterLicenseStates,
 } from "@/lib/tags/presets";
@@ -172,7 +176,7 @@ function SheetBody({
   if (sheet === "insurance") {
     return (
       <OptionList title="Insurance">
-        {INSURANCE_PRESETS.map((label) => (
+        {FIND_INSURANCE_OPTIONS.map((label) => (
           <OptionRow
             key={label}
             title={sentenceCasePhrase(label)}
@@ -237,6 +241,17 @@ function TopicSheet({
             }
           />
         ))}
+        <OptionRow
+          title={FIND_TOPIC_OTHER_OPTION.plain}
+          detail={FIND_TOPIC_OTHER_OPTION.clinical}
+          selected={filters.tags.includes(FIND_TOPIC_OTHER_OPTION.tag)}
+          onClick={() =>
+            onApply({
+              ...filters,
+              tags: toggleTag(filters.tags, FIND_TOPIC_OTHER_OPTION.tag),
+            })
+          }
+        />
         {extras.map((label) => (
           <OptionRow
             key={label}

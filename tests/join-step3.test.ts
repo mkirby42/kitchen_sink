@@ -70,6 +70,8 @@ describe("join specialties picker", () => {
     expect(approachBlock).not.toContain(">CBT<");
     const insuranceBlock = html.slice(insurance, identity);
     expect(insuranceBlock).toContain("Add your own");
+    expect(insuranceBlock).not.toMatch(/>\s*Other\s*</);
+    expect(specialtyBlock).not.toMatch(/>\s*Other\s*</);
     expect(insuranceBlock).toContain('placeholder="Add your own"');
     const identityBlock = html.slice(identity);
     expect(identityBlock).toContain("BIPOC");
