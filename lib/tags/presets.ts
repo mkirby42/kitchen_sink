@@ -93,8 +93,8 @@ export function allowedSearchTags(tags: string[]) {
 /**
  * Query labels. Self Discovery also matches a specialty row still stored as Teens.
  * Other markers are not stored presets. When one is selected, the RPC gets no tag
- * list so it returns the format and state cohort (still capped at 24). Find then
- * keeps named-tag OR Other matches in `applyFindOtherMatches`.
+ * list (it cannot express unlisted OR). `searchRpcArgs` raises that call's limit
+ * to 500 so Find can keep named-tag OR Other matches in `applyFindOtherMatches`.
  */
 export function searchQueryTags(tags: string[]) {
   const selected = allowedSearchTags(tags);

@@ -273,7 +273,7 @@ describe("search filter tags", () => {
     );
   });
 
-  it("drops the tag list when Other is selected so the page can include unlisted labels", () => {
+  it("drops named tags and raises the RPC limit when Other is selected", () => {
     expect(
       searchRpcArgs({
         tags: ["Aetna", "Other"],
@@ -286,7 +286,7 @@ describe("search filter tags", () => {
       p_virtual: false,
       p_in_person: false,
       p_state: "CA",
-      p_limit: 24,
+      p_limit: 500,
       p_offset: 0,
     });
     expect(
@@ -295,8 +295,15 @@ describe("search filter tags", () => {
         virtual: true,
         inPerson: false,
         state: null,
-      }).p_tags,
-    ).toEqual([]);
+      }),
+    ).toEqual({
+      p_tags: [],
+      p_virtual: true,
+      p_in_person: false,
+      p_state: null,
+      p_limit: 500,
+      p_offset: 0,
+    });
   });
 });
 

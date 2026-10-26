@@ -106,8 +106,9 @@ function listedRank(row: FindOtherRow) {
 
 /**
  * When an Other marker is selected, `search_therapists` was called with no tag
- * list. Keep rows that match a named tag or that Other rule, then rank drafts,
- * unlisted, overlap, and name — the same order as the RPC.
+ * list and `p_limit` 500 (offset 0) so this filter sees the directory, not the
+ * first 24. Keep rows that match a named tag or that Other rule, then rank
+ * drafts, unlisted, overlap, and name — the same order as the RPC.
  */
 export function applyFindOtherMatches<T extends FindOtherRow>(
   rows: readonly T[],
