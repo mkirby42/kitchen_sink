@@ -74,6 +74,12 @@ jobs:
   # Deploy does not wait on this job.
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # One shared group so overlapping PR/main runs queue instead of colliding on the
+    # shared test Supabase (seed race: "Therapist join has already been completed").
+    concurrency:
+      group: kitchen-sink-e2e
+      cancel-in-progress: false
     # Preinstalled browsers pinned to lockfile 1.64.1; avoids the per-run install hang.
     container:
       image: mcr.microsoft.com/playwright:v1.64.1-jammy
