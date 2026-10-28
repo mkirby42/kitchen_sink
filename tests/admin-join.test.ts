@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { ADMIN_JOIN_NOTICE, joinAccess } from "@/lib/join/access";
 import { isPublicTherapistRole } from "@/lib/role";
+import { joinPath } from "@/lib/routes";
 
 const adminId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1";
 
@@ -41,6 +42,31 @@ describe("joinAccess", () => {
   });
 
   it("sends a therapist who already joined to their profile", () => {
+    expect(
+      joinAccess({
+        userId: adminId,
+        role: "therapist",
+        hasTherapist: true,
+        editing: false,
+      }),
+    ).toEqual({ kind: "redirect", href: `/t/${adminId}` });
+  });
+
+  it("loads a therapist's saved profile when they open edit", () => {
+    expect(
+      joinAccess({
+        userId: adminId,
+        role: "therapist",
+        hasTherapist: true,
+        editing: true,
+      }),
+    ).toEqual({ kind: "wizard", editing: true, adminTest: false });
+  });
+
+  it("keeps edit=1 when Continue advances, and drops it when editing is off", () => {
+    expect(joinPath({ edit: true, step: 2 })).toBe("/join?edit=1&step=2");
+    const dropped = joinPath({ edit: false, step: 2 });
+    expect(dropped).toBe("/join?step=2");
     expect(
       joinAccess({
         userId: adminId,
