@@ -89,7 +89,7 @@ export function joinAccess(input: {
 
   return {
     kind: "wizard",
-    editing: false,
+    editing: input.editing && input.hasTherapist,
     adminTest: false,
   };
 }
