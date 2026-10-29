@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AccountShell } from "@/components/auth/AccountShell";
-import { AdminAuth } from "@/components/admin/AdminAuth";
+import { AdminSignIn } from "@/components/admin/AdminSignIn";
+import { routes } from "@/lib/routes";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
 import { ReviewQueue } from "@/components/admin/ReviewQueue";
 import { adminToolsVisible } from "@/lib/audience";
@@ -15,7 +16,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/admin/reviews" },
 };
 
-export default async function AdminReviewsPage() {
+export default async function AdminReviewsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   if (!supabasePublicConfig()) {
     return (
       <AccountShell
@@ -33,7 +38,9 @@ export default async function AdminReviewsPage() {
 
   if (!user) {
     return (
-      <AdminAuth
+      <AdminSignIn
+        returnPath={routes.adminReviews}
+        searchParams={searchParams}
         title="Sign in to review"
         lede="This page is for Kitchen Sink ops. Pending client reviews stay unpublished until you approve them. Rejecting a review deletes it."
       />

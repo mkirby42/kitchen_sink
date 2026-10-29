@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SignOutForm } from "@/components/auth/SignOutForm";
 import { Card } from "@/components/ui/Card";
 import { routes } from "@/lib/routes";
 
@@ -56,6 +57,9 @@ export function JoinShell({
           <Link href={closeHref} aria-label="Close" className={chromeBtn}>
             ×
           </Link>
+        </div>
+        <div className="flex justify-end px-5 pt-3 sm:px-10">
+          <SignOutForm />
         </div>
 
         <div className="px-6 py-8 sm:px-12 sm:py-10">{children}</div>

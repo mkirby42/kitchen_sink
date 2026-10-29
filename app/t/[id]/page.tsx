@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { AuthQueryProvider } from "@/components/auth/AuthQuery";
+import { readAuthQuery } from "@/lib/auth/auth-query";
 import {
   buildFindHref,
   buildTherapistHref,
@@ -114,7 +116,7 @@ export default async function TherapistProfilePage({
   const browse = phoneProfileBrowse(matches, data.id, filters, backHref);
 
   return (
-    <>
+    <AuthQueryProvider value={readAuthQuery(raw)}>
       <TrackProfileView therapistId={data.id} />
       <TherapistProfile
         data={presentProfileData(data, viewer.role, audience)}
@@ -127,7 +129,7 @@ export default async function TherapistProfilePage({
           profileId: data.id,
         })}
       />
-    </>
+    </AuthQueryProvider>
   );
 }
 

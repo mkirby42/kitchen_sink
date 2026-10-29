@@ -1,35 +1,38 @@
 "use client";
 
-import { FormEvent, useState, useSyncExternalStore } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
 import { textLinkClass } from "@/components/ui/styles";
+import { authPost } from "@/lib/auth/auth-query";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
+import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 
 export function AdminAuth({
   title = "Sign in to upload media",
   lede = "This page is for Kitchen Sink ops. Pick a therapist and upload the photo, intro video, or voice prompt they emailed you.",
+  returnPath = routes.adminMedia,
+  initialEmail = "",
+  initialError = "",
 }: {
   title?: string;
   lede?: string;
+  returnPath?: string;
+  initialEmail?: string;
+  initialError?: string;
 }) {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialError);
   const [submitting, setSubmitting] = useState(false);
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!mounted || submitting) return;
+    if (submitting) return;
     setMessage("");
     setSubmitting(true);
 
@@ -44,7 +47,6 @@ export function AdminAuth({
       if (result.data.session) {
         // Same cookie race as JoinAuth: hard navigate instead of router.refresh().
         setMessage("Signing you in…");
-        // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- session cookie must land before the next render
         window.location.assign(window.location.pathname + window.location.search);
         return;
       }
@@ -57,9 +59,18 @@ export function AdminAuth({
 
   return (
     <AccountShell eyebrow="Ops" title={title} lede={lede}>
-      <form method="post" onSubmit={(event) => void submit(event)} className="space-y-5">
+      <form
+        method="post"
+        action={authPost.signIn}
+        onSubmit={(event) => void submit(event)}
+        className="space-y-5"
+      >
+        <input type="hidden" name="scope" value="admin" />
+        <input type="hidden" name="next" value={returnPath} />
+        <input type="hidden" name="back" value={returnPath} />
         <TextField
           label="Email"
+          name="email"
           type="email"
           required
           autoComplete="email"
@@ -68,6 +79,7 @@ export function AdminAuth({
         />
         <TextField
           label="Password"
+          name="password"
           type="password"
           required
           minLength={6}
@@ -82,7 +94,7 @@ export function AdminAuth({
         </p>
         {message ? <Notice role="alert">{message}</Notice> : null}
         <div className="flex justify-center pt-2">
-          <Button type="submit" disabled={submitting || !mounted}>
+          <Button type="submit" disabled={submitting}>
             {submitting ? "Please wait…" : "Sign in →"}
           </Button>
         </div>

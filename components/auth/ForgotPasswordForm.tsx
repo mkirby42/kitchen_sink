@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
 import { textLinkClass } from "@/components/ui/styles";
+import { authPost } from "@/lib/auth/auth-query";
 import {
   passwordResetRedirect,
   rememberResetReturn,
@@ -15,21 +16,28 @@ import {
   resetContinuePath,
   resetRequestMessage,
   resetSignInPath,
+  safeAppPath,
 } from "@/lib/auth/password-reset";
 import { createClient } from "@/lib/supabase/client";
 
 export function ForgotPasswordForm({
   from,
   returnTo,
+  initialEmail = "",
+  initialError = "",
+  initialSent = false,
 }: {
   from?: string;
   returnTo?: string;
+  initialEmail?: string;
+  initialError?: string;
+  initialSent?: boolean;
 }) {
   const continuePath = resetContinuePath(from, returnTo);
   const signInPath = resetSignInPath(from, returnTo);
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
+  const [email, setEmail] = useState(initialEmail);
+  const [message, setMessage] = useState(initialError);
+  const [sent, setSent] = useState(initialSent);
   const [submitting, setSubmitting] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -76,9 +84,19 @@ export function ForgotPasswordForm({
         </div>
       ) : (
         <>
-          <form onSubmit={submit} className="space-y-5">
+          <form
+            method="post"
+            action={authPost.forgotPassword}
+            onSubmit={submit}
+            className="space-y-5"
+          >
+            {from ? <input type="hidden" name="from" value={from} /> : null}
+            {safeAppPath(returnTo) ? (
+              <input type="hidden" name="return" value={safeAppPath(returnTo) ?? ""} />
+            ) : null}
             <TextField
               label="Email"
+              name="email"
               type="email"
               required
               autoComplete="email"

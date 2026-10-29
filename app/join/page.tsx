@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AccountShell } from "@/components/auth/AccountShell";
+import { SignOutForm } from "@/components/auth/SignOutForm";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
 import { Button } from "@/components/ui/Button";
+import { Notice } from "@/components/ui/Notice";
+import { buttonClass } from "@/components/ui/styles";
 import { JoinAuth } from "@/components/join/JoinAuth";
+import { readAuthQuery } from "@/lib/auth/auth-query";
 import { JoinWizard } from "@/components/join/JoinWizard";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { adminToolsVisible } from "@/lib/audience";
@@ -35,6 +39,9 @@ export default async function JoinPage({
     edit?: string;
     profile?: string;
     for?: string;
+    error?: string;
+    email?: string;
+    sent?: string;
   }>;
 }) {
   if (!supabasePublicConfig()) {
@@ -48,6 +55,7 @@ export default async function JoinPage({
   }
 
   const params = await searchParams;
+  const flash = readAuthQuery(params);
   const editing = params.edit === "1";
   const targetProfileId = editing ? (params.profile?.trim() ?? "") : "";
   const forId = params.for && isProfileId(params.for) ? params.for : null;
@@ -59,7 +67,16 @@ export default async function JoinPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return <JoinAuth initialMode={initialMode} />;
+  if (!user) {
+    return (
+      <JoinAuth
+        initialMode={initialMode}
+        initialEmail={flash.email}
+        initialError={flash.error}
+        initialSent={flash.sent}
+      />
+    );
+  }
 
   const { data: therapist } = await supabase
     .from("therapists")
@@ -103,7 +120,7 @@ export default async function JoinPage({
         published={loaded.published}
         adminTest
         publishHeld={started}
-        notice={started ? STARTED_DRAFT_NOTICE : undefined}
+        notice={flash.error || (started ? STARTED_DRAFT_NOTICE : undefined)}
       />
     );
   }
@@ -145,8 +162,10 @@ export default async function JoinPage({
         title="You're signed in as a patient."
         lede="Keep browsing therapists on Kitchen Sink. Sign out if you want to join as a therapist."
       >
-        <div className="flex justify-center">
+        {flash.error ? <Notice role="alert">{flash.error}</Notice> : null}
+        <div className="flex flex-wrap justify-center gap-3">
           <Button href={routes.find}>Find a therapist</Button>
+          <SignOutForm className={buttonClass("secondary")} />
         </div>
       </AccountShell>
     );
@@ -200,13 +219,15 @@ export default async function JoinPage({
       canPublish={canPublish}
       publishHeld={Boolean(access.onBehalfId) && started}
       notice={
-        access.onBehalfId
-          ? STARTED_DRAFT_NOTICE
-          : canPublish
-            ? "This draft is only visible to you and Kitchen Sink. Nothing goes live until you publish it."
-            : access.adminTest && !access.editing && audience === "admin"
-              ? ADMIN_JOIN_NOTICE
-              : undefined
+        flash.error
+          ? flash.error
+          : access.onBehalfId
+            ? STARTED_DRAFT_NOTICE
+            : canPublish
+              ? "This draft is only visible to you and Kitchen Sink. Nothing goes live until you publish it."
+              : access.adminTest && !access.editing && audience === "admin"
+                ? ADMIN_JOIN_NOTICE
+                : undefined
       }
     />
   );

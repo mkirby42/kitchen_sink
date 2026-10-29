@@ -9,15 +9,25 @@ import { TextField } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { textLinkClass } from "@/components/ui/styles";
+import { useAuthQuery } from "@/components/auth/AuthQuery";
+import { authPost, SIGNUP_CONFIRM_MESSAGE } from "@/lib/auth/auth-query";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
+import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 
 export function ReviewAuth({ returnTo }: { returnTo?: string }) {
   const router = useRouter();
+  const flash = useAuthQuery();
+  const back = returnTo || routes.find;
   const [mode, setMode] = useState<"signup" | "signin">("signin");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(flash.email);
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(
+    flash.error || (flash.sent === "confirm" ? SIGNUP_CONFIRM_MESSAGE : ""),
+  );
+  const [messageRole, setMessageRole] = useState<"alert" | "status">(
+    flash.error ? "alert" : "status",
+  );
   const [submitting, setSubmitting] = useState(false);
 
   async function submitAuth(event: FormEvent<HTMLFormElement>) {
@@ -32,6 +42,7 @@ export function ReviewAuth({ returnTo }: { returnTo?: string }) {
           : await supabase.auth.signInWithPassword({ email, password });
 
       if (result.error) {
+        setMessageRole("alert");
         setMessage(result.error.message);
         return;
       }
@@ -42,9 +53,11 @@ export function ReviewAuth({ returnTo }: { returnTo?: string }) {
       }
 
       if (mode === "signup" && result.data.user) {
-        setMessage("Check your email to confirm, then sign in.");
+        setMessageRole("status");
+        setMessage(SIGNUP_CONFIRM_MESSAGE);
       }
     } catch (error) {
+      setMessageRole("alert");
       setMessage(error instanceof Error ? error.message : "Unable to sign in.");
     } finally {
       setSubmitting(false);
@@ -70,9 +83,18 @@ export function ReviewAuth({ returnTo }: { returnTo?: string }) {
         />
       </div>
 
-      <form onSubmit={submitAuth} className="mt-6 space-y-5">
+      <form
+        method="post"
+        action={mode === "signup" ? authPost.signUp : authPost.signIn}
+        onSubmit={submitAuth}
+        className="mt-6 space-y-5"
+      >
+        <input type="hidden" name="scope" value="review" />
+        <input type="hidden" name="next" value={back} />
+        <input type="hidden" name="back" value={back} />
         <TextField
           label="Email"
+          name="email"
           type="email"
           required
           autoComplete="email"
@@ -81,6 +103,7 @@ export function ReviewAuth({ returnTo }: { returnTo?: string }) {
         />
         <TextField
           label="Password"
+          name="password"
           type="password"
           required
           minLength={6}
@@ -98,7 +121,7 @@ export function ReviewAuth({ returnTo }: { returnTo?: string }) {
             </Link>
           </p>
         ) : null}
-        {message ? <Notice>{message}</Notice> : null}
+        {message ? <Notice role={messageRole}>{message}</Notice> : null}
         <div className="flex justify-center pt-2">
           <Button type="submit" disabled={submitting}>
             {submitting

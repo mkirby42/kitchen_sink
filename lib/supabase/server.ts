@@ -1,8 +1,20 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { supabasePublicConfig } from "./env";
 
-export async function createClient() {
+export type AuthCookie = {
+  name: string;
+  value: string;
+  options: CookieOptions;
+};
+
+/** Cookies and cache headers a route handler must copy onto its own response. */
+export type AuthCookieCapture = {
+  cookies: AuthCookie[];
+  headers: Record<string, string>;
+};
+
+export async function createClient(capture?: AuthCookieCapture) {
   const config = supabasePublicConfig();
   if (!config) {
     throw new Error(
@@ -17,13 +29,18 @@ export async function createClient() {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         try {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options),
           );
         } catch {
-          // Called from a Server Component. Proxy refreshes the session.
+          // Server Components cannot write cookies. Route handlers copy
+          // `capture` onto the NextResponse they return, including a redirect.
+        }
+        if (capture) {
+          capture.cookies.push(...cookiesToSet);
+          if (headers) Object.assign(capture.headers, headers);
         }
       },
     },
