@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, useSyncExternalStore } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
@@ -8,36 +8,38 @@ import { TextField } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { textLinkClass } from "@/components/ui/styles";
+import {
+  authPost,
+  joinAuthErrorCopy,
+  SIGNUP_CONFIRM_MESSAGE,
+} from "@/lib/auth/auth-query";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
+import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 
-const ALREADY_HAS_ACCOUNT = /already|registered|exists/i;
-const SIGN_IN_HINT = "Switch to Sign in if you already have an account.";
-
-/** Keep Supabase's already-registered copy and point the person at Sign in. */
-export function joinAuthErrorCopy(message: string): string {
-  const text = message.trim() || "Unable to authenticate.";
-  if (!ALREADY_HAS_ACCOUNT.test(text) || /switch to sign in/i.test(text)) return text;
-  const spaced = /[.!?]$/.test(text) ? text : `${text}.`;
-  return `${spaced} ${SIGN_IN_HINT}`;
-}
+export { joinAuthErrorCopy };
 
 export function JoinAuth({
   initialMode = "signup",
+  initialEmail = "",
+  initialError = "",
+  initialSent = "",
 }: {
   initialMode?: "signup" | "signin";
+  initialEmail?: string;
+  initialError?: string;
+  initialSent?: "" | "1" | "confirm";
 }) {
   const [mode, setMode] = useState<"signup" | "signin">(initialMode);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [messageRole, setMessageRole] = useState<"alert" | "status">("status");
-  const [submitting, setSubmitting] = useState(false);
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
+  const [message, setMessage] = useState(
+    initialError || (initialSent === "confirm" ? SIGNUP_CONFIRM_MESSAGE : ""),
   );
+  const [messageRole, setMessageRole] = useState<"alert" | "status">(
+    initialError ? "alert" : "status",
+  );
+  const [submitting, setSubmitting] = useState(false);
 
   function showMessage(text: string, role: "alert" | "status") {
     setMessage(text);
@@ -46,7 +48,7 @@ export function JoinAuth({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!mounted || submitting) return;
+    if (submitting) return;
     setMessage("");
     setSubmitting(true);
 
@@ -77,7 +79,7 @@ export function JoinAuth({
       }
 
       if (mode === "signup" && result.data.user) {
-        showMessage("Check your email to confirm, then sign in.", "status");
+        showMessage(SIGNUP_CONFIRM_MESSAGE, "status");
       }
       setSubmitting(false);
     } catch (error) {
@@ -119,9 +121,22 @@ export function JoinAuth({
         />
       </div>
 
-      <form method="post" onSubmit={(event) => void submit(event)} className="mt-8 space-y-5">
+      <form
+        method="post"
+        action={mode === "signup" ? authPost.signUp : authPost.signIn}
+        onSubmit={(event) => void submit(event)}
+        className="mt-8 space-y-5"
+      >
+        <input type="hidden" name="scope" value="join" />
+        <input type="hidden" name="next" value={routes.join} />
+        <input
+          type="hidden"
+          name="back"
+          value={mode === "signup" ? routes.join : routes.joinSignIn}
+        />
         <TextField
           label="Email"
+          name="email"
           type="email"
           required
           autoComplete="email"
@@ -131,6 +146,7 @@ export function JoinAuth({
 
         <TextField
           label="Password"
+          name="password"
           type="password"
           required
           minLength={6}
@@ -151,7 +167,7 @@ export function JoinAuth({
         {message ? <Notice role={messageRole}>{message}</Notice> : null}
 
         <div className="flex justify-center pt-2">
-          <Button type="submit" disabled={submitting || !mounted}>
+          <Button type="submit" disabled={submitting}>
             {submitting
               ? "Please wait…"
               : mode === "signup"

@@ -67,6 +67,9 @@ describe("join step design", () => {
     const html = wizard();
     expect(html).toContain('aria-label="Go back"');
     expect(html).toContain('aria-label="Close"');
+    expect(html).toContain("Sign out");
+    expect(html).toContain('action="/auth/sign-out"');
+    expect(html).toContain('method="post"');
     expect(html).toContain('aria-label="Step 1 of 4"');
     expect(html).toContain("Step 1 of 4 · Basic info");
     expect(html).toContain("Let&#x27;s start with");

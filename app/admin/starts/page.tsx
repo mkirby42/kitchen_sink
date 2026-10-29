@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AccountShell } from "@/components/auth/AccountShell";
-import { AdminAuth } from "@/components/admin/AdminAuth";
+import { AdminSignIn } from "@/components/admin/AdminSignIn";
+import { routes } from "@/lib/routes";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
 import {
   ProfileStartQueue,
@@ -19,7 +20,11 @@ export const metadata: Metadata = {
 
 const statuses = new Set(["submitted", "drafting", "ready", "published"]);
 
-export default async function AdminStartsPage() {
+export default async function AdminStartsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   if (!supabasePublicConfig()) {
     return (
       <AccountShell
@@ -37,7 +42,9 @@ export default async function AdminStartsPage() {
 
   if (!user) {
     return (
-      <AdminAuth
+      <AdminSignIn
+        returnPath={routes.adminStarts}
+        searchParams={searchParams}
         title="Sign in to profile drafts"
         lede="This page is for Kitchen Sink ops. Start a hidden draft from a therapist's request, then email them when it is ready."
       />

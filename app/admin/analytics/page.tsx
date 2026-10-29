@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AccountShell } from "@/components/auth/AccountShell";
-import { AdminAuth } from "@/components/admin/AdminAuth";
+import { AdminSignIn } from "@/components/admin/AdminSignIn";
+import { routes } from "@/lib/routes";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import {
@@ -43,7 +44,9 @@ export default async function AdminAnalyticsPage({
 
   if (!user) {
     return (
-      <AdminAuth
+      <AdminSignIn
+        returnPath={routes.adminAnalytics}
+        searchParams={searchParams}
         title="Sign in to see analytics"
         lede="This page is for Kitchen Sink ops. Visit and click counts stay here."
       />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AccountShell } from "@/components/auth/AccountShell";
-import { AdminAuth } from "@/components/admin/AdminAuth";
+import { AdminSignIn } from "@/components/admin/AdminSignIn";
+import { routes } from "@/lib/routes";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
 import { HelperUpload } from "@/components/admin/HelperUpload";
 import { adminToolsVisible } from "@/lib/audience";
@@ -15,7 +16,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/admin/media" },
 };
 
-export default async function AdminMediaPage() {
+export default async function AdminMediaPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   if (!supabasePublicConfig()) {
     return (
       <AccountShell
@@ -31,7 +36,9 @@ export default async function AdminMediaPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return <AdminAuth />;
+  if (!user) {
+    return <AdminSignIn returnPath={routes.adminMedia} searchParams={searchParams} />;
+  }
 
   const { data: profile } = await supabase
     .from("profiles")

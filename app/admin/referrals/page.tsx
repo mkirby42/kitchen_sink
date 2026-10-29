@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AccountShell } from "@/components/auth/AccountShell";
-import { AdminAuth } from "@/components/admin/AdminAuth";
+import { AdminSignIn } from "@/components/admin/AdminSignIn";
+import { routes } from "@/lib/routes";
 import { AdminViewHold } from "@/components/admin/AdminViewHold";
 import { ReferralQueue } from "@/components/admin/ReferralQueue";
 import { adminToolsVisible } from "@/lib/audience";
@@ -17,7 +18,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/admin/referrals" },
 };
 
-export default async function AdminReferralsPage() {
+export default async function AdminReferralsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   if (!supabasePublicConfig()) {
     return (
       <AccountShell
@@ -35,7 +40,9 @@ export default async function AdminReferralsPage() {
 
   if (!user) {
     return (
-      <AdminAuth
+      <AdminSignIn
+        returnPath={routes.adminReferrals}
+        searchParams={searchParams}
         title="Sign in to review referrals"
         lede="This page is for Kitchen Sink ops. A referral stays off the board until you approve it."
       />
