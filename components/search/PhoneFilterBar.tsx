@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { buttonClass, cx, fieldClass, primaryPillClass } from "@/components/ui/styles";
-import { buildFindHref, findViewFromSearchParams } from "@/components/search/query";
+import { buildFindHref } from "@/components/search/query";
 import {
   clearPhoneSheet,
   phonePills,
@@ -34,18 +34,19 @@ export function PhoneFilterBar({
   matchCount,
   open,
   onOpen,
+  layout = "grid",
 }: {
   filters: SearchFilters;
   matchCount: number | null;
   open: PhoneSheet | null;
   onOpen: (sheet: PhoneSheet | null) => void;
+  /** Kept on the address when a pill changes the filters. */
+  layout?: "grid" | "one";
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   function apply(next: SearchFilters) {
-    const view = findViewFromSearchParams(searchParams);
-    router.push(buildFindHref(next, { layout: view.layout }), { scroll: false });
+    router.push(buildFindHref(next, { layout }), { scroll: false });
   }
 
   return (

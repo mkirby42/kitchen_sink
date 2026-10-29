@@ -8,8 +8,9 @@ const baseURL = `http://127.0.0.1:${port}`;
  * exists. Chromium phone and desktop still run every file under
  * tests/guards/browser. Firefox and WebKit run only this list.
  *
- * No join/edit builder browser test exists. A save or publish on a seeded
- * account would collide across projects, so that flow is not in this matrix.
+ * join-builder.test.ts saves, publishes, and edits a throwaway user. It stays
+ * off this list: file upload is Chromium-only here, and the profile is closed
+ * to new clients so it does not land on Find beside the seeded cards.
  * Profile tests sign in as seeded users and do not save or publish, so they
  * stay in the list. The no-JS sign-up posts an already-confirmed throwaway
  * user and accepts either "already registered" or the confirm-email screen.
@@ -26,6 +27,7 @@ const christinePath = [
   "**/join-signup-auth.test.ts",
   "**/join-auth-no-js.test.ts",
   "**/reset-password-no-js.test.ts",
+  "**/find-no-js.test.ts",
   "**/auth-clean-load.test.ts",
   "**/find-cards.test.ts",
   "**/find-detail.test.ts",

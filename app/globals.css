@@ -86,6 +86,11 @@ input.ks-field[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 
+/* Native media for browsers that never run scripts. The inline script adds `js`. */
+html.js [data-no-js] {
+  display: none !important;
+}
+
 /* Phone Find browse. Firefox uses scrollbar-width on the scroller. */
 [data-phone-scroller]::-webkit-scrollbar {
   display: none;

@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { VoicePromptCard } from "@/components/profile/VoicePromptCard";
+import { withoutNoJsMedia } from "./no-js-html";
 
 describe("voice prompt card", () => {
   it("shows the title and a play control without requesting the file", () => {
@@ -17,6 +18,8 @@ describe("voice prompt card", () => {
     expect(html).toContain("Start the conversation");
     expect(html).toContain('aria-label="Play voice prompt for Maya Chen"');
     expect(html).toContain('preload="none"');
-    expect(html).not.toContain(src);
+    expect(withoutNoJsMedia(html)).not.toContain(src);
+    expect(html).toContain(`src="${src}"`);
+    expect(html).toContain('data-no-js=""');
   });
 });

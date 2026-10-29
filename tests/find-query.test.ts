@@ -4,6 +4,7 @@ import {
   buildTherapistHref,
   filtersFromSearchParams,
   parseFindPageView,
+  findSearchHasBlank,
   requestFindHref,
   requestFindPageHref,
   resultCountLabel,
@@ -194,6 +195,9 @@ describe("find search URL", () => {
     expect(requestFindPageHref(raw)).toBe(
       buildFindHref(parseFindSearchParams(raw), parseFindPageView(raw)),
     );
+    expect(findSearchHasBlank({ state: "" })).toBe(true);
+    expect(findSearchHasBlank({ tags: ["Anxiety", ""] })).toBe(true);
+    expect(findSearchHasBlank({ tags: "Anxiety" })).toBe(false);
     expect(
       requestFindPageHref({ tags: "Aetna", layout: "nope", more: "0", t: "nope" }),
     ).not.toBe(

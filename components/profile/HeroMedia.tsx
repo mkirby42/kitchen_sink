@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FrameVideo } from "@/components/ui/FrameVideo";
+import { NoJsVideo } from "@/components/ui/NoJsMedia";
 import { metaLineClass, therapistNameClass, therapistNameOnPhotoClass } from "@/components/ui/styles";
 import { VideoStill } from "@/components/ui/VideoStill";
 
@@ -11,6 +12,8 @@ type HeroMediaProps = {
   videoUrl: string | null;
   /** A saved photo is shown later on the page, so the hero does not paint it or request the video file until play. */
   hasPhoto?: boolean;
+  /** Poster for the no-JS video. The scripted hero still does not paint this photo. */
+  posterUrl?: string | null;
   licenseCaptions: string[];
   years: number | null;
   /** overlay: phone lead card. poster: desktop frame, name lives in the card below. */
@@ -23,6 +26,7 @@ export function HeroMedia({
   initials,
   videoUrl,
   hasPhoto = false,
+  posterUrl = null,
   licenseCaptions,
   years,
   variant = "overlay",
@@ -86,6 +90,14 @@ export function HeroMedia({
                 <path d="M8 5.5v13l11-6.5-11-6.5z" />
               </svg>
             </button>
+          ) : null}
+
+          {videoUrl ? (
+            <NoJsVideo
+              src={videoUrl}
+              poster={posterUrl}
+              label={`Intro video for ${name}`}
+            />
           ) : null}
 
           {poster && watchLabel && videoUrl && !showVideo ? (

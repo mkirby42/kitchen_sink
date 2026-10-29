@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FindCardLink } from "@/components/analytics/FindCardLink";
 import { FrameVideo } from "@/components/ui/FrameVideo";
+import { NoJsVideo } from "@/components/ui/NoJsMedia";
 import { VideoStill } from "@/components/ui/VideoStill";
 import { PersonMark } from "@/components/search/find-marks";
 
@@ -66,6 +67,13 @@ export function GridCardMedia({
           ) : null}
         </>
       )}
+      {videoUrl ? (
+        <NoJsVideo
+          src={videoUrl}
+          poster={photoUrl}
+          label={`Intro video for ${name}`}
+        />
+      ) : null}
       {formatBadge && !playing ? (
         <p className="absolute top-3 left-3 z-20 rounded-full bg-paper px-2.5 py-1 font-sans text-[12px] leading-4 font-medium text-ink shadow-[0_6px_16px_rgb(23_23_23/0.12)]">
           {formatBadge}

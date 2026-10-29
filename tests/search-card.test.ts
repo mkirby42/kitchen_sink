@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { promptAnswerClass, promptLabelClass } from "@/components/profile/prompt-type";
 import { TherapistCard } from "@/components/search/TherapistCard";
+import { withoutNoJsMedia } from "./no-js-html";
 import { credentialTitle, yearsPracticing } from "@/lib/therapists/display";
 import {
   ADMIN_ONLY_HIDDEN_LABEL,
@@ -184,8 +185,13 @@ describe("Find therapist card", () => {
     expect(narrow).toContain("object-cover");
     expect(narrow).not.toContain("size-[4.5rem]");
     expect(narrow).toContain("/object/public/photos/maya/photo.jpg");
-    expect(narrow).not.toContain("intro.mp4");
-    expect(narrow).not.toContain("<video");
+    const scripted = withoutNoJsMedia(narrow);
+    expect(scripted).not.toContain("intro.mp4");
+    expect(scripted).not.toContain("<video");
+    expect(narrow).toContain('data-no-js=""');
+    expect(narrow).toContain('preload="none"');
+    expect(narrow).toContain("/object/public/videos/maya/intro.mp4");
+    expect(narrow).toContain('poster="');
     expect(narrow).not.toContain("autoPlay");
     expect(narrow).not.toContain("autoplay");
     expect(narrow).toContain('aria-label="Play intro video for Maya Chen"');
@@ -263,7 +269,8 @@ describe("Find therapist card", () => {
     expect(narrow).toContain("aspect-[4/5]");
     expect(narrow).toContain("object-cover");
     expect(narrow).not.toContain("size-[4.5rem]");
-    expect(narrow).not.toContain("intro.mp4");
+    expect(withoutNoJsMedia(narrow)).not.toContain("intro.mp4");
+    expect(narrow).toContain('preload="none"');
     expect(narrow).toContain("PsyD · Licensed psychologist");
     expect(narrow).not.toContain("Licensed Psychologist");
     expect(narrow).not.toContain(" yrs");
@@ -330,9 +337,10 @@ describe("Find therapist card", () => {
     expect(narrow).toContain('aria-label="Play intro video for Maya Chen"');
     expect(narrow).not.toContain(">MC<");
     expect(narrow).not.toContain("<img");
-    expect(narrow).not.toContain("autoplay");
+    expect(withoutNoJsMedia(narrow)).not.toContain("autoplay");
     expect(narrow).not.toContain("0:30");
-    expect(narrow).not.toMatch(/<video[^>]*\scontrols[\s=]/);
+    expect(withoutNoJsMedia(narrow)).not.toMatch(/<video[^>]*\scontrols[\s=]/);
+    expect(narrow).toContain('preload="none"');
     expect(narrow).toContain('aria-label="Get to know Maya"');
     expect(html).not.toContain("Watch intro");
   });

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Card } from "@/components/ui/Card";
+import { NoJsAudio } from "@/components/ui/NoJsMedia";
 import { voiceWaveform } from "@/lib/join/voice";
 
 export function VoicePromptCard({
@@ -67,6 +68,7 @@ export function VoicePromptCard({
           })}
         </div>
       </div>
+      <NoJsAudio src={src} label={`Voice prompt for ${name}`} />
       <audio
         ref={audioRef}
         preload="none"

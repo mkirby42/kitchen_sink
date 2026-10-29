@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FindCardLink } from "@/components/analytics/FindCardLink";
 import { HiddenFromPublicBadge } from "@/components/directory/HiddenFromPublicBadge";
 import { FrameVideo } from "@/components/ui/FrameVideo";
+import { NoJsVideo } from "@/components/ui/NoJsMedia";
 import { VideoStill } from "@/components/ui/VideoStill";
 import { buildTherapistHref } from "@/components/search/query";
 import { desktopFormatBadge } from "@/lib/search/find-desktop";
@@ -102,6 +103,13 @@ export function PhoneListPortrait({
                   <path d="M8 5.5v13l11-6.5-11-6.5z" />
                 </svg>
               </button>
+            ) : null}
+            {videoUrl ? (
+              <NoJsVideo
+                src={videoUrl}
+                poster={photoUrl}
+                label={`Intro video for ${row.name}`}
+              />
             ) : null}
             {format ? (
               <span

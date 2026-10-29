@@ -7,6 +7,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { TherapistProfile } from "@/components/profile/TherapistProfile";
+import { withoutNoJsMedia } from "./no-js-html";
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { routes } from "@/lib/routes";
 import { NOT_ACCEPTING_CLIENTS_LABEL } from "@/lib/therapists/listing";
@@ -146,9 +147,12 @@ describe("phone profile layout", () => {
     expect(html.indexOf("data-profile-switch")).toBeLessThan(desk);
 
     const lead = phoneTree.slice(media, phone);
+    const scriptedLead = withoutNoJsMedia(lead);
+    expect(lead).toContain('preload="none"');
     expect(lead).not.toContain("https://example.com/photo.jpg");
-    expect(lead).not.toContain("data-video-still");
-    expect(lead).not.toContain("intro.mp4");
+    expect(scriptedLead).not.toContain("https://example.com/photo.jpg");
+    expect(scriptedLead).not.toContain("data-video-still");
+    expect(scriptedLead).not.toContain("intro.mp4");
     expect(lead).toContain("Play intro video for Travis White");
     expect(lead).toContain("bg-transparent");
     expect(lead).toContain("border-paper/80");

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import { FindDesktopFilters } from "@/components/search/FindDesktopFilters";
 import { FindDesktopResults } from "@/components/search/FindDesktopResults";
+import { FindNoJsForm } from "@/components/search/FindNoJsForm";
 import { PhoneFindSection } from "@/components/search/PhoneFindSection";
 import { pageTitleClass } from "@/components/ui/styles";
 import {
   buildFindHref,
+  findSearchHasBlank,
   parseFindPageView,
   requestFindPageHref,
 } from "@/components/search/query";
@@ -35,7 +36,7 @@ export default async function FindPage({ searchParams }: FindPageProps) {
   const filters = parseFindSearchParams(raw);
   const view = parseFindPageView(raw);
   const clean = buildFindHref(filters, view);
-  if (requestFindPageHref(raw) !== clean) redirect(clean);
+  if (findSearchHasBlank(raw) || requestFindPageHref(raw) !== clean) redirect(clean);
   const [found, audience, nav] = await Promise.all([
     searchTherapists(filters),
     readAudienceCookie(),
@@ -70,22 +71,30 @@ export default async function FindPage({ searchParams }: FindPageProps) {
   return (
     <main className="mx-auto max-w-5xl px-5 py-12 sm:px-8 sm:py-16 md:max-w-7xl md:py-14">
       <div className="md:hidden">
-        <PhoneFindSection rows={rows} audience={audience} />
+        <PhoneFindSection
+          rows={rows}
+          audience={audience}
+          filters={filters}
+          layout={view.layout}
+        />
       </div>
 
       <div className="hidden md:block">
-        <Suspense fallback={null}>
-          <FindDesktopFilters
-            key={detail ? "detail" : "list"}
-            matchCount={rows?.length ?? null}
-            initialOpen={detail ? null : "topics"}
-            leading={
-              <h1 className={`shrink-0 text-left md:text-heading ${pageTitleClass}`}>
-                Find your therapist
-              </h1>
-            }
-          />
-        </Suspense>
+        <FindDesktopFilters
+          key={detail ? "detail" : "list"}
+          filters={filters}
+          layout={view.layout}
+          matchCount={rows?.length ?? null}
+          initialOpen={detail ? null : "topics"}
+          leading={
+            <h1 className={`shrink-0 text-left md:text-heading ${pageTitleClass}`}>
+              Find your therapist
+            </h1>
+          }
+        />
+        <noscript>
+          <FindNoJsForm filters={filters} layout={view.layout} />
+        </noscript>
       </div>
 
       <div id="find-results" className="mt-8 hidden md:block">
