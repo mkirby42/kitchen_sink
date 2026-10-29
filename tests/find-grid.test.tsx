@@ -245,6 +245,18 @@ describe("desktop find profile", () => {
       lead: { prompt: "who I work best with...", answer: "Students." },
       rest: [{ prompt: "A session with me feels like...", answer: "Easy." }],
     });
+    expect(
+      splitDetailCards([
+        { prompt: "a session with me feels like...", answer: "Easy." },
+        { prompt: "I enjoy working with people who...", answer: "Are new to therapy." },
+      ]),
+    ).toEqual({
+      lead: {
+        prompt: "I enjoy working with people who...",
+        answer: "Are new to therapy.",
+      },
+      rest: [{ prompt: "a session with me feels like...", answer: "Easy." }],
+    });
     expect(detailConsult(profile().contact)).toEqual({
       href: "mailto:travis@example.com",
       cta: "consult",

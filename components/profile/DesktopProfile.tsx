@@ -13,10 +13,12 @@ import {
 import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { modalityDisplayLabels } from "@/lib/tags/modality-display";
 import { directorySpecialties } from "@/lib/tags/presets";
+import { publicConversationPrompt } from "@/lib/join/cards";
 import { AboutLead } from "./AboutLead";
 import { DesktopIdentity } from "./DesktopIdentity";
 import { DesktopPractice } from "./DesktopPractice";
 import { HeroMedia } from "./HeroMedia";
+import { ProfilePhoto } from "./ProfilePhoto";
 import { VoicePromptCard } from "./VoicePromptCard";
 import { ProfileHeading } from "./ProfileHeading";
 import { ProfileTabs } from "./ProfileTabs";
@@ -60,8 +62,8 @@ export function DesktopProfile({
           variant="poster"
           name={data.name}
           initials={initials(data.name.replace(/^dr\.?\s+/i, ""))}
-          photoUrl={data.photoUrl}
           videoUrl={data.videoUrl}
+          hasPhoto={Boolean(data.photoUrl)}
           licenseCaptions={licenses}
           years={data.years}
           watchLabel={watchLabel}
@@ -89,6 +91,9 @@ export function DesktopProfile({
           specialties={directorySpecialties(data.specialties)}
           modalities={modalityDisplayLabels(data.modalities)}
         />
+        {data.photoUrl ? (
+          <ProfilePhoto name={data.name} src={data.photoUrl} />
+        ) : null}
       </div>
       <div className="min-w-0">
         {data.cards.length > 0 ? (
@@ -107,7 +112,9 @@ export function DesktopProfile({
                   data-prompt-variant="desk"
                   className="px-5 py-5"
                 >
-                  <p className={promptLabelClass}>{card.prompt}</p>
+                  <p className={promptLabelClass}>
+                    {publicConversationPrompt(card.prompt)}
+                  </p>
                   <p className={promptAnswerClass}>{card.answer}</p>
                 </Card>
               ))}

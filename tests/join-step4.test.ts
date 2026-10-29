@@ -119,6 +119,40 @@ describe("JoinStep4 contact and rates", () => {
     expect(html).not.toContain("Number for texts");
   });
 
+  it("lists the current prompts and keeps a retired answer as its own card", () => {
+    const html = render({
+      cards: [
+        {
+          prompt: "before we start, you should know...",
+          answer: "I take notes.",
+          tag: "custom",
+        },
+        {
+          prompt: "clients say I'm especially good at...",
+          answer: "Listening.",
+          tag: "custom",
+        },
+      ],
+    });
+    expect(html).toContain("I enjoy working with people who...");
+    expect(html).toContain("my personal philosophy in therapy is...");
+    expect(html).toContain("what you can expect in our first session together...");
+    expect(html).toContain("people often come to me because...");
+    expect(html).toContain("outside of session, I...");
+    expect(html).toContain("I know therapy is working when...");
+    expect(html).toContain("you&#x27;ll know it&#x27;s working when...");
+    expect(html).not.toContain(">who I work best with...</span>");
+    expect(html).toContain("before we start, you should know...");
+    expect(html).toContain("clients say I&#x27;m especially good at...");
+    expect(html).toContain(
+      'aria-label="Remove before we start, you should know..."',
+    );
+    expect(html).toContain(
+      "aria-label=\"Remove clients say I&#x27;m especially good at...\"",
+    );
+    expect(html.match(/before we start, you should know\.\.\./g)).toHaveLength(2);
+  });
+
   it("counts conversation cards out of 6 and stops adds at the max", () => {
     const one = render();
     expect(one).toContain("1 of 6 added");

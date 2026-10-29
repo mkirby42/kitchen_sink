@@ -1,4 +1,5 @@
 import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
+import { isWorkBestPrompt } from "@/lib/join/cards";
 import {
   detailInsuranceLine,
   gridYearsLabel,
@@ -20,8 +21,6 @@ import {
   type ProfileRate,
   type ProfileReview,
 } from "@/lib/therapists/load";
-
-const WORK_BEST = /work best with/i;
 
 export type FindDetailCard = {
   prompt: string;
@@ -161,7 +160,7 @@ export function splitDetailCards(cards: readonly FindDetailCard[]) {
     }))
     .filter((card) => card.prompt && card.answer);
   if (usable.length === 0) return { lead: null, rest: [] as FindDetailCard[] };
-  const leadAt = usable.findIndex((card) => WORK_BEST.test(card.prompt));
+  const leadAt = usable.findIndex((card) => isWorkBestPrompt(card.prompt));
   const index = leadAt >= 0 ? leadAt : 0;
   return {
     lead: usable[index] ?? null,

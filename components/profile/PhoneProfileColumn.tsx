@@ -19,9 +19,11 @@ import type { ReviewViewer } from "@/lib/reviews/viewer";
 import { DRAFT_PROFILE_LABEL } from "@/lib/therapists/listing";
 import { modalityDisplayLabels } from "@/lib/tags/modality-display";
 import { directorySpecialties } from "@/lib/tags/presets";
+import { publicConversationPrompt } from "@/lib/join/cards";
 import { AboutPanel } from "./ProfileAbout";
 import { ContactCtas } from "./ContactCtas";
 import { HeroMedia } from "./HeroMedia";
+import { ProfilePhoto } from "./ProfilePhoto";
 import { VoicePromptCard } from "./VoicePromptCard";
 import { ProfileHeading } from "./ProfileHeading";
 import { ProfileTabs } from "./ProfileTabs";
@@ -104,8 +106,8 @@ export function PhoneProfileColumn({
           <HeroMedia
             name={data.name}
             initials={initials(data.name.replace(/^dr\.?\s+/i, ""))}
-            photoUrl={data.photoUrl}
             videoUrl={data.videoUrl}
+            hasPhoto={Boolean(data.photoUrl)}
             licenseCaptions={licenses}
             years={data.years}
           />
@@ -134,6 +136,10 @@ export function PhoneProfileColumn({
             />
           ) : null}
 
+          {data.photoUrl ? (
+            <ProfilePhoto name={data.name} src={data.photoUrl} />
+          ) : null}
+
           {data.cards.length > 0 ? (
             <section className="mt-10">
               <h2 className={profilePageHeadingClass}>
@@ -158,7 +164,9 @@ export function PhoneProfileColumn({
                       >
                         {corner.icon}
                       </span>
-                      <p className={`pl-8 ${promptLabelClass}`}>{card.prompt}</p>
+                      <p className={`pl-8 ${promptLabelClass}`}>
+                        {publicConversationPrompt(card.prompt)}
+                      </p>
                       <p className={promptAnswerClass}>{card.answer}</p>
                     </Card>
                   );

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { canonicalSpecialtyLabels } from "@/lib/tags/presets";
 import { yearsPracticing } from "@/lib/therapists/display";
+import { builderCardsFromSaved } from "./cards";
 import type { JoinDraft } from "./types";
 
 export type JoinDraftRows = {
@@ -93,7 +94,7 @@ export function draftFromRows(rows: JoinDraftRows): JoinDraft {
       rows.therapist.sliding_scale_max_cents != null,
     slidingScaleMinCents: rows.therapist.sliding_scale_min_cents ?? null,
     slidingScaleMaxCents: rows.therapist.sliding_scale_max_cents ?? null,
-    cards: rows.items,
+    cards: builderCardsFromSaved(rows.items),
     about: rows.profile.about_me ?? "",
     email: rows.profile.email ?? rows.email,
     phone: rows.profile.phone ?? "",

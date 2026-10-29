@@ -7,8 +7,8 @@ const texasLicense = "Licensed by State of Texas / 38047";
 
 function render(
   overrides: Partial<{
-    photoUrl: string | null;
     videoUrl: string | null;
+    hasPhoto: boolean;
     years: number | null;
     licenseCaptions: string[];
     variant: "overlay" | "poster";
@@ -19,8 +19,8 @@ function render(
     createElement(HeroMedia, {
       name: "Travis White",
       initials: "TW",
-      photoUrl: "https://example.com/photo.jpg",
       videoUrl: "https://example.com/intro.mp4",
+      hasPhoto: true,
       licenseCaptions: [texasLicense],
       years: 8,
       ...overrides,
@@ -37,7 +37,7 @@ function splitHero(html: string) {
 }
 
 describe("HeroMedia", () => {
-  it("overlays only the name and license on the photo", () => {
+  it("overlays only the name and license on the hero, not a profile photo", () => {
     const { media, details } = splitHero(render());
 
     expect(media).toContain('aria-label="Play intro video for Travis White"');
@@ -53,7 +53,8 @@ describe("HeroMedia", () => {
     expect(media).toContain("from-black/75");
     expect(media).toContain(">Travis White<");
     expect(media).toContain(texasLicense);
-    expect(media).toContain("photo.jpg");
+    expect(media).not.toContain("<img");
+    expect(media).not.toContain("photo.jpg");
     expect(media).not.toContain("data-video-still");
     expect(media).not.toContain("intro.mp4");
     expect(media).not.toContain("PsyD");
@@ -84,14 +85,15 @@ describe("HeroMedia", () => {
     expect(media).not.toContain("1 min intro");
   });
 
-  it("omits the play control without a video and keeps the license on the photo", () => {
+  it("omits the play control without a video and keeps the license on the frame", () => {
     const { media, details } = splitHero(
       render({ videoUrl: null, years: 1 }),
     );
 
     expect(media).not.toContain("Play intro video");
     expect(media).not.toContain("1 min intro");
-    expect(media).toContain('alt="Travis White"');
+    expect(media).not.toContain("<img");
+    expect(media).toContain(">TW<");
     expect(media).toContain(">Travis White<");
     expect(media).toContain(texasLicense);
     expect(details).not.toContain("PsyD");
@@ -101,8 +103,8 @@ describe("HeroMedia", () => {
     expect(details).not.toContain("1 min intro");
   });
 
-  it("uses a frame from the video when there is no photo", () => {
-    const { media, details } = splitHero(render({ photoUrl: null }));
+  it("uses a frame from the video for the hero still when there is no photo", () => {
+    const { media, details } = splitHero(render({ hasPhoto: false }));
 
     expect(media).toContain("data-video-still");
     expect(media).toContain("https://example.com/intro.mp4#t=0.1");
@@ -119,10 +121,10 @@ describe("HeroMedia", () => {
     expect(details).toContain("8 yrs practicing");
   });
 
-  it("keeps the desktop watch pill on a video frame when there is no photo", () => {
+  it("keeps the desktop watch pill on a video frame", () => {
     const { media, details } = splitHero(
       render({
-        photoUrl: null,
+        hasPhoto: false,
         variant: "poster",
         watchLabel: "Watch Travis's intro",
       }),
@@ -142,7 +144,6 @@ describe("HeroMedia", () => {
 
   it("shows initials and the name on the frame when there is no photo or video", () => {
     const html = render({
-      photoUrl: null,
       videoUrl: null,
       licenseCaptions: [],
       years: null,

@@ -134,6 +134,11 @@ describe("phone profile layout", () => {
     expect(media).toBeLessThan(phone);
     expect(phone).toBeLessThan(education);
     expect(education).toBeLessThan(know);
+    const shot = phoneTree.indexOf("data-profile-photo");
+    expect(shot).toBeGreaterThan(phoneTree.indexOf("How Travis works"));
+    expect(know).toBeGreaterThan(shot);
+    expect(phoneTree.slice(shot, know)).toContain("https://example.com/photo.jpg");
+    expect(phoneTree.slice(shot, know)).toContain("Photo of Travis White");
     expect(know).toBeLessThan(modalities);
     expect(modalities).toBeLessThan(specialties);
     expect(specialties).toBeLessThan(own);
@@ -141,7 +146,9 @@ describe("phone profile layout", () => {
     expect(html.indexOf("data-profile-switch")).toBeLessThan(desk);
 
     const lead = phoneTree.slice(media, phone);
-    expect(lead).toContain("https://example.com/photo.jpg");
+    expect(lead).not.toContain("https://example.com/photo.jpg");
+    expect(lead).not.toContain("data-video-still");
+    expect(lead).not.toContain("intro.mp4");
     expect(lead).toContain("Play intro video for Travis White");
     expect(lead).toContain("bg-transparent");
     expect(lead).toContain("border-paper/80");
@@ -201,7 +208,13 @@ describe("phone profile layout", () => {
       deskTree.indexOf("Approach in therapy"),
     );
     expect(deskTree.indexOf("Approach in therapy")).toBeLessThan(
+      deskTree.indexOf("data-profile-photo"),
+    );
+    expect(deskTree.indexOf("data-profile-photo")).toBeLessThan(
       deskTree.indexOf("Get to know"),
+    );
+    expect(deskTree.slice(0, deskTree.indexOf("How Travis works"))).not.toContain(
+      "https://example.com/photo.jpg",
     );
     expect(deskTree).toContain("bg-pill-bg");
     expect(deskTree).toContain("Life transitions");
@@ -250,8 +263,14 @@ describe("phone profile layout", () => {
       photo.indexOf('data-profile-layout="phone"'),
       photo.indexOf('data-profile-layout="desk"'),
     );
+    expect(photoPhone.indexOf("https://example.com/photo.jpg")).toBeGreaterThan(
+      photoPhone.indexOf("How Travis works"),
+    );
     expect(photoPhone.indexOf("https://example.com/photo.jpg")).toBeLessThan(
-      photoPhone.indexOf('data-profile-show="phone"'),
+      photoPhone.indexOf("Get to know"),
+    );
+    expect(photoPhone.slice(0, photoPhone.indexOf("How Travis works"))).not.toContain(
+      "<img",
     );
     expect(photoPhone.indexOf("Education")).toBeLessThan(
       photoPhone.indexOf("Get to know"),
@@ -265,6 +284,7 @@ describe("phone profile layout", () => {
     const media = videoPhone.indexOf('data-profile-layout="media"');
     const phone = videoPhone.indexOf('data-profile-show="phone"');
     expect(videoPhone.slice(media, phone)).toContain("Play intro video");
+    expect(videoPhone.slice(media, phone)).toContain("data-video-still");
     expect(video.match(/data-hero-media/g)).toHaveLength(2);
   });
 

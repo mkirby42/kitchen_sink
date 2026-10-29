@@ -3,82 +3,68 @@
 import { useRef } from "react";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { buttonClass } from "@/components/ui/styles";
+import { UploadedStatus } from "./UploadedStatus";
 
 export function MediaSlot({
   kind,
-  preview,
   uploaded,
   uploading,
   busyLabel,
   accept,
   helpers,
+  statusLabel,
   onFile,
+  onRemove,
 }: {
   kind: "photo" | "video";
-  preview: string | null;
   uploaded: boolean;
   uploading: boolean;
   busyLabel?: string;
   accept: string;
   helpers: string[];
+  statusLabel: string;
   onFile: (file?: File) => void;
+  onRemove: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const noun = kind === "photo" ? "photo" : "video";
+  const showUploaded = uploaded && !uploading;
 
   return (
     <section className="space-y-3">
       {kind === "video" ? <Eyebrow>Intro video</Eyebrow> : null}
-      <div className="flex items-center gap-4">
+      {showUploaded ? (
+        <UploadedStatus label={statusLabel} />
+      ) : (
+        <p className="text-sm text-mute">
+          {uploading
+            ? (busyLabel ?? `Uploading ${noun}…`)
+            : `No ${noun} chosen yet.`}
+        </p>
+      )}
+      <div className="flex flex-wrap gap-3">
         <button
           type="button"
-          aria-label={`Choose a ${noun}`}
           disabled={uploading}
           onClick={() => inputRef.current?.click()}
-          className="grid size-[4.5rem] shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-cream disabled:opacity-60"
+          className={buttonClass("secondary")}
         >
-          {preview ? (
-            kind === "photo" ? (
-              // Blob previews cannot use next/image.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={preview}
-                alt="Selected profile preview"
-                className="size-full object-cover"
-              />
-            ) : (
-              <video
-                src={preview}
-                muted
-                playsInline
-                className="size-full object-cover"
-              />
-            )
-          ) : (
-            <span className="text-2xl text-ink" aria-hidden>
-              {kind === "photo" ? "+" : "▶"}
-            </span>
-          )}
+          {uploading
+            ? (busyLabel ?? `Uploading ${noun}…`)
+            : uploaded
+              ? `Replace ${noun}…`
+              : `Choose a ${noun}…`}
         </button>
-        <div>
+        {uploaded ? (
           <button
             type="button"
             disabled={uploading}
-            onClick={() => inputRef.current?.click()}
+            onClick={onRemove}
             className={buttonClass("secondary")}
           >
-            {uploading
-              ? (busyLabel ?? `Uploading ${noun}…`)
-              : preview
-                ? `Change ${noun}…`
-                : `Choose a ${noun}…`}
+            Remove
           </button>
-          <p className="mt-2 text-sm text-mute">
-            {uploaded
-              ? `${kind === "photo" ? "Photo" : "Video"} uploaded.`
-              : `No ${noun} chosen yet.`}
-          </p>
-        </div>
+        ) : null}
       </div>
       {helpers.map((text) => (
         <p
@@ -93,6 +79,7 @@ export function MediaSlot({
         type="file"
         accept={accept}
         disabled={uploading}
+        aria-label={`Choose a ${noun}`}
         onChange={(event) => {
           onFile(event.target.files?.[0]);
           event.target.value = "";
