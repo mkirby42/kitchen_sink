@@ -76,8 +76,9 @@ export function pageReturnPath(path: string, params: AuthSearch): string {
 export function readAuthQuery(params: AuthSearch): AuthFlash {
   const sentRaw = firstParam(params.sent);
   const sent = sentRaw === "1" || sentRaw === "confirm" ? sentRaw : "";
+  const rawError = firstParam(params.error);
   return {
-    error: sanitizeAuthError(firstParam(params.error)),
+    error: rawError.trim() ? sanitizeAuthError(rawError) : "",
     email: sanitizeAuthEmail(firstParam(params.email)),
     sent,
   };
