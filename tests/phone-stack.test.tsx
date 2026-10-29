@@ -221,6 +221,25 @@ describe("phone Find list", () => {
     expect(html).toContain("One at a time");
     expect(html).not.toContain("1 of 1");
   });
+
+  it("keeps list play controls in the document when the address opens one at a time", () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    const html = renderToStaticMarkup(
+      createElement(PhoneFind, {
+        rows: [travis],
+        booking: [],
+        slides: null,
+        initialMode: "one",
+      }),
+    );
+    expect(html).toContain('data-phone-mode="one"');
+    expect(html).toContain('data-phone-stack=""');
+    expect(html).toContain('data-phone-list=""');
+    expect(html).toContain('hidden=""');
+    expect(html).toContain('aria-label="Play intro video for Travis White"');
+    expect(html).toContain('aria-label="Intro video for Travis White"');
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+  });
 });
 
 describe("phone profile stack", () => {

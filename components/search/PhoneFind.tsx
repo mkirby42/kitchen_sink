@@ -62,65 +62,65 @@ export function PhoneFind({
         >
           {slides}
         </PhoneProfileStack>
-      ) : (
-        <>
-          <h1 className={`text-center ${pageTitleClass}`}>Find your therapist</h1>
-          <div className="mt-6">
-            <PhoneFilterBar
-              filters={filters}
-              layout={layout}
-              matchCount={rows?.length ?? null}
-              open={sheet}
-              onOpen={setSheet}
-            />
+      ) : null}
+      {/* List stays mounted under one-at-a-time so desktop ?layout=one still has the phone cards. */}
+      <div hidden={stack || undefined}>
+        <h1 className={`text-center ${pageTitleClass}`}>Find your therapist</h1>
+        <div className="mt-6">
+          <PhoneFilterBar
+            filters={filters}
+            layout={layout}
+            matchCount={rows?.length ?? null}
+            open={sheet}
+            onOpen={setSheet}
+          />
+        </div>
+        {rows === null ? null : (
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <p className="font-sans text-[15px] font-medium text-ink">
+              {therapistsFitLabel(count)}
+            </p>
+            {count > 0 ? (
+              <SegmentedControl
+                label="How to browse therapists"
+                size="sm"
+                value={mode}
+                onChange={(next) => {
+                  setSheet(null);
+                  setMode(next);
+                }}
+                options={[
+                  { value: "list", label: "List" },
+                  { value: "one", label: "One at a time" },
+                ]}
+              />
+            ) : null}
           </div>
-          {rows === null ? null : (
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <p className="font-sans text-[15px] font-medium text-ink">
-                {therapistsFitLabel(count)}
-              </p>
-              {count > 0 ? (
-                <SegmentedControl
-                  label="How to browse therapists"
-                  size="sm"
-                  value={mode}
-                  onChange={(next) => {
-                    setSheet(null);
-                    setMode(next);
-                  }}
-                  options={[
-                    { value: "list", label: "List" },
-                    { value: "one", label: "One at a time" },
-                  ]}
-                />
-              ) : null}
-            </div>
-          )}
-          {rows === null ? (
-            <Card as="div" className="mt-4 px-6 py-10 text-center text-mute">
-              <p>Therapist search isn&apos;t available right now.</p>
-            </Card>
-          ) : count === 0 ? (
-            <Card as="div" className="mt-4 px-6 py-10 text-center text-mute">
-              <p>No therapists match</p>
-            </Card>
-          ) : (
-            <ul data-phone-list="" className="mt-4 space-y-3">
-              {rows.map((row, index) => (
-                <li key={row.profile_id}>
-                  <Card className="overflow-hidden p-0">
-                    <TherapistCardPhone
-                      row={row}
-                      filters={filters}
-                      cards={listCards?.[index]}
-                    />
-                  </Card>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
+        )}
+        {rows === null ? (
+          <Card as="div" className="mt-4 px-6 py-10 text-center text-mute">
+            <p>Therapist search isn&apos;t available right now.</p>
+          </Card>
+        ) : count === 0 ? (
+          <Card as="div" className="mt-4 px-6 py-10 text-center text-mute">
+            <p>No therapists match</p>
+          </Card>
+        ) : (
+          <ul data-phone-list="" className="mt-4 space-y-3">
+            {rows.map((row, index) => (
+              <li key={row.profile_id}>
+                <Card className="overflow-hidden p-0">
+                  <TherapistCardPhone
+                    row={row}
+                    filters={filters}
+                    cards={listCards?.[index]}
+                  />
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
