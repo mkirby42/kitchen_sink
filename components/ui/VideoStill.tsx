@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * One frame from an intro video, used when a profile has a video and no photo.
+ * One frame from an intro video. The profile photo is not this still.
  * A media-fragment seek paints that frame. Playback still starts from the
- * play control on a separate element. A photo poster does not use this.
+ * play control on a separate element.
  */
 export function videoStillSrc(url: string) {
   if (/#t=\d/.test(url)) return url;

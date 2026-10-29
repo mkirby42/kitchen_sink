@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { VoicePromptSheet } from "@/components/join/VoicePromptSheet";
 import { VoicePromptCard } from "@/components/profile/VoicePromptCard";
+import { UploadedStatus } from "@/components/join/UploadedStatus";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { buttonClass } from "@/components/ui/styles";
 import { formatRecordClock } from "@/lib/join/record-video";
@@ -38,6 +39,7 @@ export function VoicePromptEditor({
       </p>
       {saved && audioUrl ? (
         <div className="space-y-3">
+          <UploadedStatus label="Voice prompt saved" />
           <VoicePromptCard name={name} prompt={prompt} src={audioUrl} />
           <div className="flex flex-wrap gap-3">
             <button

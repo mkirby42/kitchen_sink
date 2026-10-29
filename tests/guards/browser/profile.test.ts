@@ -44,6 +44,30 @@ test(
       await expect(hero.getByRole("button", { name: "Watch Ada's intro" })).toBeVisible();
       await expect(hero).not.toContainText(ada.name);
     }
+    const layout = page.locator(
+      `[data-profile-layout='${testInfo.project.name === "phone" ? "phone" : "desk"}']`,
+    );
+    const heroFrame = layout.locator("[data-hero-media]");
+    await expect(heroFrame.locator("img")).toHaveCount(0);
+    const photo = layout.locator("[data-profile-photo]");
+    await expect(photo).toBeVisible();
+    await expect(photo.locator("img")).toHaveAttribute("alt", `Photo of ${ada.name}`);
+    const placed = await layout.evaluate((root) => {
+      const how = [...root.querySelectorAll("h2")].find((node) =>
+        node.textContent?.includes("How "),
+      );
+      const shot = root.querySelector("[data-profile-photo]");
+      const know = [...root.querySelectorAll("h2")].find((node) =>
+        node.textContent?.includes("Get to know"),
+      );
+      if (!how || !shot || !know) return false;
+      const after = Node.DOCUMENT_POSITION_FOLLOWING;
+      return (
+        Boolean(how.compareDocumentPosition(shot) & after) &&
+        Boolean(shot.compareDocumentPosition(know) & after)
+      );
+    });
+    expect(placed).toBe(true);
   },
 );
 
@@ -75,6 +99,24 @@ test(
     expect(licenseAt).toBeGreaterThan(-1);
     expect(schoolAt).toBeGreaterThan(licenseAt);
     expect(insuranceAt).toBeGreaterThan(schoolAt);
+    const photo = phone.locator("[data-profile-photo]");
+    await expect(photo).toBeVisible();
+    const placed = await phone.evaluate((root) => {
+      const how = [...root.querySelectorAll("h2")].find((node) =>
+        node.textContent?.includes("How Ada works"),
+      );
+      const shot = root.querySelector("[data-profile-photo]");
+      const know = [...root.querySelectorAll("h2")].find((node) =>
+        node.textContent?.includes("Get to know Ada"),
+      );
+      if (!how || !shot || !know) return false;
+      const after = Node.DOCUMENT_POSITION_FOLLOWING;
+      return (
+        Boolean(how.compareDocumentPosition(shot) & after) &&
+        Boolean(shot.compareDocumentPosition(know) & after)
+      );
+    });
+    expect(placed).toBe(true);
     await expect(phone.getByText(OFFICE_STREET)).toBeVisible();
     await expect(phone.getByText(PRICE_LABEL)).toBeVisible();
     await expect(phone.getByText("Sliding scale")).toBeVisible();

@@ -89,6 +89,9 @@ describe("desktop find card copy", () => {
     expect(desktopPromptHeading("I work best with...")).toBe(
       "I WORK BEST WITH...",
     );
+    expect(desktopPromptHeading("I enjoy working with people who...")).toBe(
+      "I WORK BEST WITH...",
+    );
     expect(desktopPromptHeading("my approach to therapy is...")).toBe(
       "my approach to therapy is...",
     );

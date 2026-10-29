@@ -105,6 +105,8 @@ describe("profile guards", () => {
     expect(hero).toContain("bg-transparent");
     expect(hero).toContain("8 yrs practicing");
     expect(hero).not.toContain("PsyD");
+    expect(hero).not.toContain("https://example.com/photo.jpg");
+    expect(hero).not.toContain("data-profile-photo");
     expect(html).not.toContain("1 min intro");
 
     const order = [
@@ -130,6 +132,15 @@ describe("profile guards", () => {
     expect(credentialsAt).toBeGreaterThan(educationAt);
     expect(insuranceAt).toBeGreaterThan(credentialsAt);
     expect(phone.indexOf("Get to know Travis")).toBeGreaterThan(insuranceAt);
+    const phonePhoto = phone.indexOf("data-profile-photo");
+    expect(phonePhoto).toBeGreaterThan(phone.indexOf("How Travis works"));
+    expect(phone.indexOf("Get to know Travis")).toBeGreaterThan(phonePhoto);
+    expect(phone.slice(phonePhoto, phone.indexOf("Get to know Travis"))).toContain(
+      "https://example.com/photo.jpg",
+    );
+    expect(phone.slice(phonePhoto, phone.indexOf("Get to know Travis"))).toContain(
+      "Photo of Travis White",
+    );
     expect(phone).not.toContain(">Identity<");
     expect(phone).toContain("1102 West 6th Street, Austin");
     expect(phone).toContain("Cognitive behavioral therapy (CBT)");
@@ -152,6 +163,14 @@ describe("profile guards", () => {
     expect(desk.indexOf("Credentials")).toBeLessThan(desk.indexOf("Aetna"));
     expect(desk).not.toContain(">Identity<");
     expect(desk).not.toContain("BIPOC");
+    const deskHow = desk.indexOf("How Travis works");
+    const deskPhoto = desk.indexOf("data-profile-photo");
+    const deskKnow = desk.indexOf("Get to know Travis");
+    expect(desk.slice(0, deskHow)).not.toContain("https://example.com/photo.jpg");
+    expect(deskPhoto).toBeGreaterThan(deskHow);
+    expect(deskKnow).toBeGreaterThan(deskPhoto);
+    expect(desk.slice(deskPhoto, deskKnow)).toContain("https://example.com/photo.jpg");
+    expect(desk.slice(deskPhoto, deskKnow)).toContain("Photo of Travis White");
   });
 
   it("omits education on Travis White's public profile and still shows credentials", () => {

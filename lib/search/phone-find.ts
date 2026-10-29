@@ -1,4 +1,5 @@
 import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
+import { isWorkBestPrompt } from "@/lib/join/cards";
 import {
   desktopInsuranceLabels,
   licensedInLabel,
@@ -102,9 +103,11 @@ export function takesPlans(labels: readonly string[], filters: SearchFilters) {
   return desktopInsuranceLabels(source);
 }
 
-const WORK_BEST = /work best with/i;
-
-/** Mockup label. Stored prompts are “who I work best with...” or “I work best with...”. */
+/**
+ * Phone list label. Locked by the product-decisions registry.
+ * Stored prompts may be “who I work best with...”, “I work best with...”,
+ * or “I enjoy working with people who...”. All three use this label.
+ */
 export const PHONE_LIST_WORK_BEST_LABEL = "I work best with...";
 
 /**
@@ -126,12 +129,14 @@ export function phoneListQuote(
   const answer = row.card_answer?.trim() ?? "";
   const fromRow = prompt && answer ? { prompt, answer } : null;
   const best =
-    saved.find((card) => WORK_BEST.test(card.prompt)) ??
-    (fromRow && WORK_BEST.test(fromRow.prompt) ? fromRow : null);
+    saved.find((card) => isWorkBestPrompt(card.prompt)) ??
+    (fromRow && isWorkBestPrompt(fromRow.prompt) ? fromRow : null);
   const chosen = best ?? saved[0] ?? fromRow;
   if (!chosen) return null;
   return {
-    label: WORK_BEST.test(chosen.prompt) ? PHONE_LIST_WORK_BEST_LABEL : chosen.prompt,
+    label: isWorkBestPrompt(chosen.prompt)
+      ? PHONE_LIST_WORK_BEST_LABEL
+      : chosen.prompt,
     answer: chosen.answer,
   };
 }

@@ -101,17 +101,17 @@ All N, n of N, a one-time "Swipe for the next therapist", and a preview of the n
 
 ### The profile photo keeps the face clear
 
-The play control is see-through. On the phone the photo shows the name and the license line (Licensed by State of Texas / 38047), not the credential, and there is no "1 min intro" badge. Years sit under the photo. Desktop adds "Watch {name}'s intro" and does not put the name on the photo.
+The play control is see-through. On the phone the hero shows the name and the license line (Licensed by State of Texas / 38047), not the credential, and there is no "1 min intro" badge. Years sit under the hero. Desktop adds "Watch {name}'s intro" and does not put the name on the hero. The uploaded photo is not that hero. It sits below How {name} works and above Get to know {name}, on the phone and on desktop, in a portrait frame that keeps the face clear.
 
-- Landed: 2026-10-07, #50, #52, #53, #54, #56.
+- Landed: 2026-10-07, #50, #52, #53, #54, #56. Landed: photo below How {name} works 2026-10-29 (Christine Oct 28).
 - Guard: `tests/guards/profile.test.tsx`
 - Browser: `tests/guards/browser/profile.test.ts`
 
 ### Profile sections use her words, in this order, on the phone
 
-How {name} works (formats, office address, rates, sliding scale when offered, in-network, plus the education and credential rows in that same facts card). Then Get to know {name}. Then Approach in therapy, Areas of interest. Then In {name}'s own words. Education and credentials are not their own sections. Identity tags are not on this page. Approach spells out a bare acronym (Cognitive behavioral therapy (CBT)). Tag pills wrap instead of scrolling sideways.
+How {name} works (formats, office address, rates, sliding scale when offered, in-network, plus the education and credential rows in that same facts card). Then the profile photo, when one is saved. Then Get to know {name}. Then Approach in therapy, Areas of interest. Then In {name}'s own words. Education and credentials are not their own sections. Identity tags are not on this page. Approach spells out a bare acronym (Cognitive behavioral therapy (CBT)). Tag pills wrap instead of scrolling sideways.
 
-- Landed: address 2026-10-07, #51 and #58. Headings 2026-10-08, #80 and #82. Phone order 2026-10-16, #105. Wrapping pills 2026-10-09, #91. Facts-card education and hidden identity 2026-10-26.
+- Landed: address 2026-10-07, #51 and #58. Headings 2026-10-08, #80 and #82. Phone order 2026-10-16, #105. Wrapping pills 2026-10-09, #91. Facts-card education and hidden identity 2026-10-26. Landed: photo below How {name} works 2026-10-29 (Christine Oct 28).
 - Guard: `tests/guards/profile.test.tsx`
 - Browser: `tests/guards/browser/profile.test.ts`
 

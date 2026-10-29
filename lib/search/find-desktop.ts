@@ -1,4 +1,5 @@
 import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
+import { isWorkBestPrompt } from "@/lib/join/cards";
 import { FIND_TOPICS } from "@/lib/tags/plain-language";
 import {
   canonicalSpecialtyLabel,
@@ -37,13 +38,11 @@ export function desktopFormatBadge(virtual: boolean, inPerson: boolean) {
   return parts.length ? parts.join(" · ") : null;
 }
 
-const WORK_BEST = /work best with/i;
-
-/** Tinted-box label. The work-best prompt uses the mockup heading. */
+/** Tinted-box label. Old and renamed work-best prompts use the mockup heading. */
 export function desktopPromptHeading(prompt: string | null | undefined) {
   const text = prompt?.trim() ?? "";
   if (!text) return null;
-  if (WORK_BEST.test(text)) return "I WORK BEST WITH...";
+  if (isWorkBestPrompt(text)) return "I WORK BEST WITH...";
   return text;
 }
 

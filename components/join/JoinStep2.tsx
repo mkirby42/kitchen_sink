@@ -14,7 +14,6 @@ import {
 import { uploadJoinMedia } from "@/lib/join/submit";
 import { PUBLISH_MEDIA_CONTINUE_NOTE } from "@/lib/join/validate";
 import { createClient } from "@/lib/supabase/client";
-import { storagePublicUrl } from "@/lib/therapists/display";
 import { Notice } from "@/components/ui/Notice";
 import { IntroRecorder } from "./IntroRecorder";
 import { MediaSlot } from "./MediaSlot";
@@ -33,11 +32,8 @@ export function JoinStep2({
   setDraft: Dispatch<SetStateAction<JoinDraft>>;
   onBusyChange?: (busy: boolean) => void;
 }) {
-  const [photoPreview, setPhotoPreview] = useState<string | null>(
-    () => storagePublicUrl("photos", draft.photoKey),
-  );
-  const [videoPreview, setVideoPreview] = useState<string | null>(
-    () => storagePublicUrl("videos", draft.videoKey),
+  const [videoSource, setVideoSource] = useState<"upload" | "record" | null>(
+    null,
   );
   const [uploading, setUploading] = useState({ photo: false, video: false });
   const [preparingPhoto, setPreparingPhoto] = useState(false);
@@ -57,20 +53,6 @@ export function JoinStep2({
     onFail: fail,
     onBegin: () => setError(""),
   });
-
-  useEffect(
-    () => () => {
-      if (photoPreview) URL.revokeObjectURL(photoPreview);
-    },
-    [photoPreview],
-  );
-
-  useEffect(
-    () => () => {
-      if (videoPreview) URL.revokeObjectURL(videoPreview);
-    },
-    [videoPreview],
-  );
 
   useEffect(() => {
     onBusyChange?.(uploading.photo || uploading.video || voice.uploading || preparingPhoto);
@@ -108,10 +90,6 @@ export function JoinStep2({
       return;
     }
 
-    const previewUrl = URL.createObjectURL(ready);
-    if (kind === "photo") setPhotoPreview(previewUrl);
-    else setVideoPreview(previewUrl);
-
     setDraft((current) => ({
       ...current,
       [kind === "photo" ? "photoKey" : "videoKey"]: null,
@@ -133,6 +111,17 @@ export function JoinStep2({
     }
   }
 
+  function removeMedia(kind: "photo" | "video") {
+    requestRef.current[kind] += 1;
+    if (kind === "photo") setPreparingPhoto(false);
+    else setVideoSource(null);
+    setUploading((state) => ({ ...state, [kind]: false }));
+    setDraft((current) => ({
+      ...current,
+      [kind === "photo" ? "photoKey" : "videoKey"]: null,
+    }));
+  }
+
   return (
     <div className="space-y-10">
       <p className="rounded-box bg-cream px-5 py-4 text-center text-sm leading-6 text-body">
@@ -140,35 +129,45 @@ export function JoinStep2({
       </p>
       <MediaSlot
         kind="photo"
-        preview={photoPreview}
         uploaded={Boolean(draft.photoKey)}
         uploading={uploading.photo || preparingPhoto}
         busyLabel={preparingPhoto ? "Resizing photo…" : undefined}
         accept={PHOTO_ACCEPT}
+        statusLabel="Photo uploaded"
         helpers={[
           "A clear, well-lit headshot — just you, looking at the camera — works best.",
-          "JPEG, PNG, WebP, or GIF · up to 5MB. This is the photo clients see first on your profile.",
+          "JPEG, PNG, WebP, or GIF · up to 5MB. This is the photo on your public profile.",
           "Large photos are resized in your browser so they can upload.",
         ]}
         onFile={(file) => void chooseFile("photo", file)}
+        onRemove={() => removeMedia("photo")}
       />
 
       <MediaSlot
         kind="video"
-        preview={videoPreview}
         uploaded={Boolean(draft.videoKey)}
         uploading={uploading.video}
         accept={VIDEO_ACCEPT}
+        statusLabel={
+          videoSource === "record" ? "Video recorded" : "Video uploaded"
+        }
         helpers={[
           "One short intro clip. We'll play it as uploaded on your public profile — no editing.",
           "MP4, WebM, or MOV · up to 50MB.",
         ]}
-        onFile={(file) => void chooseFile("video", file)}
+        onFile={(file) => {
+          setVideoSource("upload");
+          void chooseFile("video", file);
+        }}
+        onRemove={() => removeMedia("video")}
       />
 
       <IntroRecorder
         disabled={uploading.video}
-        onFile={(file) => void chooseFile("video", file)}
+        onFile={(file) => {
+          setVideoSource("record");
+          void chooseFile("video", file);
+        }}
       />
 
       <VoicePromptEditor

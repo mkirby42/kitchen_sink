@@ -8,11 +8,12 @@ import { VideoStill } from "@/components/ui/VideoStill";
 type HeroMediaProps = {
   name: string;
   initials: string;
-  photoUrl: string | null;
   videoUrl: string | null;
+  /** A saved photo is shown later on the page, so the hero does not paint it or request the video file until play. */
+  hasPhoto?: boolean;
   licenseCaptions: string[];
   years: number | null;
-  /** overlay: phone lead card. poster: desktop photo, name lives in the card below. */
+  /** overlay: phone lead card. poster: desktop frame, name lives in the card below. */
   variant?: "overlay" | "poster";
   watchLabel?: string | null;
 };
@@ -20,8 +21,8 @@ type HeroMediaProps = {
 export function HeroMedia({
   name,
   initials,
-  photoUrl,
   videoUrl,
+  hasPhoto = false,
   licenseCaptions,
   years,
   variant = "overlay",
@@ -53,17 +54,9 @@ export function HeroMedia({
               : "relative aspect-[3/4] min-h-[28rem] w-full"
           }
         >
-          {photoUrl ? (
-            // Public Storage URLs; next/image is out of scope this weekend.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={photoUrl}
-              alt={name}
-              className="absolute inset-0 h-full w-full object-cover object-[center_18%]"
-            />
-          ) : videoUrl ? (
+          {videoUrl && !hasPhoto ? (
             <VideoStill src={videoUrl} />
-          ) : (
+          ) : videoUrl ? null : (
             <div
               className="absolute inset-0 flex items-center justify-center bg-black"
               aria-hidden

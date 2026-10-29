@@ -146,6 +146,24 @@ describe("phone find copy", () => {
         [{ prompt: "a session with me feels like...", answer: "Easy." }],
       ),
     ).toEqual({ label: "a session with me feels like...", answer: "Easy." });
+    expect(
+      phoneListQuote(
+        row({
+          card_prompt: "my approach to therapy is...",
+          card_answer: "Collaborative.",
+        }),
+        [
+          { prompt: "my approach to therapy is...", answer: "Collaborative." },
+          {
+            prompt: "I enjoy working with people who...",
+            answer: "Want a practical session.",
+          },
+        ],
+      ),
+    ).toEqual({
+      label: "I work best with...",
+      answer: "Want a practical session.",
+    });
     expect(phoneListQuote(row({ card_prompt: " ", card_answer: "nope" }))).toBeNull();
   });
 
