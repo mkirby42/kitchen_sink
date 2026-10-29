@@ -12,9 +12,9 @@ const baseURL = `http://127.0.0.1:${port}`;
  * account would collide across projects, so that flow is not in this matrix.
  * Profile tests sign in as seeded users and do not save or publish, so they
  * stay in the list. The no-JS sign-up posts an already-confirmed throwaway
- * user and expects "already registered", so it sends no mail and runs on
- * Firefox and WebKit too. The forgot-password request sends Auth mail and
- * stays @chromium-only: hosted test Auth's built-in email is about 2/hour.
+ * user and accepts either "already registered" or the confirm-email screen.
+ * It runs on Firefox and WebKit too. The forgot-password request sends Auth
+ * mail and stays @chromium-only: hosted test Auth's built-in email is about 2/hour.
  *
  * CI's e2e job uses mcr.microsoft.com/playwright:v1.64.1-jammy, which already
  * ships Chromium, Firefox, and WebKit. No browser install step there.

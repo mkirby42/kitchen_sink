@@ -1,11 +1,24 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { ada, WORK_ANSWER } from "../../../scripts/seed-test/fixtures.mjs";
 import {
   createTestServiceClient,
   deleteAuthUser,
   findAuthUserByEmail,
 } from "../../test-supabase";
+
+async function authUsersForEmail(service: SupabaseClient, email: string): Promise<User[]> {
+  const needle = email.toLowerCase();
+  const matches: User[] = [];
+  for (let page = 1; page <= 10; page += 1) {
+    const { data, error } = await service.auth.admin.listUsers({ page, perPage: 200 });
+    if (error) throw new Error(`list users: ${error.message}`);
+    matches.push(...data.users.filter((user) => user.email?.toLowerCase() === needle));
+    if (data.users.length < 200) break;
+  }
+  return matches;
+}
 
 test.use({ javaScriptEnabled: false });
 
@@ -100,9 +113,7 @@ test(
   },
 );
 
-// The password input has minlength=6, so the browser blocks a too-short
-// password before the native POST. An already-confirmed user makes Auth
-// return "already registered" and does not send a confirmation email.
+// minlength=6 blocks a too-short password. Confirm-required Auth returns sent=confirm for an existing user; autoconfirm returns "already registered". Neither creates a user.
 test(
   "join sign-up posts without JavaScript",
   { tag: "@desktop-only" },
@@ -142,13 +153,27 @@ test(
       const url = new URL(page.url());
       expect(url.pathname).toBe("/join");
       expect(url.searchParams.get("mode")).toBeNull();
-      const error = url.searchParams.get("error");
-      expect(error).toMatch(/already registered/i);
       expect(url.searchParams.get("password")).toBeNull();
       expect(url.href).not.toContain(password);
-      await expect(page.getByRole("alert").filter({ hasText: error! })).toBeVisible();
-      await expect(page.getByLabel("Email")).toHaveValue(email);
-      await expect(page.getByRole("button", { name: "Create account →" })).toBeEnabled();
+      await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+
+      const error = url.searchParams.get("error");
+      const sent = url.searchParams.get("sent");
+      if (sent === "confirm") {
+        expect(error).toBeNull();
+        await expect(
+          page.getByText("Check your email to confirm, then sign in."),
+        ).toBeVisible();
+      } else {
+        expect(sent).toBeNull();
+        expect(error).toMatch(/already registered/i);
+        await expect(page.getByRole("alert").filter({ hasText: error! })).toBeVisible();
+        await expect(page.getByLabel("Email")).toHaveValue(email);
+        await expect(page.getByRole("button", { name: "Create account →" })).toBeEnabled();
+      }
+
+      const users = await authUsersForEmail(service, email);
+      expect(users.map((user) => user.id)).toEqual([userId]);
     } finally {
       if (userId) {
         await deleteAuthUser(service, userId);
@@ -203,7 +228,7 @@ test(
     await page.goto("/find");
     await expect(page.getByRole("alert")).toHaveCount(0);
     await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "Find your therapist" })).toBeVisible();
+    await expect(page.getByText(/fits what you told us/)).toBeVisible();
     await expect(page.getByRole("heading", { name: ada.name })).toBeVisible();
     await expect(page.getByText("Therapist search isn't available right now.")).toHaveCount(0);
     await expect(page.getByText("No therapists match")).toHaveCount(0);
