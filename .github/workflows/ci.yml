@@ -81,6 +81,7 @@ jobs:
       group: kitchen-sink-e2e
       cancel-in-progress: false
     # Preinstalled browsers pinned to lockfile 1.64.1; avoids the per-run install hang.
+    # This image already includes Chromium, Firefox, and WebKit. Do not install browsers here.
     container:
       image: mcr.microsoft.com/playwright:v1.64.1-jammy
       options: --user 1001

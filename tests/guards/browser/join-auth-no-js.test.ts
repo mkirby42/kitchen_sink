@@ -1,4 +1,24 @@
+import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { ada, WORK_ANSWER } from "../../../scripts/seed-test/fixtures.mjs";
+import {
+  createTestServiceClient,
+  deleteAuthUser,
+  findAuthUserByEmail,
+} from "../../test-supabase";
+
+async function authUsersForEmail(service: SupabaseClient, email: string): Promise<User[]> {
+  const needle = email.toLowerCase();
+  const matches: User[] = [];
+  for (let page = 1; page <= 10; page += 1) {
+    const { data, error } = await service.auth.admin.listUsers({ page, perPage: 200 });
+    if (error) throw new Error(`list users: ${error.message}`);
+    matches.push(...data.users.filter((user) => user.email?.toLowerCase() === needle));
+    if (data.users.length < 200) break;
+  }
+  return matches;
+}
 
 test.use({ javaScriptEnabled: false });
 
@@ -43,5 +63,188 @@ test(
     await expect(page.getByRole("alert").filter({ hasText: error! })).toBeVisible();
     await expect(page.getByLabel("Email")).toHaveValue("nobody-auth-nojs@example.com");
     await expect(page.getByRole("button", { name: "Sign in →" })).toBeEnabled();
+  },
+);
+
+test(
+  "throwaway therapist signs in without JavaScript and lands on join",
+  { tag: "@desktop-only" },
+  async ({ page }) => {
+    test.setTimeout(60_000);
+    const email = `signin-nojs-${randomUUID()}@gmail.com`;
+    const password = `Signin-${randomUUID()}Aa1`;
+    const service = createTestServiceClient();
+    let userId: string | null = null;
+
+    try {
+      const created = await service.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+      if (created.error || !created.data.user) {
+        throw new Error(created.error?.message ?? "admin createUser returned no user");
+      }
+      userId = created.data.user.id;
+
+      await page.goto("/join?mode=signin");
+      await expect(page.getByRole("alert")).toHaveCount(0);
+      await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+      const button = page.getByRole("button", { name: "Sign in →" });
+      await expect(button).toBeEnabled();
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill(password);
+      await button.click();
+
+      await expect(page).toHaveURL(/\/join\/?$/);
+      const url = new URL(page.url());
+      expect(url.pathname).toBe("/join");
+      expect(url.searchParams.get("mode")).toBeNull();
+      expect(url.searchParams.get("error")).toBeNull();
+      expect(url.searchParams.get("password")).toBeNull();
+      expect(url.href).not.toContain(password);
+      await expect(page.getByText("Step 1 of 4")).toBeVisible();
+      await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
+      await expect(page.getByRole("alert")).toHaveCount(0);
+      await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+    } finally {
+      if (userId) await deleteAuthUser(service, userId);
+    }
+  },
+);
+
+// minlength=6 blocks a too-short password. Confirm-required Auth returns sent=confirm for an existing user; autoconfirm returns "already registered". Neither creates a user.
+test(
+  "join sign-up posts without JavaScript",
+  { tag: "@desktop-only" },
+  async ({ page }) => {
+    test.setTimeout(60_000);
+    const email = `signup-nojs-${randomUUID()}@gmail.com`;
+    const password = `Signup-${randomUUID()}Aa1`;
+    const service = createTestServiceClient();
+    let userId: string | null = null;
+
+    try {
+      const created = await service.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+      if (created.error || !created.data.user) {
+        throw new Error(created.error?.message ?? "admin createUser returned no user");
+      }
+      userId = created.data.user.id;
+
+      await page.goto("/join");
+      await expect(page.getByRole("alert")).toHaveCount(0);
+      await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+      const button = page.getByRole("button", { name: "Create account →" });
+      await expect(button).toBeVisible();
+      await expect(button).toBeEnabled();
+      await expect(page.getByLabel("Password")).toHaveAttribute("minlength", "6");
+      const form = page.locator("form").filter({ has: button });
+      await expect(form).toHaveAttribute("method", "post");
+      await expect(form).toHaveAttribute("action", "/auth/sign-up");
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill(password);
+      await button.click();
+
+      await expect(page).toHaveURL(/\/join\?/);
+      const url = new URL(page.url());
+      expect(url.pathname).toBe("/join");
+      expect(url.searchParams.get("mode")).toBeNull();
+      expect(url.searchParams.get("password")).toBeNull();
+      expect(url.href).not.toContain(password);
+      await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+
+      const error = url.searchParams.get("error");
+      const sent = url.searchParams.get("sent");
+      if (sent === "confirm") {
+        expect(error).toBeNull();
+        await expect(
+          page.getByText("Check your email to confirm, then sign in."),
+        ).toBeVisible();
+      } else {
+        expect(sent).toBeNull();
+        expect(error).toMatch(/already registered/i);
+        await expect(page.getByRole("alert").filter({ hasText: error! })).toBeVisible();
+        await expect(page.getByLabel("Email")).toHaveValue(email);
+        await expect(page.getByRole("button", { name: "Create account →" })).toBeEnabled();
+      }
+
+      const users = await authUsersForEmail(service, email);
+      expect(users.map((user) => user.id)).toEqual([userId]);
+    } finally {
+      if (userId) {
+        await deleteAuthUser(service, userId);
+      } else {
+        const user = await findAuthUserByEmail(service, email);
+        if (user) await deleteAuthUser(service, user.id);
+      }
+    }
+  },
+);
+
+// Same email cap as sign-up. Uses an address with no account; the screen
+// still says check your email.
+test(
+  "forgot-password request reaches check your email without JavaScript",
+  { tag: ["@desktop-only", "@chromium-only"] },
+  async ({ page }) => {
+    test.setTimeout(60_000);
+    const email = `forgot-nojs-${randomUUID()}@example.test`;
+
+    await page.goto("/forgot-password");
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+    const button = page.getByRole("button", { name: "Send reset link" });
+    await expect(button).toBeVisible();
+    await expect(button).toBeEnabled();
+    const form = page.locator("form").filter({ has: button });
+    await expect(form).toHaveAttribute("method", "post");
+    await expect(form).toHaveAttribute("action", "/auth/forgot-password");
+    await page.getByLabel("Email").fill(email);
+    await button.click();
+
+    await expect(page).toHaveURL(/\/forgot-password\?/);
+    const url = new URL(page.url());
+    expect(url.searchParams.get("sent")).toBe("1");
+    expect(url.searchParams.get("error")).toBeNull();
+    await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
+    await expect(
+      page.getByText(
+        "If an account exists for that email, we sent a link to choose a new password. Check your inbox.",
+      ),
+    ).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+  },
+);
+
+test(
+  "Find renders therapist names without JavaScript",
+  { tag: "@desktop-only" },
+  async ({ page }) => {
+    await page.goto("/find");
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+    await expect(page.getByText(/\bfits? what you told us/)).toBeVisible();
+    await expect(page.getByRole("heading", { name: ada.name })).toBeVisible();
+    await expect(page.getByText("Therapist search isn't available right now.")).toHaveCount(0);
+    await expect(page.getByText("No therapists match")).toHaveCount(0);
+  },
+);
+
+test(
+  "a public profile renders without JavaScript",
+  { tag: "@desktop-only" },
+  async ({ page }) => {
+    await page.goto(`/t/${ada.id}`);
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: ada.name })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How Ada works" })).toBeVisible();
+    await expect(page.getByText(WORK_ANSWER).filter({ visible: true })).toBeVisible();
+    await expect(page.getByText("We couldn't find that therapist.")).toHaveCount(0);
   },
 );

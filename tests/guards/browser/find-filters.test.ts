@@ -3,7 +3,7 @@
 // Registry: "What's going on is seven plain-language topics, plus Other"
 // Registry: "Insurance includes Other"
 import { expect, test } from "@playwright/test";
-import { TOPICS } from "./support";
+import { isPhoneProject, TOPICS } from "./support";
 
 const PILLS = "Where you live|Insurance|What's going on|In person or online";
 
@@ -14,7 +14,7 @@ test("Find filters are four pills, and the phone row wraps", async ({ page }, te
   await page.goto("/find");
   await expect(page.getByRole("heading", { name: "Find your therapist" })).toBeVisible();
 
-  if (testInfo.project.name === "phone") {
+  if (isPhoneProject(testInfo)) {
     const labels = await page.locator("[data-phone-pill]").allTextContents();
     expect(labels.map((label) => label.trim()).join("|")).toBe(PILLS);
     const row = await page.locator("[data-phone-pills]").boundingBox();
@@ -51,13 +51,13 @@ test("What's going on is seven plain-language topics", async ({ page }, testInfo
   );
   await page.goto("/find");
 
-  if (testInfo.project.name === "phone") {
+  if (isPhoneProject(testInfo)) {
     await page.getByRole("button", { name: "What's going on" }).click();
     await expect(page.getByRole("button", { name: "Clear all" })).toBeVisible();
   }
 
   const sheet =
-    testInfo.project.name === "phone"
+    isPhoneProject(testInfo)
       ? page.locator("[data-phone-sheet='topics']")
       : page.locator("#find-whats-going-on");
   await expect(
@@ -87,14 +87,14 @@ test("Insurance includes Other", async ({ page }, testInfo) => {
   expect(testInfo.title).toBe("Insurance includes Other");
   await page.goto("/find");
 
-  if (testInfo.project.name === "phone") {
+  if (isPhoneProject(testInfo)) {
     await page.getByRole("button", { name: "Insurance" }).click();
   } else {
     await page.locator('[data-find-desktop="filters"]').getByRole("button", { name: "Insurance" }).click();
   }
 
   const sheet =
-    testInfo.project.name === "phone"
+    isPhoneProject(testInfo)
       ? page.locator("[data-phone-sheet='insurance']")
       : page.locator("#find-insurance");
   await expect(sheet.getByRole("button", { name: "Other" })).toBeVisible();

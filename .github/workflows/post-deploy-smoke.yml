@@ -1,0 +1,65 @@
+name: Post-deploy smoke
+
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Site to check
+        required: false
+        default: https://www.everythingbutkitchensink.com
+        type: string
+  schedule:
+    - cron: "0 */6 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'deployment_status' &&
+        github.event.deployment_status.state == 'success' &&
+        github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Same image as CI e2e. Chromium, Firefox, and WebKit are already installed.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-jammy
+      options: --user 1001
+    env:
+      BASE_URL: ${{ github.event.inputs.base_url || 'https://www.everythingbutkitchensink.com' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Wait until the site returns 200
+        run: |
+          url="${BASE_URL%/}"
+          ok=0
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 15 "$url" || true)
+            echo "attempt ${attempt}: HTTP ${code} ${url}"
+            if [ "$code" = "200" ]; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" = 1
+      - name: Read-only live smoke
+        run: npm run test:smoke
+      - name: Upload smoke report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

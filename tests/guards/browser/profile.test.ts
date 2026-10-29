@@ -14,7 +14,7 @@ import {
   bea,
   closed,
 } from "../../../scripts/seed-test/fixtures.mjs";
-import { signIn } from "./support";
+import { isPhoneProject, signIn } from "./support";
 
 const PHONE_ORDER = [
   "How Ada works",
@@ -30,7 +30,7 @@ test(
     expect(testInfo.title).toBe("The profile photo keeps the face clear");
     await page.goto(`/t/${ada.id}`);
     await expect(page.getByText("1 min intro")).toHaveCount(0);
-    if (testInfo.project.name === "phone") {
+    if (isPhoneProject(testInfo)) {
       const hero = page.locator("[data-hero-variant='overlay']");
       await expect(hero.getByRole("heading", { name: ada.name })).toBeVisible();
       await expect(hero).toContainText(LICENSE_LINE);
@@ -45,7 +45,7 @@ test(
       await expect(hero).not.toContainText(ada.name);
     }
     const layout = page.locator(
-      `[data-profile-layout='${testInfo.project.name === "phone" ? "phone" : "desk"}']`,
+      `[data-profile-layout='${isPhoneProject(testInfo) ? "phone" : "desk"}']`,
     );
     const heroFrame = layout.locator("[data-hero-media]");
     await expect(heroFrame.locator("img")).toHaveCount(0);
@@ -170,7 +170,7 @@ test(
     await signIn(page, closed.email);
     await page.goto(`/t/${closed.id}`);
     const layout = page.locator(
-      testInfo.project.name === "phone"
+      isPhoneProject(testInfo)
         ? "[data-profile-layout='phone']"
         : "[data-profile-layout='desk']",
     );
