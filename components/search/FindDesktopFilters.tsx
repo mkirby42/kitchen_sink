@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Tag } from "@/components/ui/Tag";
 import { cx } from "@/components/ui/styles";
 import type { SearchFilters } from "@/lib/search/rpc";
@@ -13,11 +13,7 @@ import {
 } from "@/lib/tags/presets";
 import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import { PlacePanel, TopicPanel } from "./FindFilterPanels";
-import {
-  buildFindHref,
-  filtersFromSearchParams,
-  findViewFromSearchParams,
-} from "./query";
+import { buildFindHref } from "./query";
 
 type Menu = "topics" | "place" | "insurance" | "format" | null;
 
@@ -27,25 +23,34 @@ function toggleTag(tags: string[], label: string) {
     : [...tags, label];
 }
 
+const emptyFilters: SearchFilters = {
+  tags: [],
+  virtual: false,
+  inPerson: false,
+  state: null,
+};
+
 export function FindDesktopFilters({
   matchCount,
   leading,
   initialOpen = "topics",
+  filters = emptyFilters,
+  layout = "grid",
 }: {
   matchCount: number | null;
   /** Desktop page title, so the pills can sit on the same row. */
   leading?: ReactNode;
   /** Closed on the clicked-in profile so that page leads with the therapist. */
   initialOpen?: Menu;
+  /** From the page address. Passed in so this tree does not call useSearchParams. */
+  filters?: SearchFilters;
+  layout?: "grid" | "one";
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const filters = filtersFromSearchParams(searchParams);
   const [open, setOpen] = useState<Menu>(initialOpen);
 
   function apply(next: SearchFilters) {
-    const view = findViewFromSearchParams(searchParams);
-    router.push(buildFindHref(next, { layout: view.layout }), { scroll: false });
+    router.push(buildFindHref(next, { layout }), { scroll: false });
   }
 
   function toggleMenu(menu: Exclude<Menu, null>) {

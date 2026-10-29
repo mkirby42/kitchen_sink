@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { useSearchParams } from "next/navigation";
 import { PhoneFilterBar } from "@/components/search/PhoneFilterBar";
 import { PhoneProfileStack } from "@/components/search/PhoneProfileStack";
 import { TherapistCardPhone } from "@/components/search/TherapistCardPhone";
-import { filtersFromSearchParams } from "@/components/search/query";
 import { Card } from "@/components/ui/Card";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { pageTitleClass } from "@/components/ui/styles";
@@ -16,13 +14,23 @@ import {
 } from "@/lib/search/phone-find";
 import { phoneBrowseKey } from "@/lib/search/phone-browse";
 import type { PhoneStackBooking } from "@/lib/search/phone-stack";
-import type { SearchRow } from "@/lib/search/rpc";
+import type { SearchFilters, SearchRow } from "@/lib/search/rpc";
+
+const emptyFilters: SearchFilters = {
+  tags: [],
+  virtual: false,
+  inPerson: false,
+  state: null,
+};
 
 export function PhoneFind({
   rows,
   booking,
   slides,
   listCards,
+  filters = emptyFilters,
+  layout = "grid",
+  initialMode = "list",
 }: {
   rows: SearchRow[] | null;
   booking: PhoneStackBooking[];
@@ -30,9 +38,12 @@ export function PhoneFind({
   slides: ReactNode;
   /** Conversation cards per row, same order. The list portrait prefers who-I-work-best-with. */
   listCards?: readonly (readonly StackCard[] | undefined)[];
+  filters?: SearchFilters;
+  layout?: "grid" | "one";
+  /** `layout=one` on the address opens one-at-a-time without a script. */
+  initialMode?: "list" | "one";
 }) {
-  const filters = filtersFromSearchParams(useSearchParams());
-  const [mode, setMode] = useState<"list" | "one">("list");
+  const [mode, setMode] = useState<"list" | "one">(initialMode);
   const [sheet, setSheet] = useState<PhoneSheet | null>(null);
   const count = rows?.length ?? 0;
   const stack = mode === "one" && rows != null && count > 0;
@@ -57,6 +68,7 @@ export function PhoneFind({
           <div className="mt-6">
             <PhoneFilterBar
               filters={filters}
+              layout={layout}
               matchCount={rows?.length ?? null}
               open={sheet}
               onOpen={setSheet}

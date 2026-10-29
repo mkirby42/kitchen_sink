@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FrameVideo } from "@/components/ui/FrameVideo";
+import { NoJsVideo } from "@/components/ui/NoJsMedia";
 import { VideoStill } from "@/components/ui/VideoStill";
 import { PersonMark } from "@/components/search/find-marks";
 
@@ -52,6 +53,9 @@ export function FindDetailStage({
           </span>
           Watch intro
         </button>
+      ) : null}
+      {videoUrl ? (
+        <NoJsVideo src={videoUrl} poster={photoUrl} label={`Intro video for ${name}`} />
       ) : null}
     </div>
   );

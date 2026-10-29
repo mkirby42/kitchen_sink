@@ -1,22 +1,20 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { FindCarousel } from "@/components/search/FindCarousel";
 import { FindDesktopFilters } from "@/components/search/FindDesktopFilters";
-
-const nav = vi.hoisted(() => ({
-  params: new URLSearchParams(),
-}));
+import type { SearchFilters } from "@/lib/search/rpc";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push() {} }),
-  useSearchParams: () => nav.params,
+  useSearchParams: () => new URLSearchParams(),
 }));
 
+function filters(tags: string[]): SearchFilters {
+  return { tags, virtual: false, inPerson: false, state: null };
+}
+
 describe("desktop find filters", () => {
-  beforeEach(() => {
-    nav.params = new URLSearchParams();
-  });
 
   it("opens the plain-English topic panel and the live count", () => {
     const html = renderToStaticMarkup(
@@ -74,36 +72,44 @@ describe("desktop find filters", () => {
   });
 
   it("selects insurance Other and topic Other independently", () => {
-    nav.params = new URLSearchParams("tags=Other");
     const topics = renderToStaticMarkup(
-      createElement(FindDesktopFilters, { matchCount: 1, initialOpen: "topics" }),
+      createElement(FindDesktopFilters, {
+        matchCount: 1,
+        initialOpen: "topics",
+        filters: filters(["Other"]),
+      }),
     );
     const topicAt = topics.indexOf("Another specialty");
     expect(topics.slice(topicAt - 500, topicAt)).toContain('aria-pressed="false"');
 
-    nav.params = new URLSearchParams("tags=Other+topic");
     const insurance = renderToStaticMarkup(
       createElement(FindDesktopFilters, {
         matchCount: 1,
         initialOpen: "insurance",
+        filters: filters(["Other topic"]),
       }),
     );
     const insuranceAt = insurance.indexOf("Out-of-network superbill");
     const otherAt = insurance.indexOf("Other", insuranceAt);
     expect(insurance.slice(otherAt - 500, otherAt)).toContain('aria-pressed="false"');
 
-    nav.params = new URLSearchParams("tags=Other,Other+topic");
     const both = renderToStaticMarkup(
-      createElement(FindDesktopFilters, { matchCount: 1, initialOpen: "topics" }),
+      createElement(FindDesktopFilters, {
+        matchCount: 1,
+        initialOpen: "topics",
+        filters: filters(["Other", "Other topic"]),
+      }),
     );
     const bothAt = both.indexOf("Another specialty");
     expect(both.slice(bothAt - 500, bothAt)).toContain('aria-pressed="true"');
   });
 
   it("keeps an address specialty that the panel does not list by default", () => {
-    nav.params = new URLSearchParams({ tags: "Self Discovery,Anxiety" });
     const html = renderToStaticMarkup(
-      createElement(FindDesktopFilters, { matchCount: 1 }),
+      createElement(FindDesktopFilters, {
+        matchCount: 1,
+        filters: filters(["Self Discovery", "Anxiety"]),
+      }),
     );
     expect(html).toContain("Self discovery");
     expect(html).toContain("Worry, stress or panic");

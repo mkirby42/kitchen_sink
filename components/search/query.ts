@@ -96,6 +96,16 @@ export function requestFindHref(
  * checked. Junk in those keys makes this differ from `buildFindHref`, so the
  * page can redirect it away. Profile links stay on `requestFindHref`.
  */
+/** A GET form can submit `state=` with no choice. The page redirects that away. */
+export function findSearchHasBlank(
+  searchParams: Record<string, string | string[] | undefined>,
+) {
+  return Object.values(searchParams).some((value) => {
+    const items = Array.isArray(value) ? value : [value];
+    return items.some((item) => (item ?? "").trim() === "");
+  });
+}
+
 export function requestFindPageHref(
   searchParams: Record<string, string | string[] | undefined>,
 ) {

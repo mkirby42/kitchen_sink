@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { PhoneProfileColumn } from "@/components/profile/PhoneProfileColumn";
+import { withoutNoJsMedia } from "./no-js-html";
 import { PhoneFilterSheet } from "@/components/search/PhoneFilterBar";
 import { PhoneFind } from "@/components/search/PhoneFind";
 import { PhoneProfileStack } from "@/components/search/PhoneProfileStack";
@@ -270,7 +271,7 @@ describe("phone profile stack", () => {
     expect(html).not.toContain("Book a free consult");
     expect(html).not.toContain("Watch intro");
     expect(html).not.toContain("I WORK BEST WITH...");
-    expect(html).not.toContain("intro.mp4");
+    expect(withoutNoJsMedia(html)).not.toContain("intro.mp4");
     expect(html).not.toContain("15-min");
     expect(html).not.toContain("$165");
   });

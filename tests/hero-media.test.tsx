@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { HeroMedia } from "@/components/profile/HeroMedia";
+import { withoutNoJsMedia } from "./no-js-html";
 
 const texasLicense = "Licensed by State of Texas / 38047";
 
@@ -56,7 +57,10 @@ describe("HeroMedia", () => {
     expect(media).not.toContain("<img");
     expect(media).not.toContain("photo.jpg");
     expect(media).not.toContain("data-video-still");
-    expect(media).not.toContain("intro.mp4");
+    expect(withoutNoJsMedia(media)).not.toContain("intro.mp4");
+    expect(media).toContain('preload="none"');
+    expect(media).toContain("https://example.com/intro.mp4");
+    expect(media).toContain('data-no-js=""');
     expect(media).not.toContain("PsyD");
     expect(media).not.toContain("8 yrs practicing");
     expect(media).not.toContain("Virtual");
@@ -111,8 +115,9 @@ describe("HeroMedia", () => {
     expect(media).toContain('preload="metadata"');
     expect(media).toContain("muted");
     expect(media).toContain("playsInline");
-    expect(media).not.toContain("autoplay");
-    expect(media).not.toMatch(/<video[^>]*\scontrols[\s=]/);
+    expect(withoutNoJsMedia(media)).not.toContain("autoplay");
+    expect(withoutNoJsMedia(media)).not.toMatch(/<video[^>]*\scontrols[\s=]/);
+    expect(media).toContain('preload="none"');
     expect(media).not.toContain(">TW<");
     expect(media).not.toContain("<img");
     expect(media).toContain('aria-label="Play intro video for Travis White"');
