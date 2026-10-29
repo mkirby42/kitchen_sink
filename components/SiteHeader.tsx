@@ -71,8 +71,8 @@ export function SiteHeader({
 
   useEffect(() => {
     if (!supabasePublicConfig()) return;
-    // The reset page exchanges the email code itself. A second client would
-    // consume that code first and the form would look expired.
+    // The reset link is settled on the server before this page renders.
+    // Another client here can still burn a code if one is left in the address.
     if (path === routes.resetPassword) return;
 
     const supabase = createClient();

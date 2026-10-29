@@ -12,18 +12,23 @@ import { JoinAuth } from "@/components/join/JoinAuth";
 import { ReviewAuth } from "@/components/profile/ReviewAuth";
 import {
   PASSWORD_MISMATCH_MESSAGE,
+  PASSWORD_MIN_LENGTH,
   PASSWORD_UPDATED_MESSAGE,
+  RESET_LINK_BROWSER_MESSAGE,
   RESET_LINK_INVALID_MESSAGE,
   RESET_RATE_LIMIT_MESSAGE,
   RESET_REDIRECT_MESSAGE,
   RESET_SEND_FAILED_MESSAGE,
   RESET_SENT_MESSAGE,
+  classifyResetVisit,
   forgotPasswordPath,
   passwordChangeError,
   passwordResetRedirect,
   passwordUpdateMessage,
   readResetLink,
+  resetCallbackPath,
   resetContinuePath,
+  resetExchangeProblem,
   resetLinkAction,
   resetRequestMessage,
   resetSignInPath,
@@ -120,6 +125,59 @@ describe("reset links", () => {
     expect(resetLinkAction({ tokenHash: "th", type: "signup" })).toBe("invalid");
     expect(resetLinkAction(null)).toBe("session-check");
   });
+
+  it("sends a code or recovery token hash to the callback and keeps other links on the page", () => {
+    const code = classifyResetVisit({ code: "abc" });
+    expect(code.kind).toBe("exchange");
+    if (code.kind === "exchange") {
+      expect(resetCallbackPath(code)).toBe("/auth/reset-callback?code=abc");
+    }
+
+    const otp = classifyResetVisit({ token_hash: "th", type: "recovery" });
+    expect(otp.kind).toBe("exchange");
+    if (otp.kind === "exchange") {
+      expect(resetCallbackPath(otp)).toBe(
+        "/auth/reset-callback?token_hash=th&type=recovery",
+      );
+    }
+
+    expect(classifyResetVisit({ token_hash: "th", type: "signup" }).kind).toBe("problem");
+    expect(
+      classifyResetVisit({
+        error: "access_denied",
+        error_code: "otp_expired",
+        error_description: "Email link is invalid or has expired",
+      }),
+    ).toEqual({ kind: "problem", problem: "invalid" });
+    expect(classifyResetVisit({ link: "browser" })).toEqual({
+      kind: "problem",
+      problem: "browser",
+    });
+    expect(classifyResetVisit({}).kind).toBe("page");
+    expect(classifyResetVisit({ error: PASSWORD_MISMATCH_MESSAGE })).toMatchObject({
+      kind: "page",
+      error: PASSWORD_MISMATCH_MESSAGE,
+    });
+  });
+
+  it("treats a missing verifier on a real code as the wrong browser", () => {
+    const code = "34e770dd-9ff9-416c-87fa-43b31d7ef225";
+    expect(
+      resetExchangeProblem(
+        { message: "PKCE code verifier not found in storage.", code: "pkce_code_verifier_not_found" },
+        code,
+      ),
+    ).toBe("browser");
+    expect(
+      resetExchangeProblem(
+        { message: "PKCE code verifier not found in storage." },
+        "bogus",
+      ),
+    ).toBe("invalid");
+    expect(resetExchangeProblem({ message: "Email link is invalid or has expired" }, code)).toBe(
+      "invalid",
+    );
+  });
 });
 
 describe("password reset screens", () => {
@@ -168,5 +226,48 @@ describe("password reset screens", () => {
     expect(html).toContain("Checking your reset link…");
     expect(html).not.toContain(PASSWORD_UPDATED_MESSAGE);
     expect(html).not.toContain(RESET_LINK_INVALID_MESSAGE);
+  });
+
+  it("renders an enabled password form once the server has a session", () => {
+    const html = renderToStaticMarkup(
+      createElement(ResetPasswordForm, {
+        initialPhase: "ready",
+        initialError: PASSWORD_MISMATCH_MESSAGE,
+        from: "join",
+        returnTo: "/join",
+      }),
+    );
+    expect(html).toContain("Choose a new password");
+    expect(html).toContain('action="/auth/update-password"');
+    expect(html).toContain('method="post"');
+    expect(html).toContain('name="password"');
+    expect(html).toContain('name="confirm"');
+    expect(html).toMatch(new RegExp(`minLength="${PASSWORD_MIN_LENGTH}"`, "i"));
+    expect(html).toContain('name="from" value="join"');
+    expect(html).toContain('name="return" value="/join"');
+    expect(html).toContain("passwords don");
+    expect(html).toContain("match.");
+    expect(html).toContain('role="alert"');
+    expect(html).not.toContain("Checking your reset link…");
+    expect(html).not.toMatch(/<button\b[^>]*\sdisabled(?:=|\s|>)/);
+  });
+
+  it("shows an invalid or other-browser link with a way to request another", () => {
+    const invalid = renderToStaticMarkup(
+      createElement(ResetPasswordForm, { initialPhase: "invalid" }),
+    );
+    expect(invalid).toContain(RESET_LINK_INVALID_MESSAGE);
+    expect(invalid).toContain('href="/forgot-password"');
+    expect(invalid).toContain("Request a new link");
+    expect(invalid).not.toContain("Checking your reset link…");
+    expect(invalid).not.toContain("Unable to authenticate.");
+    expect(invalid).not.toContain('action="/auth/update-password"');
+
+    const browser = renderToStaticMarkup(
+      createElement(ResetPasswordForm, { initialPhase: "wrong-browser" }),
+    );
+    expect(browser).toContain(RESET_LINK_BROWSER_MESSAGE);
+    expect(browser).toContain('href="/forgot-password"');
+    expect(browser).not.toContain("Checking your reset link…");
   });
 });

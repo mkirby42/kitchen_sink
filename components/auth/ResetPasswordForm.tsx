@@ -5,6 +5,7 @@ import { AccountShell } from "@/components/auth/AccountShell";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
+import { authPost } from "@/lib/auth/auth-query";
 import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_UPDATED_MESSAGE,
@@ -110,15 +111,48 @@ async function continueAfterReset(supabase: ReturnType<typeof createClient>) {
   return routes.home;
 }
 
-export function ResetPasswordForm() {
-  const [phase, setPhase] = useState<ResetPhase>("checking");
+export function ResetPasswordForm({
+  initialPhase = "checking",
+  initialError = "",
+  from = null,
+  returnTo = null,
+}: {
+  initialPhase?: ResetPhase;
+  initialError?: string;
+  from?: string | null;
+  returnTo?: string | null;
+}) {
+  const [phase, setPhase] = useState<ResetPhase>(initialPhase);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialError);
   const [submitting, setSubmitting] = useState(false);
   const [continueHref, setContinueHref] = useState<string>(routes.home);
 
   useEffect(() => {
+    // The server already exchanged a code or token_hash and redirected here.
+    // Exchanging again would fail the link. Hash tokens never reach the server.
+    if (
+      initialPhase === "ready" ||
+      initialPhase === "done" ||
+      initialPhase === "unconfigured"
+    ) {
+      return;
+    }
+
+    if (initialPhase === "invalid" || initialPhase === "wrong-browser") {
+      const { params, cleanPath } = readResetLink(window.location.href);
+      if (resetLinkAction(params) !== "session") return;
+      window.history.replaceState({}, "", cleanPath);
+      let cancelled = false;
+      void settleResetLink(params).then((next) => {
+        if (!cancelled) setPhase(next);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+
     let cancelled = false;
     void loadResetPhase().then((next) => {
       if (!cancelled) setPhase(next);
@@ -126,7 +160,7 @@ export function ResetPasswordForm() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialPhase]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -196,9 +230,17 @@ export function ResetPasswordForm() {
       ) : null}
 
       {phase === "ready" ? (
-        <form onSubmit={submit} className="space-y-5">
+        <form
+          method="post"
+          action={authPost.updatePassword}
+          onSubmit={submit}
+          className="space-y-5"
+        >
+          {from ? <input type="hidden" name="from" value={from} /> : null}
+          {returnTo ? <input type="hidden" name="return" value={returnTo} /> : null}
           <TextField
             label="New password"
+            name="password"
             type="password"
             required
             minLength={PASSWORD_MIN_LENGTH}
@@ -208,6 +250,7 @@ export function ResetPasswordForm() {
           />
           <TextField
             label="Confirm password"
+            name="confirm"
             type="password"
             required
             minLength={PASSWORD_MIN_LENGTH}

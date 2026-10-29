@@ -8,6 +8,7 @@ vi.mock("next/navigation", () => ({
 
 import { ProfileStartSuccessDialog } from "@/components/home/ProfileStartForm";
 import { JoinAuth, joinAuthErrorCopy } from "@/components/join/JoinAuth";
+import { joinModeHref } from "@/lib/join/mode-href";
 import { AdminAuth } from "@/components/admin/AdminAuth";
 
 const CONFIRMATION =
@@ -40,6 +41,30 @@ describe("join and admin auth screens", () => {
     );
     expect(signUp).toContain("Create account");
     expect(signUp).not.toContain("Forgot password?");
+    expect(signUp).toContain('href="/join?mode=signin"');
+    expect(signUp).toMatch(/href="\/join"/);
+    expect(signIn).toContain('aria-current="page"');
+  });
+
+  it("keeps join mode links and drops the auth flash", () => {
+    expect(
+      joinModeHref("signin", {
+        mode: "signup",
+        next: "/find",
+        back: "/join",
+        scope: "join",
+        error: "Invalid login credentials",
+        email: "ada@example.com",
+      }),
+    ).toBe("/join?next=%2Ffind&back=%2Fjoin&scope=join&mode=signin");
+    expect(
+      joinModeHref("signup", {
+        mode: "signin",
+        next: "/find",
+        scope: "join",
+      }),
+    ).toBe("/join?next=%2Ffind&scope=join");
+    expect(joinModeHref("signup", { mode: "signup" })).toBe("/join");
   });
 
   it("keeps admin sign-in fields and forgot-password", () => {

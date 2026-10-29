@@ -12,10 +12,19 @@ import {
 } from "@/lib/auth/auth-query";
 import {
   PASSWORD_MIN_LENGTH,
+  PASSWORD_UPDATED_COOKIE,
+  passwordChangeError,
   passwordResetRedirect,
+  passwordUpdateMessage,
   parseResetFrom,
+  resetCleanPath,
+  resetContinuePath,
+  resetExchangeProblem,
+  resetFormErrorPath,
+  resetProblemPath,
   resetRequestMessage,
   safeAppPath,
+  type ResetFrom,
 } from "@/lib/auth/password-reset";
 import { routes } from "@/lib/routes";
 import { originFromRequest } from "@/lib/site";
@@ -351,5 +360,199 @@ export async function postSignOut(request: Request): Promise<NextResponse> {
       failurePath(routes.joinSignIn, AUTH_SIGNOUT_FAILED, ""),
       capture,
     );
+  }
+}
+
+type ResetAuthClient = {
+  auth: {
+    getUser: () => Promise<{
+      data: { user: { id: string } | null };
+      error: AuthError;
+    }>;
+    updateUser: (input: { password: string }) => Promise<{ error: AuthError }>;
+    exchangeCodeForSession: (
+      code: string,
+      options?: { flowId: string },
+    ) => Promise<{ error: AuthError }>;
+    verifyOtp: (input: {
+      type: "recovery";
+      token_hash: string;
+    }) => Promise<{ error: AuthError }>;
+  };
+  from: (table: string) => {
+    select: (columns: string) => {
+      eq: (
+        column: string,
+        value: string,
+      ) => {
+        in: (
+          column: string,
+          values: string[],
+        ) => {
+          limit: (count: number) => Promise<{
+            data: { id: string }[] | null;
+            error: { message: string } | null;
+          }>;
+        };
+      };
+    };
+  };
+};
+
+async function openResetClient(request: Request): Promise<
+  | { denied: NextResponse }
+  | { origin: string; client: ResetAuthClient; capture: AuthCookieCapture }
+> {
+  const origin = requestOrigin(request);
+  const capture = emptyCapture();
+  try {
+    const client = (await createClient(capture)) as unknown as ResetAuthClient;
+    return { origin, client, capture };
+  } catch (error) {
+    console.error(
+      "auth reset callback",
+      error instanceof Error ? error.message : "client unavailable",
+    );
+    return {
+      denied: redirectSeeOther(origin, resetProblemPath("invalid"), capture),
+    };
+  }
+}
+
+/** Same destination the browser form's Continue button uses, plus `from` when the link carried it. */
+async function passwordUpdatedDestination(
+  client: ResetAuthClient,
+  userId: string,
+  from: ResetFrom | null,
+  returnTo: string | null,
+): Promise<string> {
+  if (returnTo) return returnTo;
+  if (from) return resetContinuePath(from, null);
+  try {
+    const { data, error } = await client
+      .from("profile_starts")
+      .select("id")
+      .eq("profile_id", userId)
+      .in("status", ["drafting", "ready"])
+      .limit(1);
+    if (!error && data && data.length > 0) return routes.joinEdit;
+  } catch {
+    // Profile starts may not be migrated yet.
+  }
+  return routes.home;
+}
+
+export async function getResetCallback(request: Request): Promise<NextResponse> {
+  const url = new URL(request.url);
+  const code = url.searchParams.get("code")?.trim() ?? "";
+  const tokenHash = url.searchParams.get("token_hash")?.trim() ?? "";
+  const type = url.searchParams.get("type")?.trim() ?? "";
+  const flowId = url.searchParams.get("sb_flow_id")?.trim() ?? "";
+  const from = url.searchParams.get("from");
+  const returnTo = url.searchParams.get("return");
+  const started = await openResetClient(request);
+  if ("denied" in started) return started.denied;
+  const { origin, client, capture } = started;
+
+  try {
+    if (code) {
+      const { error } = await client.auth.exchangeCodeForSession(
+        code,
+        flowId ? { flowId } : undefined,
+      );
+      if (error) {
+        return redirectSeeOther(
+          origin,
+          resetProblemPath(resetExchangeProblem(error, code), from, returnTo),
+          capture,
+        );
+      }
+      return redirectSeeOther(origin, resetCleanPath(from, returnTo), capture);
+    }
+
+    if (tokenHash && type === "recovery") {
+      const { error } = await client.auth.verifyOtp({
+        type: "recovery",
+        token_hash: tokenHash,
+      });
+      if (error) {
+        return redirectSeeOther(
+          origin,
+          resetProblemPath("invalid", from, returnTo),
+          capture,
+        );
+      }
+      return redirectSeeOther(origin, resetCleanPath(from, returnTo), capture);
+    }
+
+    return redirectSeeOther(
+      origin,
+      resetProblemPath("invalid", from, returnTo),
+      capture,
+    );
+  } catch (error) {
+    console.error(
+      "auth reset callback",
+      error instanceof Error ? error.message : "failed",
+    );
+    const problem =
+      error instanceof Error ? resetExchangeProblem({ message: error.message }, code) : "invalid";
+    return redirectSeeOther(
+      origin,
+      resetProblemPath(code ? problem : "invalid", from, returnTo),
+      capture,
+    );
+  }
+}
+
+export async function postUpdatePassword(request: Request): Promise<NextResponse> {
+  const started = await begin(request);
+  if ("denied" in started) return started.denied;
+  const { origin, form, client, capture } = started;
+  const auth = client as unknown as ResetAuthClient;
+  const from = parseResetFrom(field(form, "from"));
+  const returnTo = safeAppPath(field(form, "return"));
+  const fail = (error: string) =>
+    redirectSeeOther(origin, resetFormErrorPath(error, from, returnTo), capture);
+
+  try {
+    const { data, error } = await auth.auth.getUser();
+    if (error || !data.user) {
+      return redirectSeeOther(
+        origin,
+        resetProblemPath("invalid", from, returnTo),
+        capture,
+      );
+    }
+
+    const password = field(form, "password");
+    const confirm = field(form, "confirm");
+    const local = passwordChangeError(password, confirm);
+    if (local) return fail(local);
+
+    const result = await auth.auth.updateUser({ password });
+    if (result.error) {
+      return fail(sanitizeAuthError(passwordUpdateMessage(result.error), password));
+    }
+
+    const next = await passwordUpdatedDestination(auth, data.user.id, from, returnTo);
+    const response = redirectSeeOther(
+      origin,
+      withAuthQuery(next, { updated: "1", error: null, email: null, sent: null }),
+      capture,
+    );
+    response.cookies.set(PASSWORD_UPDATED_COOKIE, "1", {
+      path: "/",
+      maxAge: 120,
+      sameSite: "lax",
+      httpOnly: true,
+    });
+    return response;
+  } catch (error) {
+    console.error(
+      "auth update password",
+      error instanceof Error ? error.message : "failed",
+    );
+    return fail("We couldn't update that password. Try again.");
   }
 }

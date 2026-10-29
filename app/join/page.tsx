@@ -8,6 +8,7 @@ import { Notice } from "@/components/ui/Notice";
 import { buttonClass } from "@/components/ui/styles";
 import { JoinAuth } from "@/components/join/JoinAuth";
 import { readAuthQuery } from "@/lib/auth/auth-query";
+import { joinModeHref } from "@/lib/join/mode-href";
 import { JoinWizard } from "@/components/join/JoinWizard";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { adminToolsVisible } from "@/lib/audience";
@@ -30,19 +31,15 @@ export const metadata: Metadata = {
 const STARTED_DRAFT_NOTICE =
   "You're filling this draft in for them. It stays off Find and the public profile until they publish it.";
 
+function one(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
 export default async function JoinPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    step?: string;
-    mode?: string;
-    edit?: string;
-    profile?: string;
-    for?: string;
-    error?: string;
-    email?: string;
-    sent?: string;
-  }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   if (!supabasePublicConfig()) {
     return (
@@ -56,11 +53,14 @@ export default async function JoinPage({
 
   const params = await searchParams;
   const flash = readAuthQuery(params);
-  const editing = params.edit === "1";
-  const targetProfileId = editing ? (params.profile?.trim() ?? "") : "";
-  const forId = params.for && isProfileId(params.for) ? params.for : null;
+  const editing = one(params.edit) === "1";
+  const profileIdParam = one(params.profile).trim();
+  const targetProfileId = editing ? profileIdParam : "";
+  const forRaw = one(params.for);
+  const forId = forRaw && isProfileId(forRaw) ? forRaw : null;
+  const modeParam = one(params.mode);
   const initialMode =
-    params.mode === "signin" || editing ? "signin" : "signup";
+    editing || modeParam === "signin" ? "signin" : "signup";
 
   const supabase = await createClient();
   const {
@@ -74,6 +74,8 @@ export default async function JoinPage({
         initialEmail={flash.email}
         initialError={flash.error}
         initialSent={flash.sent}
+        signUpHref={joinModeHref("signup", params)}
+        signInHref={joinModeHref("signin", params)}
       />
     );
   }
@@ -94,12 +96,12 @@ export default async function JoinPage({
   const subject = editSubject({
     userId: user.id,
     role,
-    profile: params.profile,
+    profile: profileIdParam,
   });
 
   if (subject.kind === "deny") redirect(routes.find);
 
-  const rawStep = Number(params.step);
+  const rawStep = Number(one(params.step));
   const initialStep =
     Number.isInteger(rawStep) && rawStep >= 1 && rawStep <= 4
       ? (rawStep as 1 | 2 | 3 | 4)

@@ -14,6 +14,7 @@ import {
   SIGNUP_CONFIRM_MESSAGE,
 } from "@/lib/auth/auth-query";
 import { forgotPasswordPath } from "@/lib/auth/password-reset";
+import { joinModeHref } from "@/lib/join/mode-href";
 import { routes } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 
@@ -24,11 +25,15 @@ export function JoinAuth({
   initialEmail = "",
   initialError = "",
   initialSent = "",
+  signUpHref = joinModeHref("signup", {}),
+  signInHref = joinModeHref("signin", {}),
 }: {
   initialMode?: "signup" | "signin";
   initialEmail?: string;
   initialError?: string;
   initialSent?: "" | "1" | "confirm";
+  signUpHref?: string;
+  signInHref?: string;
 }) {
   const [mode, setMode] = useState<"signup" | "signin">(initialMode);
   const [email, setEmail] = useState(initialEmail);
@@ -115,8 +120,8 @@ export function JoinAuth({
             setMessageRole("status");
           }}
           options={[
-            { value: "signup", label: "Sign up" },
-            { value: "signin", label: "Sign in" },
+            { value: "signup", label: "Sign up", href: signUpHref },
+            { value: "signin", label: "Sign in", href: signInHref },
           ]}
         />
       </div>
