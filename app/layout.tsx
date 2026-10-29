@@ -1,11 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { Caprasimo, DM_Sans, Fraunces } from "next/font/google";
+import { cookies, headers } from "next/headers";
 import { SiteAnalytics } from "@/components/analytics/SiteAnalytics";
+import { PasswordUpdatedNote } from "@/components/auth/PasswordUpdatedNote";
 import { SiteHeader } from "@/components/SiteHeader";
 import { analyticsDataset } from "@/lib/analytics/payload";
+import { PASSWORD_UPDATED_COOKIE } from "@/lib/auth/password-reset";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadNavUser } from "@/lib/nav";
 import { canonicalOrigin } from "@/lib/site";
+import { PASSWORD_UPDATED_HEADER } from "@/lib/supabase/update-session";
 import "./globals.css";
 
 const caprasimo = Caprasimo({
@@ -52,12 +56,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [navUser, audience] = await Promise.all([
+  const [navUser, audience, headerList, cookieStore] = await Promise.all([
     loadNavUser(),
     readAudienceCookie(),
+    headers(),
+    cookies(),
   ]);
 
   const trackVisits = analyticsDataset(navUser?.role) === "on";
+  const passwordUpdated =
+    headerList.get(PASSWORD_UPDATED_HEADER) === "1" ||
+    cookieStore.get(PASSWORD_UPDATED_COOKIE)?.value === "1";
 
   return (
     <html
@@ -68,6 +77,7 @@ export default async function RootLayout({
       <body className="min-h-screen antialiased">
         <SiteHeader initialNavUser={navUser} audience={audience} />
         <SiteAnalytics enabled={trackVisits} />
+        {passwordUpdated ? <PasswordUpdatedNote /> : null}
         {children}
       </body>
     </html>

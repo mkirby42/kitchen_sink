@@ -25,6 +25,9 @@ export const PASSWORD_MISMATCH_MESSAGE = "Those passwords don't match.";
 export const PASSWORD_UPDATED_MESSAGE =
   "Your password is updated. You're signed in with it.";
 
+/** One-request flash so the continue page can show PASSWORD_UPDATED_MESSAGE. */
+export const PASSWORD_UPDATED_COOKIE = "ks-password-updated";
+
 export const RESET_RETURN_STORAGE_KEY = "kitchen-sink-reset-return";
 
 export type ResetFrom = "join" | "admin" | "review";
@@ -226,4 +229,141 @@ export function readResetReturn(fallback: string): string {
   } catch {
     return fallback;
   }
+}
+
+export type ResetSearch = Record<string, string | string[] | undefined>;
+
+function firstSearch(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
+/** Supabase PKCE auth codes are UUIDs. A garbage `code` is not a different browser. */
+const PKCE_CODE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const SUPABASE_LINK_ERRORS = new Set([
+  "access_denied",
+  "server_error",
+  "unauthorized_client",
+  "temporarily_unavailable",
+]);
+
+export type ResetVisit =
+  | {
+      kind: "exchange";
+      code: string;
+      tokenHash: string;
+      type: string;
+      flowId: string;
+      from: ResetFrom | null;
+      returnTo: string | null;
+    }
+  | { kind: "problem"; problem: "invalid" | "browser" }
+  | {
+      kind: "page";
+      error: string;
+      from: ResetFrom | null;
+      returnTo: string | null;
+    };
+
+/** Server-side view of /reset-password before any session lookup. */
+export function classifyResetVisit(params: ResetSearch): ResetVisit {
+  const code = firstSearch(params.code).trim();
+  const tokenHash = firstSearch(params.token_hash).trim();
+  const type = firstSearch(params.type).trim();
+  const error = firstSearch(params.error).trim();
+  const errorCode = firstSearch(params.error_code).trim();
+  const errorDescription = firstSearch(params.error_description).trim();
+  const link = firstSearch(params.link).trim();
+  const flowId = firstSearch(params.sb_flow_id).trim();
+  const from = parseResetFrom(firstSearch(params.from));
+  const returnTo = safeAppPath(firstSearch(params.return));
+
+  if (link === "browser") return { kind: "problem", problem: "browser" };
+  if (link === "invalid") return { kind: "problem", problem: "invalid" };
+  if (
+    errorCode ||
+    errorDescription ||
+    SUPABASE_LINK_ERRORS.has(error) ||
+    error === RESET_LINK_INVALID_MESSAGE
+  ) {
+    return { kind: "problem", problem: "invalid" };
+  }
+  if (error === RESET_LINK_BROWSER_MESSAGE) {
+    return { kind: "problem", problem: "browser" };
+  }
+  if (code || (tokenHash && type === "recovery")) {
+    return { kind: "exchange", code, tokenHash, type, flowId, from, returnTo };
+  }
+  if (tokenHash) return { kind: "problem", problem: "invalid" };
+
+  return { kind: "page", error, from, returnTo };
+}
+
+/**
+ * Missing verifier on a real-looking code means the link was opened in another
+ * browser. Any other exchange failure, including a bogus code, is invalid.
+ */
+export function resetExchangeProblem(
+  error: AuthErrorLike | null,
+  code: string,
+): "browser" | "invalid" {
+  const blob = `${error?.code ?? ""} ${error?.message ?? ""}`;
+  const verifierMissing = /code verifier|pkce/i.test(blob);
+  if (verifierMissing && PKCE_CODE.test(code)) return "browser";
+  return "invalid";
+}
+
+export function resetCallbackPath(
+  visit: Extract<ResetVisit, { kind: "exchange" }>,
+): string {
+  const params = new URLSearchParams();
+  if (visit.code) params.set("code", visit.code);
+  if (visit.tokenHash) params.set("token_hash", visit.tokenHash);
+  if (visit.type) params.set("type", visit.type);
+  if (visit.flowId) params.set("sb_flow_id", visit.flowId);
+  if (visit.from) params.set("from", visit.from);
+  if (visit.returnTo) params.set("return", visit.returnTo);
+  return `/auth/reset-callback?${params}`;
+}
+
+export function resetCleanPath(
+  from?: string | null,
+  returnTo?: string | null,
+): string {
+  const params = new URLSearchParams();
+  const parsed = parseResetFrom(from);
+  if (parsed) params.set("from", parsed);
+  const ret = safeAppPath(returnTo);
+  if (ret) params.set("return", ret);
+  const query = params.toString();
+  return query ? `${routes.resetPassword}?${query}` : routes.resetPassword;
+}
+
+export function resetProblemPath(
+  problem: "invalid" | "browser",
+  from?: string | null,
+  returnTo?: string | null,
+): string {
+  const params = new URLSearchParams();
+  const parsed = parseResetFrom(from);
+  if (parsed) params.set("from", parsed);
+  const ret = safeAppPath(returnTo);
+  if (ret) params.set("return", ret);
+  params.set("link", problem === "browser" ? "browser" : "invalid");
+  return `${routes.resetPassword}?${params}`;
+}
+
+export function resetFormErrorPath(
+  error: string,
+  from?: string | null,
+  returnTo?: string | null,
+): string {
+  const params = new URLSearchParams();
+  const parsed = parseResetFrom(from);
+  if (parsed) params.set("from", parsed);
+  const ret = safeAppPath(returnTo);
+  if (ret) params.set("return", ret);
+  params.set("error", error);
+  return `${routes.resetPassword}?${params}`;
 }

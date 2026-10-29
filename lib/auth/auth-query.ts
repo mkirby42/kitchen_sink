@@ -26,6 +26,7 @@ export const authPost = {
   signUp: "/auth/sign-up",
   forgotPassword: "/auth/forgot-password",
   signOut: "/auth/sign-out",
+  updatePassword: "/auth/update-password",
 } as const;
 
 export type AuthSearch = Record<string, string | string[] | undefined>;

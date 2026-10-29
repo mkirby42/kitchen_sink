@@ -15,6 +15,8 @@ const baseURL = `http://127.0.0.1:${port}`;
  * user and accepts either "already registered" or the confirm-email screen.
  * It runs on Firefox and WebKit too. The forgot-password request sends Auth
  * mail and stays @chromium-only: hosted test Auth's built-in email is about 2/hour.
+ * Reset-password without JavaScript uses admin generateLink and sends no email,
+ * so it runs on Chromium, Firefox, and WebKit desktop.
  *
  * CI's e2e job uses mcr.microsoft.com/playwright:v1.64.1-jammy, which already
  * ships Chromium, Firefox, and WebKit. No browser install step there.
@@ -23,6 +25,7 @@ const christinePath = [
   "**/home-nav.test.ts",
   "**/join-signup-auth.test.ts",
   "**/join-auth-no-js.test.ts",
+  "**/reset-password-no-js.test.ts",
   "**/auth-clean-load.test.ts",
   "**/find-cards.test.ts",
   "**/find-detail.test.ts",
