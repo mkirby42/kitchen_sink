@@ -228,7 +228,7 @@ test(
     await page.goto("/find");
     await expect(page.getByRole("alert")).toHaveCount(0);
     await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
-    await expect(page.getByText(/fits what you told us/)).toBeVisible();
+    await expect(page.getByText(/\bfits? what you told us/)).toBeVisible();
     await expect(page.getByRole("heading", { name: ada.name })).toBeVisible();
     await expect(page.getByText("Therapist search isn't available right now.")).toHaveCount(0);
     await expect(page.getByText("No therapists match")).toHaveCount(0);
