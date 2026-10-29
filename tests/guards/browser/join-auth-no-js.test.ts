@@ -3,6 +3,18 @@ import { expect, test } from "@playwright/test";
 test.use({ javaScriptEnabled: false });
 
 test(
+  "fresh auth pages show no error alert",
+  { tag: "@desktop-only" },
+  async ({ page }) => {
+    for (const path of ["/join?mode=signin", "/join", "/forgot-password"]) {
+      await page.goto(path);
+      await expect(page.getByRole("alert")).toHaveCount(0);
+      await expect(page.getByText("Unable to authenticate.")).toHaveCount(0);
+    }
+  },
+);
+
+test(
   "join sign-in posts without JavaScript",
   { tag: "@desktop-only" },
   async ({ page }) => {
