@@ -37,7 +37,12 @@ export const TOPICS = [
   "Losing someone",
   "Relationship trouble",
   "Big life changes",
+  "Seeking personal growth",
   "Trouble focusing",
+  "Understanding my moods",
+  "My relationship with food or my body",
+  "Autism & how my brain works",
+  "Testing or getting an evaluation",
 ];
 
 /** Signed-in owner. The site header hides on /join once the session lands. */

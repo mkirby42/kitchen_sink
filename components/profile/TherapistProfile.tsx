@@ -9,9 +9,9 @@ import {
   profileManageState,
   type ProfileManageState,
 } from "@/lib/profile/manage";
+import { HiddenListingToggle } from "./HiddenListingToggle";
 import { ProfileManageActions } from "./ProfileManageActions";
-import { DesktopProfile } from "./DesktopProfile";
-import { PhoneProfileColumn } from "./PhoneProfileColumn";
+import { ProfileOneView } from "./ProfileOneView";
 import {
   PhoneProfileSwipe,
   type PhoneProfileBrowse,
@@ -25,6 +25,7 @@ export function TherapistProfile({
   viewer,
   manage,
   browse = null,
+  canHideListing = false,
 }: {
   data: TherapistProfileData;
   backHref: string;
@@ -33,6 +34,8 @@ export function TherapistProfile({
   manage?: ProfileManageState | null;
   /** Phone pager across the current Find set. Omitted when there is nothing to swipe. */
   browse?: PhoneProfileBrowse | null;
+  /** Admin view. Toggles `listed` through `admin_set_therapist_listed`. */
+  canHideListing?: boolean;
 }) {
   const actions =
     manage === undefined
@@ -70,22 +73,30 @@ export function TherapistProfile({
           </svg>
           Back to search
         </Link>
-        {actions ? (
-          <ProfileManageActions
-            profileId={data.id}
-            name={data.givenName}
-            editHref={actions.editHref}
-            deleteMode={actions.deleteMode}
-            isOwn={actions.isOwn}
-          />
+        {actions || canHideListing ? (
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {canHideListing ? (
+              <HiddenListingToggle
+                profileId={data.id}
+                hidden={data.hiddenFromPublic === true}
+              />
+            ) : null}
+            {actions ? (
+              <ProfileManageActions
+                profileId={data.id}
+                name={data.givenName}
+                editHref={actions.editHref}
+                deleteMode={actions.deleteMode}
+                isOwn={actions.isOwn}
+              />
+            ) : null}
+          </div>
         ) : null}
       </div>
 
       <PhoneProfileSwipe browse={browse}>
-        <PhoneProfileColumn data={data} viewer={viewer} />
+        <ProfileOneView data={data} viewer={viewer} />
       </PhoneProfileSwipe>
-
-      <DesktopProfile data={data} viewer={viewer} />
     </main>
   );
 }

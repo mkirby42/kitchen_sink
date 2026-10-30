@@ -20,11 +20,11 @@ Where you live, Insurance, What's going on, In person or online. Same order on t
 - Guard: `tests/guards/find-filters.test.tsx`
 - Browser: `tests/guards/browser/find-filters.test.ts`
 
-### What's going on is seven plain-language topics, plus Other
+### What's going on is twelve plain-language topics, plus Other
 
-The pill opens "What would you like help with?" The line under it says you don't need the clinical term; it's in small print. The topics are Feeling down or stuck, Worry, stress or panic, Something hard happened, Losing someone, Relationship trouble, Big life changes, and Trouble focusing, then Other (small print: Another specialty). The button says Show N therapists. The phone sheet has Clear all. Self Discovery and Immigration show only when that tag is already in the address, so it can be cleared. Topics with no stored specialty (family, burnout, substances, food, identity) are not offered as named chips. Other matches a therapist who has at least one specialty that is not one of those seven — Self Discovery, Immigration, a custom label, or the literal specialty Other. A named topic and Other are OR. The address marker is `Other topic`, so it stays independent of insurance Other. Join does not gain an Other chip.
+The pill opens "What would you like help with?" The line under it says you don't need the clinical term; it's in small print. Under the list: "Pick as many as you like. You can change these anytime." The topics, in order, are Feeling down or stuck (Depression), Worry, stress or panic (Anxiety, panic disorder), Something hard happened (Trauma, PTSD), Losing someone (Grief and loss), Relationship trouble (Couples, relationship issues), Big life changes (Life transitions), Seeking personal growth (Self-discovery, self-awareness), Trouble focusing (ADHD), Understanding my moods (Bipolar disorder, mood disorders), My relationship with food or my body (Eating disorders, body image), Autism & how my brain works (Autism, neurodivergence), and Testing or getting an evaluation (Psychological testing, diagnostic assessment), then Other (small print: Another specialty). Each chip filters on the stored specialty a therapist can pick in Join: Depression, Anxiety, Trauma & PTSD, Grief & Loss, Couples & Relationships, Life Transitions, Self Discovery, ADHD, Bipolar & Mood Disorders, Eating Disorders & Body Image, Autism & Neurodivergence, and Psychological Testing & Assessment. The button says Show N therapists. The phone sheet has Clear all. Immigration shows only when that tag is already in the address, so it can be cleared. Self Discovery is a normal topic. Topics with no stored specialty (family, burnout, substances) are not offered as named chips. Other matches a therapist who has at least one specialty that is not one of those twelve — Immigration, a custom label, or the literal specialty Other. A named topic and Other are OR. The address marker is `Other topic`, so it stays independent of insurance Other. Join does not gain an Other chip. The referral board keeps its existing focus-area list.
 
-- Landed: 2026-10-21, #114. Phone copy 2026-10-22, #115. Other 2026-10-26.
+- Landed: 2026-10-21, #114. Phone copy 2026-10-22, #115. Other 2026-10-26. Twelve topics 2026-10-30.
 - Guard: `tests/guards/find-filters.test.tsx`
 - Browser: `tests/guards/browser/find-filters.test.ts`
 
@@ -46,7 +46,7 @@ The default is a grid, two columns, four from the wide breakpoint. The line is "
 
 ### A Find card has no price, no specialty pills, and no match count
 
-Grid and one-at-a-time cards show the photo or intro, the format, the name, the credential line (PsyD · Licensed psychologist), one conversation card, Takes {plan} when they take a plan, and years in practice. They do not show a price, a rate, sliding scale, specialty pills, or "3 of 4 tags".
+Grid and one-at-a-time cards show the photo or intro, the format, the name, the credential line (PsyD · Licensed psychologist), one conversation card, Takes {plan} when they take a plan, and years in practice. They do not show a price, a rate, sliding scale, specialty pills, or "3 of 4 tags". The opened Find detail and the public profile still show fees.
 
 - Landed: no price 2026-10-07, #60. This card shape 2026-10-22, #116 and #118.
 - Guard: `tests/guards/find-cards.test.tsx`
@@ -91,29 +91,36 @@ Initials, In person · Online, the name, the credential, the first conversation 
 - Landed: 2026-10-22, #115.
 - Guard: `tests/guards/phone-find.test.tsx`
 
-### Phone one-at-a-time is the profile, with a swipe
+### Phone one-at-a-time swipes the Find set
 
-All N, n of N, a one-time "Swipe for the next therapist", and a preview of the next person ("Swipe for n of N").
+All N, n of N, a one-time "Swipe for the next therapist", and a preview of the next person ("Swipe for n of N"). That chrome is phone-only. The public profile page is the Find detail layout at both widths. Find's phone one-at-a-time stack still uses the phone profile column inside the swipe.
 
-- Landed: 2026-10-22, #121.
+- Landed: 2026-10-22, #121. Public page moved to the Find detail 2026-10-30.
 - Guard: `tests/guards/phone-find.test.tsx`
 - Browser: `tests/guards/browser/phone-find.test.ts`
 
-### The profile photo keeps the face clear
+### The public profile uses the Find detail frame
 
-The play control is see-through. On the phone the hero shows the name and the license line (Licensed by State of Texas / 38047), not the credential, and there is no "1 min intro" badge. Years sit under the hero. Desktop adds "Watch {name}'s intro" and does not put the name on the hero. The uploaded photo is not that hero. It sits below How {name} works and above Get to know {name}, on the phone and on desktop, in a portrait frame that keeps the face clear.
+`/t/{id}` uses the same opened Find detail on the phone and on desktop. The uploaded photo is the 4:5 stage (object-fit cover). A saved video shows "Watch intro" on that frame. The video file waits until play when a photo is saved. A video with no photo uses one frame of the file. There is no "1 min intro" badge and no separate later portrait. The name and credential line (PsyD · Licensed psychologist) sit above the stage. License lines sit in the facts card (`Licensed in Texas (#38047)`). Find directory cards still use a see-through play control.
 
-- Landed: 2026-10-07, #50, #52, #53, #54, #56. Landed: photo below How {name} works 2026-10-29 (Christine Oct 28).
+- Landed: 2026-10-30. Replaces the later-frame photo (2026-10-29) and the separate phone and desktop profile layouts.
 - Guard: `tests/guards/profile.test.tsx`
 - Browser: `tests/guards/browser/profile.test.ts`
 
-### Profile sections use her words, in this order, on the phone
+### Profile sections follow the Find detail, on the phone and on desktop
 
-How {name} works (formats, office address, rates, sliding scale when offered, in-network, plus the education and credential rows in that same facts card). Then the profile photo, when one is saved. Then Get to know {name}. Then Approach in therapy, Areas of interest. Then In {name}'s own words. Education and credentials are not their own sections. Identity tags are not on this page. Approach spells out a bare acronym (Cognitive behavioral therapy (CBT)). Tag pills wrap instead of scrolling sideways.
+One layout (`data-profile-layout="one"`). Facts card: formats, years, license, education, credentials, address, insurance. Then "How {name} works" when specialties or modalities exist: Areas of interest, then Approach in therapy. Then fees. Then In {name}'s own words, the Profile/Reviews switch, conversation cards, and reviews. There is no "Get to know {name}" heading. Education and credentials are not their own sections. Identity tags are not on this page. Approach spells out a bare acronym (Cognitive behavioral therapy (CBT)). Tag pills wrap. Free consult stays left of Book a session. Edit, Delete, the draft badge, and the admin Hidden (admin only) toggle stay on the profile.
 
-- Landed: address 2026-10-07, #51 and #58. Headings 2026-10-08, #80 and #82. Phone order 2026-10-16, #105. Wrapping pills 2026-10-09, #91. Facts-card education and hidden identity 2026-10-26. Landed: photo below How {name} works 2026-10-29 (Christine Oct 28).
+- Landed: 2026-10-30.
 - Guard: `tests/guards/profile.test.tsx`
 - Browser: `tests/guards/browser/profile.test.ts`
+
+### Hidden means admin-only on the public profile
+
+`listed` false omits the profile from public Find. On `/t/{id}` only the owner and a signed-in admin in Admin view can open it, including when the practice is closed. Everyone else gets the normal not-found, including an admin in Client or Therapist view. A listed practice that is closed to new clients stays owner-only. Admin view shows a "Hidden (admin only)" toggle that calls `admin_set_therapist_listed`. An owner Save changes or Publish on an existing row does not set `listed` back to true.
+
+- Landed: 2026-10-30.
+- Guard: `tests/guards/profile.test.tsx`
 
 ### Book and Free consult open a contact sheet
 
@@ -260,3 +267,7 @@ Later asks won. Do not treat these as unfinished work.
 - Phone profile listed education as its own section after Get to know {name}, before Approach in therapy (#105, 2026-10-16). Education and credentials now sit in the facts card, under the license line and above insurance (2026-10-26).
 - Identity tags on the published profile and the Find click-in. Hidden on public profiles 2026-10-26. Join and edit still collect them.
 - Desktop name card listed Book a session before Free consult. Free consult is on the left and Book a session is on the right (2026-10-26).
+- What's going on was seven topics, and Self Discovery showed only when it was already in the address. Other matched a specialty outside those seven, including Self Discovery. Replaced 2026-10-30 by twelve topics. Self Discovery is a named topic. Immigration stays address-only. Food or body image and Who I am are no longer unmapped topics; food and body maps to Eating Disorders & Body Image.
+- The public profile photo sat below How {name} works and above Get to know {name}. The phone hero used a see-through play control, "Licensed by State of Texas / 38047", and no credential on the hero (#50–#56, later-frame photo 2026-10-29). Replaced 2026-10-30: the photo is the Find detail stage, and the license line is `Licensed in Texas (#38047)` in the facts card.
+- Phone profile section order was How {name} works, then the photo, then Get to know {name}, then Approach in therapy, then Areas of interest, then In {name}'s own words (#105, facts-card education 2026-10-26). Replaced 2026-10-30 by the Find detail order on both widths: facts, How {name} works with Areas of interest then Approach in therapy, fees, then own words. No Get to know heading.
+- Phone one-at-a-time rendered the public profile column (#121). The public page is now the Find detail at both widths. The swipe chrome on Find's phone one-at-a-time remains.

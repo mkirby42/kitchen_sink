@@ -37,7 +37,7 @@ describe("admin helper upload UI", () => {
       <HelperUpload therapists={[therapist]} initialSelectedId={therapist.id} />,
     );
     expect(selected).toContain("Shown on Find");
-    expect(selected).toContain("Hide from Find");
+    expect(selected).toContain("Hidden (admin only)");
     expect(selected).toContain("Replace photo…");
     expect(selected).toContain("Choose a video…");
     expect(selected).toContain("JPEG, PNG, WebP, or GIF · up to 5MB.");

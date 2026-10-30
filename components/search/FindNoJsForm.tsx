@@ -4,6 +4,7 @@ import { sentenceCasePhrase } from "@/lib/copy/sentence-case";
 import type { SearchFilters } from "@/lib/search/rpc";
 import {
   FIND_TOPICS,
+  FIND_TOPIC_HELPER,
   FIND_TOPIC_OTHER_OPTION,
 } from "@/lib/tags/plain-language";
 import {
@@ -103,6 +104,9 @@ export function FindNoJsForm({
             </span>
           </label>
         </div>
+        <p className="mt-3 font-sans text-[14px] leading-5 text-meta">
+          {FIND_TOPIC_HELPER}
+        </p>
       </fieldset>
 
       <fieldset>

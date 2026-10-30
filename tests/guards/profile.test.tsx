@@ -88,89 +88,61 @@ function render(profile: TherapistProfileData, viewer: ReviewViewer) {
   );
 }
 
-function phoneSlice(html: string) {
-  return html.slice(
-    html.indexOf('data-profile-layout="phone"'),
-    html.indexOf('data-profile-layout="desk"'),
-  );
+function profileSlice(html: string) {
+  const start = html.indexOf('data-profile-layout="one"');
+  expect(start).toBeGreaterThan(-1);
+  return html.slice(start);
 }
 
 describe("profile guards", () => {
-  it("keeps the face clear and the phone sections in Christine's order", () => {
+  it("uses the Find detail frame, sections, and fees on one layout", () => {
     const html = render(data, visitor);
-    const phone = phoneSlice(html);
-    const hero = phone.slice(0, phone.indexOf("How Travis works"));
-    expect(hero).toContain("Travis White");
-    expect(hero).toContain("Licensed by State of Texas / 38047");
-    expect(hero).toContain("bg-transparent");
-    expect(hero).toContain("8 yrs practicing");
-    expect(hero).not.toContain("PsyD");
-    expect(hero).not.toContain("https://example.com/photo.jpg");
-    expect(hero).not.toContain("data-profile-photo");
+    expect(html).not.toContain('data-profile-layout="phone"');
+    expect(html).not.toContain('data-profile-layout="desk"');
     expect(html).not.toContain("1 min intro");
+    expect(html).not.toContain("data-profile-photo");
+    const page = profileSlice(html);
+    const stage = page.indexOf("data-find-stage");
+    expect(stage).toBeGreaterThan(-1);
+    const stageHtml = page.slice(stage, page.indexOf("How Travis works"));
+    expect(stageHtml).toContain("https://example.com/photo.jpg");
+    expect(stageHtml).toContain("object-cover");
+    expect(stageHtml).toContain("Watch intro");
+    expect(stageHtml).toContain('preload="none"');
+    expect(page.indexOf(">Travis White<")).toBeLessThan(stage);
 
     const order = [
+      "a session with me feels like...",
+      "Licensed in Texas (#38047)",
+      "Education",
+      "Doctor of Clinical Psychology",
+      "Credentials",
+      "Aetna",
       "How Travis works",
-      "Get to know Travis",
-      "Approach in therapy",
       "Areas of interest",
+      "Approach in therapy",
+      "Individual session (55 min)",
       "In Travis&#x27;s own words",
     ];
     let at = -1;
     for (const label of order) {
-      const next = phone.indexOf(label);
+      const next = page.indexOf(label);
       expect(next).toBeGreaterThan(at);
       at = next;
     }
-    const licenseAt = phone.indexOf("Licensed by State of Texas / 38047");
-    const educationAt = phone.indexOf("Education");
-    const schoolAt = phone.indexOf("Doctor of Clinical Psychology");
-    const credentialsAt = phone.indexOf("Credentials");
-    const insuranceAt = phone.indexOf("Aetna");
-    expect(educationAt).toBeGreaterThan(licenseAt);
-    expect(schoolAt).toBeGreaterThan(educationAt);
-    expect(credentialsAt).toBeGreaterThan(educationAt);
-    expect(insuranceAt).toBeGreaterThan(credentialsAt);
-    expect(phone.indexOf("Get to know Travis")).toBeGreaterThan(insuranceAt);
-    const phonePhoto = phone.indexOf("data-profile-photo");
-    expect(phonePhoto).toBeGreaterThan(phone.indexOf("How Travis works"));
-    expect(phone.indexOf("Get to know Travis")).toBeGreaterThan(phonePhoto);
-    expect(phone.slice(phonePhoto, phone.indexOf("Get to know Travis"))).toContain(
-      "https://example.com/photo.jpg",
-    );
-    expect(phone.slice(phonePhoto, phone.indexOf("Get to know Travis"))).toContain(
-      "Photo of Travis White",
-    );
-    expect(phone).not.toContain(">Identity<");
-    expect(phone).toContain("1102 West 6th Street, Austin");
-    expect(phone).toContain("Cognitive behavioral therapy (CBT)");
-    expect(phone).not.toContain("BIPOC");
-    expect(phone).toContain("Individual session (55 min)");
-    expect(phone).toContain("$150");
-    expect(phone).toContain("Sliding scale");
-    expect(phone).toContain("Available");
-    expect(phone).toContain("break-words");
-    expect(phone).toContain("whitespace-normal");
-    expect(phone).not.toContain("Not accepting new clients");
-
-    const desk = html.slice(html.indexOf('data-profile-layout="desk"'));
-    expect(desk).toContain("Watch Travis&#x27;s intro");
-    expect(desk).toContain("bg-transparent");
-    expect(desk.indexOf("Licensed by State of Texas / 38047")).toBeLessThan(
-      desk.indexOf("Education"),
-    );
-    expect(desk.indexOf("Education")).toBeLessThan(desk.indexOf("Aetna"));
-    expect(desk.indexOf("Credentials")).toBeLessThan(desk.indexOf("Aetna"));
-    expect(desk).not.toContain(">Identity<");
-    expect(desk).not.toContain("BIPOC");
-    const deskHow = desk.indexOf("How Travis works");
-    const deskPhoto = desk.indexOf("data-profile-photo");
-    const deskKnow = desk.indexOf("Get to know Travis");
-    expect(desk.slice(0, deskHow)).not.toContain("https://example.com/photo.jpg");
-    expect(deskPhoto).toBeGreaterThan(deskHow);
-    expect(deskKnow).toBeGreaterThan(deskPhoto);
-    expect(desk.slice(deskPhoto, deskKnow)).toContain("https://example.com/photo.jpg");
-    expect(desk.slice(deskPhoto, deskKnow)).toContain("Photo of Travis White");
+    expect(page).toContain("PsyD · Licensed psychologist");
+    expect(page).toContain("8 yrs in practice");
+    expect(page).not.toContain(">Identity<");
+    expect(page).toContain("1102 West 6th Street, Austin");
+    expect(page).toContain("Cognitive behavioral therapy (CBT)");
+    expect(page).not.toContain("BIPOC");
+    expect(page).toContain("$150");
+    expect(page).toContain("Sliding scale");
+    expect(page).toContain("Available");
+    expect(page).toContain("break-words");
+    expect(page).toContain("whitespace-normal");
+    expect(page).not.toContain("Not accepting new clients");
+    expect(page).not.toContain("Get to know Travis");
   });
 
   it("omits education on Travis White's public profile and still shows credentials", () => {
@@ -193,13 +165,14 @@ describe("profile guards", () => {
     expect(html).toContain("Free consult");
     expect(html).toContain("Book a session");
     expect(html).toContain('data-cta-placement="dock"');
+    expect(html).toContain('data-cta-placement="inline"');
     const dock = html.indexOf('data-cta-placement="dock"');
-    const stack = html.indexOf('data-cta-placement="stack"');
+    const inline = html.indexOf('data-cta-placement="inline"');
     expect(html.indexOf("Free consult", dock)).toBeLessThan(
       html.indexOf("Book a session", dock),
     );
-    expect(html.indexOf("Free consult", stack)).toBeLessThan(
-      html.indexOf("Book a session", stack),
+    expect(html.indexOf("Free consult", inline)).toBeLessThan(
+      html.indexOf("Book a session", inline),
     );
     expect(html).toContain('aria-haspopup="dialog"');
     expect(html).not.toContain("mailto:");
@@ -235,5 +208,36 @@ describe("profile guards", () => {
     const guest = render(data, visitor);
     expect(guest).not.toContain("Edit profile");
     expect(guest).not.toContain("Delete profile");
+    expect(guest).not.toContain("Hidden (admin only)");
+  });
+
+  it("offers Hidden (admin only) only in admin view", () => {
+    const admin = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data,
+        backHref: routes.find,
+        viewer: { userId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", role: "admin", isOwner: false },
+        canHideListing: true,
+      }),
+    );
+    expect(admin).toContain("Hidden (admin only)");
+    expect(admin).toContain('aria-pressed="false"');
+    expect(admin).toContain("Edit profile");
+    const hidden = renderToStaticMarkup(
+      createElement(TherapistProfile, {
+        data: { ...data, hiddenFromPublic: true },
+        backHref: routes.find,
+        viewer: { userId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", role: "admin", isOwner: false },
+        canHideListing: true,
+      }),
+    );
+    expect(hidden).toContain('aria-pressed="true"');
+    expect(hidden).toContain("Admin only — hidden from public");
+    const owner = render(data, {
+      userId: data.id,
+      role: "therapist",
+      isOwner: true,
+    });
+    expect(owner).not.toContain("Hidden (admin only)");
   });
 });

@@ -26,10 +26,14 @@ describe("Find Other matching", () => {
     expect(hasUnlistedInsurance(["Other"])).toBe(true);
   });
 
-  it("treats a specialty outside the seven topics as topic Other", () => {
+  it("treats a specialty outside the twelve named topics as topic Other", () => {
     expect(hasUnlistedFindTopic(["Depression", "Anxiety"])).toBe(false);
-    expect(hasUnlistedFindTopic(["Self Discovery"])).toBe(true);
-    expect(hasUnlistedFindTopic(["Teens"])).toBe(true);
+    expect(hasUnlistedFindTopic(["Self Discovery"])).toBe(false);
+    expect(hasUnlistedFindTopic(["Teens"])).toBe(false);
+    expect(hasUnlistedFindTopic(["Bipolar & Mood Disorders"])).toBe(false);
+    expect(hasUnlistedFindTopic(["Eating Disorders & Body Image"])).toBe(false);
+    expect(hasUnlistedFindTopic(["Autism & Neurodivergence"])).toBe(false);
+    expect(hasUnlistedFindTopic(["Psychological Testing & Assessment"])).toBe(false);
     expect(hasUnlistedFindTopic(["Immigration"])).toBe(true);
     expect(hasUnlistedFindTopic(["Eating Disorders"])).toBe(true);
     expect(hasUnlistedFindTopic(["Other"])).toBe(true);
@@ -67,7 +71,7 @@ describe("Find Other matching", () => {
     expect(both?.match_count).toBe(2);
   });
 
-  it("ORs a named topic with a specialty outside the seven", () => {
+  it("ORs a named topic with a specialty outside the twelve", () => {
     const rows = [
       row({ name: "Depression only", specialty_labels: ["Depression"] }),
       row({ name: "Immigration", specialty_labels: ["Immigration"] }),
@@ -80,11 +84,10 @@ describe("Find Other matching", () => {
       "Custom",
       "Immigration",
       "Literal",
-      "Teens",
     ]);
     expect(
       applyFindOtherMatches(rows, ["Depression", "Other topic"]).map((item) => item.name),
-    ).toEqual(["Custom", "Depression only", "Immigration", "Literal", "Teens"]);
+    ).toEqual(["Custom", "Depression only", "Immigration", "Literal"]);
   });
 
   it("does not let insurance Other match a topic, or topic Other match a plan", () => {

@@ -6,6 +6,7 @@ import { cx, fieldClass, primaryPillClass } from "@/components/ui/styles";
 import { showTherapistsLabel } from "@/lib/search/find-desktop";
 import {
   FIND_TOPICS,
+  FIND_TOPIC_HELPER,
   FIND_TOPIC_OTHER_OPTION,
   isFindTopicSpecialty,
 } from "@/lib/tags/plain-language";
@@ -67,7 +68,7 @@ export function TopicPanel({
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <p className="font-sans text-[14px] leading-5 text-meta">
-          Pick as many as you like. You can change these anytime.
+          {FIND_TOPIC_HELPER}
         </p>
         <a href="#find-results" className={`${primaryPillClass} px-6 py-3`}>
           {showTherapistsLabel(matchCount)}

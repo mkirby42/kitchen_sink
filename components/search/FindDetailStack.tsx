@@ -24,7 +24,14 @@ import {
 import type { FindDetailContent } from "@/lib/search/find-detail";
 import { reviewAverage } from "@/lib/therapists/load";
 
-export function FindDetailStack({ detail }: { detail: FindDetailContent }) {
+export function FindDetailStack({
+  detail,
+  reviews,
+}: {
+  detail: FindDetailContent;
+  /** Profile page passes the review composer. Find keeps the read-only list. */
+  reviews?: ReactNode;
+}) {
   return (
     <div className="mx-auto mt-5 max-w-3xl space-y-3">
       {detail.voiceUrl && detail.voicePrompt ? (
@@ -46,7 +53,7 @@ export function FindDetailStack({ detail }: { detail: FindDetailContent }) {
         modalities={detail.modalities}
       />
       <Fees detail={detail} />
-      <OwnWords detail={detail} />
+      <OwnWords detail={detail} reviews={reviews} />
     </div>
   );
 }
@@ -91,7 +98,10 @@ function Facts({ detail }: { detail: FindDetailContent }) {
         className="flex items-start gap-2 font-sans text-[15px] leading-6 text-copy"
       >
         <CardMark />
-        Cash pay
+        <span>
+          Cash pay
+          <span className="mt-0.5 block text-meta">Accepted</span>
+        </span>
       </p>
     ) : null,
     detail.superbill ? (
@@ -126,7 +136,7 @@ function Facts({ detail }: { detail: FindDetailContent }) {
   return (
     <Card as="div" className="px-5 py-4">
       {facts.length > 0 ? (
-        <div className="flex flex-wrap gap-x-5 gap-y-2">
+        <div className="flex flex-wrap gap-x-5 gap-y-2" data-session-format>
           {facts.map((fact) => (
             <span
               key={fact.key}
@@ -209,8 +219,14 @@ function Fees({ detail }: { detail: FindDetailContent }) {
   );
 }
 
-function OwnWords({ detail }: { detail: FindDetailContent }) {
-  if (!detail.about && detail.reviews.length === 0) return null;
+function OwnWords({
+  detail,
+  reviews,
+}: {
+  detail: FindDetailContent;
+  reviews?: ReactNode;
+}) {
+  if (!detail.about && detail.reviews.length === 0 && !reviews) return null;
   return (
     <section className="pt-3">
       <ProfileHeading>{`In ${possessive(detail.givenName)} own words`}</ProfileHeading>
@@ -225,7 +241,7 @@ function OwnWords({ detail }: { detail: FindDetailContent }) {
             </Card>
           ) : null
         }
-        reviews={<DetailReviews detail={detail} />}
+        reviews={reviews ?? <DetailReviews detail={detail} />}
       />
     </section>
   );

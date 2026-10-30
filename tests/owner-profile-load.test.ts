@@ -200,12 +200,26 @@ describe("owner profile load", () => {
     expect(data?.hiddenFromPublic).toBe(true);
   });
 
-  it("still hides a closed practice from an admin who does not own it", async () => {
+  it("lets an admin open a hidden practice even when it is closed", async () => {
     const data = await fetchTherapistProfile(
       client({
         userId: OTHER_ID,
         role: "admin",
         listed: false,
+        open: false,
+      }),
+      THERAPIST_ID,
+    );
+    expect(data?.hiddenFromPublic).toBe(true);
+    expect(data?.openToNewClients).toBe(false);
+  });
+
+  it("still hides a listed closed practice from an admin who does not own it", async () => {
+    const data = await fetchTherapistProfile(
+      client({
+        userId: OTHER_ID,
+        role: "admin",
+        listed: true,
         open: false,
       }),
       THERAPIST_ID,

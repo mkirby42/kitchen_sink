@@ -126,15 +126,15 @@ describe("profile edit control", () => {
     expect(ranged).not.toContain(">Insurance<");
     expect(ranged).not.toContain("sliding scale available");
     expect(ranged).not.toContain("+ out-of-network superbills");
-    expect(ranged).not.toContain("Aetna, BCBS");
-    expect(ranged).toContain("How Maya");
+    expect(ranged).toContain("Aetna, BCBS");
+    expect(ranged).not.toContain("How Maya");
     expect(ranged).not.toContain("Rates &amp; insurance");
     expect(ranged).toContain("Individual session (50 min)");
     expect(ranged).toContain("$165");
     expect(ranged).toContain("Sliding scale");
     expect(ranged).toContain("$90-120");
-    expect(ranged).toContain("Aetna · BCBS");
-    expect(ranged).toContain("Superbill provided");
+    expect(ranged).toContain("Out-of-network superbill");
+    expect(ranged).toContain("Paying yourself? Get reimbursed later");
 
     const bare = renderToStaticMarkup(
       createElement(TherapistProfile, {
@@ -245,7 +245,8 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Edit profile");
     expect(html).not.toContain("♡");
     expect(html).toContain("max-w-6xl");
-    expect(html).not.toContain("max-w-[26.5rem]");
+    expect(html).toContain('data-find-stage');
+    expect(html).toContain("max-w-[26.5rem]");
     expect(html).toContain("Back to search");
     expect(html).not.toContain("I'm interested");
     expect(html).not.toContain(routes.joinEdit);
@@ -271,31 +272,19 @@ describe("profile edit control", () => {
         viewer: visitor,
       }),
     );
-    expect(html).toContain("How Maya");
+    expect(html).toContain('data-profile-layout="one"');
     expect(html).not.toContain("Rates &amp; insurance");
     expect(html).not.toContain("Virtual &amp; In-Person");
     expect(html).not.toContain("In-Person");
-    const logisticsAt = html.indexOf("How Maya");
     const inPersonAt = html.indexOf(">In person<");
     const virtualAt = html.indexOf(">Online<");
     const addressAt = html.indexOf("1102 West 6th Street, Austin");
-    expect(inPersonAt).toBeGreaterThan(logisticsAt);
+    expect(inPersonAt).toBeGreaterThan(-1);
     expect(virtualAt).toBeGreaterThan(inPersonAt);
-    expect(addressAt).toBeGreaterThan(logisticsAt);
-    const phoneSlot = html.indexOf('data-profile-show="phone"');
-    const deskSlot = html.indexOf('data-profile-layout="desk"');
-    expect(html.slice(phoneSlot, deskSlot)).not.toContain(">Office<");
-    expect(html.slice(deskSlot)).toContain(">Office<");
-    expect(html.indexOf("1102 West 6th Street, Austin", phoneSlot)).toBeGreaterThan(
-      phoneSlot,
-    );
-    expect(html.indexOf("1102 West 6th Street, Austin", phoneSlot)).toBeLessThan(
-      deskSlot,
-    );
-    expect(html.indexOf("1102 West 6th Street, Austin", deskSlot)).toBeGreaterThan(
-      deskSlot,
-    );
-    expect(html.split("1102 West 6th Street, Austin").length - 1).toBe(2);
+    expect(addressAt).toBeGreaterThan(virtualAt);
+    expect(html).toContain('data-profile-layout="one"');
+    expect(html).not.toContain(">Office<");
+    expect(html.split("1102 West 6th Street, Austin").length - 1).toBe(1);
     expect(html).toContain("Suite 4");
     expect(html).toContain("TX 78703");
   });
@@ -318,7 +307,7 @@ describe("profile edit control", () => {
     expect(html).toContain(">Online<");
     expect(html).not.toContain(">Virtual<");
     expect(html).toContain("Education");
-    expect(html).toContain("How Maya");
+    expect(html).toContain("B.A. Psychology");
   });
 
   it("hides a leftover address when the therapist is virtual only", () => {
@@ -344,10 +333,10 @@ describe("profile edit control", () => {
     expect(html).toContain(">Online<");
     expect(html).not.toContain(">Virtual<");
     expect(html).not.toContain(">In person<");
-    expect(html).toContain("How Maya");
+    expect(html).toContain("B.A. Psychology");
   });
 
-  it("titles modalities above specialties, both below education", () => {
+  it("titles areas of interest above approach, both below education", () => {
     const html = renderToStaticMarkup(
       createElement(TherapistProfile, {
         data: {
@@ -362,22 +351,19 @@ describe("profile edit control", () => {
     const education = html.indexOf("Education");
     const modalities = html.indexOf("Approach in therapy");
     const specialties = html.indexOf("Areas of interest");
-    const heroDetails = html.indexOf("data-hero-details");
+    const stage = html.indexOf("data-find-stage");
     expect(education).toBeGreaterThan(-1);
-    expect(modalities).toBeGreaterThan(education);
-    expect(specialties).toBeGreaterThan(modalities);
+    expect(specialties).toBeGreaterThan(education);
+    expect(modalities).toBeGreaterThan(specialties);
     expect(html.indexOf("Cognitive behavioral therapy (CBT)")).toBeGreaterThan(
       modalities,
-    );
-    expect(html.indexOf("Cognitive behavioral therapy (CBT)")).toBeLessThan(
-      specialties,
     );
     expect(html).toContain(
       "Eye movement desensitization and reprocessing (EMDR)",
     );
     expect(html.indexOf("Anxiety")).toBeGreaterThan(specialties);
-    expect(html.slice(heroDetails, education)).not.toContain("CBT");
-    expect(html.slice(heroDetails, education)).not.toContain("EMDR");
+    expect(html.slice(stage, education)).not.toContain("CBT");
+    expect(html.slice(stage, education)).not.toContain("EMDR");
   });
 
   it("keeps the modality and specialty boxes when education is empty", () => {
@@ -398,8 +384,8 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Credentials");
     const modalities = html.indexOf("Approach in therapy");
     const specialties = html.indexOf("Areas of interest");
-    expect(modalities).toBeGreaterThan(-1);
-    expect(specialties).toBeGreaterThan(modalities);
+    expect(specialties).toBeGreaterThan(-1);
+    expect(modalities).toBeGreaterThan(specialties);
   });
 
   it("shows custom specialties and still shows every modality", () => {
@@ -433,7 +419,7 @@ describe("profile edit control", () => {
     expect(html).not.toContain("Therapy for men");
     expect(html).toContain(">Stress<");
     expect(html).toContain("Internal family systems (IFS)");
-    expect(html.indexOf("Cognitive behavioral therapy (CBT)")).toBeLessThan(
+    expect(html.indexOf("Cognitive behavioral therapy (CBT)")).toBeGreaterThan(
       specialties,
     );
   });

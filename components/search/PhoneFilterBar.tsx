@@ -12,6 +12,7 @@ import {
 import { showTherapistsLabel } from "@/lib/search/find-desktop";
 import {
   FIND_TOPICS,
+  FIND_TOPIC_HELPER,
   FIND_TOPIC_OTHER_OPTION,
   isFindTopicSpecialty,
 } from "@/lib/tags/plain-language";
@@ -265,6 +266,9 @@ function TopicSheet({
           />
         ))}
       </div>
+      <p className="mt-4 font-sans text-[14px] leading-5 text-meta">
+        {FIND_TOPIC_HELPER}
+      </p>
     </div>
   );
 }

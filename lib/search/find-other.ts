@@ -31,9 +31,9 @@ export function hasUnlistedInsurance(labels: readonly string[]) {
 }
 
 /**
- * At least one specialty outside the seven Find topics.
- * Self Discovery, Immigration, a custom label, and literal "Other" count.
- * Teens is read as Self Discovery.
+ * At least one specialty outside the twelve named Find topics.
+ * Immigration, a custom label, and literal "Other" count.
+ * Self Discovery is a named topic. Teens is read as Self Discovery.
  */
 export function hasUnlistedFindTopic(labels: readonly string[]) {
   return canonicalSpecialtyLabels(labels).some(

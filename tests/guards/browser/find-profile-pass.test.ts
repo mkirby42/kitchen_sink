@@ -69,10 +69,14 @@ test(
     await expect(play).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
 
     await page.goto(`/t/${ada.id}`);
-    const desk = page.locator("[data-profile-layout='desk']");
-    const hero = desk.locator("[data-hero-variant='poster'] .aspect-\\[4\\/5\\]");
+    const desk = page.locator("[data-profile-layout='one']");
+    const hero = desk.locator("[data-find-stage]");
     const heroBox = await box(hero);
     expect(heroBox.height).toBeGreaterThan(heroBox.width);
+    const profileRatio = heroBox.height / heroBox.width;
+    expect(profileRatio).toBeGreaterThan(1.2);
+    expect(profileRatio).toBeLessThan(1.3);
+    await expect(hero.locator("img")).toHaveCSS("object-fit", "cover");
     await expect(desk.locator("[data-session-format]")).toContainText("Online");
     await expect(desk.locator("[data-session-format]")).not.toContainText("Virtual");
     await desk.getByRole("button", { name: /^Reviews/ }).click();
@@ -114,12 +118,15 @@ test(
     expect(Math.abs(videoBox.height - frameBox.height)).toBeLessThan(2);
 
     await page.goto(`/t/${ada.id}`);
-    const phone = page.locator("[data-profile-layout='phone']");
+    const phone = page.locator("[data-profile-layout='one']");
     await expect(phone.locator("[data-session-format]")).toContainText("Online");
     await expect(phone.locator("[data-session-format]")).not.toContainText("Virtual");
-    const hero = phone.locator("[data-hero-variant='overlay'] .aspect-\\[3\\/4\\]");
+    const hero = phone.locator("[data-find-stage]");
     const heroBox = await box(hero);
     expect(heroBox.height).toBeGreaterThan(heroBox.width);
+    const ratio = heroBox.height / heroBox.width;
+    expect(ratio).toBeGreaterThan(1.2);
+    expect(ratio).toBeLessThan(1.3);
     await phone.getByRole("button", { name: /^Reviews/ }).click();
     await expect(phone.getByText("No reviews yet.")).toBeVisible();
   },

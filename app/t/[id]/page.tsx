@@ -13,7 +13,12 @@ import {
   ProfileNotFound,
   TherapistProfile,
 } from "@/components/profile/TherapistProfile";
-import { narrowSearchRows, presentProfileData, presentReviewViewer } from "@/lib/audience";
+import {
+  adminToolsVisible,
+  narrowSearchRows,
+  presentProfileData,
+  presentReviewViewer,
+} from "@/lib/audience";
 import { profileManageForViewer } from "@/lib/profile/manage";
 import { readAudienceCookie } from "@/lib/audience-cookie";
 import { loadReviewViewer, type ReviewViewer } from "@/lib/reviews/viewer";
@@ -128,6 +133,7 @@ export default async function TherapistProfilePage({
           audience,
           profileId: data.id,
         })}
+        canHideListing={adminToolsVisible({ role: viewer.role, audience })}
       />
     </AuthQueryProvider>
   );
