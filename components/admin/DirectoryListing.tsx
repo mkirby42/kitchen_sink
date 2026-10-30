@@ -15,16 +15,17 @@ export function DirectoryListing({
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
       <span className={tagClass(listed)}>
-        {listed ? "Shown on Find" : "Hidden from Find"}
+        {listed ? "Shown on Find" : "Hidden (admin only)"}
       </span>
       <Button
         type="button"
         variant="secondary"
         size="sm"
         disabled={disabled}
+        aria-pressed={!listed}
         onClick={onToggle}
       >
-        {busy ? "Saving…" : listed ? "Hide from Find" : "Show on Find"}
+        {busy ? "Saving…" : listed ? "Hidden (admin only)" : "Show on Find"}
       </Button>
     </div>
   );

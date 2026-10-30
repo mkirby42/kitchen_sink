@@ -8,7 +8,7 @@ export type FindTopic = {
 };
 
 /**
- * Plain-English labels for specialties Find already stores.
+ * Plain-English labels for specialties Find stores.
  * Filtering still writes the specialty string, not the plain label.
  * Topics with no stored specialty are intentionally absent.
  */
@@ -44,9 +44,34 @@ export const FIND_TOPICS: readonly FindTopic[] = [
     specialty: "Life Transitions",
   },
   {
+    plain: "Seeking personal growth",
+    clinical: "Self-discovery, self-awareness",
+    specialty: "Self Discovery",
+  },
+  {
     plain: "Trouble focusing",
     clinical: "ADHD",
     specialty: "ADHD",
+  },
+  {
+    plain: "Understanding my moods",
+    clinical: "Bipolar disorder, mood disorders",
+    specialty: "Bipolar & Mood Disorders",
+  },
+  {
+    plain: "My relationship with food or my body",
+    clinical: "Eating disorders, body image",
+    specialty: "Eating Disorders & Body Image",
+  },
+  {
+    plain: "Autism & how my brain works",
+    clinical: "Autism, neurodivergence",
+    specialty: "Autism & Neurodivergence",
+  },
+  {
+    plain: "Testing or getting an evaluation",
+    clinical: "Psychological testing, diagnostic assessment",
+    specialty: "Psychological Testing & Assessment",
   },
 ];
 
@@ -55,9 +80,11 @@ export const UNMAPPED_FIND_TOPICS = [
   "Family or parenting",
   "Burnout or work stress",
   "Drinking or substance use",
-  "Food or body image",
-  "Who I am",
 ] as const;
+
+/** Line under the What's going on list, on the phone, on desktop, and without JavaScript. */
+export const FIND_TOPIC_HELPER =
+  "Pick as many as you like. You can change these anytime.";
 
 const TOPIC_SPECIALTIES = new Set<string>(
   FIND_TOPICS.map((topic) => topic.specialty),

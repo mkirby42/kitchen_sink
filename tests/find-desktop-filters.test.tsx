@@ -39,7 +39,13 @@ describe("desktop find filters", () => {
     expect(html).toContain("Losing someone");
     expect(html).toContain("Relationship trouble");
     expect(html).toContain("Big life changes");
+    expect(html).toContain("Seeking personal growth");
+    expect(html).toContain("Self-discovery, self-awareness");
     expect(html).toContain("Trouble focusing");
+    expect(html).toContain("Understanding my moods");
+    expect(html).toContain("My relationship with food or my body");
+    expect(html).toContain("Autism &amp; how my brain works");
+    expect(html).toContain("Testing or getting an evaluation");
     expect(html).toContain("Pick as many as you like. You can change these anytime.");
     expect(html).toContain("Show 3 therapists");
     expect(html).not.toContain("Family or parenting");
@@ -48,11 +54,11 @@ describe("desktop find filters", () => {
     expect(html).not.toContain("Food or body image");
     expect(html).not.toContain("Who I am");
     expect(html).not.toContain("What brings you to therapy?");
-    expect(html).not.toContain("Self discovery");
+    expect(html).toContain("Seeking personal growth");
     expect(html).not.toContain("Immigration");
     expect(html).toContain("Other");
     expect(html).toContain("Another specialty");
-    expect(html.indexOf("Trouble focusing")).toBeLessThan(
+    expect(html.indexOf("Testing or getting an evaluation")).toBeLessThan(
       html.indexOf("Another specialty"),
     );
   });
@@ -104,16 +110,22 @@ describe("desktop find filters", () => {
     expect(both.slice(bothAt - 500, bothAt)).toContain('aria-pressed="true"');
   });
 
-  it("keeps an address specialty that the panel does not list by default", () => {
+  it("keeps Immigration when the address already has it, and lists personal growth", () => {
     const html = renderToStaticMarkup(
       createElement(FindDesktopFilters, {
         matchCount: 1,
-        filters: filters(["Self Discovery", "Anxiety"]),
+        filters: filters(["Self Discovery", "Immigration", "Anxiety"]),
       }),
     );
-    expect(html).toContain("Self discovery");
+    expect(html).toContain("Seeking personal growth");
+    expect(html).toContain("Immigration");
     expect(html).toContain("Worry, stress or panic");
     expect(html).toContain("Show 1 therapist");
+    const plain = renderToStaticMarkup(
+      createElement(FindDesktopFilters, { matchCount: 1 }),
+    );
+    expect(plain).toContain("Seeking personal growth");
+    expect(plain).not.toContain("Immigration");
   });
 
   it("says Show therapists when the count is unknown", () => {

@@ -1,6 +1,6 @@
 // Product-decision guard. Do not weaken this file to make CI pass.
 // Registry: "Find filters are four pills, and the phone row wraps"
-// Registry: "What's going on is seven plain-language topics, plus Other"
+// Registry: "What's going on is twelve plain-language topics, plus Other"
 // Registry: "Insurance includes Other"
 import { expect, test } from "@playwright/test";
 import { isPhoneProject, TOPICS } from "./support";
@@ -45,9 +45,9 @@ test("Find filters are four pills, and the phone row wraps", async ({ page }, te
   await expect(page.getByText("What brings you to therapy?")).toHaveCount(0);
 });
 
-test("What's going on is seven plain-language topics", async ({ page }, testInfo) => {
+test("What's going on is twelve plain-language topics, plus Other", async ({ page }, testInfo) => {
   expect(testInfo.title).toBe(
-    "What's going on is seven plain-language topics",
+    "What's going on is twelve plain-language topics, plus Other",
   );
   await page.goto("/find");
 
@@ -71,13 +71,24 @@ test("What's going on is seven plain-language topics", async ({ page }, testInfo
   expect(text).toContain("Anxiety, panic disorder");
   expect(text).toContain("Trauma, PTSD");
   expect(text).toContain("ADHD");
+  expect(text).toContain("Seeking personal growth");
+  expect(text).toContain("Self-discovery, self-awareness");
+  expect(text).toContain("Understanding my moods");
+  expect(text).toContain("Bipolar disorder, mood disorders");
+  expect(text).toContain("My relationship with food or my body");
+  expect(text).toContain("Autism & how my brain works");
+  expect(text).toContain("Testing or getting an evaluation");
+  expect(text).toContain("Psychological testing, diagnostic assessment");
+  expect(text).toContain("Pick as many as you like. You can change these anytime.");
   expect(text).toContain("Other");
   expect(text).toContain("Another specialty");
-  expect(text.indexOf("Trouble focusing")).toBeLessThan(text.indexOf("Another specialty"));
+  expect(text.indexOf("Testing or getting an evaluation")).toBeLessThan(
+    text.indexOf("Another specialty"),
+  );
   expect(text).toMatch(/Show \d+ therapists/);
-  expect(text).not.toContain("Self Discovery");
-  expect(text).not.toContain("Self discovery");
   expect(text).not.toContain("Immigration");
+  expect(text).not.toContain("Food or body image");
+  expect(text).not.toContain("Who I am");
   expect(text).not.toContain("Family or parenting");
   expect(text).not.toContain("Burnout or work stress");
   expect(text).not.toContain("What brings you to therapy?");

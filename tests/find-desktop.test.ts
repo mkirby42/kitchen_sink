@@ -23,7 +23,12 @@ describe("desktop find topics", () => {
       "Losing someone",
       "Relationship trouble",
       "Big life changes",
+      "Seeking personal growth",
       "Trouble focusing",
+      "Understanding my moods",
+      "My relationship with food or my body",
+      "Autism & how my brain works",
+      "Testing or getting an evaluation",
     ]);
     for (const topic of FIND_TOPICS) {
       expect(SPECIALTY_PRESETS).toContain(topic.specialty);
@@ -38,9 +43,9 @@ describe("desktop find topics", () => {
       "Family or parenting",
       "Burnout or work stress",
       "Drinking or substance use",
-      "Food or body image",
-      "Who I am",
     ]);
+    expect(UNMAPPED_FIND_TOPICS).not.toContain("Food or body image");
+    expect(UNMAPPED_FIND_TOPICS).not.toContain("Who I am");
     const offered = FIND_TOPICS.map((topic) => topic.plain);
     for (const plain of UNMAPPED_FIND_TOPICS) {
       expect(offered).not.toContain(plain);
@@ -52,8 +57,8 @@ describe("desktop find topics", () => {
       desktopTopicLabels(["ADHD", "Anxiety", "Self Discovery", "Teens"]),
     ).toEqual([
       "Worry, stress or panic",
+      "Seeking personal growth",
       "Trouble focusing",
-      "Self discovery",
     ]);
   });
 });

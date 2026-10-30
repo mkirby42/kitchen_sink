@@ -8,6 +8,10 @@ export const SPECIALTY_PRESETS = [
   "Life Transitions",
   "Self Discovery",
   "Immigration",
+  "Bipolar & Mood Disorders",
+  "Eating Disorders & Body Image",
+  "Autism & Neurodivergence",
+  "Psychological Testing & Assessment",
 ] as const;
 
 /** Specialty chip renamed in place. Stored rows may still say the old label. */

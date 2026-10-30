@@ -24,6 +24,10 @@ describe("join presets", () => {
       "Life Transitions",
       "Self Discovery",
       "Immigration",
+      "Bipolar & Mood Disorders",
+      "Eating Disorders & Body Image",
+      "Autism & Neurodivergence",
+      "Psychological Testing & Assessment",
     ]);
     expect(SPECIALTY_PRESETS).not.toContain("Teens");
   });

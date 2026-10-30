@@ -1,12 +1,11 @@
 // Product-decision guard. Do not weaken this file to make CI pass.
-// Registry: "The profile photo keeps the face clear"
-// Registry: "Profile sections use her words, in this order, on the phone"
+// Registry: "The public profile uses the Find detail frame"
+// Registry: "Profile sections follow the Find detail, on the phone and on desktop"
 // Registry: "Book and Free consult open a contact sheet"
 // Registry: "A closed practice says Not accepting new clients"
 // Registry: "The owner can Edit and Delete from the profile"
 import { expect, test } from "@playwright/test";
 import {
-  LICENSE_LINE,
   OFFICE_STREET,
   PRICE_LABEL,
   VOICE_TITLE,
@@ -14,75 +13,55 @@ import {
   bea,
   closed,
 } from "../../../scripts/seed-test/fixtures.mjs";
-import { isPhoneProject, signIn } from "./support";
+import { signIn } from "./support";
 
-const PHONE_ORDER = [
+const PROFILE_ORDER = [
   "How Ada works",
-  "Get to know Ada",
-  "Approach in therapy",
   "Areas of interest",
+  "Approach in therapy",
   "In Ada's own words",
 ];
 
 test(
-  "The profile photo keeps the face clear",
+  "The public profile uses the Find detail frame",
   async ({ page }, testInfo) => {
-    expect(testInfo.title).toBe("The profile photo keeps the face clear");
+    expect(testInfo.title).toBe("The public profile uses the Find detail frame");
     await page.goto(`/t/${ada.id}`);
     await expect(page.getByText("1 min intro")).toHaveCount(0);
-    if (isPhoneProject(testInfo)) {
-      const hero = page.locator("[data-hero-variant='overlay']");
-      await expect(hero.getByRole("heading", { name: ada.name })).toBeVisible();
-      await expect(hero).toContainText(LICENSE_LINE);
-      await expect(hero).not.toContainText("PsyD");
-      const play = hero.getByRole("button", { name: `Play intro video for ${ada.name}` });
-      await expect(play).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expect(page.locator("[data-hero-details]")).toContainText(/yrs practicing/);
-    } else {
-      const hero = page.locator("[data-hero-variant='poster']");
-      await expect(hero.getByRole("heading")).toHaveCount(0);
-      await expect(hero.getByRole("button", { name: "Watch Ada's intro" })).toBeVisible();
-      await expect(hero).not.toContainText(ada.name);
-    }
-    const layout = page.locator(
-      `[data-profile-layout='${isPhoneProject(testInfo) ? "phone" : "desk"}']`,
-    );
-    const heroFrame = layout.locator("[data-hero-media]");
-    await expect(heroFrame.locator("img")).toHaveCount(0);
-    const photo = layout.locator("[data-profile-photo]");
-    await expect(photo).toBeVisible();
-    await expect(photo.locator("img")).toHaveAttribute("alt", `Photo of ${ada.name}`);
+    const layout = page.locator("[data-profile-layout='one']");
+    const stage = layout.locator("[data-find-stage]");
+    await expect(stage).toBeVisible();
+    const still = stage.locator("img");
+    await expect(still).toHaveCount(1);
+    await expect(still).toHaveCSS("object-fit", "cover");
+    await expect(stage.getByRole("button", { name: "Watch intro" })).toBeVisible();
+    await expect(layout.locator("[data-profile-photo]")).toHaveCount(0);
+    await expect(layout.getByRole("heading", { name: ada.name })).toBeVisible();
+    await expect(layout).toContainText("PsyD");
+    await expect(layout).toContainText(/Licensed in Texas/);
     const placed = await layout.evaluate((root) => {
+      const shot = root.querySelector("[data-find-stage]");
       const how = [...root.querySelectorAll("h2")].find((node) =>
         node.textContent?.includes("How "),
       );
-      const shot = root.querySelector("[data-profile-photo]");
-      const know = [...root.querySelectorAll("h2")].find((node) =>
-        node.textContent?.includes("Get to know"),
-      );
-      if (!how || !shot || !know) return false;
-      const after = Node.DOCUMENT_POSITION_FOLLOWING;
-      return (
-        Boolean(how.compareDocumentPosition(shot) & after) &&
-        Boolean(shot.compareDocumentPosition(know) & after)
-      );
+      if (!shot || !how) return false;
+      return Boolean(shot.compareDocumentPosition(how) & Node.DOCUMENT_POSITION_FOLLOWING);
     });
     expect(placed).toBe(true);
   },
 );
 
 test(
-  "Profile sections use her words, in this order, on the phone",
-  { tag: "@phone-only" },
+  "Profile sections follow the Find detail, on the phone and on desktop",
   async ({ page }, testInfo) => {
     expect(testInfo.title).toBe(
-      "Profile sections use her words, in this order, on the phone",
+      "Profile sections follow the Find detail, on the phone and on desktop",
     );
     await page.goto(`/t/${ada.id}`);
-    const phone = page.locator("[data-profile-layout='phone']");
+    const phone = page.locator("[data-profile-layout='one']");
     const text = (await phone.getByRole("heading").allTextContents()).join("\n");
     let previous = -1;
-    for (const heading of PHONE_ORDER) {
+    for (const heading of PROFILE_ORDER) {
       expect(text).toContain(heading);
       const index = text.indexOf(heading);
       expect(index).toBeGreaterThan(previous);
@@ -93,27 +72,28 @@ test(
     await expect(phone.getByRole("heading", { name: "Identity" })).toHaveCount(0);
     await expect(phone.getByText("Sample State University")).toBeVisible();
     const body = await phone.innerText();
-    const licenseAt = body.indexOf(LICENSE_LINE);
+    const licenseAt = body.indexOf("Licensed in Texas");
     const schoolAt = body.indexOf("Sample State University");
     const insuranceAt = body.indexOf("Aetna");
     expect(licenseAt).toBeGreaterThan(-1);
     expect(schoolAt).toBeGreaterThan(licenseAt);
     expect(insuranceAt).toBeGreaterThan(schoolAt);
-    const photo = phone.locator("[data-profile-photo]");
-    await expect(photo).toBeVisible();
+    const stage = phone.locator("[data-find-stage] img");
+    await expect(stage).toBeVisible();
+    await expect(stage).toHaveCSS("object-fit", "cover");
     const placed = await phone.evaluate((root) => {
+      const shot = root.querySelector("[data-find-stage]");
       const how = [...root.querySelectorAll("h2")].find((node) =>
         node.textContent?.includes("How Ada works"),
       );
-      const shot = root.querySelector("[data-profile-photo]");
-      const know = [...root.querySelectorAll("h2")].find((node) =>
-        node.textContent?.includes("Get to know Ada"),
+      const words = [...root.querySelectorAll("h2")].find((node) =>
+        node.textContent?.includes("own words"),
       );
-      if (!how || !shot || !know) return false;
+      if (!shot || !how || !words) return false;
       const after = Node.DOCUMENT_POSITION_FOLLOWING;
       return (
-        Boolean(how.compareDocumentPosition(shot) & after) &&
-        Boolean(shot.compareDocumentPosition(know) & after)
+        Boolean(shot.compareDocumentPosition(how) & after) &&
+        Boolean(how.compareDocumentPosition(words) & after)
       );
     });
     expect(placed).toBe(true);
@@ -169,11 +149,7 @@ test(
     await expect(page.getByText("Not accepting new clients")).toHaveCount(0);
     await signIn(page, closed.email);
     await page.goto(`/t/${closed.id}`);
-    const layout = page.locator(
-      isPhoneProject(testInfo)
-        ? "[data-profile-layout='phone']"
-        : "[data-profile-layout='desk']",
-    );
+    const layout = page.locator("[data-profile-layout='one']");
     await expect(layout.getByText("Not accepting new clients")).toBeVisible();
     await expect(layout.getByRole("heading", { name: closed.name })).toBeVisible();
   },
@@ -207,9 +183,9 @@ test(
       card.getByRole("button", { name: `Play intro video for ${bea.name}` }),
     ).toHaveCount(0);
     await page.goto(`/t/${bea.id}`);
-    const desk = page.locator("[data-profile-layout='desk']");
+    const desk = page.locator("[data-profile-layout='one']");
     await expect(desk.getByText(VOICE_TITLE)).toBeVisible();
-    const stack = desk.locator("[data-cta-placement='stack']");
+    const stack = desk.locator("[data-cta-placement='inline']");
     const consult = stack.getByRole("button", { name: "Free consult" });
     const book = stack.getByRole("button", { name: "Book a session" });
     const consultBox = await consult.boundingBox();

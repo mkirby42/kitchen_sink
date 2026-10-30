@@ -20,6 +20,7 @@ import {
   type ContactAction,
   type ProfileRate,
   type ProfileReview,
+  type TherapistProfileData,
 } from "@/lib/therapists/load";
 
 export type FindDetailCard = {
@@ -230,6 +231,46 @@ export function buildFindDetail(input: {
       inPerson,
       insurance,
       profile,
+    }),
+  };
+}
+
+/** Public profile page, same detail the Find click-in renders. */
+export function findDetailFromProfile(data: TherapistProfileData): FindDetailContent {
+  const { lead, rest } = splitDetailCards(data.cards);
+  const consult = detailConsult(data.contact);
+  const years =
+    data.years == null
+      ? null
+      : `${data.years} ${data.years === 1 ? "yr" : "yrs"} in practice`;
+
+  return {
+    id: data.id,
+    name: data.name,
+    credentialLine: detailCredentialLine(data.credential, data.credentials),
+    yearsLabel: years,
+    photoUrl: data.photoUrl,
+    videoUrl: data.videoUrl,
+    inPerson: data.inPerson,
+    virtual: data.virtual,
+    licenseFacts: detailLicenseFacts(data.licenses, null),
+    insuranceLine: detailInsuranceLine(data.insurance),
+    superbill: hasSuperbill(data.insurance, data.superbill),
+    lead,
+    rest,
+    consult,
+    book: detailBookLink(data.contact, consult?.href ?? null),
+    contact: data.contact,
+    hidden: data.hiddenFromPublic === true,
+    draft: data.unpublished === true,
+    ...detailPublicFields({
+      name: data.name,
+      inPerson: data.inPerson,
+      insurance: data.insurance,
+      profile: {
+        ...data,
+        openToNewClients: data.openToNewClients,
+      },
     }),
   };
 }

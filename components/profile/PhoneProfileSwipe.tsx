@@ -35,8 +35,6 @@ export function PhoneProfileSwipe({
 
   return (
     <div
-      data-profile-layout="phone"
-      className="md:hidden"
       onTouchStart={(event) => {
         const touch = event.changedTouches[0];
         if (!touch) return;
@@ -57,7 +55,7 @@ export function PhoneProfileSwipe({
       }}
     >
       {browse ? (
-        <div data-phone-profile-browse="" className="mb-2">
+        <div data-phone-profile-browse="" className="mb-2 md:hidden">
           <div className="flex items-center justify-between gap-3">
             <Link
               href={browse.allHref}
@@ -103,7 +101,7 @@ export function PhoneProfileSwipe({
       {browse && nextLabel && browse.nextName ? (
         <Link
           href={browse.nextHref ?? browse.allHref}
-          className="mt-8 flex items-center justify-between gap-3 rounded-2xl border border-line bg-paper px-4 py-3"
+          className="mt-8 flex items-center justify-between gap-3 rounded-2xl border border-line bg-paper px-4 py-3 md:hidden"
         >
           <span>
             <span className="block font-sans text-[13px] font-medium text-heading">

@@ -27,7 +27,12 @@ const topics = [
   "Losing someone",
   "Relationship trouble",
   "Big life changes",
+  "Seeking personal growth",
   "Trouble focusing",
+  "Understanding my moods",
+  "My relationship with food or my body",
+  "Autism &amp; how my brain works",
+  "Testing or getting an evaluation",
 ];
 
 function phone(filters: SearchFilters, open: PhoneSheet | null) {
@@ -58,37 +63,55 @@ describe("find filter guards", () => {
     expect(html).not.toContain("What brings you to therapy?");
   });
 
-  it("opens What's going on onto the seven topics and Show N therapists", () => {
+  it("opens What's going on onto the twelve topics and Show N therapists", () => {
     const html = phone(empty, "topics");
     expect(html).toContain("What would you like help with?");
     expect(html).toContain("You don&#x27;t need the clinical");
     expect(html).toContain("it&#x27;s in small print");
-    for (const topic of topics) expect(html).toContain(topic);
+    let at = -1;
+    for (const topic of topics) {
+      expect(html).toContain(topic);
+      const next = html.indexOf(topic);
+      expect(next).toBeGreaterThan(at);
+      at = next;
+    }
     expect(html).toContain("Depression");
     expect(html).toContain("Anxiety, panic disorder");
     expect(html).toContain("Trauma, PTSD");
+    expect(html).toContain("Self-discovery, self-awareness");
     expect(html).toContain("ADHD");
+    expect(html).toContain("Bipolar disorder, mood disorders");
+    expect(html).toContain("Eating disorders, body image");
+    expect(html).toContain("Autism, neurodivergence");
+    expect(html).toContain("Psychological testing, diagnostic assessment");
     expect(html).toContain("Show 4 therapists");
     expect(html).toContain("Clear all");
-    expect(html.indexOf("Trouble focusing")).toBeLessThan(html.indexOf("Another specialty"));
+    expect(html).toContain("Pick as many as you like. You can change these anytime.");
+    expect(html.indexOf("Testing or getting an evaluation")).toBeLessThan(
+      html.indexOf("Another specialty"),
+    );
     expect(html).toContain("Other");
     expect(html).toContain("Another specialty");
-    expect(html).not.toContain("Self discovery");
-    expect(html).not.toContain("Self Discovery");
     expect(html).not.toContain("Immigration");
     expect(html).not.toContain("Family or parenting");
     expect(html).not.toContain("Burnout or work stress");
+    expect(html).not.toContain("Food or body image");
+    expect(html).not.toContain("Who I am");
     expect(html).not.toContain("What brings you to therapy?");
   });
 
-  it("keeps Self Discovery and Immigration only so a link that already has them can clear them", () => {
+  it("keeps Immigration only so a link that already has it can clear it", () => {
     const html = phone(
       { ...empty, tags: ["Self Discovery", "Immigration"] },
       "topics",
     );
-    expect(html).toContain("Self discovery");
+    expect(html).toContain("Seeking personal growth");
+    expect(html).toContain("Self-discovery, self-awareness");
     expect(html).toContain("Immigration");
     for (const topic of topics) expect(html).toContain(topic);
+    const plain = phone(empty, "topics");
+    expect(plain).not.toContain("Immigration");
+    expect(plain).toContain("Seeking personal growth");
   });
 
   it("uses the same What's going on panel on desktop", () => {
@@ -105,12 +128,23 @@ describe("find filter guards", () => {
     expect(format).toBeGreaterThan(going);
     expect(html).toContain("What would you like help with?");
     expect(html).toContain("Show 4 therapists");
-    for (const topic of topics) expect(html).toContain(topic);
+    let at = -1;
+    for (const topic of topics) {
+      expect(html).toContain(topic);
+      const next = html.indexOf(topic);
+      expect(next).toBeGreaterThan(at);
+      at = next;
+    }
+    expect(html).toContain("Pick as many as you like. You can change these anytime.");
+    expect(html).toContain("Self-discovery, self-awareness");
     expect(html).not.toContain("What brings you to therapy?");
     expect(html).not.toContain("Years in practice");
-    expect(html).not.toContain("Self discovery");
     expect(html).not.toContain("Immigration");
-    expect(html.indexOf("Trouble focusing")).toBeLessThan(html.indexOf("Another specialty"));
+    expect(html).not.toContain("Food or body image");
+    expect(html).not.toContain("Who I am");
+    expect(html.indexOf("Testing or getting an evaluation")).toBeLessThan(
+      html.indexOf("Another specialty"),
+    );
     expect(html).toContain("Other");
     expect(html).toContain("Another specialty");
   });

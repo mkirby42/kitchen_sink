@@ -36,6 +36,20 @@ describe("directory listing", () => {
         listed: false,
         viewerIsAdmin: true,
       }),
+    ).toBe(true);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: false,
+        listed: false,
+        viewerIsAdmin: false,
+      }),
+    ).toBe(false);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: false,
+        listed: true,
+        viewerIsAdmin: true,
+      }),
     ).toBe(false);
     expect(
       canViewDirectoryProfile({
@@ -67,6 +81,14 @@ describe("directory listing", () => {
       canViewDirectoryProfile({
         openToNewClients: false,
         listed: false,
+        viewerIsAdmin: true,
+        viewerIsOwner: false,
+      }),
+    ).toBe(true);
+    expect(
+      canViewDirectoryProfile({
+        openToNewClients: false,
+        listed: true,
         viewerIsAdmin: true,
         viewerIsOwner: false,
       }),
