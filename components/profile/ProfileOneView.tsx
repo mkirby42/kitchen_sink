@@ -41,9 +41,9 @@ export function ProfileOneView({
       ) : null}
       {data.hiddenFromPublic ? <HiddenFromPublicBadge variant="banner" /> : null}
 
-      <h2 className="font-display text-[40px] leading-[1.15] font-medium text-black">
+      <h1 className="font-display text-[40px] leading-[1.15] font-medium text-black">
         {detail.name}
-      </h2>
+      </h1>
       {detail.credentialLine ? (
         <p className={`mt-1 ${metaLineClass}`}>{detail.credentialLine}</p>
       ) : null}

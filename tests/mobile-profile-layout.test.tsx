@@ -105,6 +105,17 @@ function one(html: string) {
 }
 
 describe("profile one-at-a-time layout", () => {
+  it("renders the therapist name as the only h1", () => {
+    const html = render();
+    const headings = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/g) ?? [];
+    expect(headings).toHaveLength(1);
+    expect(headings[0]).toContain(">Travis White<");
+    expect(headings[0]).toContain(
+      'class="font-display text-[40px] leading-[1.15] font-medium text-black"',
+    );
+    expect(html).not.toContain(">Travis White</h2>");
+  });
+
   it("uses the Find detail frame once, with fees and sections after the photo", () => {
     const html = render();
     expect(html.match(/data-profile-layout="one"/g)).toHaveLength(1);
